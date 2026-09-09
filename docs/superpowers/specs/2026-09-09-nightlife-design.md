@@ -38,6 +38,7 @@ Family and friends come first. Everything else is built on top of what works for
 | Launch date target | 19 Nov 2026 (game release, PS5 and Xbox Series only) | Fixed by Rockstar |
 | Code freeze | 1 Nov 2026 | Exam on 11 Nov must be untouched |
 | Framework | Astro 7 with React islands | Static content, React scoped to a few components, built-in i18n routing |
+| Form factors | Phone is the primary target and the design starts there; the same site must be first-class on tablet, laptop and desktop, with layouts designed per breakpoint (768 px, 1024 px), not a stretched phone view | The family uses phones with the TV on; guides and stats get read on bigger screens; one codebase, no separate desktop site |
 | Hosting | Cloudflare Workers with static assets | Static requests free and unlimited; 500k-visit day ≈ $5 |
 | Database | Neon Postgres, Frankfurt, from day one | Pipeline needs a store; scale-to-zero; already have the account |
 | Progress storage | IndexedDB in the browser, export and import as JSON | No account needed; nothing lost |
