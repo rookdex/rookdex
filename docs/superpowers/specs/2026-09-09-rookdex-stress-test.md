@@ -1,6 +1,6 @@
-# Nightlife spec — stress test (2026-09-09)
+# Rookdex spec — stress test (2026-09-09)
 
-Four passes over `2026-09-09-nightlife-design.md` before plan-writing: security, privacy, accessibility, loopholes. All proposed changes are folded into the spec in the same commit.
+Four passes over `2026-09-09-rookdex-design.md` before plan-writing: security, privacy, accessibility, loopholes. All proposed changes are folded into the spec in the same commit.
 
 ## Findings
 

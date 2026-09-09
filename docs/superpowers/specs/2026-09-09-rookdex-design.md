@@ -1,6 +1,6 @@
-# Nightlife — design spec
+# Rookdex — design spec
 
-Codename "nightlife". The brand name is not decided (deadline 15 September 2026; standing candidate: heistbook). Written 2026-09-09; stress-tested and revised the same day (see `2026-09-09-nightlife-stress-test.md`).
+Brand name: **Rookdex** (decided 2026-09-09; formerly codename "nightlife"). Domains rookdex.app and rookdex.com, GitHub org `rookdex`. Written 2026-09-09; stress-tested and revised the same day (see `2026-09-09-rookdex-stress-test.md`).
 
 ## 1. What I'm building
 
@@ -50,7 +50,7 @@ Family and friends come first. Everything else is built on top of what works for
 | Analytics | Cloudflare Web Analytics at launch (cookieless, same origin); Plausible in phase 2 if longer retention matters | No consent banner, no third-party script |
 | Fonts | Self-hosted from the site's origin | No third-party requests; strict CSP |
 | Licence | MIT on code; guide text CC BY-SA 4.0; data in Neon is not redistributed | Contributors keep their attribution; the hosted service is what Pro sells |
-| Brand | Neutral name, no "GTA", "VI", "Leonida" or "Vice" in domain or app name | Take-Two enforcement; app-store trademark rules |
+| Brand | **Rookdex** (rookdex.app, rookdex.com, GitHub org `rookdex`). No "GTA", "VI", "Leonida" or "Vice" anywhere in the brand | Verified free on .app, .com, GitHub and the open web on 2026-09-09; "dex" carries the index meaning, "rook" gives the mark; Take-Two enforcement; app-store trademark rules |
 
 ## 3. Architecture
 
@@ -233,7 +233,7 @@ Budget: 8 hours a week, roughly 55 hours before the freeze. Fallback if 1c runs 
 
 ## 13. Open questions
 
-1. Brand name (deadline 15 Sep). Heistbook is free on every surface; nothing better has survived the checks yet.
+1. ~~Brand name~~ Decided 2026-09-09: Rookdex. Remaining: trademark screen (nearby marks: Hasbro ROOK card game, rook.io storage project) before the Play Store listing in phase 2.
 2. Which YouTube channels and forums make the initial allowlist.
 3. Whether the phase 2 sync API is a Cloudflare Worker or an ASP.NET Core service on Azure (career value versus cost). Decided in January.
 4. Whether to add ads at all. Pro plus Ko-fi may be enough; the decision waits for real traffic numbers.
