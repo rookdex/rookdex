@@ -1,4 +1,5 @@
 ---
+import { getRelativeLocaleUrl } from "astro:i18n"
 import { isLocale, type Locale, locales, t } from "../../i18n"
 import Base from "../../layouts/Base.astro"
 
@@ -14,4 +15,7 @@ const s = t(locale as Locale)
 <Base locale={locale} title={s.siteName} description={s.tagline} path="">
 	<h1>{s.siteName}</h1>
 	<p class="tagline">{s.tagline}</p>
+	<p>
+		<a href={getRelativeLocaleUrl(locale, "guides/before-you-start")}>{s.hub.beforeYouStart}</a>
+	</p>
 </Base>
