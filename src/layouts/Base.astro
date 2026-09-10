@@ -21,7 +21,7 @@ const s = t(locale)
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{title} · {s.siteName}</title>
+		<title>{title === s.siteName ? title : `${title} · ${s.siteName}`}</title>
 		<meta name="description" content={description} />
 		<meta name="color-scheme" content="dark" />
 		<meta name="theme-color" content="#000000" />
