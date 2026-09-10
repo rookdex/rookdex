@@ -4,8 +4,8 @@
  */
 export function wireOfflineNotice(el: HTMLElement, win: Window, text: string): () => void {
 	const show = () => {
-		el.textContent = text
 		el.hidden = false
+		el.textContent = text
 	}
 	const hide = () => {
 		el.textContent = ""
