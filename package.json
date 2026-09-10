@@ -11,7 +11,8 @@
 		"build": "astro build",
 		"check": "astro check",
 		"format": "biome format --write .",
-		"lint": "biome lint ."
+		"lint": "biome lint .",
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"astro": "7.3.2"
@@ -19,6 +20,7 @@
 	"devDependencies": {
 		"@astrojs/check": "0.9.10",
 		"@biomejs/biome": "2.5.12",
-		"typescript": "6.0.3"
+		"typescript": "6.0.3",
+		"vitest": "^4.1.10"
 	}
 }
