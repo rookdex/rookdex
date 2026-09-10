@@ -1,8 +1,10 @@
 ---
+import "@fontsource-variable/inter"
 import { getAbsoluteLocaleUrl, getRelativeLocaleUrl } from "astro:i18n"
 import Footer from "../components/Footer.astro"
 import LanguageSwitch from "../components/LanguageSwitch.astro"
 import { defaultLocale, type Locale, locales, t } from "../i18n"
+import "../styles/global.css"
 
 interface Props {
 	locale: Locale

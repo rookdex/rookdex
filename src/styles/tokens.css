@@ -1,0 +1,29 @@
+:root {
+	color-scheme: dark;
+
+	/* Surfaces: true black content, lifted chrome. */
+	--bg: #000000;
+	--bg-raised: #0d0d0d;
+	--border: #262626;
+
+	/* Text hierarchy by brightness, not hue. */
+	--text: #f2f2f2;
+	--text-muted: #a3a3a3;
+
+	/* One accent. Placeholder until the brand palette lands. */
+	--accent: #f0a742;
+	--accent-text: #1a1200;
+
+	--font-sans: "Inter Variable", system-ui, sans-serif;
+
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 1rem;
+	--space-4: 1.5rem;
+	--space-5: 2rem;
+	--space-6: 3rem;
+
+	--radius: 0.5rem;
+	--measure: 65ch;
+	--tap: 44px;
+}
