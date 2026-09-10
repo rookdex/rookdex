@@ -6,4 +6,12 @@ export default defineConfig({
 	site: "https://rookdex.app",
 	output: "static",
 	trailingSlash: "always",
+	i18n: {
+		defaultLocale: "en",
+		locales: ["en", "no"],
+		routing: {
+			prefixDefaultLocale: true,
+			redirectToDefaultLocale: false,
+		},
+	},
 })

@@ -1,0 +1,17 @@
+---
+import { isLocale, type Locale, locales, t } from "../../i18n"
+import Base from "../../layouts/Base.astro"
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale } }))
+}
+
+const { locale } = Astro.params
+if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
+const s = t(locale as Locale)
+---
+
+<Base locale={locale} title={s.siteName} description={s.tagline} path="">
+	<h1>{s.siteName}</h1>
+	<p class="tagline">{s.tagline}</p>
+</Base>

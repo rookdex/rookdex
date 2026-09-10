@@ -1,0 +1,43 @@
+---
+import { getAbsoluteLocaleUrl, getRelativeLocaleUrl } from "astro:i18n"
+import Footer from "../components/Footer.astro"
+import LanguageSwitch from "../components/LanguageSwitch.astro"
+import { defaultLocale, type Locale, locales, t } from "../i18n"
+
+interface Props {
+	locale: Locale
+	title: string
+	description: string
+	/** Route without the locale prefix: "" for the hub, "guides/before-you-start" for a guide. */
+	path: string
+}
+
+const { locale, title, description, path } = Astro.props
+const s = t(locale)
+---
+
+<!doctype html>
+<html lang={locale}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title} · {s.siteName}</title>
+		<meta name="description" content={description} />
+		<meta name="color-scheme" content="dark" />
+		<meta name="theme-color" content="#000000" />
+		<link rel="canonical" href={getAbsoluteLocaleUrl(locale, path)} />
+		{locales.map((l) => <link rel="alternate" hreflang={l} href={getAbsoluteLocaleUrl(l, path)} />)}
+		<link rel="alternate" hreflang="x-default" href={getAbsoluteLocaleUrl(defaultLocale, path)} />
+	</head>
+	<body>
+		<a class="skip" href="#main">{s.skipToContent}</a>
+		<header class="site-header">
+			<a class="brand" href={getRelativeLocaleUrl(locale, "")}>{s.siteName}</a>
+			<LanguageSwitch locale={locale} path={path} />
+		</header>
+		<main id="main" class="wrap">
+			<slot />
+		</main>
+		<Footer locale={locale} />
+	</body>
+</html>

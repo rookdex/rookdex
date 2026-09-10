@@ -1,0 +1,22 @@
+---
+import { type Locale, t } from "../i18n"
+
+interface Props {
+	locale: Locale
+}
+
+const { locale } = Astro.props
+const s = t(locale)
+---
+
+<footer class="site-footer">
+	<p>{s.footer.disclaimer}</p>
+	<p>
+		{s.footer.contact}
+		<a href="mailto:legal@rookdex.app">legal@rookdex.app</a>
+	</p>
+	<p>
+		{s.footer.licence}
+		<a href="https://github.com/rookdex/rookdex">{s.footer.source}</a>
+	</p>
+</footer>
