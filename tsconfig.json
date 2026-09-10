@@ -3,7 +3,9 @@
 	"compilerOptions": {
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"verbatimModuleSyntax": true
+		"verbatimModuleSyntax": true,
+		"jsx": "react-jsx",
+		"jsxImportSource": "react"
 	},
 	"include": [".astro/types.d.ts", "**/*"],
 	"exclude": ["dist", "node_modules"]
