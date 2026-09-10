@@ -158,6 +158,12 @@ p {
 	background: var(--bg-raised);
 }
 
+.hub-state a {
+	display: inline-flex;
+	align-items: center;
+	min-height: var(--tap);
+}
+
 .days {
 	font-size: 1.25rem;
 	font-weight: 600;
