@@ -119,6 +119,12 @@ p {
 
 /* Utilities */
 
+.tap-links a {
+	display: inline-flex;
+	align-items: center;
+	min-height: var(--tap);
+}
+
 .skip {
 	position: absolute;
 	left: var(--space-3);

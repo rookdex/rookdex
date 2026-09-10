@@ -1,6 +1,7 @@
 /**
- * Fills a polite live region once when the connection drops and empties it when it returns.
- * Setting the same text twice would not re-announce, so the second "offline" is a no-op anyway.
+ * Fills a polite live region when offline (immediately at init if already offline, or when the
+ * connection drops later) and empties it when online. Setting the same text twice would not
+ * re-announce, so the second "offline" is a no-op anyway.
  */
 export function wireOfflineNotice(el: HTMLElement, win: Window, text: string): () => void {
 	const show = () => {
@@ -11,7 +12,8 @@ export function wireOfflineNotice(el: HTMLElement, win: Window, text: string): (
 		el.textContent = ""
 		el.hidden = true
 	}
-	hide()
+	if (win.navigator.onLine) hide()
+	else show()
 	win.addEventListener("offline", show)
 	win.addEventListener("online", hide)
 	return () => {

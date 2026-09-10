@@ -32,13 +32,13 @@ const updated = entry.data.updated.toLocaleDateString(dateLocale, { dateStyle: "
 		{fellBack && <p class="notice" lang={locale}>{s.guides.inEnglish}</p>}
 		<h1>{entry.data.title}</h1>
 		<p class="tagline">{entry.data.summary}</p>
-		<p class="meta">{fill(s.guides.updated, { date: updated })}</p>
+		<p class="meta" lang={fellBack ? locale : undefined}>{fill(s.guides.updated, { date: updated })}</p>
 		<Content />
 		{
 			entry.data.sources.length > 0 && (
 				<section aria-labelledby="sources">
 					<h2 id="sources">{s.guides.sources}</h2>
-					<ul>
+					<ul class="tap-links">
 						{entry.data.sources.map((url) => (
 							<li>
 								<a href={url} rel="noopener">

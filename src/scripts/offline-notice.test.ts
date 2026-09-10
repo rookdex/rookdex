@@ -16,4 +16,13 @@ describe("wireOfflineNotice", () => {
 		expect(el.textContent).toBe("")
 		expect(el.hidden).toBe(true)
 	})
+
+	it("shows immediately when wired while offline", () => {
+		Object.defineProperty(window.navigator, "onLine", { value: false, configurable: true })
+		const el = document.createElement("p")
+		wireOfflineNotice(el, window, "Offline, showing saved data")
+		expect(el.textContent).toBe("Offline, showing saved data")
+		expect(el.hidden).toBe(false)
+		Object.defineProperty(window.navigator, "onLine", { value: true, configurable: true })
+	})
 })

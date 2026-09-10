@@ -44,14 +44,19 @@ jobs:
         run: npm run build
       - name: Upload preview version
         id: preview
-        uses: cloudflare/wrangler-action@v4
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: versions upload
       - name: Preview URL
         env:
-          OUT: ${{ steps.preview.outputs.command-stdout }}
+          OUT: ${{ steps.preview.outputs.command-output }}
+          URL: ${{ steps.preview.outputs.deployment-url }}
         run: |
           echo "## Preview" >> "$GITHUB_STEP_SUMMARY"
-          printf '%s\n' "$OUT" | grep -i "preview" >> "$GITHUB_STEP_SUMMARY" || echo "no preview URL in output" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$URL" ]; then
+            echo "$URL" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '%s\n' "$OUT" | grep -i "preview" >> "$GITHUB_STEP_SUMMARY" || echo "no preview URL in output" >> "$GITHUB_STEP_SUMMARY"
+          fi
