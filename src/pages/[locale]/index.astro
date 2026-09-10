@@ -2,6 +2,7 @@
 import { getRelativeLocaleUrl } from "astro:i18n"
 import { isLocale, type Locale, locales, t } from "../../i18n"
 import { Countdown } from "../../islands/Countdown"
+import { InstallPrompt } from "../../islands/InstallPrompt"
 import Base from "../../layouts/Base.astro"
 
 export function getStaticPaths() {
@@ -26,4 +27,5 @@ const s = t(locale as Locale)
 			guideHref={getRelativeLocaleUrl(locale, "guides/before-you-start")}
 		/>
 	</div>
+	<InstallPrompt client:idle locale={locale} />
 </Base>

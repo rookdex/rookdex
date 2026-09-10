@@ -27,6 +27,10 @@ const s = t(locale)
 		<meta name="description" content={description} />
 		<meta name="color-scheme" content="dark" />
 		<meta name="theme-color" content="#000000" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<link rel="icon" href="/favicon.ico" sizes="48x48" />
+		<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
 		<link rel="canonical" href={getAbsoluteLocaleUrl(locale, path)} />
 		{locales.map((l) => <link rel="alternate" hreflang={l} href={getAbsoluteLocaleUrl(l, path)} />)}
 		<link rel="alternate" hreflang="x-default" href={getAbsoluteLocaleUrl(defaultLocale, path)} />
@@ -40,6 +44,22 @@ const s = t(locale)
 		<main id="main" class="wrap">
 			<slot />
 		</main>
+		<p
+			id="offline-notice"
+			class="offline"
+			role="status"
+			aria-live="polite"
+			data-text={s.offline.notice}
+			hidden
+		>
+		</p>
+		<script>
+			import { wireOfflineNotice } from "../scripts/offline-notice"
+			import "../scripts/register-sw"
+
+			const el = document.getElementById("offline-notice")
+			if (el) wireOfflineNotice(el, window, el.dataset.text ?? "")
+		</script>
 		<Footer locale={locale} />
 	</body>
 </html>
