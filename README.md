@@ -15,7 +15,11 @@ npm install
 npm run dev
 ```
 
-`npm run build` writes the site to `dist/`. `npm run check` type-checks the Astro and TypeScript files.
+`npm run build` writes the site to `dist/`; `npm run preview` serves that folder the way Cloudflare does. `npm test` runs the unit tests, `npm run check` type-checks.
+
+## Deploy
+
+Pull requests get a preview URL (CI job summary). Merging to `main` deploys to https://rookdex.app through Cloudflare Workers static assets.
 
 ## Licence
 
