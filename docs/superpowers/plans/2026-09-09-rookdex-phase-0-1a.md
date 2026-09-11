@@ -114,7 +114,7 @@ rookdex/
 
 These are dashboard clicks only I can do. Nothing in later tasks depends on them until Task 8, so they can run in parallel with Tasks 1–7. Secrets go straight into GitHub or the password manager, never through a chat.
 
-- [ ] **Cloudflare account ID.** Dashboard → Workers & Pages → right-hand column "Account ID". Add it as a GitHub repository secret `CLOUDFLARE_ACCOUNT_ID` (Settings → Secrets and variables → Actions).
+- [x] **Cloudflare account ID.** Dashboard → Workers & Pages → right-hand column "Account ID". Add it as a GitHub repository secret `CLOUDFLARE_ACCOUNT_ID` (Settings → Secrets and variables → Actions).
 - [ ] **Cloudflare API token.** My Profile → API Tokens → Create Token → template **Edit Cloudflare Workers**. Under Zone Resources pick `rookdex.app` (needed to attach the custom domain). Add as repository secret `CLOUDFLARE_API_TOKEN`.
 - [ ] **GitHub environment `production`.** Settings → Environments → New → `production`. Add the same two secrets there (the deploy job reads them from the environment).
 - [ ] **Spend notification.** Cloudflare → Notifications → Add → "Billing: usage-based billing" at $10. Workers Paid stays off; Task 8 deploys on the free plan.
