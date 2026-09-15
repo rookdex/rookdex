@@ -1,0 +1,65 @@
+---
+import "@fontsource-variable/inter"
+import { getAbsoluteLocaleUrl, getRelativeLocaleUrl } from "astro:i18n"
+import Footer from "../components/Footer.astro"
+import LanguageSwitch from "../components/LanguageSwitch.astro"
+import { defaultLocale, type Locale, locales, t } from "../i18n"
+import "../styles/global.css"
+
+interface Props {
+	locale: Locale
+	title: string
+	description: string
+	/** Route without the locale prefix: "" for the hub, "guides/before-you-start" for a guide. */
+	path: string
+}
+
+const { locale, title, description, path } = Astro.props
+const s = t(locale)
+---
+
+<!doctype html>
+<html lang={locale}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title === s.siteName ? title : `${title} · ${s.siteName}`}</title>
+		<meta name="description" content={description} />
+		<meta name="color-scheme" content="dark" />
+		<meta name="theme-color" content="#000000" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<link rel="icon" href="/favicon.ico" sizes="48x48" />
+		<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+		<link rel="canonical" href={getAbsoluteLocaleUrl(locale, path)} />
+		{locales.map((l) => <link rel="alternate" hreflang={l} href={getAbsoluteLocaleUrl(l, path)} />)}
+		<link rel="alternate" hreflang="x-default" href={getAbsoluteLocaleUrl(defaultLocale, path)} />
+	</head>
+	<body>
+		<a class="skip" href="#main">{s.skipToContent}</a>
+		<header class="site-header">
+			<a class="brand" href={getRelativeLocaleUrl(locale, "")}>{s.siteName}</a>
+			<LanguageSwitch locale={locale} path={path} />
+		</header>
+		<main id="main" class="wrap">
+			<slot />
+		</main>
+		<p
+			id="offline-notice"
+			class="offline"
+			role="status"
+			aria-live="polite"
+			data-text={s.offline.notice}
+			hidden
+		>
+		</p>
+		<script>
+			import { wireOfflineNotice } from "../scripts/offline-notice"
+			import "../scripts/register-sw"
+
+			const el = document.getElementById("offline-notice")
+			if (el) wireOfflineNotice(el, window, el.dataset.text ?? "")
+		</script>
+		<Footer locale={locale} />
+	</body>
+</html>

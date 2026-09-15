@@ -1,6 +1,6 @@
 # Rookdex — design spec
 
-Brand name: **Rookdex** (decided 2026-09-09; formerly codename "nightlife"). Domains rookdex.app and rookdex.com, GitHub org `rookdex`. Written 2026-09-09; stress-tested and revised the same day (see `2026-09-09-rookdex-stress-test.md`).
+Brand name: **Rookdex** (decided 2026-09-09). Domains rookdex.app and rookdex.com, GitHub org `rookdex`. Written 2026-09-09; stress-tested and revised the same day (see `2026-09-09-rookdex-stress-test.md`).
 
 ## 1. What I'm building
 

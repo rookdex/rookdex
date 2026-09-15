@@ -1,0 +1,31 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n"
+import { isLocale, type Locale, locales, t } from "../../i18n"
+import { Countdown } from "../../islands/Countdown"
+import { InstallPrompt } from "../../islands/InstallPrompt"
+import Base from "../../layouts/Base.astro"
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale } }))
+}
+
+const { locale } = Astro.params
+if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
+const s = t(locale as Locale)
+---
+
+<Base locale={locale} title={s.siteName} description={s.tagline} path="">
+	<div class="hub">
+		<header class="hub-intro">
+			<h1>{s.siteName}</h1>
+			<p class="tagline">{s.tagline}</p>
+		</header>
+		<Countdown
+			client:load
+			locale={locale}
+			initialNow={new Date().toISOString()}
+			guideHref={getRelativeLocaleUrl(locale, "guides/before-you-start")}
+		/>
+	</div>
+	<InstallPrompt client:idle locale={locale} />
+</Base>

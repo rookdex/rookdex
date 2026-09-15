@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # Job key is the required-check context in the protect-main ruleset — do not rename.
+  web-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Biome
+        run: npx biome ci .
+      - name: Type-check
+        run: npm run check
+      - name: Test
+        run: npm test
+      - name: Build
+        run: npm run build
+
+  preview:
+    needs: web-tests
+    # Secrets are not exposed to forks or Dependabot; skip the upload there.
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Upload preview version
+        id: preview
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: versions upload
+      - name: Preview URL
+        env:
+          OUT: ${{ steps.preview.outputs.command-output }}
+          URL: ${{ steps.preview.outputs.deployment-url }}
+        run: |
+          echo "## Preview" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$URL" ]; then
+            echo "$URL" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '%s\n' "$OUT" | grep -i "preview" >> "$GITHUB_STEP_SUMMARY" || echo "no preview URL in output" >> "$GITHUB_STEP_SUMMARY"
+          fi

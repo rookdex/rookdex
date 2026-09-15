@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="t">
+	<title id="t">Rookdex</title>
+	<rect width="512" height="512" rx="96" fill="#000000"/>
+	<path fill="#f0a742" d="M160 120h48v40h32v-40h32v40h32v-40h48v88l-28 24v120l28 24v40H160v-40l28-24V232l-28-24z"/>
+</svg>
