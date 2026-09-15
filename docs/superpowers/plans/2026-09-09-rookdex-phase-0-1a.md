@@ -2688,17 +2688,17 @@ Run: `git checkout main && git pull`
 
 Everything here is a GitHub settings click. The code is already MIT-licensed and free of secrets (Tasks 1 and 8), so nothing needs to change in the tree first.
 
-- [ ] **Transfer.** github.com/malinfossum/rookdex → Settings → Danger Zone → Transfer → new owner `rookdex`. GitHub redirects the old URL, but update the remote anyway:
+- [x] **Transfer.** Done 2026-09-15 via `gh api repos/malinfossum/rookdex/transfer`; remote updated. github.com/malinfossum/rookdex → Settings → Danger Zone → Transfer → new owner `rookdex`. GitHub redirects the old URL, but update the remote anyway:
 
 ```bash
 git remote set-url origin https://github.com/rookdex/rookdex.git
 ```
 
-- [ ] **Check the secrets survived the transfer.** Settings → Secrets and variables → Actions: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` present at repository level and in the `production` environment. Re-add if not.
-- [ ] **Make it public.** Settings → Danger Zone → Change visibility → Public.
-- [ ] **Security.** Settings → Code security: enable Dependabot alerts and security updates; enable CodeQL **default setup** (free now that the repo is public).
-- [ ] **Protect main.** Settings → Rules → Rulesets → New branch ruleset `protect-main`: target `main`; require a pull request before merging; require status checks to pass with `web-tests`; block force pushes. Include administrators.
-- [ ] **Re-run Deploy once** (Actions → Deploy → Run workflow) and confirm rookdex.app still deploys from the new owner.
+- [x] **Check the secrets survived the transfer.** Verified 2026-09-15: both present at repo level and in `production`. Settings → Secrets and variables → Actions: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` present at repository level and in the `production` environment. Re-add if not.
+- [x] **Make it public.** Done 2026-09-15. Settings → Danger Zone → Change visibility → Public.
+- [x] **Security.** Done 2026-09-15: Dependabot alerts + security updates on, CodeQL default setup configured (first run green). Copilot cloud agent: no licence, "Allow automations" off, "Require approval for workflow runs" on. Settings → Code security: enable Dependabot alerts and security updates; enable CodeQL **default setup** (free now that the repo is public).
+- [x] **Protect main.** Done 2026-09-15: ruleset `protect-main` (id 23444906) active, no bypass actors. Settings → Rules → Rulesets → New branch ruleset `protect-main`: target `main`; require a pull request before merging; require status checks to pass with `web-tests`; block force pushes. Include administrators.
+- [x] **Re-run Deploy once** — run 34967771599 green from `rookdex/rookdex` on 2026-09-15. (Actions → Deploy → Run workflow) and confirm rookdex.app still deploys from the new owner.
 - [ ] **Family test.** Send https://rookdex.app to the family. Ask two things: did the install dialog appear, and does it open in airplane mode.
 
 ---
