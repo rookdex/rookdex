@@ -115,14 +115,14 @@ rookdex/
 These are dashboard clicks only I can do. Nothing in later tasks depends on them until Task 8, so they can run in parallel with Tasks 1–7. Secrets go straight into GitHub or the password manager, never through a chat.
 
 - [x] **Cloudflare account ID.** Dashboard → Workers & Pages → right-hand column "Account ID". Add it as a GitHub repository secret `CLOUDFLARE_ACCOUNT_ID` (Settings → Secrets and variables → Actions).
-- [ ] **Cloudflare API token.** My Profile → API Tokens → Create Token → template **Edit Cloudflare Workers**. Under Zone Resources pick `rookdex.app` (needed to attach the custom domain). Add as repository secret `CLOUDFLARE_API_TOKEN`.
-- [ ] **GitHub environment `production`.** Settings → Environments → New → `production`. Add the same two secrets there (the deploy job reads them from the environment).
+- [x] **Cloudflare API token.** My Profile → API Tokens → Create Token → template **Edit Cloudflare Workers**. Under Zone Resources pick `rookdex.app` (needed to attach the custom domain). Add as repository secret `CLOUDFLARE_API_TOKEN`.
+- [x] **GitHub environment `production`.** Settings → Environments → New → `production`. Add the same two secrets there (the deploy job reads them from the environment).
 - [ ] **Spend notification.** Cloudflare → Notifications → Add → "Billing: usage-based billing" at $10. Workers Paid stays off; Task 8 deploys on the free plan.
 - [ ] **rookdex.com → rookdex.app redirect.** In zone `rookdex.com`: DNS → add `AAAA @ 100::` (proxied) and `AAAA www 100::` (proxied) so requests reach Cloudflare. Then Rules → Redirect Rules → Create → "Redirect from WWW/root": all incoming requests, dynamic target `concat("https://rookdex.app", http.request.uri.path)`, status 301, preserve query string. In zone `rookdex.app`: `AAAA www 100::` (proxied) plus a redirect rule for hostname `www.rookdex.app` to `https://rookdex.app${path}`. Do **not** add an apex record on `rookdex.app`; Wrangler creates it when the custom domain attaches in Task 8.
 - [ ] **Takedown alias.** Zone `rookdex.app` → Email → Email Routing → enable, accept the MX records, add custom address `legal@rookdex.app` → destination `malinfossum.dev@proton.me` (verify the destination mail). This is the address the footer shows from Task 3.
 - [ ] **Neon project.** console.neon.tech → New project: name `rookdex`, region **AWS Europe (Frankfurt) eu-central-1**, Postgres 17. Copy the pooled connection string into the password manager under "rookdex neon". It becomes a GitHub/Cloudflare secret in the 1c plan, not before.
 - [ ] **Discord digest webhook.** In my private server: create channel `#rookdex-digest` → channel settings → Integrations → Webhooks → New Webhook → copy URL into the password manager under "rookdex discord webhook". Used in 1c.
-- [ ] **GitHub org hygiene.** github.com/organizations/rookdex/settings → Copilot → disable for the org. Nothing else changes until Task 9.
+- [x] **GitHub org hygiene.** github.com/organizations/rookdex/settings → Copilot → disable for the org. Resolved 2026-09-11: a Free org with no Copilot plan has no org-level Copilot surface, so there is nothing to disable; re-check per repo after the Task 9 transfer.
 - [ ] **DNSSEC.** Both zones are pending; nothing to do. Check back after 24 h that both show "Active".
 
 ---
