@@ -6,3 +6,6 @@ dist/
 .env.*
 .dev.vars
 *.log
+
+# brainstorming companion mockups
+.superpowers/
