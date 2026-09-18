@@ -50,6 +50,9 @@ function wrap(db: IDBDatabase): Store {
 	let firstWrite: (() => void) | undefined
 	let written = false
 
+	// A later phase bumping DB_VERSION would otherwise block forever behind this open connection.
+	db.onversionchange = () => db.close()
+
 	function transaction<T>(
 		names: StoreName[],
 		mode: IDBTransactionMode,

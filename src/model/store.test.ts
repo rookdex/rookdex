@@ -1,6 +1,6 @@
 import { IDBFactory } from "fake-indexeddb"
 import { describe, expect, it, vi } from "vitest"
-import { openStore, request, type Store } from "./store"
+import { DB_NAME, DB_VERSION, openStore, request, type Store } from "./store"
 
 function fresh(): Promise<Store> {
 	return openStore(new IDBFactory())
@@ -30,6 +30,18 @@ describe("openStore", () => {
 		await store.put("profiles", { id: "p1", name: "A", created_at: "2026-09-16T10:00:00.000Z" })
 		await store.put("profiles", { id: "p2", name: "B", created_at: "2026-09-16T10:00:00.000Z" })
 		expect(spy).toHaveBeenCalledTimes(1)
+	})
+
+	it("closes on onversionchange so a later upgrade in another connection isn't blocked", async () => {
+		const factory = new IDBFactory()
+		const v1 = await openStore(factory)
+		const upgraded = new Promise((resolve) => {
+			const open = factory.open(DB_NAME, DB_VERSION + 1)
+			open.onupgradeneeded = () => resolve(undefined)
+			open.onerror = () => resolve(open.error)
+		})
+		await expect(upgraded).resolves.toBeUndefined()
+		v1.close()
 	})
 })
 
