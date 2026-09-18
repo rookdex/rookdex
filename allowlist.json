@@ -1,0 +1,13 @@
+{
+	"official": ["rockstargames.com", "youtube.com/@RockstarGames/", "take2games.com"],
+	"press": [
+		"ign.com",
+		"gamesradar.com",
+		"eurogamer.net",
+		"gamespot.com",
+		"pcgamer.com",
+		"rockstarintel.com",
+		"gtabase.com"
+	],
+	"blocklist": []
+}

@@ -50,4 +50,11 @@ export const no: Strings = {
 	offline: {
 		notice: "Frakoblet, viser lagrede data",
 	},
+	category: {
+		wildlife: "Dyreliv",
+		vehicles: "Kjøretøy",
+		places: "Steder",
+		collectibles: "Samleobjekter",
+	},
+	group: {},
 }

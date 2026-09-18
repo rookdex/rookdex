@@ -49,6 +49,15 @@ export const en = {
 	offline: {
 		notice: "Offline, showing saved data",
 	},
+	// Category and group labels are keyed by seed id. The seed test checks every id has a label
+	// in both languages, so the type stays open.
+	category: {
+		wildlife: "Wildlife",
+		vehicles: "Vehicles",
+		places: "Places",
+		collectibles: "Collectibles",
+	} as Record<string, string>,
+	group: {} as Record<string, string>,
 }
 
 export type Strings = typeof en
