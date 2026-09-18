@@ -105,6 +105,7 @@ export const no: Strings = {
 		renameTitle: "Gi {name} nytt navn",
 		save: "Lagre",
 		cancel: "Avbryt",
+		close: "Lukk",
 		deleteTitle: "Slette {name}?",
 		deleteBody: "Du kan gjenopprette den fra Slettede profiler i 30 dager. Etter det er den borte.",
 		exportFirst: "Eksporter først",

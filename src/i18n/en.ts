@@ -106,6 +106,7 @@ export const en = {
 		renameTitle: "Rename {name}",
 		save: "Save",
 		cancel: "Cancel",
+		close: "Close",
 		deleteTitle: "Delete {name}?",
 		deleteBody: "You can restore it from Deleted profiles for 30 days. After that it is gone.",
 		exportFirst: "Export first",

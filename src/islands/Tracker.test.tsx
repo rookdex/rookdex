@@ -1,61 +1,24 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { IDBFactory } from "fake-indexeddb"
+import { fireEvent, screen, waitFor } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
+import { renderReady, resetBrowser } from "../test/tracker-fixtures"
 import { Tracker } from "./Tracker"
 
-const fixtures = vi.hoisted(() => {
-	const src = { url: "https://www.rockstargames.com/VI", title: "Site", tier: "official" as const }
-	return [
-		{
-			id: "vehicles/bike",
-			category: "vehicles",
-			group: "bikes",
-			name: "Bike",
-			status: "confirmed" as const,
-			sources: [src],
-		},
-		{
-			id: "wildlife/american-alligator",
-			category: "wildlife",
-			group: "reptiles",
-			name: "American alligator",
-			status: "confirmed" as const,
-			sources: [src],
-			description: "Everglades native.",
-		},
-		{
-			id: "wildlife/pelican",
-			category: "wildlife",
-			group: "birds",
-			name: "Pelican",
-			status: "expected" as const,
-			precedent: "GTA V",
-			sources: [src],
-		},
-	]
-})
 vi.mock("../model/seed", async (importOriginal) => {
 	const actual = await importOriginal<typeof import("../model/seed")>()
+	const { fixtures } = await import("../test/tracker-fixtures")
 	return { ...actual, seedItems: fixtures }
 })
 
-beforeEach(() => {
-	Object.defineProperty(globalThis, "indexedDB", { value: new IDBFactory(), configurable: true })
-	window.history.replaceState(null, "", "/en/tracker/")
-})
+beforeEach(resetBrowser)
 
-async function renderReady(locale: "en" | "no" = "en") {
-	const view = render(<Tracker locale={locale} rumoursHref="/en/tracker/rumours/" />)
-	const box = await screen.findByRole("checkbox", { name: "American alligator" })
-	await waitFor(() => expect(box).toBeEnabled())
-	return view
-}
+const ready = (locale: "en" | "no" = "en") =>
+	renderReady(<Tracker locale={locale} rumoursHref="/en/tracker/rumours/" />)
 
 describe("Tracker list", () => {
 	it("renders groups, tiers, sources and a disabled report button", async () => {
-		await renderReady()
+		await ready()
 		expect(screen.getByRole("heading", { name: "Wildlife", level: 2 })).toBeInTheDocument()
 		expect(screen.getByRole("heading", { name: /reptiles/i, level: 3 })).toBeInTheDocument()
 		expect(screen.getByText("Expected, as in GTA V")).toBeInTheDocument()
@@ -69,7 +32,7 @@ describe("Tracker list", () => {
 	})
 
 	it("ticking announces the category count in the live region", async () => {
-		await renderReady()
+		await ready()
 		fireEvent.click(screen.getByRole("checkbox", { name: "American alligator" }))
 		await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Wildlife: 1 of 2"))
 		expect(screen.getByRole("checkbox", { name: "American alligator" })).toBeChecked()
@@ -78,7 +41,7 @@ describe("Tracker list", () => {
 
 describe("Category toggles", () => {
 	it("start on All, mirror to ?show=, and All clears", async () => {
-		await renderReady()
+		await ready()
 		const all = screen.getByRole("button", { name: "All" })
 		const vehicles = screen.getByRole("button", { name: "Vehicles" })
 		expect(all).toHaveAttribute("aria-pressed", "true")
@@ -94,14 +57,14 @@ describe("Category toggles", () => {
 
 	it("reads a deep link and drops unknown ids", async () => {
 		window.history.replaceState(null, "", "/en/tracker/?show=wildlife,evil")
-		await renderReady()
+		await ready()
 		expect(screen.getByRole("button", { name: "Wildlife" })).toHaveAttribute("aria-pressed", "true")
 		expect(screen.getByRole("button", { name: "All" })).toHaveAttribute("aria-pressed", "false")
 		expect(window.location.search).toBe("?show=wildlife")
 	})
 
 	it("links to Rumours", async () => {
-		await renderReady()
+		await ready()
 		expect(screen.getByRole("link", { name: "Rumours" })).toHaveAttribute(
 			"href",
 			"/en/tracker/rumours/"
@@ -111,7 +74,7 @@ describe("Category toggles", () => {
 
 describe("Tracker accessibility", () => {
 	it("has no axe violations", async () => {
-		const { container } = await renderReady()
+		const { container } = await ready()
 		expect(await axe(container)).toHaveNoViolations()
 	})
 })

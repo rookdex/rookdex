@@ -213,7 +213,8 @@ p {
 	max-width: none;
 }
 
-.install {
+.install,
+.modal {
 	background: var(--bg-raised);
 	color: var(--text);
 	border: 1px solid var(--border);
@@ -223,7 +224,8 @@ p {
 	width: calc(100% - var(--space-4));
 }
 
-.install::backdrop {
+.install::backdrop,
+.modal::backdrop {
 	background: rgb(0 0 0 / 0.7);
 }
 
@@ -468,6 +470,108 @@ p {
 	padding: 0;
 	list-style: none;
 	font-size: 0.875rem;
+}
+
+.profile-menu {
+	position: relative;
+	display: inline-block;
+}
+
+.profile-menu > button,
+.hint button {
+	min-height: var(--tap);
+	padding: var(--space-2) var(--space-3);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
+	color: var(--text);
+}
+
+.menu {
+	position: absolute;
+	top: calc(100% + var(--space-1));
+	left: 0;
+	z-index: 5;
+	min-width: 14rem;
+	margin: 0;
+	padding: var(--space-1);
+	list-style: none;
+	background: var(--bg-raised);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+}
+
+.menu hr {
+	height: 1px;
+	margin: var(--space-1) 0;
+	border: 0;
+	background: var(--border);
+}
+
+.menu button {
+	display: flex;
+	width: 100%;
+	min-height: var(--tap);
+	align-items: center;
+	padding: var(--space-2) var(--space-3);
+	border: 0;
+	border-radius: var(--radius);
+	background: none;
+	color: var(--text);
+	text-align: left;
+}
+
+.menu button[aria-checked="true"] {
+	color: var(--accent);
+	font-weight: 600;
+}
+
+.menu button:hover,
+.menu button:focus-visible {
+	background: var(--bg);
+}
+
+.modal label {
+	display: block;
+	margin-bottom: var(--space-1);
+}
+
+.modal input {
+	width: 100%;
+	min-height: var(--tap);
+	margin-bottom: var(--space-2);
+	padding: var(--space-2);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg);
+	color: var(--text);
+	font: inherit;
+}
+
+/* Keeps the same gap below a shown name error as the input has above it. */
+.modal .tracker-alert:not(:empty) {
+	margin-bottom: var(--space-2);
+}
+
+.deleted-list {
+	list-style: none;
+	margin: 0 0 var(--space-3);
+	padding: 0;
+}
+
+.deleted-list li {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-2);
+	min-height: var(--tap);
+}
+
+.deleted-list button {
+	min-height: var(--tap);
+	padding: var(--space-1) var(--space-3);
+	border-radius: var(--radius);
+	background: var(--bg);
+	color: var(--text);
 }
 
 @media (min-width: 768px) {

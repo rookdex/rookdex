@@ -1,11 +1,16 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { fill, type Locale, t } from "../i18n"
+import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, recentFinds } from "../model/stats"
 import { openStore } from "../model/store"
 import { createTracker, parseShow, type Tracker as TrackerModel } from "../model/tracker"
 import { CategoryNav } from "./tracker/CategoryNav"
+import { DeleteDialog } from "./tracker/DeleteDialog"
+import { DeletedDialog } from "./tracker/DeletedDialog"
 import { ItemList } from "./tracker/ItemList"
+import { NameDialog } from "./tracker/NameDialog"
+import { ProfileMenu } from "./tracker/ProfileMenu"
 import { StatsRail } from "./tracker/StatsRail"
 import { useTracker } from "./useTracker"
 
@@ -48,6 +53,48 @@ export function Tracker({ locale, rumoursHref }: Props) {
 	const s = t(locale)
 	const [tracker] = useState(() => buildTracker(s.profile.defaultName))
 	const state = useTracker(tracker)
+	const [dialog, setDialog] = useState<"new" | "rename" | "delete" | "deleted" | null>(null)
+	// Bumped per opening: the NameDialog keys on this alone, so its field resets on each opening
+	// but the element is not remounted while it is closing (which would skip the focus return).
+	const [opening, setOpening] = useState(0)
+	// Owned here so dialogs opened from the menu can return focus to its button.
+	const menuButton = useRef<HTMLButtonElement>(null)
+	const current = state.profiles.find((p) => p.id === state.profileId)
+	const currentName = current?.name ?? ""
+
+	function openDialog(kind: "new" | "rename" | "delete" | "deleted") {
+		setOpening((n) => n + 1)
+		setDialog(kind)
+	}
+
+	function closeDialog() {
+		tracker.clearError()
+		setDialog(null)
+	}
+
+	function exportNow() {
+		const result = tracker.exportProfile()
+		if (!result) return
+		const blob = new Blob([result.json], { type: "application/json" })
+		const url = URL.createObjectURL(blob)
+		const anchor = document.createElement("a")
+		anchor.href = url
+		anchor.download = result.filename
+		anchor.click()
+		// Revoking synchronously can cancel the download in some browsers.
+		window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+	}
+
+	async function saveName(name: string) {
+		if (dialog === "rename" && current) await tracker.renameProfile(current.id, name)
+		else await tracker.createProfile(name)
+		if (!tracker.getState().error) setDialog(null)
+	}
+
+	function deleteCurrent() {
+		setDialog(null)
+		if (current) tracker.deleteProfile(current.id)
+	}
 
 	const categories = perCategory(countable(state.items), state.records).map((c) => ({
 		...c,
@@ -66,6 +113,8 @@ export function Tracker({ locale, rumoursHref }: Props) {
 			})
 		: ""
 	const error = state.error ? s.tracker.errors[state.error] : ""
+	const nameError = state.error === "name" ? error : ""
+	const pageError = state.error === "name" ? "" : error
 
 	if (state.status === "error") {
 		return (
@@ -78,7 +127,21 @@ export function Tracker({ locale, rumoursHref }: Props) {
 	return (
 		<div className="tracker" aria-busy={state.status === "loading"}>
 			{state.status === "loading" && <p className="visually-hidden">{s.tracker.loading}</p>}
-			{/* Task 12 adds the profile menu here */}
+			<div className="tracker-top">
+				<ProfileMenu
+					triggerRef={menuButton}
+					profiles={activeProfiles(state.profiles)}
+					current={current}
+					onSwitch={tracker.switchProfile}
+					onNew={() => openDialog("new")}
+					onRename={() => openDialog("rename")}
+					onExport={exportNow}
+					onImport={() => {}}
+					onDelete={() => openDialog("delete")}
+					onDeleted={() => openDialog("deleted")}
+					strings={s.profile}
+				/>
+			</div>
 			<CategoryNav
 				categories={categories}
 				selected={state.selected}
@@ -107,9 +170,38 @@ export function Tracker({ locale, rumoursHref }: Props) {
 				{announcement}
 			</p>
 			<p className="tracker-alert" role="alert">
-				{error}
+				{pageError}
 			</p>
-			{/* Task 12 and 13 add the dialogs and the file input here */}
+			<NameDialog
+				key={opening}
+				open={dialog === "new" || dialog === "rename"}
+				title={
+					dialog === "rename"
+						? fill(s.profile.renameTitle, { name: currentName })
+						: s.profile.newTitle
+				}
+				initial={dialog === "rename" ? currentName : ""}
+				error={nameError}
+				strings={s.profile}
+				onSave={saveName}
+				onCancel={closeDialog}
+			/>
+			<DeleteDialog
+				open={dialog === "delete"}
+				name={currentName}
+				strings={s.profile}
+				onExport={exportNow}
+				onDelete={deleteCurrent}
+				onCancel={closeDialog}
+			/>
+			<DeletedDialog
+				open={dialog === "deleted"}
+				profiles={deletedProfiles(state.profiles)}
+				strings={s.profile}
+				onRestore={tracker.restoreProfile}
+				onClose={closeDialog}
+			/>
+			{/* Task 13 adds the file input here */}
 		</div>
 	)
 }
