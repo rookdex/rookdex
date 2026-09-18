@@ -1,1 +1,138 @@
-[]
+[
+	{
+		"id": "places/vice-city",
+		"category": "places",
+		"group": "cities",
+		"name": "Vice City",
+		"status": "confirmed",
+		"description": "The neon-soaked coastal city at the heart of Grand Theft Auto VI, in the state of Leonida, home to Jason and Lucia.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI",
+				"title": "Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.rockstargames.com/VI/vice-city",
+				"title": "Grand Theft Auto VI - Vice City - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/leonida-keys",
+		"category": "places",
+		"group": "keys",
+		"name": "Leonida Keys",
+		"status": "confirmed",
+		"description": "A touristy archipelago south of Vice City, one of the six named regions of Leonida, modeled on the Florida Keys.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/map/",
+				"title": "GTA 6 Map: Full Leonida Map, Vice City and All Locations"
+			}
+		]
+	},
+	{
+		"id": "places/grassrivers",
+		"category": "places",
+		"group": "regions",
+		"name": "Grassrivers",
+		"status": "confirmed",
+		"description": "A swampy wetlands region of Leonida, one of the six named regions, modeled on the Everglades.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/map/",
+				"title": "GTA 6 Map: Full Leonida Map, Vice City and All Locations"
+			}
+		]
+	},
+	{
+		"id": "places/port-gellhorn",
+		"category": "places",
+		"group": "regions",
+		"name": "Port Gellhorn",
+		"status": "confirmed",
+		"description": "A coastal region of Leonida named by Rockstar, one of the six named regions beyond Vice City.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/map/",
+				"title": "GTA 6 Map: Full Leonida Map, Vice City and All Locations"
+			}
+		]
+	},
+	{
+		"id": "places/ambrosia",
+		"category": "places",
+		"group": "regions",
+		"name": "Ambrosia",
+		"status": "confirmed",
+		"description": "A rural, industrial region of Leonida named by Rockstar, one of the six named regions beyond Vice City.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/map/",
+				"title": "GTA 6 Map: Full Leonida Map, Vice City and All Locations"
+			}
+		]
+	},
+	{
+		"id": "places/mount-kalaga-national-park",
+		"category": "places",
+		"group": "landmarks",
+		"name": "Mount Kalaga National Park",
+		"status": "confirmed",
+		"description": "A wilderness national park region of Leonida, one of the six named regions shown on the official Grand Theft Auto VI site.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/map/",
+				"title": "GTA 6 Map: Full Leonida Map, Vice City and All Locations"
+			}
+		]
+	},
+	{
+		"id": "places/leonida-penitentiary",
+		"category": "places",
+		"group": "landmarks",
+		"name": "Leonida Penitentiary",
+		"status": "confirmed",
+		"description": "The state prison where Lucia was locked up for fighting to protect her family, named in her official Vice City character bio.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/vice-city",
+				"title": "Grand Theft Auto VI - Vice City - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/only-raw-records",
+		"category": "places",
+		"group": "businesses",
+		"name": "Only Raw Records",
+		"status": "confirmed",
+		"description": "The record label Dre'Quan Priest runs with Boobie's backing, home to rap duo Real Dimez, named on the official Vice City page.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/vice-city",
+				"title": "Grand Theft Auto VI - Vice City - Rockstar Games"
+			}
+		]
+	}
+]

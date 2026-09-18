@@ -1,1 +1,126 @@
-[]
+[
+	{
+		"id": "vehicles/declasse-tulip",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Declasse Tulip",
+		"status": "confirmed",
+		"description": "A four-door muscle car styled after a 1972 Chevrolet Chevelle Malibu, red with black stripes and a black soft-top roof. Jason and Lucia drive it in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/tulip",
+				"title": "Declasse Tulip - GTA 6 Muscle Car - GTABase"
+			},
+			{
+				"url": "https://rockstarintel.com/gta-6-car-tease-in-gta-online-by-rockstar-games/",
+				"title": "GTA 6 Car Tease In GTA Online Spotted By Fan - RockstarINTEL"
+			}
+		]
+	},
+	{
+		"id": "vehicles/maibatsu-sanchez",
+		"category": "vehicles",
+		"group": "motorcycles",
+		"name": "Maibatsu Sanchez",
+		"status": "confirmed",
+		"description": "A dirt bike styled after motocross machines such as the Yamaha YZ450F and Kawasaki KX450F, built for off-road riding. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/sanchez",
+				"title": "Maibatsu Sanchez - GTA 6 Bike - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/lcc-avarus",
+		"category": "vehicles",
+		"group": "motorcycles",
+		"name": "LCC Avarus",
+		"status": "confirmed",
+		"description": "A stripped-down custom chopper from Liberty City Cycles, styled after a naked chopper build. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/avarus",
+				"title": "LCC Avarus - GTA 6 Motorcycle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/marquis",
+		"category": "vehicles",
+		"group": "boats",
+		"name": "Marquis",
+		"status": "confirmed",
+		"description": "A cabin cruiser returning from GTA V, previously owned by Michael De Santa, rendered with an updated paint job and blue stripes. Seen at the start of Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://rockstarintel.com/gta-6-trailer-2-might-feature-gta-v-story-easter-egg/",
+				"title": "GTA 6 Trailer 2 Might Feature GTA V Story Easter Egg - RockstarINTEL"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-stanier",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "1955 Vapid Stanier",
+		"status": "confirmed",
+		"description": "A 1955-styled classic sedan for cruising Shore Drive, included free with the Vintage Vice City Pack for pre-orders and purchases made before 19 November 2026, alongside a garage near Ocean Beach.",
+		"sources": [
+			{
+				"url": "https://www.take2games.com/ir/news/rockstar-games-announces-pre-orders-grand-theft-auto-vi",
+				"title": "Rockstar Games Announces Pre-Orders for Grand Theft Auto VI - Take-Two Interactive"
+			},
+			{
+				"url": "https://www.gtabase.com/articles/gta-6/gta-6-editions-guide-pre-order-bonus-special-editions-content",
+				"title": "GTA 6 Editions Guide - Ultimate Edition, Pre-Order Bonus and Prices - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vehicle-garages",
+		"category": "vehicles",
+		"group": "service",
+		"name": "Vehicle Garages",
+		"status": "expected",
+		"precedent": "GTA V",
+		"description": "Purchasable garage properties across Leonida for storing multiple personal vehicles beyond starting capacity, with some garages including a weapon locker and a stolen-goods deposit.",
+		"sources": [
+			{
+				"url": "https://www.gtabase.com/articles/gta-6/gta-6-previews-recap-all-new-gameplay-features-revealed",
+				"title": "GTA 6 Previews Roundup - All New Gameplay Features Revealed - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vehicle-customization",
+		"category": "vehicles",
+		"group": "service",
+		"name": "Vehicle Customization Shops",
+		"status": "expected",
+		"precedent": "GTA V",
+		"description": "Multiple specialized mod shops across Leonida, each offering a different set of upgrades such as liveries, engines, brakes, suspension and wheels, similar to GTA V's Los Santos Customs.",
+		"sources": [
+			{
+				"url": "https://www.gtabase.com/articles/gta-6/gta-6-previews-recap-all-new-gameplay-features-revealed",
+				"title": "GTA 6 Previews Roundup - All New Gameplay Features Revealed - GTABase"
+			}
+		]
+	}
+]

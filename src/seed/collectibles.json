@@ -1,1 +1,96 @@
-[]
+[
+	{
+		"id": "collectibles/classic-car-collection",
+		"category": "collectibles",
+		"group": "vehicles",
+		"name": "Classic Car Collection",
+		"status": "confirmed",
+		"description": "Wyman's Ultimate Edition commission: track down abandoned classic and work-in-progress project cars and their parts around Leonida, then have mechanic Wyman restore them into drivable vehicles.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Ultimate Edition - Grand Theft Auto VI"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-pre-orders-officially-open-at-midnight-local-time-rockstar-confirms-and-heres-whats-in-the-ultimate-edition/",
+				"title": "GTA 6 pre-orders open, and here's what's in the Ultimate Edition"
+			}
+		]
+	},
+	{
+		"id": "collectibles/spaceship-parts",
+		"category": "collectibles",
+		"group": "hidden-items",
+		"name": "Spaceship Parts",
+		"status": "expected",
+		"precedent": "GTA V",
+		"description": "Fifty UFO-themed novelty parts scattered across San Andreas in GTA V; press coverage expects a similar find-the-pieces set in GTA 6.",
+		"sources": [
+			{
+				"url": "https://www.gtabase.com/articles/gta-6/gta-6-100-completion-guide-interactive-checklist",
+				"title": "GTA 6 100% Completion Guide & Interactive Checklist"
+			},
+			{
+				"url": "https://www.gtabase.com/grand-theft-auto-v/guides/gta-5-100-completion-guide-checklist",
+				"title": "GTA 5 100% Completion Guide & Full Checklist"
+			}
+		]
+	},
+	{
+		"id": "collectibles/letter-scraps",
+		"category": "collectibles",
+		"group": "hidden-items",
+		"name": "Letter Scraps",
+		"status": "expected",
+		"precedent": "GTA V",
+		"description": "Fifty scattered paper pieces that assemble into a killer's letters in GTA V; press coverage expects a similar novelty collectible in GTA 6.",
+		"sources": [
+			{
+				"url": "https://www.gtabase.com/articles/gta-6/gta-6-100-completion-guide-interactive-checklist",
+				"title": "GTA 6 100% Completion Guide & Interactive Checklist"
+			},
+			{
+				"url": "https://www.gtabase.com/grand-theft-auto-v/guides/gta-5-100-completion-guide-checklist",
+				"title": "GTA 5 100% Completion Guide & Full Checklist"
+			}
+		]
+	},
+	{
+		"id": "collectibles/stunt-jumps",
+		"category": "collectibles",
+		"group": "stunts",
+		"name": "Stunt Jumps",
+		"status": "expected",
+		"precedent": "GTA V",
+		"description": "Fifty marked ramps to launch a vehicle from for a checklist reward in GTA V; press coverage expects stunt jumps to return in GTA 6.",
+		"sources": [
+			{
+				"url": "https://www.gtabase.com/articles/gta-6/gta-6-100-completion-guide-interactive-checklist",
+				"title": "GTA 6 100% Completion Guide & Interactive Checklist"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-5-stunt-jump-locations/",
+				"title": "GTA 5 Stunt Jumps locations and where to find all ramps"
+			}
+		]
+	},
+	{
+		"id": "collectibles/time-trials",
+		"category": "collectibles",
+		"group": "challenges",
+		"name": "Time Trials",
+		"status": "expected",
+		"precedent": "GTA V",
+		"description": "A checklist of timed vehicle and stunt-plane courses that count toward completion in GTA V; press coverage expects time trials to return in GTA 6.",
+		"sources": [
+			{
+				"url": "https://www.gtabase.com/articles/gta-6/gta-6-100-completion-guide-interactive-checklist",
+				"title": "GTA 6 100% Completion Guide & Interactive Checklist"
+			},
+			{
+				"url": "https://www.gtabase.com/grand-theft-auto-v/side-missions/stunt-plane-time-trials",
+				"title": "Stunt Plane Time Trials - GTA 5 Hobbies & Pastimes Guide"
+			}
+		]
+	}
+]
