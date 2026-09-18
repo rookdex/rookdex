@@ -53,13 +53,13 @@ checklist/zoo system (see Rejected).
 
 | id | name | status | sources |
 |---|---|---|---|
-| places/vice-city | Vice City | confirmed | rockstargames.com/VI; rockstargames.com/VI/vice-city |
-| places/leonida-keys | Leonida Keys | confirmed | rockstargames.com/VI/only-in-leonida; GTABase |
+| places/the-city | Vice City | confirmed | rockstargames.com/VI; rockstargames.com/VI/vice-city |
+| places/the-keys | Leonida Keys | confirmed | rockstargames.com/VI/only-in-leonida; GTABase |
 | places/grassrivers | Grassrivers | confirmed | rockstargames.com/VI/only-in-leonida; GTABase |
 | places/port-gellhorn | Port Gellhorn | confirmed | rockstargames.com/VI/only-in-leonida; GTABase |
 | places/ambrosia | Ambrosia | confirmed | rockstargames.com/VI/only-in-leonida; GTABase |
 | places/mount-kalaga-national-park | Mount Kalaga National Park | confirmed | rockstargames.com/VI/only-in-leonida; GTABase |
-| places/leonida-penitentiary | Leonida Penitentiary | confirmed | rockstargames.com/VI/vice-city |
+| places/state-penitentiary | Leonida Penitentiary | confirmed | rockstargames.com/VI/vice-city |
 | places/only-raw-records | Only Raw Records | confirmed | rockstargames.com/VI/vice-city |
 
 No `expected` places items: the research agent found no non-leak-tainted source for a place-based

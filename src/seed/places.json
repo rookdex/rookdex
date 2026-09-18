@@ -1,6 +1,6 @@
 [
 	{
-		"id": "places/vice-city",
+		"id": "places/the-city",
 		"category": "places",
 		"group": "cities",
 		"name": "Vice City",
@@ -18,7 +18,7 @@
 		]
 	},
 	{
-		"id": "places/leonida-keys",
+		"id": "places/the-keys",
 		"category": "places",
 		"group": "keys",
 		"name": "Leonida Keys",
@@ -108,7 +108,7 @@
 		]
 	},
 	{
-		"id": "places/leonida-penitentiary",
+		"id": "places/state-penitentiary",
 		"category": "places",
 		"group": "landmarks",
 		"name": "Leonida Penitentiary",
