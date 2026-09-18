@@ -45,9 +45,9 @@ checklist/zoo system (see Rejected).
 | vehicles/maibatsu-sanchez | Maibatsu Sanchez | confirmed | Trailer 1 (YouTube); GTABase |
 | vehicles/lcc-avarus | LCC Avarus | confirmed | Trailer 2 (YouTube); GTABase |
 | vehicles/marquis | Marquis | confirmed | Trailer 2 (YouTube); RockstarINTEL |
-| vehicles/vapid-stanier | 1955 Vapid Stanier | confirmed | Take-Two Interactive; GTABase |
-| vehicles/vehicle-garages | Vehicle Garages | expected (GTA V) | GTABase |
-| vehicles/vehicle-customization | Vehicle Customization Shops | expected (GTA V) | GTABase |
+| vehicles/vapid-stanier | 1955 Vapid Stanier | confirmed | rockstargames.com/VI/editions; GTABase |
+| vehicles/vehicle-garages | Vehicle Garages | expected (GTA V) | GTABase (GTA 6 feature); GTABase (GTA V properties guide) |
+| vehicles/vehicle-customization | Vehicle Customization Shops | expected (GTA V) | GTABase (GTA 6 feature); GTABase (Los Santos Customs, GTA V) |
 
 ## Places
 
@@ -146,4 +146,46 @@ take any action; all page content was treated as data.
 
 ## Source-check review
 
-Pending — filled after the source-check review.
+The full review is at `.superpowers/sdd/2026-09-16-rookdex-phase-1b/research-review.md`. It was
+run with WebFetch only (no browser), which cannot render YouTube's client-side player and hit
+truncation on several long `gamesradar.com`/`pcgamer.com` articles before reaching the body text —
+the review itself flags this as a tooling limitation, not a finding that a claim is false, and
+distinguishes "unreachable" from "unsupported" on that basis. Fix round 1 re-opened every flagged
+id's cited press page in a real browser (full JS rendering, no truncation) to settle each one.
+
+**IDs the review could not confirm via WebFetch (marked unreachable or inconclusive) — re-checked
+in a browser:**
+
+| id | what the cited press page actually says | outcome |
+|---|---|---|
+| wildlife/american-alligator | GamesRadar trailer-1 breakdown: "flamingos, alligators, dolphins, and sharks all make an appearance" | supported — kept, sources unchanged |
+| wildlife/loggerhead-sea-turtle | PC Gamer nature-watchers article has a dedicated "Loggerhead turtle (Caretta caretta)" section | supported — kept, sources unchanged |
+| wildlife/american-flamingo | same GamesRadar sentence as alligator, above | supported — kept, sources unchanged |
+| wildlife/herring-gull | same PC Gamer article has a dedicated "Herring Gull (Larus Argentatus)" section | supported — kept, sources unchanged |
+| wildlife/florida-panther | PC Gamer national-park article: "even a Florida panther (Leonida panther?) stalking unsuspecting deer" | supported — kept, sources unchanged |
+| wildlife/deer | same sentence as florida-panther, above | supported — kept, sources unchanged |
+| wildlife/dolphin | same GamesRadar sentence as alligator, above | supported — kept, sources unchanged |
+| wildlife/green-iguana | PC Gamer bodega-cats article: "there's also an enormous iguana ambling toward Jason's house in the very second shot" | supported — kept, sources unchanged |
+| wildlife/pelican | same PC Gamer article: "you probably saw a bunch of seagulls and pelicans flying overhead as the trailer opens" | supported — kept, sources unchanged |
+| rumours/online-2027-launch | PC Gamer, quoting Twitch CEO Dan Clancy: multiplayer launches "next year" (2027), after GTA 6 | supported — kept, sources unchanged |
+| rumours/pc-release-timing | PC Gamer: "The PC release date for GTA 6 likely won't be before November 2027" | supported — kept, sources unchanged |
+
+**IDs the review flagged as wrong-status — fixed:**
+
+| id | problem | fix |
+|---|---|---|
+| `vehicles/vapid-stanier` | cited official source (take2games.com pre-order release) never names the car | re-sourced to `rockstargames.com/VI/editions`, which names "the timeless two-tone '55 Vapid Stanier sedan and garage" once the Vintage Vice City Pack panel is expanded — replaces the take2games.com source; GTABase press source unchanged. Description's pre-order cutoff corrected from "before 19 November 2026" to "before 20 November 2026" to match the official page's own wording ("purchases before November 20, 2026") |
+| `vehicles/vehicle-garages` | cited source confirms garages exist in GTA 6 but never ties them to GTA V | added `gtabase.com/grand-theft-auto-v/properties/` (GTA V's Story Mode properties/garages guide) as a second source, actually tying `precedent: "GTA V"` to a source |
+| `vehicles/vehicle-customization` | same problem, no GTA V tie-in | added `gtabase.com/grand-theft-auto-v/properties/story-mode/los-santos-customs` (Los Santos Customs, GTA V's vehicle customization shop) as a second source |
+| `collectibles/time-trials` | description said GTA V time trials "count toward completion"; the cited precedent source says they're "an optional endeavor, not required for 100% Completion" | rewrote the description to match the source: "A set of timed vehicle and stunt-plane courses in GTA V, an optional extra not required for 100% completion; press coverage expects time trials to return in GTA 6." |
+
+**Specific question — do `collectibles/spaceship-parts` and `collectibles/letter-scraps` get named
+separately?** The review found both items' GTA V precedent source gives each its own full paragraph
+("Collect all 50 Spaceship Parts…" / "Collect all the 50 Letter Scraps…"). No change — both items
+kept as they were.
+
+**Rumour `rumours/post-launch-map-expansion`** was already confirmed supported by the review (the
+gtabase.com map page states Rockstar "plans to continue to develop the game's world after release");
+kept unchanged.
+
+All fixes verified with `npx vitest run src/model/seed.test.ts` (18/18 passing) after the edits.

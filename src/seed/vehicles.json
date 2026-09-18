@@ -81,11 +81,11 @@
 		"group": "cars",
 		"name": "1955 Vapid Stanier",
 		"status": "confirmed",
-		"description": "A 1955-styled classic sedan for cruising Shore Drive, included free with the Vintage Vice City Pack for pre-orders and purchases made before 19 November 2026, alongside a garage near Ocean Beach.",
+		"description": "A 1955-styled classic sedan for cruising Shore Drive, included free with the Vintage Vice City Pack for pre-orders and purchases made before 20 November 2026, alongside a garage near Ocean Beach.",
 		"sources": [
 			{
-				"url": "https://www.take2games.com/ir/news/rockstar-games-announces-pre-orders-grand-theft-auto-vi",
-				"title": "Rockstar Games Announces Pre-Orders for Grand Theft Auto VI - Take-Two Interactive"
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
 			},
 			{
 				"url": "https://www.gtabase.com/articles/gta-6/gta-6-editions-guide-pre-order-bonus-special-editions-content",
@@ -105,6 +105,10 @@
 			{
 				"url": "https://www.gtabase.com/articles/gta-6/gta-6-previews-recap-all-new-gameplay-features-revealed",
 				"title": "GTA 6 Previews Roundup - All New Gameplay Features Revealed - GTABase"
+			},
+			{
+				"url": "https://www.gtabase.com/grand-theft-auto-v/properties/",
+				"title": "GTA 5 Story Mode Properties Guide: All Businesses, Safehouses & Garages - GTABase"
 			}
 		]
 	},
@@ -120,6 +124,10 @@
 			{
 				"url": "https://www.gtabase.com/articles/gta-6/gta-6-previews-recap-all-new-gameplay-features-revealed",
 				"title": "GTA 6 Previews Roundup - All New Gameplay Features Revealed - GTABase"
+			},
+			{
+				"url": "https://www.gtabase.com/grand-theft-auto-v/properties/story-mode/los-santos-customs",
+				"title": "Los Santos Customs (Blaine County) - GTA 5 Story Property - GTABase"
 			}
 		]
 	}
