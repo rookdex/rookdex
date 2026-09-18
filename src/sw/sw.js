@@ -47,8 +47,12 @@ async function cacheFirst(request) {
 	if (cached) return cached
 	const response = await fetch(request)
 	if (response.ok) {
-		const cache = await caches.open(CACHE)
-		await cache.put(request, response.clone())
+		try {
+			const cache = await caches.open(CACHE)
+			await cache.put(request, response.clone())
+		} catch {
+			// A full cache (QuotaExceededError) must not fail a response the network already gave us.
+		}
 	}
 	return response
 }
@@ -60,7 +64,13 @@ async function staleWhileRevalidate(event, url) {
 	const cached = await cache.match(key)
 	const refresh = fetch(event.request)
 		.then(async (response) => {
-			if (response.ok) await cache.put(key, response.clone())
+			if (response.ok) {
+				try {
+					await cache.put(key, response.clone())
+				} catch {
+					// A full cache must not turn a good network response into the home-page fallback.
+				}
+			}
 			return response
 		})
 		.catch(() => undefined)
