@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { fireEvent, screen, waitFor, within } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { openMenu, renderReady, resetBrowser } from "../test/tracker-fixtures"
+import { downloads, openMenu, renderReady, resetBrowser } from "../test/tracker-fixtures"
 import { Tracker } from "./Tracker"
 
 vi.mock("../model/seed", async (importOriginal) => {
@@ -24,7 +24,8 @@ describe("profiles in the island", () => {
 		fireEvent.click(within(dialog).getByRole("button", { name: "Save" }))
 		const trigger = await screen.findByRole("button", { name: "Profile: Dad" })
 		expect(screen.queryByRole("heading", { name: "New profile" })).not.toBeInTheDocument()
-		expect(trigger).toHaveFocus()
+		// The save lands outside an event handler, so the close effect that returns focus flushes a tick later.
+		await waitFor(() => expect(trigger).toHaveFocus())
 	})
 
 	it("shows a blank-name error inside the dialog", async () => {
@@ -85,5 +86,8 @@ describe("profiles in the island", () => {
 		openMenu()
 		fireEvent.click(screen.getByRole("menuitem", { name: "Export" }))
 		expect(URL.createObjectURL).toHaveBeenCalledTimes(1)
+		expect(downloads).toHaveLength(1)
+		expect(downloads[0].download).toMatch(/^rookdex-player-1-\d{4}-\d{2}-\d{2}\.json$/)
+		expect(downloads[0].href).toBe("blob:rookdex")
 	})
 })

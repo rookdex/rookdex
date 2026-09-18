@@ -38,12 +38,24 @@ export const fixtures: SeedItem[] = [
 	},
 ]
 
-/** Fresh IndexedDB, a clean tracker URL and stubbed blob URLs. Call from `beforeEach`. */
+/** Anchors the island "clicked" to download a file since the last `resetBrowser()`. */
+export const downloads: HTMLAnchorElement[] = []
+
+/**
+ * Fresh IndexedDB, a clean tracker URL, stubbed blob URLs and a no-op anchor click that records
+ * the anchor (jsdom would otherwise try to navigate). Call from `beforeEach`.
+ */
 export function resetBrowser(): void {
 	Object.defineProperty(globalThis, "indexedDB", { value: new IDBFactory(), configurable: true })
 	window.history.replaceState(null, "", "/en/tracker/")
 	URL.createObjectURL = vi.fn(() => "blob:rookdex")
 	URL.revokeObjectURL = vi.fn()
+	downloads.length = 0
+	vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (
+		this: HTMLAnchorElement
+	) {
+		downloads.push(this)
+	})
 }
 
 /** Renders the island and waits until the store has loaded and the list is interactive. */
