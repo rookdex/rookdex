@@ -1,0 +1,464 @@
+[
+	{
+		"id": "wildlife/american-alligator",
+		"category": "wildlife",
+		"group": "reptiles",
+		"name": "American alligator",
+		"status": "confirmed",
+		"description": "Appears in trailer 1, where press coverage lists it among the wildlife roaming Leonida alongside flamingos, dolphins and sharks.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-trailer-1-breakdown-things-you-missed/",
+				"title": "GTA 6 trailer breakdown - 12 things you might have missed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/green-iguana",
+		"category": "wildlife",
+		"group": "reptiles",
+		"name": "Green iguana",
+		"status": "confirmed",
+		"description": "A large iguana is shown ambling toward the male protagonist's house in trailer 2's opening shots, rendered in close-up detail.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.pcgamer.com/games/grand-theft-auto/bodega-cats-trash-pandas-and-a-great-white-shark-the-real-stars-of-the-gta-6-reveal-are-all-the-animals-hiding-in-plain-sight/",
+				"title": "Bodega cats, trash pandas, and a great white shark - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "wildlife/loggerhead-sea-turtle",
+		"category": "wildlife",
+		"group": "reptiles",
+		"name": "Loggerhead sea turtle",
+		"status": "confirmed",
+		"description": "Visible in the opening seconds of trailer 1, heading toward the beach during the Rockstar Presents scene.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.pcgamer.com/games/grand-theft-auto/dedicated-nature-watchers-are-combing-every-millisecond-of-gta-6-trailer-footage-to-exhaustively-catalogue-all-of-its-animals/",
+				"title": "Dedicated nature watchers catalogue GTA 6's trailer animals - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "wildlife/snake",
+		"category": "wildlife",
+		"group": "reptiles",
+		"name": "Snake",
+		"status": "confirmed",
+		"description": "Listed among the confirmed wildlife species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/american-flamingo",
+		"category": "wildlife",
+		"group": "birds",
+		"name": "American flamingo",
+		"status": "confirmed",
+		"description": "Flamingos appear in trailer 1, scattered by an airboat racing through wetlands that mirror the real Florida Everglades.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-trailer-1-breakdown-things-you-missed/",
+				"title": "GTA 6 trailer breakdown - 12 things you might have missed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/herring-gull",
+		"category": "wildlife",
+		"group": "birds",
+		"name": "Herring gull",
+		"status": "confirmed",
+		"description": "Visible at the very opening of trailer 1, a common coastal bird identified by trailer analysts and covered in the press.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.pcgamer.com/games/grand-theft-auto/dedicated-nature-watchers-are-combing-every-millisecond-of-gta-6-trailer-footage-to-exhaustively-catalogue-all-of-its-animals/",
+				"title": "Dedicated nature watchers catalogue GTA 6's trailer animals - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "wildlife/pelican",
+		"category": "wildlife",
+		"group": "birds",
+		"name": "Pelican",
+		"status": "confirmed",
+		"description": "Pelicans are shown flying overhead as trailer 2 opens.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.pcgamer.com/games/grand-theft-auto/bodega-cats-trash-pandas-and-a-great-white-shark-the-real-stars-of-the-gta-6-reveal-are-all-the-animals-hiding-in-plain-sight/",
+				"title": "Bodega cats, trash pandas, and a great white shark - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "wildlife/duck",
+		"category": "wildlife",
+		"group": "birds",
+		"name": "Duck",
+		"status": "confirmed",
+		"description": "Listed among the confirmed bird species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/heron",
+		"category": "wildlife",
+		"group": "birds",
+		"name": "Heron",
+		"status": "confirmed",
+		"description": "Listed among the confirmed bird species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/spoonbill",
+		"category": "wildlife",
+		"group": "birds",
+		"name": "Spoonbill",
+		"status": "confirmed",
+		"description": "Listed among the confirmed bird species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/crane",
+		"category": "wildlife",
+		"group": "birds",
+		"name": "Crane",
+		"status": "confirmed",
+		"description": "Listed among the confirmed bird species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/raccoon",
+		"category": "wildlife",
+		"group": "mammals",
+		"name": "Raccoon",
+		"status": "confirmed",
+		"description": "Shown twice digging through a trash can in the background of a trailer 2 scene.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.pcgamer.com/games/grand-theft-auto/bodega-cats-trash-pandas-and-a-great-white-shark-the-real-stars-of-the-gta-6-reveal-are-all-the-animals-hiding-in-plain-sight/",
+				"title": "Bodega cats, trash pandas, and a great white shark - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "wildlife/florida-panther",
+		"category": "wildlife",
+		"group": "mammals",
+		"name": "Florida panther",
+		"status": "confirmed",
+		"description": "Shown stalking deer in Mount Kalaga national park screenshots released alongside trailer 2; Rockstar describes the region as offering prime hunting.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.pcgamer.com/games/grand-theft-auto/the-gta-6-map-will-include-a-lush-national-park-in-the-mountains-featuring-hillbilly-mystics-and-paranoid-radicals/",
+				"title": "GTA 6's Mount Kalaga national park screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "wildlife/deer",
+		"category": "wildlife",
+		"group": "mammals",
+		"name": "Deer",
+		"status": "confirmed",
+		"description": "Shown grazing near a stalking Florida panther in Mount Kalaga national park screenshots released alongside trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.pcgamer.com/games/grand-theft-auto/the-gta-6-map-will-include-a-lush-national-park-in-the-mountains-featuring-hillbilly-mystics-and-paranoid-radicals/",
+				"title": "GTA 6's Mount Kalaga national park screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "wildlife/bobcat",
+		"category": "wildlife",
+		"group": "mammals",
+		"name": "Bobcat",
+		"status": "confirmed",
+		"description": "Listed among the confirmed mammal species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/fox",
+		"category": "wildlife",
+		"group": "mammals",
+		"name": "Fox",
+		"status": "confirmed",
+		"description": "Listed among the confirmed mammal species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/beaver",
+		"category": "wildlife",
+		"group": "mammals",
+		"name": "Beaver",
+		"status": "confirmed",
+		"description": "Listed among the confirmed mammal species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/boar",
+		"category": "wildlife",
+		"group": "mammals",
+		"name": "Boar",
+		"status": "confirmed",
+		"description": "Listed among the confirmed mammal species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/squirrel",
+		"category": "wildlife",
+		"group": "mammals",
+		"name": "Squirrel",
+		"status": "confirmed",
+		"description": "Listed among the confirmed mammal species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/dolphin",
+		"category": "wildlife",
+		"group": "marine",
+		"name": "Dolphin",
+		"status": "confirmed",
+		"description": "Dolphins appear in trailer 1 alongside flamingos, alligators and sharks.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-trailer-1-breakdown-things-you-missed/",
+				"title": "GTA 6 trailer breakdown - 12 things you might have missed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/great-white-shark",
+		"category": "wildlife",
+		"group": "marine",
+		"name": "Great white shark",
+		"status": "confirmed",
+		"description": "Barely visible beneath the waves of a busy marina in footage and screenshots released alongside trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.pcgamer.com/games/grand-theft-auto/bodega-cats-trash-pandas-and-a-great-white-shark-the-real-stars-of-the-gta-6-reveal-are-all-the-animals-hiding-in-plain-sight/",
+				"title": "Bodega cats, trash pandas, and a great white shark - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "wildlife/manatee",
+		"category": "wildlife",
+		"group": "marine",
+		"name": "Manatee",
+		"status": "confirmed",
+		"description": "Listed among the confirmed marine species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
+		"id": "wildlife/eel",
+		"category": "wildlife",
+		"group": "marine",
+		"name": "Eel",
+		"status": "confirmed",
+		"description": "Listed among the confirmed marine species spotted across the trailers and official screenshots.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	}
+]

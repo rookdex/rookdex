@@ -1,0 +1,29 @@
+{
+	"official": [
+		"rockstargames.com",
+		"youtube.com/@RockstarGames/",
+		"take2games.com",
+		"youtube.com/watch?v=QdBZY2fkU-0",
+		"youtube.com/watch?v=VQRLujxTm3c"
+	],
+	"press": [
+		"ign.com",
+		"gamesradar.com",
+		"eurogamer.net",
+		"gamespot.com",
+		"pcgamer.com",
+		"rockstarintel.com",
+		"gtabase.com"
+	],
+	"blocklist": [
+		"gtaboom.com",
+		"gta6explained.com",
+		"gta6data.com",
+		"leonida-intel.com",
+		"redreactions.com",
+		"gta.fandom.com",
+		"gta.wiki",
+		"gtaforums.com",
+		"wikigtavi.com"
+	]
+}

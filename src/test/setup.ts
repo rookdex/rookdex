@@ -31,6 +31,8 @@ if (typeof window !== "undefined") {
 
 	HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
 		this.setAttribute("open", "")
+		// Browsers move focus into the dialog; without this, "focus returns" tests pass vacuously.
+		this.querySelector<HTMLElement>("[autofocus], input, button")?.focus()
 	}
 	HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
 		this.removeAttribute("open")
