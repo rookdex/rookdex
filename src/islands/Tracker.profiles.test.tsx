@@ -23,8 +23,11 @@ describe("profiles in the island", () => {
 		fireEvent.change(within(dialog).getByLabelText("Profile name"), { target: { value: "Dad" } })
 		fireEvent.click(within(dialog).getByRole("button", { name: "Save" }))
 		const trigger = await screen.findByRole("button", { name: "Profile: Dad" })
-		expect(screen.queryByRole("heading", { name: "New profile" })).not.toBeInTheDocument()
-		// The save lands outside an event handler, so the close effect that returns focus flushes a tick later.
+		// The save lands outside an event handler, so the close effect that removes the dialog and
+		// returns focus flushes a tick later.
+		await waitFor(() =>
+			expect(screen.queryByRole("heading", { name: "New profile" })).not.toBeInTheDocument()
+		)
 		await waitFor(() => expect(trigger).toHaveFocus())
 	})
 
