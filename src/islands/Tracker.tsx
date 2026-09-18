@@ -1,13 +1,15 @@
-import { useRef, useState } from "react"
+import { type ChangeEvent, useRef, useState } from "react"
 import { fill, type Locale, t } from "../i18n"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, recentFinds } from "../model/stats"
 import { openStore } from "../model/store"
 import { createTracker, parseShow, type Tracker as TrackerModel } from "../model/tracker"
+import { readFlag, writeFlag } from "./seenFlag"
 import { CategoryNav } from "./tracker/CategoryNav"
 import { DeleteDialog } from "./tracker/DeleteDialog"
 import { DeletedDialog } from "./tracker/DeletedDialog"
+import { ImportDialog } from "./tracker/ImportDialog"
 import { ItemList } from "./tracker/ItemList"
 import { NameDialog } from "./tracker/NameDialog"
 import { ProfileMenu } from "./tracker/ProfileMenu"
@@ -21,14 +23,6 @@ interface Props {
 	rumoursHref: string
 }
 
-function readHintSeen(): boolean {
-	try {
-		return localStorage.getItem(HINT_KEY) === "1"
-	} catch {
-		return false
-	}
-}
-
 function buildTracker(defaultProfileName: string): TrackerModel {
 	return createTracker({
 		openStore: () => openStore(indexedDB),
@@ -40,7 +34,7 @@ function buildTracker(defaultProfileName: string): TrackerModel {
 				? () => navigator.storage.persist()
 				: undefined,
 		installed: window.matchMedia("(display-mode: standalone)").matches,
-		hintSeen: readHintSeen(),
+		hintSeen: readFlag(HINT_KEY),
 	})
 }
 
@@ -59,6 +53,7 @@ export function Tracker({ locale, rumoursHref }: Props) {
 	const [opening, setOpening] = useState(0)
 	// Owned here so dialogs opened from the menu can return focus to its button.
 	const menuButton = useRef<HTMLButtonElement>(null)
+	const fileInput = useRef<HTMLInputElement>(null)
 	const current = state.profiles.find((p) => p.id === state.profileId)
 	const currentName = current?.name ?? ""
 
@@ -94,6 +89,18 @@ export function Tracker({ locale, rumoursHref }: Props) {
 	function deleteCurrent() {
 		setDialog(null)
 		if (current) tracker.deleteProfile(current.id)
+	}
+
+	async function onFile(event: ChangeEvent<HTMLInputElement>) {
+		const file = event.target.files?.[0]
+		// Cleared first so picking the same file again still fires `change`.
+		event.target.value = ""
+		if (file) await tracker.readImport(file)
+	}
+
+	function dismissHint() {
+		writeFlag(HINT_KEY)
+		tracker.dismissPersistHint()
 	}
 
 	const categories = perCategory(countable(state.items), state.records).map((c) => ({
@@ -136,11 +143,19 @@ export function Tracker({ locale, rumoursHref }: Props) {
 					onNew={() => openDialog("new")}
 					onRename={() => openDialog("rename")}
 					onExport={exportNow}
-					onImport={() => {}}
+					onImport={() => fileInput.current?.click()}
 					onDelete={() => openDialog("delete")}
 					onDeleted={() => openDialog("deleted")}
 					strings={s.profile}
 				/>
+				{state.persistHint && (
+					<p className="hint" role="status">
+						{s.tracker.persistHint}{" "}
+						<button type="button" onClick={dismissHint}>
+							{s.tracker.dismiss}
+						</button>
+					</p>
+				)}
 			</div>
 			<CategoryNav
 				categories={categories}
@@ -201,7 +216,24 @@ export function Tracker({ locale, rumoursHref }: Props) {
 				onRestore={tracker.restoreProfile}
 				onClose={closeDialog}
 			/>
-			{/* Task 13 adds the file input here */}
+			<ImportDialog
+				file={state.pendingImport}
+				into={currentName}
+				strings={s.profile}
+				onInto={() => tracker.confirmImport("current")}
+				onCreate={() => tracker.confirmImport("new")}
+				onCancel={tracker.cancelImport}
+				returnTo={menuButton}
+			/>
+			<input
+				ref={fileInput}
+				type="file"
+				accept=".json,application/json"
+				className="visually-hidden"
+				tabIndex={-1}
+				aria-label={s.profile.import}
+				onChange={onFile}
+			/>
 		</div>
 	)
 }
