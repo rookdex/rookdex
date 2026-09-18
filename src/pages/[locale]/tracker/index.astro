@@ -1,0 +1,24 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n"
+import { isLocale, type Locale, locales, t } from "../../../i18n"
+import { Tracker } from "../../../islands/Tracker"
+import Base from "../../../layouts/Base.astro"
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale } }))
+}
+
+const { locale } = Astro.params
+if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
+const s = t(locale as Locale)
+---
+
+<Base locale={locale} title={s.tracker.title} description={s.tracker.description} path="tracker">
+	<h1>{s.tracker.title}</h1>
+	<noscript><p>{s.tracker.needsJs}</p></noscript>
+	<Tracker
+		client:only="react"
+		locale={locale}
+		rumoursHref={getRelativeLocaleUrl(locale, "tracker/rumours")}
+	/>
+</Base>
