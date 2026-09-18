@@ -277,6 +277,20 @@ p {
 
 .stats {
 	grid-area: stats;
+	padding: var(--space-3);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
+}
+
+.stats h2 {
+	font-size: 1rem;
+}
+
+.stats h3 {
+	font-size: 0.875rem;
+	color: var(--text-muted);
+	margin-top: var(--space-3);
 }
 
 /* Shared button reset; each kind below sets only what differs. */
@@ -414,6 +428,46 @@ p {
 	margin: 0;
 	color: var(--accent);
 	max-width: none;
+}
+
+.progress {
+	margin-bottom: var(--space-2);
+}
+
+.progress-label {
+	display: flex;
+	justify-content: space-between;
+	gap: var(--space-2);
+	font-size: 0.875rem;
+	font-variant-numeric: tabular-nums;
+}
+
+.bar {
+	height: 0.5rem;
+	border-radius: 999px;
+	background: var(--border);
+	overflow: hidden;
+}
+
+.bar-fill {
+	display: block;
+	height: 100%;
+	background: var(--accent);
+	transition: width 300ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.bar-fill {
+		transition: none;
+	}
+}
+
+.recent,
+.stats-empty {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-size: 0.875rem;
 }
 
 @media (min-width: 768px) {

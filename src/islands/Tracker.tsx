@@ -1,11 +1,12 @@
 import { useState } from "react"
 import { fill, type Locale, t } from "../i18n"
 import { categoryIds, seedItems } from "../model/seed"
-import { perCategory } from "../model/stats"
+import { countable, countItems, perCategory, recentFinds } from "../model/stats"
 import { openStore } from "../model/store"
 import { createTracker, parseShow, type Tracker as TrackerModel } from "../model/tracker"
 import { CategoryNav } from "./tracker/CategoryNav"
 import { ItemList } from "./tracker/ItemList"
+import { StatsRail } from "./tracker/StatsRail"
 import { useTracker } from "./useTracker"
 
 export const HINT_KEY = "rookdex.persist-hint-seen"
@@ -48,7 +49,7 @@ export function Tracker({ locale, rumoursHref }: Props) {
 	const [tracker] = useState(() => buildTracker(s.profile.defaultName))
 	const state = useTracker(tracker)
 
-	const categories = perCategory(state.items, state.records).map((c) => ({
+	const categories = perCategory(countable(state.items), state.records).map((c) => ({
 		...c,
 		id: c.category,
 		label: label(s.category, c.category),
@@ -96,7 +97,12 @@ export function Tracker({ locale, rumoursHref }: Props) {
 				onToggle={(id, done) => (done ? tracker.tick(id) : tracker.untick(id))}
 				strings={s.tracker}
 			/>
-			{/* Task 11 adds the stats rail here */}
+			<StatsRail
+				overall={countItems(state.items, state.records)}
+				categories={categories}
+				recent={recentFinds(state.items, state.records)}
+				strings={s.tracker}
+			/>
 			<p className="visually-hidden" role="status" aria-live="polite">
 				{announcement}
 			</p>
