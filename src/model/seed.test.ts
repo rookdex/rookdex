@@ -194,4 +194,12 @@ describe("shipped seed", () => {
 			expect(no.group[item.group], `no group ${item.group}`).toBeTruthy()
 		}
 	})
+	it("keeps brand tokens out of item and rumour ids (whole segment only)", () => {
+		const banned = ["gta", "gta6", "gtavi", "rockstar", "leonida", "vice"]
+		for (const { id } of [...seedItems, ...rumours]) {
+			for (const segment of id.split(/[/-]/)) {
+				expect(banned, id).not.toContain(segment)
+			}
+		}
+	})
 })
