@@ -34,9 +34,9 @@ self.addEventListener("fetch", (event) => {
 		event.respondWith(cacheFirst(request))
 		return
 	}
-	// Pages: network first so a deploy shows on the next load; cache when offline.
+	// Pages: cached copy at once, refreshed in the background; a deploy shows on the next load.
 	if (request.mode === "navigate") {
-		event.respondWith(networkFirst(request, url))
+		event.respondWith(staleWhileRevalidate(event, url))
 		return
 	}
 	event.respondWith(cacheFirst(request))
@@ -48,24 +48,29 @@ async function cacheFirst(request) {
 	const response = await fetch(request)
 	if (response.ok) {
 		const cache = await caches.open(CACHE)
-		cache.put(request, response.clone())
+		await cache.put(request, response.clone())
 	}
 	return response
 }
 
-async function networkFirst(request, url) {
-	try {
-		const response = await fetch(request)
-		if (response.ok) {
-			const cache = await caches.open(CACHE)
-			cache.put(request, response.clone())
-		}
-		return response
-	} catch {
-		const cached = await caches.match(request)
-		if (cached) return cached
-		// Unknown page while offline: fall back to the home page of the same language.
-		const localeHome = `/${url.pathname.split("/")[1] || "en"}/`
-		return (await caches.match(localeHome)) ?? (await caches.match("/en/")) ?? Response.error()
+async function staleWhileRevalidate(event, url) {
+	// The query string is dropped from the key so /en/tracker/?show=wildlife hits the precached page.
+	const key = url.origin + url.pathname
+	const cache = await caches.open(CACHE)
+	const cached = await cache.match(key)
+	const refresh = fetch(event.request)
+		.then(async (response) => {
+			if (response.ok) await cache.put(key, response.clone())
+			return response
+		})
+		.catch(() => undefined)
+	if (cached) {
+		event.waitUntil(refresh)
+		return cached
 	}
+	const response = await refresh
+	if (response) return response
+	// Unknown page while offline: fall back to the home page of the same language.
+	const localeHome = `/${url.pathname.split("/")[1] || "en"}/`
+	return (await cache.match(localeHome)) ?? (await cache.match("/en/")) ?? Response.error()
 }

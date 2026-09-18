@@ -9,6 +9,15 @@ export function guideSlugs(entries: { id: string }[]): string[] {
 	return [...new Set(entries.map((e) => splitGuideId(e.id).slug))]
 }
 
+/**
+ * Slugs that have a copy in the `fallback` language. Only these get a page in every locale;
+ * a guide written in another language alone stays unpublished instead of failing the build.
+ */
+export function publishedSlugs(entries: { id: string }[], fallback = "en"): string[] {
+	const ids = new Set(entries.map((e) => e.id))
+	return guideSlugs(entries).filter((slug) => ids.has(`${fallback}/${slug}`))
+}
+
 /** The guide in `locale`, or the `fallback` language's copy flagged with `fellBack`. */
 export function resolveGuide<T extends { id: string }>(
 	entries: T[],

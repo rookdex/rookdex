@@ -28,6 +28,7 @@ const s = t(locale as Locale)
 			locale={locale}
 			initialNow={new Date().toISOString()}
 			guideHref={getRelativeLocaleUrl(locale, "guides/before-you-start")}
+			trackerHref={getRelativeLocaleUrl(locale, "tracker")}
 		/>
 	</div>
 	<InstallPrompt client:idle locale={locale} />

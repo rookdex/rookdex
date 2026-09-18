@@ -21,7 +21,6 @@ export const en = {
 		beforeYouStart: "Read this before you start",
 		launched: "It is out.",
 		daySince: "Day {n} since launch",
-		statsSoon: "Your progress and stats land here in the next release.",
 		openTracker: "Open the tracker",
 	},
 	guides: {

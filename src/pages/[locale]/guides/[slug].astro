@@ -2,13 +2,13 @@
 import { getCollection, render } from "astro:content"
 import { defaultLocale, fill, isLocale, type Locale, locales, t } from "../../../i18n"
 import Base from "../../../layouts/Base.astro"
-import { guideSlugs, resolveGuide } from "../../../model/guides"
+import { publishedSlugs, resolveGuide } from "../../../model/guides"
 
 export async function getStaticPaths() {
 	const entries = await getCollection("guides")
-	// Every slug exists in every language; missing translations render the English copy.
+	// Every published slug exists in every language; missing translations render the English copy.
 	return locales.flatMap((locale) =>
-		guideSlugs(entries).map((slug) => ({ params: { locale, slug } }))
+		publishedSlugs(entries, defaultLocale).map((slug) => ({ params: { locale, slug } }))
 	)
 }
 
@@ -37,7 +37,9 @@ const updated = entry.data.updated.toLocaleDateString(dateLocale, { dateStyle: "
 		{
 			entry.data.sources.length > 0 && (
 				<section aria-labelledby="sources">
-					<h2 id="sources">{s.guides.sources}</h2>
+					<h2 id="sources" lang={fellBack ? locale : undefined}>
+						{s.guides.sources}
+					</h2>
 					<ul class="tap-links">
 						{entry.data.sources.map((url) => (
 							<li>

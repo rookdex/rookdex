@@ -22,7 +22,6 @@ export const no: Strings = {
 		beforeYouStart: "Les dette før du begynner",
 		launched: "Det er ute.",
 		daySince: "Dag {n} etter lansering",
-		statsSoon: "Fremgangen og statistikken din kommer hit i neste utgave.",
 		openTracker: "Åpne oversikten",
 	},
 	guides: {

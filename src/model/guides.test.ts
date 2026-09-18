@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { guideSlugs, resolveGuide, splitGuideId } from "./guides"
+import { guideSlugs, publishedSlugs, resolveGuide, splitGuideId } from "./guides"
 
 const entries = [{ id: "en/before-you-start" }, { id: "no/before-you-start" }, { id: "en/regions" }]
 
@@ -12,6 +12,13 @@ describe("splitGuideId", () => {
 describe("guideSlugs", () => {
 	it("lists every slug once, across languages", () => {
 		expect(guideSlugs(entries)).toEqual(["before-you-start", "regions"])
+	})
+})
+
+describe("publishedSlugs", () => {
+	it("keeps only slugs with a copy in the fallback language, so every locale can resolve", () => {
+		const withNorwegianOnly = [...entries, { id: "no/kun-norsk" }]
+		expect(publishedSlugs(withNorwegianOnly, "en")).toEqual(["before-you-start", "regions"])
 	})
 })
 
