@@ -593,6 +593,32 @@ p {
 	color: var(--text);
 }
 
+.rumour-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.rumour-list li {
+	padding: var(--space-3) 0;
+	border-bottom: 1px solid var(--border);
+}
+
+.rumour-list h2 {
+	font-size: 1.125rem;
+}
+
+.rumour-list .meta {
+	font-size: 0.875rem;
+	margin: 0;
+}
+
+.rumour-list .meta a {
+	display: inline-flex;
+	align-items: center;
+	min-height: var(--tap);
+}
+
 @media (min-width: 768px) {
 	.wrap {
 		padding: var(--space-5) var(--space-4);
@@ -606,6 +632,31 @@ p {
 	.unit .value {
 		font-size: 3rem;
 	}
+
+	.tracker {
+		grid-template-columns: 170px minmax(0, 1fr);
+		grid-template-areas:
+			"top top"
+			"nav list"
+			"stats stats";
+		align-items: start;
+	}
+
+	.chips {
+		flex-direction: column;
+	}
+
+	.chips button {
+		width: 100%;
+		text-align: left;
+		border-radius: var(--radius);
+	}
+
+	.stats-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--space-3);
+	}
 }
 
 @media (min-width: 1024px) {
@@ -616,5 +667,24 @@ p {
 	.hub {
 		grid-template-columns: 1fr 1fr;
 		align-items: start;
+	}
+
+	.tracker {
+		grid-template-columns: 170px minmax(0, 640px) 180px;
+		grid-template-areas:
+			"top top top"
+			"nav list stats";
+		justify-content: center;
+	}
+
+	.item-groups {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--space-3);
+		align-items: start;
+	}
+
+	.stats-grid {
+		grid-template-columns: 1fr;
 	}
 }
