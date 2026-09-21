@@ -4,9 +4,9 @@ import * as axeMatchers from "vitest-axe/matchers"
 
 // vitest-axe still augments Vitest's removed `Vi` namespace, so the matcher is declared here instead.
 declare module "vitest" {
-	// biome-ignore lint/suspicious/noExplicitAny: must match `interface Matchers<T = any>` in @vitest/expect.
-	interface Matchers<T = any> {
-		toHaveNoViolations(): T
+	// The type parameters must match `interface Matchers<R, T>` in vitest exactly.
+	interface Matchers<R extends void | Promise<void> = void | Promise<void>, T = unknown> {
+		toHaveNoViolations(): R
 	}
 }
 
