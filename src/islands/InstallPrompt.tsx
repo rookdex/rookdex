@@ -1,23 +1,8 @@
 import { useEffect, useRef, useState } from "react"
 import { type Locale, t } from "../i18n"
+import { readFlag, writeFlag } from "./seenFlag"
 
 export const SEEN_KEY = "rookdex.install-prompt-seen"
-
-function readSeen(): boolean {
-	try {
-		return localStorage.getItem(SEEN_KEY) === "1"
-	} catch {
-		return false
-	}
-}
-
-function writeSeen(): void {
-	try {
-		localStorage.setItem(SEEN_KEY, "1")
-	} catch {
-		// Private mode or blocked storage: the prompt simply shows again next visit.
-	}
-}
 
 interface Props {
 	locale: Locale
@@ -32,7 +17,7 @@ export function InstallPrompt({ locale }: Props) {
 
 	useEffect(() => {
 		const onPrompt = (event: BeforeInstallPromptEvent) => {
-			if (readSeen()) return
+			if (readFlag(SEEN_KEY)) return
 			event.preventDefault()
 			setDeferred(event)
 		}
@@ -49,7 +34,7 @@ export function InstallPrompt({ locale }: Props) {
 	}, [deferred])
 
 	function dismiss() {
-		writeSeen()
+		writeFlag(SEEN_KEY)
 		setDeferred(null)
 		dialogRef.current?.close()
 	}
@@ -61,7 +46,7 @@ export function InstallPrompt({ locale }: Props) {
 
 	function onClose() {
 		// Fires for the buttons and for Escape alike.
-		writeSeen()
+		writeFlag(SEEN_KEY)
 		setDeferred(null)
 		returnFocus.current?.focus()
 	}

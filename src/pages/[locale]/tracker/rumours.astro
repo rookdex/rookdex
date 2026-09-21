@@ -1,0 +1,52 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n"
+import { fill, isLocale, type Locale, locales, t } from "../../../i18n"
+import Base from "../../../layouts/Base.astro"
+import { outletOf, rumours } from "../../../model/seed"
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale } }))
+}
+
+const { locale } = Astro.params
+if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
+const s = t(locale as Locale)
+---
+
+<Base
+	locale={locale}
+	title={s.rumours.title}
+	description={s.rumours.description}
+	path="tracker/rumours"
+>
+	<article class="rumours">
+		<h1>{s.rumours.title}</h1>
+		<p class="tagline">{s.rumours.intro}</p>
+		<p class="tap-links">
+			<a href={getRelativeLocaleUrl(locale, "tracker")}>{s.rumours.backToTracker}</a>
+		</p>
+		{
+			rumours.length === 0 ? (
+				<p>{s.rumours.empty}</p>
+			) : (
+				<ul class="rumour-list">
+					{rumours.map((rumour) => {
+						const press =
+							rumour.sources.find((source) => source.tier === "press") ?? rumour.sources[0]
+						return (
+							<li>
+								<h2>{rumour.name}</h2>
+								<p>{rumour.summary}</p>
+								<p class="meta">
+									<a href={press.url} rel="noopener noreferrer">
+										{fill(s.rumours.reportedBy, { outlet: outletOf(press.url) })}
+									</a>
+								</p>
+							</li>
+						)
+					})}
+				</ul>
+			)
+		}
+	</article>
+</Base>

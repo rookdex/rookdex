@@ -1,0 +1,38 @@
+[
+	{
+		"id": "rumours/online-2027-launch",
+		"name": "GTA 6 Multiplayer in 2027",
+		"claim_key": "online-2027-launch",
+		"summary": "Twitch CEO Dan Clancy told Bloomberg that Rockstar plans to launch GTA 6's online multiplayer mode in 2027, a year after the single player game, though Rockstar itself has not confirmed a date.",
+		"sources": [
+			{
+				"url": "https://www.pcgamer.com/games/grand-theft-auto/twitch-ceo-says-gta-6-multiplayer-will-launch-in-2027/",
+				"title": "Twitch CEO says GTA 6 multiplayer will launch in 2027"
+			}
+		]
+	},
+	{
+		"id": "rumours/pc-release-timing",
+		"name": "GTA 6 PC Release Timing",
+		"claim_key": "pc-release-late-2027",
+		"summary": "PC Gamer estimates the PC version likely will not arrive before late 2027, based on the gaps between console and PC launches for past Rockstar titles; Rockstar has given no PC release window.",
+		"sources": [
+			{
+				"url": "https://www.pcgamer.com/games/grand-theft-auto/gta-6-pc-release-date/",
+				"title": "When might the GTA 6 PC release date be?"
+			}
+		]
+	},
+	{
+		"id": "rumours/post-launch-map-expansion",
+		"name": "Post-Launch Map Expansion",
+		"claim_key": "map-expansion",
+		"summary": "Insider reporting cited by GTABase suggests Rockstar intends to keep growing Leonida after launch by adding new missions and cities over time rather than shipping the full world on day one; this plan is not officially confirmed.",
+		"sources": [
+			{
+				"url": "https://www.gtabase.com/gta-6/map/",
+				"title": "GTA 6 Map: Full Leonida Map, Vice City & All Locations"
+			}
+		]
+	}
+]
