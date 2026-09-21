@@ -9,3 +9,6 @@ dist/
 
 # brainstorming companion mockups
 .superpowers/
+
+# Claude Code local config (Browser-pane launch config, local permissions)
+.claude/
