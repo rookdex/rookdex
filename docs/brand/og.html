@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Rookdex OG banner source</title>
+		<link rel="stylesheet" href="/node_modules/@fontsource/bebas-neue/latin-400.css" />
+		<link rel="stylesheet" href="/node_modules/@fontsource-variable/dm-sans/index.css" />
+		<style>
+			html,
+			body {
+				margin: 0;
+				background: #000000;
+			}
+			svg {
+				display: block;
+			}
+			#status {
+				font: 14px system-ui, sans-serif;
+				color: #a3a3a3;
+				padding: 8px;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- 1200 × 630, Layout 2 lockup (spec §8). Geometry is the table in §8; the mark is §5.1 at scale 0.9. -->
+		<svg id="og" xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+			<defs>
+				<linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+					<stop offset="0" stop-color="#ff3d81" />
+					<stop offset="1" stop-color="#ff8a3d" />
+				</linearGradient>
+				<linearGradient id="stripe" x1="0" y1="0" x2="1" y2="0">
+					<stop offset="0" stop-color="#ff3d81" />
+					<stop offset="1" stop-color="#ff8a3d" />
+				</linearGradient>
+				<clipPath id="disc"><circle cx="256" cy="236" r="150" /></clipPath>
+				<filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+					<feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#ff3d81" flood-opacity="0.45" />
+				</filter>
+			</defs>
+			<rect width="1200" height="630" fill="#000000" />
+			<g transform="translate(50 85) scale(0.9)">
+				<circle cx="256" cy="236" r="150" fill="url(#sun)" filter="url(#glow)" />
+				<g fill="#000000" clip-path="url(#disc)">
+					<rect x="0" y="262" width="512" height="12" />
+					<rect x="0" y="298" width="512" height="18" />
+					<rect x="0" y="342" width="512" height="26" />
+				</g>
+				<rect x="96" y="398" width="320" height="14" rx="7" fill="#22e0ff" />
+				<g fill="#000000">
+					<path d="M352 404 C 344 340, 334 280, 312 214" fill="none" stroke="#000000" stroke-width="24" stroke-linecap="round" />
+					<path d="M312 214 Q 236 156 178 190 Q 244 192 312 214 z" />
+					<path d="M312 214 Q 208 208 168 262 Q 250 228 312 214 z" />
+					<path d="M312 214 Q 386 152 446 184 Q 380 190 312 214 z" />
+					<path d="M312 214 Q 412 206 452 262 Q 372 228 312 214 z" />
+					<path d="M312 214 Q 236 246 224 316 Q 276 248 312 214 z" />
+					<path d="M312 214 Q 386 246 398 316 Q 346 248 312 214 z" />
+					<path d="M312 214 Q 300 140 332 104 Q 316 160 312 214 z" />
+				</g>
+			</g>
+			<text id="wordmark" x="540" y="284" font-family="Bebas Neue" font-size="176" letter-spacing="6" fill="#f2f2f2">ROOKDEX</text>
+			<text id="tagline" x="542" y="350" font-family="DM Sans Variable" font-weight="600" font-size="32" fill="#f2f2f2">The open-source GTA VI companion.</text>
+			<text id="muted" x="542" y="412" font-family="DM Sans Variable" font-weight="500" font-size="20" fill="#a3a3a3">rookdex.app · track your progress · works offline · unofficial</text>
+			<rect x="0" y="606" width="1200" height="24" fill="url(#stripe)" />
+		</svg>
+		<p id="status">Fonts loading…</p>
+		<script>
+			// render(): copies the SVG, embeds the two faces as data URLs (an SVG drawn into a canvas
+			// cannot see page fonts), rasterises at exactly 1200 × 630 and posts the PNG to serve.mjs.
+			const faces = [
+				["Bebas Neue", "/node_modules/@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2", "400"],
+				["DM Sans Variable", "/node_modules/@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2", "100 1000"],
+			]
+
+			async function toDataUrl(url) {
+				const blob = await (await fetch(url)).blob()
+				return new Promise((resolve) => {
+					const reader = new FileReader()
+					reader.onload = () => resolve(reader.result)
+					reader.readAsDataURL(blob)
+				})
+			}
+
+			/** Right edge of each text element in SVG units, to compare with spec §8. */
+			function edges() {
+				const edge = (id) => {
+					const box = document.getElementById(id).getBBox()
+					return Math.round(box.x + box.width)
+				}
+				return { wordmark: edge("wordmark"), tagline: edge("tagline"), muted: edge("muted") }
+			}
+
+			async function render() {
+				await document.fonts.ready
+				const svg = document.getElementById("og").cloneNode(true)
+				const style = document.createElementNS("http://www.w3.org/2000/svg", "style")
+				const rules = await Promise.all(
+					faces.map(async ([family, url, weight]) =>
+						`@font-face{font-family:"${family}";font-weight:${weight};src:url(${await toDataUrl(url)}) format("woff2")}`
+					)
+				)
+				style.textContent = rules.join("")
+				svg.insertBefore(style, svg.firstChild)
+				const blob = new Blob([new XMLSerializer().serializeToString(svg)], { type: "image/svg+xml" })
+				const img = new Image()
+				await new Promise((resolve, reject) => {
+					img.onload = resolve
+					img.onerror = reject
+					img.src = URL.createObjectURL(blob)
+				})
+				const canvas = document.createElement("canvas")
+				canvas.width = 1200
+				canvas.height = 630
+				canvas.getContext("2d").drawImage(img, 0, 0, 1200, 630)
+				const png = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"))
+				const saved = await (await fetch("/og.png", { method: "POST", body: png })).json()
+				const result = { width: canvas.width, height: canvas.height, bytes: saved.bytes, edges: edges() }
+				document.getElementById("status").textContent = JSON.stringify(result)
+				return result
+			}
+
+			document.fonts.ready.then(() => {
+				document.getElementById("status").textContent = `Fonts ready. ${JSON.stringify(edges())}`
+			})
+		</script>
+	</body>
+</html>
