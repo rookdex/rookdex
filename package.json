@@ -30,6 +30,7 @@
 		"@biomejs/biome": "2.5.12",
 		"@testing-library/jest-dom": "7.0.1",
 		"@testing-library/react": "16.3.3",
+		"@types/node": "26.6.2",
 		"@types/react": "19.2.18",
 		"@types/react-dom": "19.2.7",
 		"@vite-pwa/assets-generator": "1.0.2",
