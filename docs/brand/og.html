@@ -24,6 +24,7 @@
 	<body>
 		<!-- 1200 × 630, Layout 2 lockup (spec §8). Geometry is the table in §8; the mark is §5.1 at scale 0.9. -->
 		<svg id="og" xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+			<title>Rookdex — the open-source GTA VI companion</title>
 			<defs>
 				<linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
 					<stop offset="0" stop-color="#ff3d81" />
@@ -90,6 +91,7 @@
 				return { wordmark: edge("wordmark"), tagline: edge("tagline"), muted: edge("muted") }
 			}
 
+			// biome-ignore lint/correctness/noUnusedVariables: called by hand from the browser console
 			async function render() {
 				await document.fonts.ready
 				const svg = document.getElementById("og").cloneNode(true)
