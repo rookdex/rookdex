@@ -28,7 +28,9 @@ svg {
 }
 
 a {
-	color: var(--accent);
+	color: var(--link);
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
 }
 
 :focus-visible {
@@ -36,11 +38,28 @@ a {
 	outline-offset: 2px;
 }
 
+/* Pink is focus everywhere except on the three pink surfaces (spec §12). */
+.skip:focus-visible,
+.actions .primary:focus-visible,
+.chips button[aria-pressed="true"]:focus-visible {
+	outline-color: var(--text);
+}
+
 h1,
 h2,
 h3 {
 	line-height: 1.2;
 	margin: 0 0 var(--space-3);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-heading);
+	font-weight: 600;
 }
 
 p {
@@ -69,12 +88,38 @@ p {
 }
 
 .brand {
-	font-weight: 700;
-	text-decoration: none;
-	color: var(--text);
-	min-height: var(--tap);
 	display: inline-flex;
 	align-items: center;
+	gap: var(--space-2);
+	min-height: var(--tap);
+	color: var(--text);
+	text-decoration: none;
+}
+
+/* The header mark is one of the three glow sites (spec §4.2). The wordmark never glows. */
+.brand .mark {
+	filter: var(--glow-filter);
+}
+
+.wordmark {
+	font-family: var(--font-display);
+	font-weight: 400;
+	font-size: 1.25rem;
+	line-height: 1;
+	letter-spacing: 0.04em;
+	color: var(--text);
+}
+
+/* Hub h1: the same lockup, larger. It is the wordmark, not a heading, so the display face is right. */
+.lockup {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	margin: 0 0 var(--space-3);
+}
+
+.lockup .wordmark {
+	font-size: 2.5rem;
 }
 
 .lang ul {
@@ -632,6 +677,15 @@ p {
 
 	.unit .value {
 		font-size: 3rem;
+	}
+
+	.lockup .mark {
+		width: 64px;
+		height: 64px;
+	}
+
+	.lockup .wordmark {
+		font-size: 3.5rem;
 	}
 
 	.tracker {

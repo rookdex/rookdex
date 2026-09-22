@@ -1,5 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n"
+import Mark from "../../components/Mark.astro"
 import { isLocale, type Locale, locales, t } from "../../i18n"
 import { Countdown } from "../../islands/Countdown"
 import { InstallPrompt } from "../../islands/InstallPrompt"
@@ -17,7 +18,10 @@ const s = t(locale as Locale)
 <Base locale={locale} title={s.siteName} description={s.tagline} path="">
 	<div class="hub">
 		<header class="hub-intro">
-			<h1>{s.siteName}</h1>
+			<h1 class="lockup" aria-label="Rookdex">
+				<Mark id="hub" size={48} />
+				<span class="wordmark">ROOKDEX</span>
+			</h1>
 			<p class="tagline">{s.tagline}</p>
 			<p class="tap-links">
 				<a href={getRelativeLocaleUrl(locale, "tracker")}>{s.hub.openTracker}</a>

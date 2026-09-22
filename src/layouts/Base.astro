@@ -6,6 +6,7 @@ import { getAbsoluteLocaleUrl, getRelativeLocaleUrl } from "astro:i18n"
 import bebasLatin from "@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2?url"
 import Footer from "../components/Footer.astro"
 import LanguageSwitch from "../components/LanguageSwitch.astro"
+import Mark from "../components/Mark.astro"
 import { defaultLocale, type Locale, locales, t } from "../i18n"
 import "../styles/global.css"
 
@@ -42,7 +43,10 @@ const s = t(locale)
 	<body>
 		<a class="skip" href="#main">{s.skipToContent}</a>
 		<header class="site-header">
-			<a class="brand" href={getRelativeLocaleUrl(locale, "")}>{s.siteName}</a>
+			<a class="brand" href={getRelativeLocaleUrl(locale, "")} aria-label="Rookdex">
+				<Mark id="header" />
+				<span class="wordmark">ROOKDEX</span>
+			</a>
 			<LanguageSwitch locale={locale} path={path} />
 		</header>
 		<main id="main" class="wrap">
