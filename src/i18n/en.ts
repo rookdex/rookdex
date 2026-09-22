@@ -9,7 +9,7 @@ export const en = {
 	hub: {
 		countdownHeading: "Launch countdown",
 		daysToGo: "{n} days to go",
-		oneDayToGo: "1 day to go",
+		oneDayToGo: "{n} day to go",
 		days: "days",
 		hours: "hours",
 		minutes: "minutes",

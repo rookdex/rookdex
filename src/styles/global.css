@@ -221,6 +221,16 @@ p {
 	font-weight: 600;
 }
 
+/* The one display number (spec §6.1). Third glow site; the token is `none` under reduced motion. */
+.days-number {
+	font-family: var(--font-display);
+	font-weight: 400;
+	font-size: 4rem;
+	line-height: 1;
+	color: var(--text);
+	text-shadow: var(--glow);
+}
+
 .countdown {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(3.5rem, 1fr));
@@ -677,6 +687,10 @@ p {
 
 	.unit .value {
 		font-size: 3rem;
+	}
+
+	.days-number {
+		font-size: 6rem;
 	}
 
 	.lockup .mark {
