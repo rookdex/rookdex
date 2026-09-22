@@ -49,9 +49,35 @@ function withoutPalm(svg: string): string {
 	return svg.slice(0, start) + svg.slice(end)
 }
 
+/** The favicon source without its scale wrapper — the wrapper is the only element the icon lacks. */
+function withoutScaleWrapper(svg: string): string {
+	const open = svg.indexOf("<g transform=")
+	const close = svg.lastIndexOf("</g>")
+	return (
+		svg.slice(0, open) +
+		svg.slice(svg.indexOf(">", open) + 1, close) +
+		svg.slice(close + "</g>".length)
+	)
+}
+
 describe("favicon source parity (Task 7 ruling)", () => {
 	it("is the icon with the palm removed and nothing else changed", () => {
-		expect(lines(favicon)).toEqual(lines(withoutPalm(icon)))
+		expect(lines(withoutScaleWrapper(favicon))).toEqual(lines(withoutPalm(icon)))
+	})
+
+	it("scales the drawing up, so the mark carries at 16 px", () => {
+		expect(Number(favicon.match(/scale\(([\d.]+)\)/)?.[1])).toBeGreaterThan(1)
+	})
+
+	it("keeps the scaled drawing inside the 512 box", () => {
+		const m = favicon.match(/translate\((-?[\d.]+) (-?[\d.]+)\) scale\(([\d.]+)\)/)
+		const [tx, ty, s] = [Number(m?.[1]), Number(m?.[2]), Number(m?.[3])]
+		// Untransformed extents: the horizon bar is widest (96–416); the sun top and the bar bottom are the ends (86–412).
+		const edges = [96 * s + tx, 416 * s + tx, 86 * s + ty, 412 * s + ty]
+		for (const edge of edges) {
+			expect(edge).toBeGreaterThanOrEqual(0)
+			expect(edge).toBeLessThanOrEqual(512)
+		}
 	})
 
 	it("drops the palm, which is noise at 16 px", () => {
