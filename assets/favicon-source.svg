@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="t">
+	<title id="t">Rookdex</title>
+	<defs>
+		<linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#ff3d81"/>
+			<stop offset="1" stop-color="#ff8a3d"/>
+		</linearGradient>
+		<clipPath id="disc"><circle cx="256" cy="236" r="150"/></clipPath>
+	</defs>
+	<rect width="512" height="512" rx="96" fill="#000000"/>
+	<circle cx="256" cy="236" r="150" fill="url(#sun)"/>
+	<g fill="#000000" clip-path="url(#disc)">
+		<rect x="0" y="262" width="512" height="12"/>
+		<rect x="0" y="298" width="512" height="18"/>
+		<rect x="0" y="342" width="512" height="26"/>
+	</g>
+	<rect x="96" y="398" width="320" height="14" rx="7" fill="#22e0ff"/>
+</svg>
