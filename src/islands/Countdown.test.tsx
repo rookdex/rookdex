@@ -36,6 +36,7 @@ describe("Countdown before launch", () => {
 		const digits = screen.getByTestId("countdown-digits")
 		expect(digits).toHaveAttribute("aria-live", "off")
 		expect(daysLine()).toHaveAttribute("aria-live", "polite")
+		expect(daysLine()).toHaveAttribute("aria-atomic", "true")
 		expect(daysLine()).toHaveTextContent("70 days to go")
 		expect(daysLine().querySelector(".days-number")).toHaveTextContent("70")
 		expect(screen.getByRole("link", { name: "Read this before you start" })).toHaveAttribute(

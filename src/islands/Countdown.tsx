@@ -45,7 +45,7 @@ export function Countdown({ locale, initialNow, guideHref, trackerHref }: Props)
 		<section className="hub-state" aria-labelledby="hub-heading">
 			<h2 id="hub-heading">{after ? s.launched : s.countdownHeading}</h2>
 			{/* One live region for both phases, so the flip itself is announced as one sentence. */}
-			<p className="days" aria-live="polite">
+			<p className="days" aria-live="polite" aria-atomic="true">
 				<DaysLine template={template} n={n} />
 			</p>
 			{after ? (
