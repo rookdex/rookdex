@@ -520,13 +520,15 @@ p {
 	margin-bottom: var(--space-2);
 }
 
-/* Ledger numbers (spec §3, §6.1): one face for the whole row so a DM Sans label never sits
-   beside Inter digits. Task 6 Step 1 decides the face; the label is muted so it reads as a label. */
+/* Ledger numbers (spec §3, §6.1): one face for the whole row so the label and its count never
+   split across two faces. Task 6 Step 1 measured DM Sans Variable with no working tabular
+   figures, so this stays on --font-sans (Inter) rather than --font-heading; the label is muted
+   so it reads as a label. */
 .progress-label {
 	display: flex;
 	justify-content: space-between;
 	gap: var(--space-2);
-	font-family: var(--font-heading);
+	font-family: var(--font-sans);
 	font-weight: 600;
 	font-size: 0.875rem;
 	font-variant-numeric: tabular-nums;
