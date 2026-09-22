@@ -462,6 +462,15 @@ p {
 	white-space: nowrap;
 }
 
+/* Tier colours come from their own tokens so a theme can swap them without touching the accent. */
+.tier[data-status="confirmed"] {
+	color: var(--tier-confirmed);
+}
+
+.tier[data-status="expected"] {
+	color: var(--tier-expected);
+}
+
 .item-desc {
 	margin: 0 0 var(--space-1);
 	color: var(--text-muted);
@@ -511,12 +520,20 @@ p {
 	margin-bottom: var(--space-2);
 }
 
+/* Ledger numbers (spec §3, §6.1): one face for the whole row so a DM Sans label never sits
+   beside Inter digits. Task 6 Step 1 decides the face; the label is muted so it reads as a label. */
 .progress-label {
 	display: flex;
 	justify-content: space-between;
 	gap: var(--space-2);
+	font-family: var(--font-heading);
+	font-weight: 600;
 	font-size: 0.875rem;
 	font-variant-numeric: tabular-nums;
+}
+
+.progress-label > span:first-child {
+	color: var(--text-muted);
 }
 
 .bar {
@@ -526,10 +543,15 @@ p {
 	overflow: hidden;
 }
 
+/* Second glow site: only the overall bar, and on the wrapper, because `.bar` clips the fill. */
+.progress:has(> .progress-label > #progress-overall) .bar {
+	box-shadow: var(--glow);
+}
+
 .bar-fill {
 	display: block;
 	height: 100%;
-	background: var(--accent);
+	background: var(--gradient);
 	transition: width 300ms ease;
 }
 

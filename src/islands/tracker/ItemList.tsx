@@ -89,7 +89,9 @@ function ItemRow({ item, done, disabled, onToggle, strings }: RowProps) {
 					onChange={(event) => onToggle(item.id, event.target.checked)}
 				/>
 				<label htmlFor={inputId}>{item.name}</label>
-				<span className="tier">{tier}</span>
+				<span className="tier" data-status={item.status}>
+					{tier}
+				</span>
 			</div>
 			{item.description && <p className="item-desc">{item.description}</p>}
 			<div className="item-foot">
