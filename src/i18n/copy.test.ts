@@ -19,8 +19,8 @@ describe("copy rules (spec §9)", () => {
 	})
 
 	it.each(all)("%s keeps the tier vocabulary and the tone", (_path, text) => {
-		// Word boundaries: "bleak" is fine, "leak" is not. "lekk" covers lekk/lekket in Norwegian.
-		expect(text).not.toMatch(/\b(leak|leaked|lekk)\b/i)
+		// Word boundaries: "bleak" is fine, "leak" is not. The Norwegian suffix covers lekk, lekket and lekkasje.
+		expect(text).not.toMatch(/\b(leak|leaked|lekk\w*)\b/i)
 		expect(text).not.toContain("!")
 		// One capital in prose; all caps belongs to the wordmark only, and that is markup, not a string.
 		expect(text).not.toContain("ROOKDEX")

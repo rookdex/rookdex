@@ -31,3 +31,31 @@ describe("mark parity (spec §5)", () => {
 		expect(mark).toContain('aria-hidden="true"')
 	})
 })
+
+const favicon = readFileSync(new URL("../../assets/favicon-source.svg", import.meta.url), "utf8")
+
+/** Non-empty trimmed lines, so a CRLF checkout compares the same as an LF one. */
+function lines(svg: string): string[] {
+	return svg
+		.split(/\r?\n/)
+		.map((line) => line.trim())
+		.filter(Boolean)
+}
+
+/** The icon without its palm group — the palm is the only thing the favicon source drops. */
+function withoutPalm(svg: string): string {
+	const start = svg.lastIndexOf('<g fill="#000000">')
+	const end = svg.lastIndexOf("</g>") + "</g>".length
+	return svg.slice(0, start) + svg.slice(end)
+}
+
+describe("favicon source parity (Task 7 ruling)", () => {
+	it("is the icon with the palm removed and nothing else changed", () => {
+		expect(lines(favicon)).toEqual(lines(withoutPalm(icon)))
+	})
+
+	it("drops the palm, which is noise at 16 px", () => {
+		expect(favicon).not.toContain("<path")
+		expect(paths(favicon)).toHaveLength(0)
+	})
+})
