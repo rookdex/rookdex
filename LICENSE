@@ -1,3 +1,13 @@
+Scope
+
+The Rookdex name, mark, wordmark lockup and banner are not covered by the
+licence below. That is these files: public/icon.svg,
+assets/favicon-source.svg, src/components/Mark.astro, docs/brand/og.html,
+public/og.png and the generated icons (public/pwa-*.png,
+public/maskable-icon-512x512.png, public/apple-touch-icon-180x180.png,
+public/favicon.ico). Everything else in this repository is under the MIT
+License that follows.
+
 MIT License
 
 Copyright (c) 2026 Malin Fossum

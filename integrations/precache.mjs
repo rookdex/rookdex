@@ -6,11 +6,25 @@ import { join, relative, sep } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const SKIP = new Set(["404.html", "sw.js", "_headers", "_redirects"])
+/** A face's latin subset, matched on the part of the basename before the first dot, because
+ *  Astro's base64url hashes can contain "-" themselves. "-latin-ext-" is not "-latin-". */
+const LATIN_FONT = /^[^.]*-latin-(?!ext-)/
+
+/** Which built files the worker precaches: pages and assets, minus the worker's own files, the
+ *  OG banner (crawlers only) and every non-latin font subset (they load on demand online). */
+export function shouldPrecache(file) {
+	if (SKIP.has(file)) return false
+	if (/^og\./.test(file)) return false
+	if (file.startsWith("_astro/") && file.endsWith(".woff2")) {
+		return LATIN_FONT.test(file.slice("_astro/".length))
+	}
+	return true
+}
 
 /** Posix-relative file paths from dist/ → URLs the worker precaches. */
 export function precacheUrls(files) {
 	return files
-		.filter((file) => !SKIP.has(file))
+		.filter(shouldPrecache)
 		.map((file) => {
 			if (file === "index.html") return "/"
 			if (file.endsWith("/index.html")) return `/${file.slice(0, -"index.html".length)}`
@@ -36,7 +50,7 @@ export default function precache() {
 				const urls = precacheUrls(files)
 
 				const hash = createHash("sha256")
-				for (const file of files.filter((f) => !SKIP.has(f))) {
+				for (const file of files.filter(shouldPrecache)) {
 					hash.update(file)
 					hash.update(await readFile(join(root, file)))
 				}

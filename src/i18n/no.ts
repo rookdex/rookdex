@@ -10,7 +10,7 @@ export const no: Strings = {
 	hub: {
 		countdownHeading: "Nedtelling til lansering",
 		daysToGo: "{n} dager igjen",
-		oneDayToGo: "1 dag igjen",
+		oneDayToGo: "{n} dag igjen",
 		days: "dager",
 		hours: "timer",
 		minutes: "minutter",

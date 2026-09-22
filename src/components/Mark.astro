@@ -1,0 +1,71 @@
+---
+/**
+ * The in-page mark (spec §5.2): the icon drawing without its background, coloured by tokens so a
+ * theme can recolour it. public/icon.svg is the same drawing in literal hex; Mark.test.ts keeps
+ * the two in step. No glow here: the header adds it with `filter: var(--glow-filter)`.
+ */
+interface Props {
+	/** Rendered width and height in CSS pixels. */
+	size?: number
+	/** Prefix for the gradient and clip-path ids; unique per instance on a page. */
+	id?: string
+}
+const { size = 24, id = "mark" } = Astro.props
+const sun = `${id}-sun`
+const disc = `${id}-disc`
+---
+
+<svg
+	class="mark"
+	width={size}
+	height={size}
+	viewBox="0 0 512 512"
+	aria-hidden="true"
+	focusable="false"
+>
+	<defs>
+		<linearGradient id={sun} x1="0" y1="0" x2="0" y2="1">
+			<stop class="top" offset="0"></stop>
+			<stop class="bottom" offset="1"></stop>
+		</linearGradient>
+		<clipPath id={disc}><circle cx="256" cy="236" r="150"></circle></clipPath>
+	</defs>
+	<circle cx="256" cy="236" r="150" fill={`url(#${sun})`}></circle>
+	<g class="ink" clip-path={`url(#${disc})`}>
+		<rect x="0" y="262" width="512" height="12"></rect>
+		<rect x="0" y="298" width="512" height="18"></rect>
+		<rect x="0" y="342" width="512" height="26"></rect>
+	</g>
+	<rect class="horizon" x="96" y="398" width="320" height="14" rx="7"></rect>
+	<g class="ink">
+		<path class="trunk" d="M352 404 C 344 340, 334 280, 312 214"></path>
+		<path d="M312 214 Q 236 156 178 190 Q 244 192 312 214 z"></path>
+		<path d="M312 214 Q 208 208 168 262 Q 250 228 312 214 z"></path>
+		<path d="M312 214 Q 386 152 446 184 Q 380 190 312 214 z"></path>
+		<path d="M312 214 Q 412 206 452 262 Q 372 228 312 214 z"></path>
+		<path d="M312 214 Q 236 246 224 316 Q 276 248 312 214 z"></path>
+		<path d="M312 214 Q 386 246 398 316 Q 346 248 312 214 z"></path>
+		<path d="M312 214 Q 300 140 332 104 Q 316 160 312 214 z"></path>
+	</g>
+</svg>
+
+<style>
+	.top {
+		stop-color: var(--accent);
+	}
+	.bottom {
+		stop-color: var(--accent-2);
+	}
+	.horizon {
+		fill: var(--link);
+	}
+	.ink {
+		fill: var(--bg);
+	}
+	.trunk {
+		fill: none;
+		stroke: var(--bg);
+		stroke-width: 24;
+		stroke-linecap: round;
+	}
+</style>

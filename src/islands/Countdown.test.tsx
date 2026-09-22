@@ -7,6 +7,13 @@ import { Countdown } from "./Countdown"
 const before = "2026-09-10T10:00:00Z" // 70 days to go
 const after = "2026-11-22T10:00:00Z" // day 3
 
+/** The one live region. getByText cannot see the whole sentence once the number is in its own span. */
+function daysLine(): HTMLElement {
+	const el = document.querySelector<HTMLElement>(".days")
+	if (!el) throw new Error("no .days element")
+	return el
+}
+
 beforeEach(() => {
 	vi.useFakeTimers()
 })
@@ -28,7 +35,10 @@ describe("Countdown before launch", () => {
 		expect(screen.getByRole("heading", { name: "Launch countdown" })).toBeInTheDocument()
 		const digits = screen.getByTestId("countdown-digits")
 		expect(digits).toHaveAttribute("aria-live", "off")
-		expect(screen.getByText("70 days to go")).toHaveAttribute("aria-live", "polite")
+		expect(daysLine()).toHaveAttribute("aria-live", "polite")
+		expect(daysLine()).toHaveAttribute("aria-atomic", "true")
+		expect(daysLine()).toHaveTextContent("70 days to go")
+		expect(daysLine().querySelector(".days-number")).toHaveTextContent("70")
 		expect(screen.getByRole("link", { name: "Read this before you start" })).toHaveAttribute(
 			"href",
 			"/en/guides/before-you-start/"
@@ -39,13 +49,14 @@ describe("Countdown before launch", () => {
 		const eve = "2026-11-18T20:00:00Z"
 		vi.setSystemTime(new Date(eve))
 		render(<Countdown locale="en" initialNow={eve} guideHref="#" trackerHref="/en/tracker/" />)
-		expect(screen.getByText("1 day to go")).toBeInTheDocument()
+		expect(daysLine()).toHaveTextContent("1 day to go")
+		expect(daysLine().querySelector(".days-number")).toHaveTextContent("1")
 	})
 
 	it("uses Norwegian strings", () => {
 		vi.setSystemTime(new Date(before))
 		render(<Countdown locale="no" initialNow={before} guideHref="#" trackerHref="/no/tracker/" />)
-		expect(screen.getByText("70 dager igjen")).toBeInTheDocument()
+		expect(daysLine()).toHaveTextContent("70 dager igjen")
 	})
 
 	it("has no axe violations", async () => {
@@ -65,7 +76,8 @@ describe("Countdown after launch", () => {
 		// initialNow is the build time (before launch); the device clock decides.
 		render(<Countdown locale="en" initialNow={before} guideHref="#" trackerHref="/en/tracker/" />)
 		expect(screen.getByText("It is out.")).toBeInTheDocument()
-		expect(screen.getByText("Day 3 since launch")).toBeInTheDocument()
+		expect(daysLine()).toHaveTextContent("Day 3 since launch")
+		expect(daysLine().querySelector(".days-number")).toHaveTextContent("3")
 		expect(screen.queryByTestId("countdown-digits")).not.toBeInTheDocument()
 		expect(screen.getByRole("link", { name: "Open the tracker" })).toHaveAttribute(
 			"href",
@@ -76,12 +88,14 @@ describe("Countdown after launch", () => {
 	it("keeps the same live region across the flip", () => {
 		vi.setSystemTime(new Date("2026-11-18T22:59:59Z"))
 		render(<Countdown locale="en" initialNow={before} guideHref="#" trackerHref="/en/tracker/" />)
-		const region = screen.getByText("1 day to go")
+		const region = daysLine()
+		expect(region).toHaveTextContent("1 day to go")
 		expect(region).toHaveAttribute("aria-live", "polite")
 		act(() => {
 			vi.advanceTimersByTime(2_000)
 		})
-		expect(screen.getByText("Day 0 since launch")).toBe(region)
+		expect(daysLine()).toBe(region)
+		expect(region).toHaveTextContent("Day 0 since launch")
 	})
 })
 

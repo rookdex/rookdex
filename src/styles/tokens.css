@@ -10,11 +10,27 @@
 	--text: #f2f2f2;
 	--text-muted: #a3a3a3;
 
-	/* One accent. Placeholder until the brand palette lands. */
-	--accent: #f0a742;
-	--accent-text: #1a1200;
+	/* One accent. Buttons, checks, focus, the confirmed tier. */
+	--accent: #ff3d81;
+	--accent-text: #2a0010;
+
+	/* Gradient partner only. Never used alone for text or UI. */
+	--accent-2: #ff8a3d;
+	--gradient: linear-gradient(90deg, var(--accent), var(--accent-2));
+
+	/* Cyan has three jobs: links, the expected tier, the horizon in the mark. */
+	--link: #22e0ff;
+
+	--tier-confirmed: var(--accent);
+	--tier-expected: var(--link);
+
+	/* Decorative glow. Both are cleared under reduced motion (see below). */
+	--glow: 0 0 24px color-mix(in srgb, var(--accent) 45%, transparent);
+	--glow-filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 45%, transparent));
 
 	--font-sans: "Inter Variable", system-ui, sans-serif;
+	--font-heading: "DM Sans Variable", var(--font-sans);
+	--font-display: "Bebas Neue", "Impact", var(--font-heading);
 
 	--space-1: 0.25rem;
 	--space-2: 0.5rem;
@@ -26,4 +42,11 @@
 	--radius: 0.5rem;
 	--measure: 65ch;
 	--tap: 44px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--glow: none;
+		--glow-filter: none;
+	}
 }

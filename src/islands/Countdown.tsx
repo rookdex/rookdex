@@ -1,4 +1,4 @@
-import { fill, type Locale, t } from "../i18n"
+import { type Locale, t } from "../i18n"
 import { useCountdown } from "./useCountdown"
 
 interface Props {
@@ -9,16 +9,30 @@ interface Props {
 	trackerHref: string
 }
 
+/**
+ * The sentence with its number in its own span, so CSS can give the number the display face
+ * while the words stay in Inter (spec §7). Splitting on the placeholder keeps the translation
+ * in charge of word order ("{n} days to go", "Dag {n} etter lansering").
+ */
+function DaysLine({ template, n }: { template: string; n: number }) {
+	const [before, after] = template.split("{n}")
+	if (after === undefined) return <>{template}</>
+	return (
+		<>
+			{before}
+			<span className="days-number">{n}</span>
+			{after}
+		</>
+	)
+}
+
 export function Countdown({ locale, initialNow, guideHref, trackerHref }: Props) {
 	const s = t(locale).hub
 	const state = useCountdown(new Date(initialNow))
 	const after = state.phase === "after"
 
-	const daysLine = after
-		? fill(s.daySince, { n: state.daysSince })
-		: state.daysToGo === 1
-			? s.oneDayToGo
-			: fill(s.daysToGo, { n: state.daysToGo })
+	const template = after ? s.daySince : state.daysToGo === 1 ? s.oneDayToGo : s.daysToGo
+	const n = after ? state.daysSince : state.daysToGo
 
 	const units: [number, string][] = [
 		[state.parts.days, s.days],
@@ -30,9 +44,9 @@ export function Countdown({ locale, initialNow, guideHref, trackerHref }: Props)
 	return (
 		<section className="hub-state" aria-labelledby="hub-heading">
 			<h2 id="hub-heading">{after ? s.launched : s.countdownHeading}</h2>
-			{/* One live region for both phases, so the flip itself is announced. */}
-			<p className="days" aria-live="polite">
-				{daysLine}
+			{/* One live region for both phases, so the flip itself is announced as one sentence. */}
+			<p className="days" aria-live="polite" aria-atomic="true">
+				<DaysLine template={template} n={n} />
 			</p>
 			{after ? (
 				<p>

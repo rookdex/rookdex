@@ -28,7 +28,9 @@ svg {
 }
 
 a {
-	color: var(--accent);
+	color: var(--link);
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
 }
 
 :focus-visible {
@@ -36,11 +38,28 @@ a {
 	outline-offset: 2px;
 }
 
+/* Pink is focus everywhere except on the three pink surfaces (spec §12). */
+.skip:focus-visible,
+.actions .primary:focus-visible,
+.chips button[aria-pressed="true"]:focus-visible {
+	outline-color: var(--text);
+}
+
 h1,
 h2,
 h3 {
 	line-height: 1.2;
 	margin: 0 0 var(--space-3);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-heading);
+	font-weight: 600;
 }
 
 p {
@@ -69,12 +88,38 @@ p {
 }
 
 .brand {
-	font-weight: 700;
-	text-decoration: none;
-	color: var(--text);
-	min-height: var(--tap);
 	display: inline-flex;
 	align-items: center;
+	gap: var(--space-2);
+	min-height: var(--tap);
+	color: var(--text);
+	text-decoration: none;
+}
+
+/* The header mark is one of the three glow sites (spec §4.2). The wordmark never glows. */
+.brand .mark {
+	filter: var(--glow-filter);
+}
+
+.wordmark {
+	font-family: var(--font-display);
+	font-weight: 400;
+	font-size: 1.25rem;
+	line-height: 1;
+	letter-spacing: 0.04em;
+	color: var(--text);
+}
+
+/* Hub h1: the same lockup, larger. It is the wordmark, not a heading, so the display face is right. */
+.lockup {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	margin: 0 0 var(--space-3);
+}
+
+.lockup .wordmark {
+	font-size: 2.5rem;
 }
 
 .lang ul {
@@ -174,6 +219,16 @@ p {
 .days {
 	font-size: 1.25rem;
 	font-weight: 600;
+}
+
+/* The one display number (spec §6.1). Third glow site; the token is `none` under reduced motion. */
+.days-number {
+	font-family: var(--font-display);
+	font-weight: 400;
+	font-size: 4rem;
+	line-height: 1;
+	color: var(--text);
+	text-shadow: var(--glow);
 }
 
 .countdown {
@@ -407,6 +462,15 @@ p {
 	white-space: nowrap;
 }
 
+/* Tier colours come from their own tokens so a theme can swap them without touching the accent. */
+.tier[data-status="confirmed"] {
+	color: var(--tier-confirmed);
+}
+
+.tier[data-status="expected"] {
+	color: var(--tier-expected);
+}
+
 .item-desc {
 	margin: 0 0 var(--space-1);
 	color: var(--text-muted);
@@ -456,12 +520,22 @@ p {
 	margin-bottom: var(--space-2);
 }
 
+/* Ledger numbers (spec §3, §6.1): one face for the whole row so the label and its count never
+   split across two faces. Task 6 Step 1 measured DM Sans Variable with no working tabular
+   figures, so this stays on --font-sans (Inter) rather than --font-heading; the label is muted
+   so it reads as a label. */
 .progress-label {
 	display: flex;
 	justify-content: space-between;
 	gap: var(--space-2);
+	font-family: var(--font-sans);
+	font-weight: 600;
 	font-size: 0.875rem;
 	font-variant-numeric: tabular-nums;
+}
+
+.progress-label > span:first-child {
+	color: var(--text-muted);
 }
 
 .bar {
@@ -471,10 +545,15 @@ p {
 	overflow: hidden;
 }
 
+/* Second glow site: only the overall bar, and on the wrapper, because `.bar` clips the fill. */
+.progress:has(> .progress-label > #progress-overall) .bar {
+	box-shadow: var(--glow);
+}
+
 .bar-fill {
 	display: block;
 	height: 100%;
-	background: var(--accent);
+	background: var(--gradient);
 	transition: width 300ms ease;
 }
 
@@ -632,6 +711,19 @@ p {
 
 	.unit .value {
 		font-size: 3rem;
+	}
+
+	.days-number {
+		font-size: 6rem;
+	}
+
+	.lockup .mark {
+		width: 64px;
+		height: 64px;
+	}
+
+	.lockup .wordmark {
+		font-size: 3.5rem;
 	}
 
 	.tracker {
