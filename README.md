@@ -21,8 +21,14 @@ npm run dev
 
 Pull requests get a preview URL (CI job summary). Merging to `main` deploys to https://rookdex.app through Cloudflare Workers static assets.
 
+## Brand
+
+Colours and type are tokens in `src/styles/tokens.css`; components read tokens and never write a colour of their own. The mark is `public/icon.svg` (the app icon) and `src/components/Mark.astro` (in-page, token-coloured); the social banner is rendered from `docs/brand/og.html` to `public/og.png`. The brand spec is `docs/superpowers/specs/2026-09-21-rookdex-brand-design.md`.
+
+The Rookdex name, mark and banner are not under the MIT licence (`LICENSE` names the files). Use them to link to or talk about Rookdex, not to present another project as Rookdex.
+
 ## Licence
 
-Code is MIT (see `LICENSE`). Guide text under `src/content/` is CC BY-SA 4.0.
+Code is MIT (see `LICENSE`; the brand files listed there are excluded). Guide text under `src/content/` is CC BY-SA 4.0.
 
 Design spec and plans live in `docs/superpowers/`.
