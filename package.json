@@ -12,7 +12,7 @@
 		"check": "astro check",
 		"format": "biome format --write .",
 		"icons": "pwa-assets-generator",
-		"icons:favicon": "pwa-assets-generator --config pwa-assets.config.favicon.ts",
+		"icons:favicon": "pwa-assets-generator --config pwa-assets.config.favicon.ts && node -e \"require('node:fs').renameSync('assets/favicon.ico', 'public/favicon.ico')\"",
 		"lint": "biome lint .",
 		"preview": "wrangler dev",
 		"test": "vitest run"
