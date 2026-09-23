@@ -1,3 +1,8 @@
+// The two flags Rookdex keeps in localStorage. Here, not in the islands, so the Settings page's
+// delete script can name them without pulling React into its bundle.
+export const INSTALL_SEEN_KEY = "rookdex.install-prompt-seen"
+export const HINT_SEEN_KEY = "rookdex.persist-hint-seen"
+
 /** One-shot "already shown" flags in localStorage, tolerant of private mode and blocked storage. */
 export function readFlag(key: string): boolean {
 	try {

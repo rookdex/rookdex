@@ -5,7 +5,7 @@ import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, recentFinds } from "../model/stats"
 import { openStore } from "../model/store"
 import { createTracker, parseShow, type Tracker as TrackerModel } from "../model/tracker"
-import { readFlag, writeFlag } from "./seenFlag"
+import { HINT_SEEN_KEY, readFlag, writeFlag } from "./seenFlag"
 import { CategoryNav } from "./tracker/CategoryNav"
 import { DeleteDialog } from "./tracker/DeleteDialog"
 import { DeletedDialog } from "./tracker/DeletedDialog"
@@ -16,7 +16,7 @@ import { ProfileMenu } from "./tracker/ProfileMenu"
 import { StatsRail } from "./tracker/StatsRail"
 import { useTracker } from "./useTracker"
 
-export const HINT_KEY = "rookdex.persist-hint-seen"
+export const HINT_KEY = HINT_SEEN_KEY
 
 interface Props {
 	locale: Locale
