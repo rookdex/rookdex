@@ -153,7 +153,6 @@ export const no: Strings = {
 	},
 	rumours: {
 		title: "Rykter",
-		description: "Det pressen melder om GTA VI som Rockstar ikke har bekreftet.",
 		intro:
 			"Meldt av pressen, ikke bekreftet av Rockstar. Rykter flyttes til oversikten når de bekreftes.",
 		reportedBy: "Meldt av {outlet}",

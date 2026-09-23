@@ -153,7 +153,6 @@ export const en = {
 	},
 	rumours: {
 		title: "Rumours",
-		description: "What the press reports about GTA VI that Rockstar has not confirmed.",
 		intro:
 			"Reported by press, not confirmed by Rockstar. Rumours move to the tracker when confirmed.",
 		reportedBy: "Reported by {outlet}",
