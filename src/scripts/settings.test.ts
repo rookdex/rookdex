@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from "vitest"
-import { type InstallWindow, wireInstallRow, wireStorageRow } from "./settings"
+import type { DeleteResult } from "./delete-all"
+import { type InstallWindow, wireDeleteDialog, wireInstallRow, wireStorageRow } from "./settings"
 
 function storageRow(): HTMLElement {
 	document.body.innerHTML = `
@@ -133,4 +134,106 @@ describe("wireInstallRow (spec §7.3)", () => {
 		expect(row.hidden).toBe(false)
 		expect(shown(row)).toEqual(["Installed"])
 	})
+})
+
+function dangerBox() {
+	document.body.innerHTML = `
+		<div data-delete>
+			<button type="button" data-delete-open>Delete all data on this device</button>
+			<p role="status" data-delete-status></p>
+			<dialog
+				data-blocked="Close other Rookdex tabs to finish."
+				data-failed="Something went wrong. Nothing was deleted."
+				data-done="All data on this device is deleted."
+			>
+				<p role="alert" data-delete-alert></p>
+				<button type="button" data-delete-cancel>Cancel</button>
+				<button type="button" data-delete-confirm>Delete everything</button>
+			</dialog>
+		</div>`
+	const root = document.querySelector("[data-delete]") as HTMLElement
+	const get = <T extends HTMLElement>(selector: string) => root.querySelector(selector) as T
+	return {
+		root,
+		open: get<HTMLButtonElement>("[data-delete-open]"),
+		status: get<HTMLElement>("[data-delete-status]"),
+		dialog: get<HTMLDialogElement>("dialog"),
+		alert: get<HTMLElement>("[data-delete-alert]"),
+		cancel: get<HTMLButtonElement>("[data-delete-cancel]"),
+		confirm: get<HTMLButtonElement>("[data-delete-confirm]"),
+	}
+}
+
+/** A delete that settles when the test says so. */
+function pendingRun() {
+	let settle: (result: DeleteResult) => void = () => {}
+	let blocked: () => void = () => {}
+	const run = vi.fn(
+		(onBlocked: () => void) =>
+			new Promise<DeleteResult>((resolve) => {
+				blocked = onBlocked
+				settle = resolve
+			})
+	)
+	return { run, settle: (result: DeleteResult) => settle(result), block: () => blocked() }
+}
+
+describe("wireDeleteDialog (spec §7.2)", () => {
+	it("opens with Cancel focused, and Cancel closes it and returns focus", () => {
+		const box = dangerBox()
+		wireDeleteDialog(box.root, pendingRun().run)
+		box.open.click()
+		expect(box.dialog.open).toBe(true)
+		expect(document.activeElement).toBe(box.cancel)
+		box.cancel.click()
+		expect(box.dialog.open).toBe(false)
+		expect(document.activeElement).toBe(box.open)
+	})
+
+	it("disables the confirm button while the request is pending, so a double tap sends one", async () => {
+		const box = dangerBox()
+		const { run, settle } = pendingRun()
+		wireDeleteDialog(box.root, run)
+		box.open.click()
+		box.confirm.click()
+		box.confirm.click()
+		expect(box.confirm.disabled).toBe(true)
+		expect(run).toHaveBeenCalledOnce()
+		settle("deleted")
+		await vi.waitFor(() => expect(box.dialog.open).toBe(false))
+		expect(box.status.textContent).toBe("All data on this device is deleted.")
+		expect(document.activeElement).toBe(box.open)
+	})
+
+	it("asks to close other tabs when blocked, stays open, then finishes on success", async () => {
+		const box = dangerBox()
+		const { run, settle, block } = pendingRun()
+		wireDeleteDialog(box.root, run)
+		box.open.click()
+		box.confirm.click()
+		block()
+		expect(box.alert.textContent).toBe("Close other Rookdex tabs to finish.")
+		expect(box.dialog.open).toBe(true)
+		expect(box.confirm.disabled).toBe(true)
+		settle("deleted")
+		await vi.waitFor(() => expect(box.dialog.open).toBe(false))
+	})
+
+	it.each(["failed", "unsupported"] as const)(
+		"says nothing was deleted when the result is %s, and allows a retry",
+		async (result) => {
+			const box = dangerBox()
+			const { run, settle } = pendingRun()
+			wireDeleteDialog(box.root, run)
+			box.open.click()
+			box.confirm.click()
+			settle(result)
+			await vi.waitFor(() =>
+				expect(box.alert.textContent).toBe("Something went wrong. Nothing was deleted.")
+			)
+			expect(box.dialog.open).toBe(true)
+			expect(box.confirm.disabled).toBe(false)
+			expect(box.status.textContent).toBe("")
+		}
+	)
 })
