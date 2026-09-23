@@ -12,6 +12,10 @@ html {
 	font-family: var(--font-sans);
 	line-height: 1.5;
 	-webkit-text-size-adjust: 100%;
+	/* The phone tab bar's measured two-line height (spec §5), in rem so it follows the text size. */
+	--tabbar-h: 4.25rem;
+	/* Keeps a focused control from scrolling in behind the fixed bar (WCAG 2.4.11). */
+	scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
 }
 
 body {
@@ -19,12 +23,18 @@ body {
 	min-height: 100dvh;
 	display: flex;
 	flex-direction: column;
+	padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
 }
 
 img,
 svg {
 	max-width: 100%;
 	height: auto;
+}
+
+/* A class that sets display beats the UA's [hidden]; this keeps hidden meaning hidden (spec §4). */
+[hidden] {
+	display: none !important;
 }
 
 a {
@@ -160,6 +170,76 @@ p {
 
 .site-footer p {
 	max-width: none;
+}
+
+/* Navigation */
+
+.tabbar {
+	position: fixed;
+	inset-inline: 0;
+	bottom: 0;
+	z-index: 5;
+	padding-bottom: env(safe-area-inset-bottom);
+	background: var(--bg-raised);
+	border-top: 1px solid var(--border);
+}
+
+.tabbar ul {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.tabbar li {
+	display: flex;
+	min-width: 0;
+}
+
+/* No white-space: nowrap here: it would also suppress the soft hyphen in "Inn-stillinger". */
+.tabbar a {
+	position: relative;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-1);
+	min-height: 56px;
+	padding: var(--space-1) 2px;
+	color: var(--text-muted);
+	font-size: 0.75rem;
+	font-weight: 500;
+	line-height: 1;
+	text-align: center;
+	text-decoration: none;
+}
+
+.tabbar .tab-icon {
+	width: 24px;
+	height: 24px;
+	flex: none;
+}
+
+.tabbar a[aria-current="page"] {
+	color: var(--text);
+}
+
+.tabbar a[aria-current="page"] .tab-icon {
+	color: var(--accent);
+}
+
+.tabbar a[aria-current="page"]::before {
+	content: "";
+	position: absolute;
+	top: -1px;
+	left: 50%;
+	width: 32px;
+	height: 2px;
+	margin-left: -16px;
+	border-radius: 0 0 2px 2px;
+	background: var(--accent);
 }
 
 /* Utilities */
@@ -700,6 +780,58 @@ p {
 }
 
 @media (min-width: 768px) {
+	html {
+		scroll-padding-bottom: 0;
+	}
+
+	body {
+		padding-bottom: 0;
+	}
+
+	/* The tab row carries the chrome's bottom edge on desktop. */
+	.site-header {
+		border-bottom: 0;
+	}
+
+	/* The row's first label starts on the brand's left edge: header padding minus link padding. */
+	.tabbar {
+		position: static;
+		padding: 0 calc(var(--space-4) - 12px);
+		border-top: 0;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.tabbar ul {
+		display: flex;
+		gap: var(--space-1);
+	}
+
+	.tabbar .tab-icon {
+		display: none;
+	}
+
+	.tabbar a {
+		flex-direction: row;
+		min-height: var(--tap);
+		padding: 0 12px;
+		font-size: 0.875rem;
+		line-height: 1.5;
+	}
+
+	.tabbar a[aria-current="page"]::before {
+		content: none;
+	}
+
+	.tabbar a[aria-current="page"]::after {
+		content: "";
+		position: absolute;
+		left: 12px;
+		right: 12px;
+		bottom: -1px;
+		height: 2px;
+		background: var(--accent);
+	}
+
 	.wrap {
 		padding: var(--space-5) var(--space-4);
 	}
