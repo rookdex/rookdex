@@ -115,7 +115,6 @@ export const en = {
 		persistHint:
 			"This browser may clear saved progress after a week without a visit. Install Rookdex or export your profile to keep it safe.",
 		dismiss: "Got it",
-		rumours: "Rumours",
 		errors: {
 			"too-large": "That file is larger than 5 MB.",
 			"not-json": "That file isn't JSON.",
@@ -159,7 +158,6 @@ export const en = {
 			"Reported by press, not confirmed by Rockstar. Rumours move to the tracker when confirmed.",
 		reportedBy: "Reported by {outlet}",
 		empty: "No rumours listed yet.",
-		backToTracker: "Back to the tracker",
 	},
 	news: {
 		title: "News",

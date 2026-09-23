@@ -34,7 +34,7 @@ beforeEach(() => {
 	localStorage.clear()
 })
 
-const ready = () => renderReady(<Tracker locale="en" rumoursHref="/en/tracker/rumours/" />)
+const ready = () => renderReady(<Tracker locale="en" />)
 
 function pickFile(container: HTMLElement, contents: string, name = "rookdex-dad.json") {
 	const input = container.querySelector<HTMLInputElement>('input[type="file"]')

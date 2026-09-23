@@ -1,0 +1,48 @@
+---
+import { fill, isLocale, type Locale, locales, t } from "../../i18n"
+import Base from "../../layouts/Base.astro"
+import { outletOf } from "../../model/outlet"
+import { rumours } from "../../model/seed"
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale }, props: {} }))
+}
+
+// The News tab (spec §8). Rumours are its first section; phase 1c adds the facts feed above them.
+const { locale } = Astro.params
+if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
+const s = t(locale as Locale)
+---
+
+<Base locale={locale} title={s.news.title} description={s.news.description} path="news">
+	<article class="news">
+		<h1>{s.news.title}</h1>
+		<p class="tagline">{s.rumours.intro}</p>
+		<section aria-labelledby="rumours">
+			<h2 id="rumours">{s.rumours.title}</h2>
+			{
+				rumours.length === 0 ? (
+					<p>{s.rumours.empty}</p>
+				) : (
+					<ul class="rumour-list">
+						{rumours.map((rumour) => {
+							const press =
+								rumour.sources.find((source) => source.tier === "press") ?? rumour.sources[0]
+							return (
+								<li>
+									<h3>{rumour.name}</h3>
+									<p class="summary">{rumour.summary}</p>
+									<p class="meta">
+										<a href={press.url} rel="noopener noreferrer">
+											{fill(s.rumours.reportedBy, { outlet: outletOf(press.url) })}
+										</a>
+									</p>
+								</li>
+							)
+						})}
+					</ul>
+				)
+			}
+		</section>
+	</article>
+</Base>

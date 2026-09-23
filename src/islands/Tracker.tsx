@@ -20,7 +20,6 @@ export const HINT_KEY = "rookdex.persist-hint-seen"
 
 interface Props {
 	locale: Locale
-	rumoursHref: string
 }
 
 function buildTracker(defaultProfileName: string): TrackerModel {
@@ -43,7 +42,7 @@ function label(map: Record<string, string>, key: string): string {
 }
 
 /** Island root. `client:only`: the first render reads the URL and IndexedDB. */
-export function Tracker({ locale, rumoursHref }: Props) {
+export function Tracker({ locale }: Props) {
 	const s = t(locale)
 	const [tracker] = useState(() => buildTracker(s.profile.defaultName))
 	const state = useTracker(tracker)
@@ -163,8 +162,6 @@ export function Tracker({ locale, rumoursHref }: Props) {
 				onSelect={tracker.selectCategories}
 				allLabel={s.tracker.all}
 				navLabel={s.tracker.categories}
-				rumoursHref={rumoursHref}
-				rumoursLabel={s.tracker.rumours}
 			/>
 			<ItemList
 				items={visible}

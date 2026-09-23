@@ -115,7 +115,6 @@ export const no: Strings = {
 		persistHint:
 			"Denne nettleseren kan slette lagret fremgang etter en uke uten besøk. Installer Rookdex eller eksporter profilen din for å være trygg.",
 		dismiss: "Skjønner",
-		rumours: "Rykter",
 		errors: {
 			"too-large": "Filen er større enn 5 MB.",
 			"not-json": "Filen er ikke JSON.",
@@ -159,7 +158,6 @@ export const no: Strings = {
 			"Meldt av pressen, ikke bekreftet av Rockstar. Rykter flyttes til oversikten når de bekreftes.",
 		reportedBy: "Meldt av {outlet}",
 		empty: "Ingen rykter oppført ennå.",
-		backToTracker: "Tilbake til oversikten",
 	},
 	news: {
 		title: "Nyheter",
