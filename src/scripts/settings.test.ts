@@ -146,6 +146,7 @@ function dangerBox() {
 				data-failed="Something went wrong. Nothing was deleted."
 				data-done="All data on this device is deleted."
 			>
+				<h2 id="delete-all-title" tabindex="-1">Delete all data on this device?</h2>
 				<p role="alert" data-delete-alert></p>
 				<button type="button" data-delete-cancel>Cancel</button>
 				<button type="button" data-delete-confirm>Delete everything</button>
@@ -158,6 +159,7 @@ function dangerBox() {
 		open: get<HTMLButtonElement>("[data-delete-open]"),
 		status: get<HTMLElement>("[data-delete-status]"),
 		dialog: get<HTMLDialogElement>("dialog"),
+		heading: get<HTMLElement>("#delete-all-title"),
 		alert: get<HTMLElement>("[data-delete-alert]"),
 		cancel: get<HTMLButtonElement>("[data-delete-cancel]"),
 		confirm: get<HTMLButtonElement>("[data-delete-confirm]"),
@@ -234,6 +236,42 @@ describe("wireDeleteDialog (spec §7.2)", () => {
 			expect(box.dialog.open).toBe(true)
 			expect(box.confirm.disabled).toBe(false)
 			expect(box.status.textContent).toBe("")
+			expect(document.activeElement).toBe(box.cancel)
 		}
 	)
+
+	it("moves focus to the dialog heading once a delete starts, so it stays inside the dialog", () => {
+		const box = dangerBox()
+		wireDeleteDialog(box.root, pendingRun().run)
+		box.open.click()
+		box.confirm.click()
+		expect(document.activeElement).toBe(box.heading)
+	})
+
+	it("disables Cancel and blocks Escape while a delete is pending (spec §7.2 step 6)", () => {
+		const box = dangerBox()
+		wireDeleteDialog(box.root, pendingRun().run)
+		box.open.click()
+		box.confirm.click()
+		expect(box.cancel.disabled).toBe(true)
+		const escapeKey = new Event("cancel", { cancelable: true })
+		box.dialog.dispatchEvent(escapeKey)
+		expect(escapeKey.defaultPrevented).toBe(true)
+		expect(box.dialog.open).toBe(true)
+	})
+
+	it("speaks a result that arrives after the dialog was already forced shut", async () => {
+		const box = dangerBox()
+		const { run, settle } = pendingRun()
+		wireDeleteDialog(box.root, run)
+		box.open.click()
+		box.confirm.click()
+		// Some browsers' close watcher forces the dialog shut on a second Escape despite pending.
+		box.dialog.close()
+		expect(box.status.textContent).toBe("Close other Rookdex tabs to finish.")
+		settle("deleted")
+		await vi.waitFor(() =>
+			expect(box.status.textContent).toBe("All data on this device is deleted.")
+		)
+	})
 })

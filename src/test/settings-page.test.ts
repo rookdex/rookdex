@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest"
+import pkg from "../../package.json"
 import Settings from "../pages/[locale]/settings.astro"
 import { renderDoc } from "./render"
+
+/** Escapes the version for use inside a RegExp, so a dot in "0.1.0" doesn't match any character. */
+const versionPattern = pkg.version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 
 const settings = (locale: "en" | "no") => renderDoc(Settings, { params: { locale } })
 
@@ -64,7 +68,9 @@ describe("Settings page (spec §7)", () => {
 		const rows = [...doc.querySelectorAll("main dl > div")]
 		const value = (label: string) =>
 			rows.find((row) => row.querySelector("dt")?.textContent === label)?.querySelector("dd")
-		expect(value("Version")?.textContent?.trim()).toMatch(/^0\.1\.0 · ([0-9a-f]{7}|dev)$/)
+		expect(value("Version")?.textContent?.trim()).toMatch(
+			new RegExp(`^${versionPattern} · ([0-9a-f]{7}|dev)$`)
+		)
 		expect(value("Source code")?.querySelector("a")?.getAttribute("href")).toBe(
 			"https://github.com/rookdex/rookdex"
 		)

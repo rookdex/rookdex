@@ -84,9 +84,9 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 				data-failed={s.settings.failed}
 				data-done={s.settings.done}
 			>
-				<h2 id="delete-all-title">{s.settings.dialogTitle}</h2>
+				<h2 id="delete-all-title" tabindex="-1">{s.settings.dialogTitle}</h2>
 				<p>{s.settings.dangerBody}</p>
-				<p role="alert" data-delete-alert></p>
+				<p class="tracker-alert" role="alert" data-delete-alert></p>
 				<div class="actions">
 					<button type="button" data-delete-cancel>{s.settings.cancel}</button>
 					<button type="button" class="danger-button" data-delete-confirm>{s.settings.confirm}</button>
