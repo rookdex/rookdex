@@ -62,4 +62,17 @@ describe("main navigation (spec §5, §12)", () => {
 			"width=device-width, initial-scale=1, viewport-fit=cover"
 		)
 	})
+
+	it("ships the history buttons hidden and labelled, before the brand (spec §4)", async () => {
+		const doc = await page("", { locale: "no" })
+		const group = doc.querySelector("header [data-history]")
+		const brand = doc.querySelector("header .brand")
+		expect(group?.hasAttribute("hidden")).toBe(true)
+		const labels = [...(group?.querySelectorAll("button") ?? [])].map((b) =>
+			b.getAttribute("aria-label")
+		)
+		expect(labels).toEqual(["Tilbake", "Fremover"])
+		// 4 = Node.DOCUMENT_POSITION_FOLLOWING: the brand comes after the group.
+		expect(brand && group ? group.compareDocumentPosition(brand) & 4 : 0).toBe(4)
+	})
 })

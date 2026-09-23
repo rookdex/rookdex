@@ -1,0 +1,49 @@
+---
+import { type Locale, t } from "../i18n"
+
+interface Props {
+	locale: Locale
+}
+
+const s = t(Astro.props.locale)
+---
+
+<div class="history" data-history hidden>
+	<button type="button" data-history-back aria-label={s.nav.back}>
+		<svg
+			viewBox="0 0 24 24"
+			width="24"
+			height="24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			aria-hidden="true"
+		>
+			<path d="M15 5l-7 7 7 7"></path>
+		</svg>
+	</button>
+	<button type="button" data-history-forward aria-label={s.nav.forward}>
+		<svg
+			viewBox="0 0 24 24"
+			width="24"
+			height="24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			aria-hidden="true"
+		>
+			<path d="M9 5l7 7-7 7"></path>
+		</svg>
+	</button>
+</div>
+
+<script>
+	import { wireHistoryButtons } from "../scripts/history-buttons"
+
+	const group = document.querySelector<HTMLElement>("[data-history]")
+	if (group) wireHistoryButtons(group, window)
+</script>

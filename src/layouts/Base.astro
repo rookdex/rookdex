@@ -5,6 +5,7 @@ import "@fontsource/bebas-neue"
 import { getAbsoluteLocaleUrl, getRelativeLocaleUrl } from "astro:i18n"
 import bebasLatin from "@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2?url"
 import Footer from "../components/Footer.astro"
+import HistoryButtons from "../components/HistoryButtons.astro"
 import LanguageSwitch from "../components/LanguageSwitch.astro"
 import Mark from "../components/Mark.astro"
 import TabBar from "../components/TabBar.astro"
@@ -47,6 +48,7 @@ const s = t(locale)
 	<body>
 		<a class="skip" href="#main">{s.skipToContent}</a>
 		<header class="site-header">
+			<HistoryButtons locale={locale} />
 			<a class="brand" href={getRelativeLocaleUrl(locale, "")} aria-label="Rookdex">
 				<Mark id="header" />
 				<span class="wordmark">ROOKDEX</span>
