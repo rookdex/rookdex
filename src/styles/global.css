@@ -275,6 +275,40 @@ p {
 	max-width: none;
 }
 
+/* A hairline under the disclaimer, then pairs: 2 × 2 on a phone, four across from about 720 px. */
+.footer-pairs {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: var(--space-3) var(--space-4);
+	margin: 0;
+	padding-top: var(--space-3);
+	border-top: 1px solid var(--border);
+}
+
+.footer-pairs dt {
+	color: var(--text-muted);
+	font-size: 0.75rem;
+	font-weight: 500;
+}
+
+/* Flex and a fixed minimum put link and text values on one baseline (measured 0.9 px off without). */
+.footer-pairs dd {
+	display: flex;
+	align-items: center;
+	min-height: 20px;
+	margin: 0;
+	color: var(--text);
+	font-size: 0.8125rem;
+}
+
+/* 44 px tap area; the negative margins keep it from stretching the row. */
+.footer-pairs a {
+	display: inline-flex;
+	align-items: center;
+	min-height: var(--tap);
+	margin-block: -12px;
+}
+
 /* Navigation */
 
 .tabbar {

@@ -43,9 +43,7 @@ export const no: Strings = {
 	footer: {
 		disclaimer:
 			"Rookdex er et uoffisielt fanprosjekt. Det er ikke tilknyttet eller godkjent av Rockstar Games eller Take-Two Interactive. Alle varemerker tilhører sine eiere.",
-		contact: "Kontakt for fjerning eller juridiske henvendelser:",
-		licence: "Kode under MIT, guidetekst under CC BY-SA 4.0.",
-		source: "Kildekode på GitHub",
+		source: "GitHub",
 		legalLabel: "Fjerning og juridisk",
 		codeLicenceLabel: "Kodelisens",
 		codeLicence: "MIT",

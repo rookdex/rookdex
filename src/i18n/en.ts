@@ -41,9 +41,7 @@ export const en = {
 	footer: {
 		disclaimer:
 			"Rookdex is an unofficial fan project. It is not affiliated with or endorsed by Rockstar Games or Take-Two Interactive. All trademarks belong to their owners.",
-		contact: "Takedown or legal contact:",
-		licence: "Code under MIT, guide text under CC BY-SA 4.0.",
-		source: "Source on GitHub",
+		source: "GitHub",
 		legalLabel: "Takedown and legal",
 		codeLicenceLabel: "Code licence",
 		codeLicence: "MIT",

@@ -5,18 +5,29 @@ interface Props {
 	locale: Locale
 }
 
+// The disclaimer is the only sentence; the rest are label/value pairs in an even grid (spec §10).
 const { locale } = Astro.props
 const s = t(locale)
 ---
 
 <footer class="site-footer">
 	<p>{s.footer.disclaimer}</p>
-	<p>
-		{s.footer.contact}
-		<a href="mailto:legal@rookdex.app">legal@rookdex.app</a>
-	</p>
-	<p>
-		{s.footer.licence}
-		<a href="https://github.com/rookdex/rookdex">{s.footer.source}</a>
-	</p>
+	<dl class="footer-pairs">
+		<div>
+			<dt>{s.footer.legalLabel}</dt>
+			<dd><a href="mailto:legal@rookdex.app">legal@rookdex.app</a></dd>
+		</div>
+		<div>
+			<dt>{s.footer.codeLicenceLabel}</dt>
+			<dd>{s.footer.codeLicence}</dd>
+		</div>
+		<div>
+			<dt>{s.footer.guideLicenceLabel}</dt>
+			<dd>{s.footer.guideLicence}</dd>
+		</div>
+		<div>
+			<dt>{s.footer.sourceLabel}</dt>
+			<dd><a href="https://github.com/rookdex/rookdex">{s.footer.source}</a></dd>
+		</div>
+	</dl>
 </footer>
