@@ -43,6 +43,17 @@ describe("openStore", () => {
 		await expect(upgraded).resolves.toBeUndefined()
 		v1.close()
 	})
+
+	it("calls onClosed after another connection deletes the database (spec §7.2)", async () => {
+		const factory = new IDBFactory()
+		const store = await openStore(factory)
+		const onClosed = vi.fn()
+		store.onClosed(onClosed)
+		await new Promise((resolve) => {
+			factory.deleteDatabase(DB_NAME).onsuccess = resolve
+		})
+		expect(onClosed).toHaveBeenCalledOnce()
+	})
 })
 
 describe("transaction", () => {

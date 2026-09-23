@@ -268,3 +268,17 @@ describe("persist hint", () => {
 		}
 	})
 })
+
+describe("closed (spec §7.2)", () => {
+	it("moves to closed when another tab deletes the database, and stops writing", async () => {
+		const { tracker, factory } = make()
+		await tracker.init()
+		await new Promise((resolve) => {
+			factory.deleteDatabase("rookdex").onsuccess = resolve
+		})
+		expect(tracker.getState().error).toBe("closed")
+		await tracker.tick("wildlife/a")
+		expect(tracker.getState().error).toBe("closed")
+		expect(tracker.getState().records["wildlife/a"]).toBeUndefined()
+	})
+})
