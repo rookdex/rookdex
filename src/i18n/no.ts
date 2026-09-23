@@ -15,7 +15,7 @@ export const no: Strings = {
 		back: "Tilbake",
 		forward: "Fremover",
 	},
-	languageSwitch: "Språk",
+	languageSwitch: { label: "Språk", current: "Språk: norsk" },
 	languageNames: { en: "English", no: "Norsk" },
 	hub: {
 		countdownHeading: "Nedtelling til lansering",

@@ -13,7 +13,7 @@ export const en = {
 		back: "Back",
 		forward: "Forward",
 	},
-	languageSwitch: "Language",
+	languageSwitch: { label: "Language", current: "Language: English" },
 	languageNames: { en: "English", no: "Norsk" },
 	hub: {
 		countdownHeading: "Launch countdown",
