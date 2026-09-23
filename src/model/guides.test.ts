@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { guideSlugs, resolveGuide, splitGuideId } from "./guides"
+import { guideSchema, guideSlugs, resolveGuide, splitGuideId } from "./guides"
 
 const entries = [{ id: "en/before-you-start" }, { id: "no/before-you-start" }, { id: "en/regions" }]
 
@@ -30,5 +30,30 @@ describe("resolveGuide", () => {
 	})
 	it("is undefined when no language has the guide", () => {
 		expect(resolveGuide(entries, "en", "missing")).toBeUndefined()
+	})
+})
+
+describe("guideSchema (spec §9)", () => {
+	const guide = { title: "T", summary: "S", updated: "2026-09-23" }
+
+	it("accepts one page per outlet", () => {
+		const result = guideSchema.safeParse({
+			...guide,
+			sources: ["https://www.rockstargames.com/VI", "https://www.ign.com/articles/x"],
+		})
+		expect(result.success).toBe(true)
+	})
+
+	it("defaults to no sources", () => {
+		expect(guideSchema.parse(guide).sources).toEqual([])
+	})
+
+	it("fails a guide that cites one outlet twice, naming the outlet", () => {
+		const result = guideSchema.safeParse({
+			...guide,
+			sources: ["https://www.ign.com/articles/a", "https://ign.com/articles/b"],
+		})
+		expect(result.success).toBe(false)
+		expect(result.error?.issues[0]?.message).toContain("ign.com")
 	})
 })

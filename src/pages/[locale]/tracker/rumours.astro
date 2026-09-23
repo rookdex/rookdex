@@ -2,7 +2,8 @@
 import { getRelativeLocaleUrl } from "astro:i18n"
 import { fill, isLocale, type Locale, locales, t } from "../../../i18n"
 import Base from "../../../layouts/Base.astro"
-import { outletOf, rumours } from "../../../model/seed"
+import { outletOf } from "../../../model/outlet"
+import { rumours } from "../../../model/seed"
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale } }))

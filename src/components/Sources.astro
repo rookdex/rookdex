@@ -1,0 +1,72 @@
+---
+import { outletOf } from "../model/outlet"
+
+interface Props {
+	urls: string[]
+	label: string
+}
+
+// A quiet line under the guide: the label and the outlet links flow like one sentence (spec §9).
+// The <h2> stays a real heading, because the section is labelled by it; only its look shrinks.
+const { urls, label } = Astro.props
+---
+
+{
+	urls.length > 0 && (
+		<section class="sources" aria-labelledby="sources">
+			<h2 id="sources">{label}</h2>
+			<ul>
+				{urls.map((url) => (
+					<li>
+						<a href={url} rel="noopener">
+							{outletOf(url)}
+						</a>
+					</li>
+				))}
+			</ul>
+		</section>
+	)
+}
+
+<style>
+	/* 44 px lines give every link its tap height without padding. */
+	.sources {
+		margin-top: var(--space-4);
+		font-size: 0.75rem;
+		line-height: 44px;
+	}
+
+	.sources h2 {
+		display: inline;
+		margin: 0 var(--space-2) 0 0;
+		font-family: var(--font-sans);
+		font-size: 0.75rem;
+		font-weight: 500;
+		line-height: inherit;
+		color: var(--text-muted);
+	}
+
+	.sources ul,
+	.sources li {
+		display: inline;
+		margin: 0;
+		padding: 0;
+	}
+
+	.sources li + li::before {
+		content: "·";
+		margin-inline: var(--space-2);
+		color: var(--text-muted);
+	}
+
+	.sources a {
+		white-space: nowrap;
+		text-decoration-thickness: 1px;
+		text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
+	}
+
+	.sources a:hover,
+	.sources a:focus-visible {
+		text-decoration-color: var(--link);
+	}
+</style>

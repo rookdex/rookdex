@@ -9,7 +9,6 @@ import {
 	isVideo,
 	loadAll,
 	matchesPrefix,
-	outletOf,
 	resolveTier,
 	rumours,
 	seedItems,
@@ -170,12 +169,6 @@ describe("loadAll", () => {
 		expect(errors).toEqual([])
 		expect(categoryIds(items)).toEqual(["vehicles", "wildlife"])
 		expect([...groupItems(items).keys()]).toEqual(["bikes", "reptiles"])
-	})
-})
-
-describe("outletOf", () => {
-	it("returns the host without www", () => {
-		expect(outletOf("https://www.ign.com/articles/x")).toBe("ign.com")
 	})
 })
 
