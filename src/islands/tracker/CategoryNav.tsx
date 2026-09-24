@@ -9,20 +9,10 @@ interface Props {
 	onSelect: (ids: string[]) => void
 	allLabel: string
 	navLabel: string
-	rumoursHref: string
-	rumoursLabel: string
 }
 
 /** Multi-select toggles with an explicit All, so a screen reader never hears "all, not pressed". */
-export function CategoryNav({
-	categories,
-	selected,
-	onSelect,
-	allLabel,
-	navLabel,
-	rumoursHref,
-	rumoursLabel,
-}: Props) {
+export function CategoryNav({ categories, selected, onSelect, allLabel, navLabel }: Props) {
 	const allPressed = selected.length === 0
 
 	function toggle(id: string) {
@@ -52,9 +42,6 @@ export function CategoryNav({
 					</li>
 				))}
 			</ul>
-			<a className="rumours-link" href={rumoursHref}>
-				{rumoursLabel}
-			</a>
 		</nav>
 	)
 }

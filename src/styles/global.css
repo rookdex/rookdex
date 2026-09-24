@@ -12,6 +12,10 @@ html {
 	font-family: var(--font-sans);
 	line-height: 1.5;
 	-webkit-text-size-adjust: 100%;
+	/* The phone tab bar's measured two-line height (spec §5), in rem so it follows the text size. */
+	--tabbar-h: 4.25rem;
+	/* Keeps a focused control from scrolling in behind the fixed bar (WCAG 2.4.11). */
+	scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
 }
 
 body {
@@ -19,12 +23,18 @@ body {
 	min-height: 100dvh;
 	display: flex;
 	flex-direction: column;
+	padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
 }
 
 img,
 svg {
 	max-width: 100%;
 	height: auto;
+}
+
+/* A class that sets display beats the UA's [hidden]; this keeps hidden meaning hidden (spec §4). */
+[hidden] {
+	display: none !important;
 }
 
 a {
@@ -80,7 +90,7 @@ p {
 .site-header {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: flex-start;
 	gap: var(--space-3);
 	padding: var(--space-2) var(--space-3);
 	background: var(--bg-raised);
@@ -110,6 +120,59 @@ p {
 	color: var(--text);
 }
 
+/* Back, forward, mark, wordmark, flexible space, language (spec §4). */
+.site-header .lang {
+	margin-inline-start: auto;
+}
+
+.history {
+	display: flex;
+}
+
+.history button {
+	display: inline-grid;
+	place-items: center;
+	width: var(--tap);
+	height: var(--tap);
+	padding: 0;
+	border: 0;
+	border-radius: var(--radius);
+	background: transparent;
+	color: var(--text);
+	cursor: pointer;
+}
+
+.history button:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--text) 9%, var(--bg));
+}
+
+/* Dimmed but kept in place, so the mark never shifts when history runs out. */
+.history button:disabled {
+	opacity: 0.45;
+	color: var(--text-muted);
+	cursor: default;
+}
+
+.history svg {
+	width: 24px;
+	height: 24px;
+}
+
+/*
+ * The one max-width query: the wordmark hides only when phone width and the installed app's history
+ * buttons coincide (spec §4, measured). Visually hidden, not removed, so the brand keeps its name.
+ */
+@media (max-width: 767px) and (display-mode: standalone) {
+	.site-header .wordmark {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+}
+
 /* Hub h1: the same lockup, larger. It is the wordmark, not a heading, so the display face is right. */
 .lockup {
 	display: flex;
@@ -122,27 +185,77 @@ p {
 	font-size: 2.5rem;
 }
 
-.lang ul {
+.lang details {
+	position: relative;
+}
+
+.lang summary {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	min-height: var(--tap);
+	padding: 0 8px 0 10px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	color: var(--text);
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1;
 	list-style: none;
+	cursor: pointer;
+}
+
+.lang summary::-webkit-details-marker {
+	display: none;
+}
+
+.lang details[open] > summary {
+	border-color: color-mix(in srgb, var(--text) 24%, var(--bg));
+	background: color-mix(in srgb, var(--text) 9%, var(--bg));
+}
+
+.lang-globe,
+.lang-chevron {
+	flex: none;
+	color: var(--text-muted);
+}
+
+.lang ul {
+	position: absolute;
+	top: calc(100% + var(--space-1));
+	right: 0;
+	z-index: 20;
+	min-width: 176px;
 	margin: 0;
-	padding: 0;
-	display: flex;
-	gap: var(--space-2);
+	padding: var(--space-1);
+	list-style: none;
+	background: var(--bg-raised);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	box-shadow: 0 8px 24px color-mix(in srgb, var(--bg) 60%, transparent);
 }
 
 .lang a {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-2);
 	min-height: var(--tap);
-	padding-inline: var(--space-2);
-	color: var(--text-muted);
+	padding: 0 12px;
+	border-radius: 6px;
+	color: var(--text);
+	font-size: 0.875rem;
 	text-decoration: none;
 }
 
+.lang a:hover,
 .lang a[aria-current="page"] {
-	color: var(--text);
-	text-decoration: underline;
-	text-underline-offset: 0.3em;
+	background: color-mix(in srgb, var(--text) 9%, var(--bg));
+}
+
+.lang-check {
+	flex: none;
+	color: var(--accent);
 }
 
 .tagline {
@@ -160,6 +273,110 @@ p {
 
 .site-footer p {
 	max-width: none;
+}
+
+/* A hairline under the disclaimer, then pairs: 2 × 2 on a phone, four across from about 720 px. */
+.footer-pairs {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: var(--space-3) var(--space-4);
+	margin: 0;
+	padding-top: var(--space-3);
+	border-top: 1px solid var(--border);
+}
+
+.footer-pairs dt {
+	color: var(--text-muted);
+	font-size: 0.75rem;
+	font-weight: 500;
+}
+
+/* Flex and a fixed minimum put link and text values on one baseline (measured 0.9 px off without). */
+.footer-pairs dd {
+	display: flex;
+	align-items: center;
+	min-height: 1.25rem;
+	margin: 0;
+	color: var(--text);
+	font-size: 0.8125rem;
+}
+
+/* 44 px tap area; the negative margins keep it from stretching the row. */
+.footer-pairs a {
+	display: inline-flex;
+	align-items: center;
+	min-height: var(--tap);
+	margin-block: -12px;
+}
+
+/* Navigation */
+
+.tabbar {
+	position: fixed;
+	inset-inline: 0;
+	bottom: 0;
+	z-index: 5;
+	padding-bottom: env(safe-area-inset-bottom);
+	background: var(--bg-raised);
+	border-top: 1px solid var(--border);
+}
+
+.tabbar ul {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.tabbar li {
+	display: flex;
+	min-width: 0;
+}
+
+/* No white-space: nowrap here: it would also suppress the soft hyphen in "Inn-stillinger". */
+.tabbar a {
+	position: relative;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-1);
+	min-height: 56px;
+	padding: var(--space-1) 2px;
+	color: var(--text-muted);
+	font-size: 0.75rem;
+	font-weight: 500;
+	line-height: 1;
+	text-align: center;
+	text-decoration: none;
+}
+
+.tabbar .tab-icon {
+	width: 24px;
+	height: 24px;
+	flex: none;
+}
+
+.tabbar a[aria-current="page"] {
+	color: var(--text);
+}
+
+.tabbar a[aria-current="page"] .tab-icon {
+	color: var(--accent);
+}
+
+.tabbar a[aria-current="page"]::before {
+	content: "";
+	position: absolute;
+	top: -1px;
+	left: 50%;
+	width: 32px;
+	height: 2px;
+	margin-left: -16px;
+	border-radius: 0 0 2px 2px;
+	background: var(--accent);
 }
 
 /* Utilities */
@@ -402,13 +619,6 @@ p {
 	background: var(--accent);
 	color: var(--accent-text);
 	border-color: var(--accent);
-}
-
-.rumours-link {
-	display: inline-flex;
-	align-items: center;
-	min-height: var(--tap);
-	margin-top: var(--space-2);
 }
 
 .item-category > h2 {
@@ -680,12 +890,20 @@ p {
 }
 
 .rumour-list li {
-	padding: var(--space-3) 0;
+	padding: 0.75rem 0;
 	border-bottom: 1px solid var(--border);
 }
 
-.rumour-list h2 {
-	font-size: 1.125rem;
+.rumour-list h3 {
+	margin-bottom: var(--space-1);
+	font-size: 1.0625rem;
+	font-weight: 700;
+}
+
+.rumour-list .summary {
+	margin-bottom: 0;
+	color: var(--text-muted);
+	font-size: 0.875rem;
 }
 
 .rumour-list .meta {
@@ -700,6 +918,58 @@ p {
 }
 
 @media (min-width: 768px) {
+	html {
+		scroll-padding-bottom: 0;
+	}
+
+	body {
+		padding-bottom: 0;
+	}
+
+	/* The tab row carries the chrome's bottom edge on desktop. */
+	.site-header {
+		border-bottom: 0;
+	}
+
+	/* The row's first label starts on the brand's left edge: header padding minus link padding. */
+	.tabbar {
+		position: static;
+		padding: 0 calc(var(--space-4) - 12px);
+		border-top: 0;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.tabbar ul {
+		display: flex;
+		gap: var(--space-1);
+	}
+
+	.tabbar .tab-icon {
+		display: none;
+	}
+
+	.tabbar a {
+		flex-direction: row;
+		min-height: var(--tap);
+		padding: 0 12px;
+		font-size: 0.875rem;
+		line-height: 1.5;
+	}
+
+	.tabbar a[aria-current="page"]::before {
+		content: none;
+	}
+
+	.tabbar a[aria-current="page"]::after {
+		content: "";
+		position: absolute;
+		left: 12px;
+		right: 12px;
+		bottom: -1px;
+		height: 2px;
+		background: var(--accent);
+	}
+
 	.wrap {
 		padding: var(--space-5) var(--space-4);
 	}

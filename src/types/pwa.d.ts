@@ -7,3 +7,8 @@ interface BeforeInstallPromptEvent extends Event {
 interface WindowEventMap {
 	beforeinstallprompt: BeforeInstallPromptEvent
 }
+
+// iOS Safari's home-screen flag; not in lib.dom, needed so `window` satisfies StandaloneWindow.
+interface Navigator {
+	standalone?: boolean
+}

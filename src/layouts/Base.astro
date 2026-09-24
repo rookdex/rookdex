@@ -5,9 +5,12 @@ import "@fontsource/bebas-neue"
 import { getAbsoluteLocaleUrl, getRelativeLocaleUrl } from "astro:i18n"
 import bebasLatin from "@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2?url"
 import Footer from "../components/Footer.astro"
+import HistoryButtons from "../components/HistoryButtons.astro"
 import LanguageSwitch from "../components/LanguageSwitch.astro"
 import Mark from "../components/Mark.astro"
+import TabBar from "../components/TabBar.astro"
 import { defaultLocale, type Locale, locales, t } from "../i18n"
+import { currentTab, type Tab } from "../model/tabs"
 import "../styles/global.css"
 
 interface Props {
@@ -16,9 +19,11 @@ interface Props {
 	description: string
 	/** Route without the locale prefix: "" for the hub, "guides/before-you-start" for a guide. */
 	path: string
+	/** Overrides the tab `path` implies; `null` marks none (the 404 passes "" but is not Home). */
+	tab?: Tab | null
 }
 
-const { locale, title, description, path } = Astro.props
+const { locale, title, description, path, tab } = Astro.props
 const s = t(locale)
 ---
 
@@ -26,7 +31,7 @@ const s = t(locale)
 <html lang={locale}>
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<title>{title === s.siteName ? title : `${title} · ${s.siteName}`}</title>
 		<meta name="description" content={description} />
 		<meta name="color-scheme" content="dark" />
@@ -43,12 +48,14 @@ const s = t(locale)
 	<body>
 		<a class="skip" href="#main">{s.skipToContent}</a>
 		<header class="site-header">
+			<HistoryButtons locale={locale} />
 			<a class="brand" href={getRelativeLocaleUrl(locale, "")} aria-label="Rookdex">
 				<Mark id="header" />
 				<span class="wordmark">ROOKDEX</span>
 			</a>
 			<LanguageSwitch locale={locale} path={path} />
 		</header>
+		<TabBar locale={locale} current={currentTab(path, tab)} />
 		<main id="main" class="wrap">
 			<slot />
 		</main>

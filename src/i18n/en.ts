@@ -4,7 +4,16 @@ export const en = {
 	siteName: "Rookdex",
 	tagline: "A launch-night companion for GTA VI. Track what you find, see what is confirmed.",
 	skipToContent: "Skip to content",
-	languageSwitch: "Language",
+	nav: {
+		label: "Main",
+		home: "Home",
+		tracker: "Tracker",
+		news: "News",
+		settings: "Settings",
+		back: "Back",
+		forward: "Forward",
+	},
+	languageSwitch: { label: "Language", current: "Language: English" },
 	languageNames: { en: "English", no: "Norsk" },
 	hub: {
 		countdownHeading: "Launch countdown",
@@ -32,9 +41,13 @@ export const en = {
 	footer: {
 		disclaimer:
 			"Rookdex is an unofficial fan project. It is not affiliated with or endorsed by Rockstar Games or Take-Two Interactive. All trademarks belong to their owners.",
-		contact: "Takedown or legal contact:",
-		licence: "Code under MIT, guide text under CC BY-SA 4.0.",
-		source: "Source on GitHub",
+		source: "GitHub",
+		legalLabel: "Takedown and legal",
+		codeLicenceLabel: "Code licence",
+		codeLicence: "MIT",
+		guideLicenceLabel: "Guide licence",
+		guideLicence: "CC BY-SA 4.0",
+		sourceLabel: "Source code",
 	},
 	notFound: {
 		title: "Page not found",
@@ -100,13 +113,13 @@ export const en = {
 		persistHint:
 			"This browser may clear saved progress after a week without a visit. Install Rookdex or export your profile to keep it safe.",
 		dismiss: "Got it",
-		rumours: "Rumours",
 		errors: {
 			"too-large": "That file is larger than 5 MB.",
 			"not-json": "That file isn't JSON.",
 			"not-export": "This isn't a Rookdex export file.",
 			storage: "Saving failed. Your browser may be blocking storage.",
 			name: "Give the profile a name of 1 to 40 characters.",
+			closed: "Your data changed in another tab. Reload to continue.",
 		},
 	},
 	profile: {
@@ -138,12 +151,45 @@ export const en = {
 	},
 	rumours: {
 		title: "Rumours",
-		description: "What the press reports about GTA VI that Rockstar has not confirmed.",
 		intro:
 			"Reported by press, not confirmed by Rockstar. Rumours move to the tracker when confirmed.",
 		reportedBy: "Reported by {outlet}",
 		empty: "No rumours listed yet.",
-		backToTracker: "Back to the tracker",
+	},
+	news: {
+		title: "News",
+		description:
+			"News about GTA VI, including what the press reports that Rockstar has not confirmed.",
+	},
+	settings: {
+		title: "Settings",
+		description: "Language, the data Rookdex keeps on this device, and app details.",
+		language: "Language",
+		data: "Your data",
+		app: "App",
+		stored: "Stored",
+		storedValue: "In this browser only",
+		persisted: "Protected from clearing",
+		yes: "Yes",
+		no: "No",
+		transfer: "Export or import",
+		transferLink: "Profile menu in Tracker",
+		dangerBody:
+			"Removes every profile and all progress on this device. It can't be undone. Export first if you want a copy.",
+		deleteAll: "Delete all data on this device",
+		dialogTitle: "Delete all data on this device?",
+		cancel: "Cancel",
+		confirm: "Delete everything",
+		done: "All data on this device is deleted.",
+		blocked: "Close other Rookdex tabs to finish.",
+		failed: "Something went wrong. Nothing was deleted.",
+		install: "Install",
+		installButton: "Install Rookdex",
+		installed: "Installed",
+		iosHowTo: "Share, then Add to Home Screen",
+		version: "Version",
+		source: "Source code",
+		sourceLink: "GitHub",
 	},
 }
 

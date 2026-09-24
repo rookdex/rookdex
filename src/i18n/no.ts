@@ -5,7 +5,17 @@ export const no: Strings = {
 	tagline:
 		"En følgesvenn for lanseringskvelden til GTA VI. Hold oversikt over det du finner, og se hva som er bekreftet.",
 	skipToContent: "Hopp til innhold",
-	languageSwitch: "Språk",
+	nav: {
+		label: "Hoved",
+		home: "Hjem",
+		tracker: "Oversikt",
+		news: "Nyheter",
+		// U+00AD: at 130 % text the bottom bar wraps the label here instead of clipping it (spec §5).
+		settings: "Inn­stillinger",
+		back: "Tilbake",
+		forward: "Fremover",
+	},
+	languageSwitch: { label: "Språk", current: "Språk: norsk" },
 	languageNames: { en: "English", no: "Norsk" },
 	hub: {
 		countdownHeading: "Nedtelling til lansering",
@@ -33,9 +43,13 @@ export const no: Strings = {
 	footer: {
 		disclaimer:
 			"Rookdex er et uoffisielt fanprosjekt. Det er ikke tilknyttet eller godkjent av Rockstar Games eller Take-Two Interactive. Alle varemerker tilhører sine eiere.",
-		contact: "Kontakt for fjerning eller juridiske henvendelser:",
-		licence: "Kode under MIT, guidetekst under CC BY-SA 4.0.",
-		source: "Kildekode på GitHub",
+		source: "GitHub",
+		legalLabel: "Fjerning og juridisk",
+		codeLicenceLabel: "Kodelisens",
+		codeLicence: "MIT",
+		guideLicenceLabel: "Guidelisens",
+		guideLicence: "CC BY-SA 4.0",
+		sourceLabel: "Kildekode",
 	},
 	notFound: {
 		title: "Siden finnes ikke",
@@ -99,13 +113,13 @@ export const no: Strings = {
 		persistHint:
 			"Denne nettleseren kan slette lagret fremgang etter en uke uten besøk. Installer Rookdex eller eksporter profilen din for å være trygg.",
 		dismiss: "Skjønner",
-		rumours: "Rykter",
 		errors: {
 			"too-large": "Filen er større enn 5 MB.",
 			"not-json": "Filen er ikke JSON.",
 			"not-export": "Dette er ikke en eksportfil fra Rookdex.",
 			storage: "Lagring mislyktes. Nettleseren kan blokkere lagring.",
 			name: "Gi profilen et navn på 1 til 40 tegn.",
+			closed: "Dataene dine ble endret i en annen fane. Last inn siden på nytt for å fortsette.",
 		},
 	},
 	profile: {
@@ -137,11 +151,44 @@ export const no: Strings = {
 	},
 	rumours: {
 		title: "Rykter",
-		description: "Det pressen melder om GTA VI som Rockstar ikke har bekreftet.",
 		intro:
 			"Meldt av pressen, ikke bekreftet av Rockstar. Rykter flyttes til oversikten når de bekreftes.",
 		reportedBy: "Meldt av {outlet}",
 		empty: "Ingen rykter oppført ennå.",
-		backToTracker: "Tilbake til oversikten",
+	},
+	news: {
+		title: "Nyheter",
+		description:
+			"Nyheter om GTA VI, blant annet det pressen melder som Rockstar ikke har bekreftet.",
+	},
+	settings: {
+		title: "Innstillinger",
+		description: "Språk, dataene Rookdex lagrer på denne enheten, og appdetaljer.",
+		language: "Språk",
+		data: "Dine data",
+		app: "App",
+		stored: "Lagret",
+		storedValue: "Bare i denne nettleseren",
+		persisted: "Beskyttet mot sletting",
+		yes: "Ja",
+		no: "Nei",
+		transfer: "Eksport eller import",
+		transferLink: "Profilmenyen i Oversikt",
+		dangerBody:
+			"Fjerner alle profiler og all fremgang på denne enheten. Det kan ikke angres. Eksporter først hvis du vil ha en kopi.",
+		deleteAll: "Slett alle data på denne enheten",
+		dialogTitle: "Slette alle data på denne enheten?",
+		cancel: "Avbryt",
+		confirm: "Slett alt",
+		done: "Alle data på denne enheten er slettet.",
+		blocked: "Lukk andre Rookdex-faner for å fullføre.",
+		failed: "Noe gikk galt. Ingenting ble slettet.",
+		install: "Installer",
+		installButton: "Installer Rookdex",
+		installed: "Installert",
+		iosHowTo: "Del, deretter Legg til på Hjem-skjerm",
+		version: "Versjon",
+		source: "Kildekode",
+		sourceLink: "GitHub",
 	},
 }

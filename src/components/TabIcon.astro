@@ -1,0 +1,58 @@
+---
+import type { Tab } from "../model/tabs"
+
+interface Props {
+	name: Tab
+}
+
+// Four hand-drawn icons on a 24 px grid, 2 px stroke (spec §5). Decorative: the label names the tab.
+const { name } = Astro.props
+---
+
+<svg
+	class="tab-icon"
+	viewBox="0 0 24 24"
+	width="24"
+	height="24"
+	fill="none"
+	stroke="currentColor"
+	stroke-width="2"
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	aria-hidden="true"
+>
+	{
+		name === "home" && (
+			<>
+				<path d="M3 10.5 12 3l9 7.5" />
+				<path d="M5.5 9v11h5v-6h3v6h5V9" />
+			</>
+		)
+	}
+	{
+		name === "tracker" && (
+			<>
+				<rect x="3.5" y="3.5" width="17" height="17" rx="4" />
+				<path d="M8 12.5l3 3 5-6" />
+			</>
+		)
+	}
+	{
+		name === "news" && (
+			<>
+				<path d="M4 5h12v13a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2z" />
+				<path d="M16 9h4v9a2 2 0 0 1-4 0" />
+				<path d="M8 9h4M8 13h4M8 16h2" />
+			</>
+		)
+	}
+	{
+		name === "settings" && (
+			<>
+				<path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+				<circle cx="15" cy="7" r="2" />
+				<circle cx="9" cy="17" r="2" />
+			</>
+		)
+	}
+</svg>

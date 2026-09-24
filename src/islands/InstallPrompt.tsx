@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react"
 import { type Locale, t } from "../i18n"
-import { readFlag, writeFlag } from "./seenFlag"
+import { INSTALL_SEEN_KEY, readFlag, writeFlag } from "./seenFlag"
 
-export const SEEN_KEY = "rookdex.install-prompt-seen"
+export const SEEN_KEY = INSTALL_SEEN_KEY
 
 interface Props {
 	locale: Locale

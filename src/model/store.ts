@@ -28,6 +28,8 @@ export interface Store {
 	 * registers it after its own init writes, so the persistence request follows a player's write.
 	 */
 	onFirstWrite(callback: () => void): void
+	/** Called after the connection closes because another tab deleted or upgraded the database. */
+	onClosed(callback: () => void): void
 	close(): void
 }
 
@@ -49,9 +51,14 @@ export function openStore(factory: IDBFactory, name = DB_NAME): Promise<Store> {
 function wrap(db: IDBDatabase): Store {
 	let firstWrite: (() => void) | undefined
 	let written = false
+	let closed: (() => void) | undefined
 
-	// A later phase bumping DB_VERSION would otherwise block forever behind this open connection.
-	db.onversionchange = () => db.close()
+	// Another tab deleting or upgrading the database would otherwise block behind this connection.
+	// After closing, the tracker hears about it and stops writing (spec §7.2).
+	db.onversionchange = () => {
+		db.close()
+		closed?.()
+	}
 
 	function transaction<T>(
 		names: StoreName[],
@@ -104,6 +111,9 @@ function wrap(db: IDBDatabase): Store {
 		onFirstWrite: (callback) => {
 			firstWrite = callback
 			written = false
+		},
+		onClosed: (callback) => {
+			closed = callback
 		},
 		close: () => db.close(),
 	}

@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from "astro:content"
+import Sources from "../../../components/Sources.astro"
 import { defaultLocale, fill, isLocale, type Locale, locales, t } from "../../../i18n"
 import Base from "../../../layouts/Base.astro"
 import { guideSlugs, resolveGuide } from "../../../model/guides"
@@ -34,22 +35,7 @@ const updated = entry.data.updated.toLocaleDateString(dateLocale, { dateStyle: "
 		<p class="tagline">{entry.data.summary}</p>
 		<p class="meta" lang={fellBack ? locale : undefined}>{fill(s.guides.updated, { date: updated })}</p>
 		<Content />
-		{
-			entry.data.sources.length > 0 && (
-				<section aria-labelledby="sources">
-					<h2 id="sources">{s.guides.sources}</h2>
-					<ul class="tap-links">
-						{entry.data.sources.map((url) => (
-							<li>
-								<a href={url} rel="noopener">
-									{url}
-								</a>
-							</li>
-						))}
-					</ul>
-				</section>
-			)
-		}
+		<Sources urls={entry.data.sources} label={s.guides.sources} />
 	</article>
 </Base>
 

@@ -3,6 +3,7 @@
 // seed is invalid, so a bad seed fails the build and CI.
 import { z } from "astro/zod"
 import allowlistJson from "../../allowlist.json"
+import { normalizeHost } from "./outlet"
 import {
 	type Allowlist,
 	allowlistSchema,
@@ -18,10 +19,6 @@ import {
 export const allowlist: Allowlist = allowlistSchema.parse(allowlistJson)
 
 const VIDEO_HOSTS = ["youtube.com", "youtu.be"]
-
-function normalizeHost(host: string): string {
-	return host.toLowerCase().replace(/^www\./, "")
-}
 
 /**
  * `prefix` is a URL without scheme: a bare domain covers the domain and its subdomains,
@@ -54,11 +51,6 @@ export function resolveTier(urlString: string, list: Allowlist): TierResult {
 export function isVideo(urlString: string): boolean {
 	const url = new URL(urlString)
 	return VIDEO_HOSTS.some((host) => matchesPrefix(url, host))
-}
-
-/** Host without `www.`, used as the outlet name on the Rumours page. */
-export function outletOf(urlString: string): string {
-	return normalizeHost(new URL(urlString).hostname)
 }
 
 function attachTiers(

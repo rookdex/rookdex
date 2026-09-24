@@ -12,7 +12,7 @@ vi.mock("../model/seed", async (importOriginal) => {
 
 beforeEach(resetBrowser)
 
-const ready = () => renderReady(<Tracker locale="en" rumoursHref="/en/tracker/rumours/" />)
+const ready = () => renderReady(<Tracker locale="en" />)
 
 describe("profiles in the island", () => {
 	it("creates a profile through the name dialog and switches to it", async () => {

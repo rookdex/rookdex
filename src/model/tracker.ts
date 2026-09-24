@@ -24,7 +24,7 @@ import {
 } from "./transfer"
 
 export type Status = "loading" | "ready" | "error"
-export type TrackerError = ImportError | "storage" | "name"
+export type TrackerError = ImportError | "storage" | "name" | "closed"
 
 export interface Announcement {
 	category: string
@@ -104,6 +104,8 @@ export function createTracker(deps: TrackerDeps): Tracker {
 	const known = new Set(categoryIds(deps.items))
 	const listeners = new Set<() => void>()
 	let store: Store | undefined
+	// Set when another tab deletes the database under us; writes stop until the page reloads.
+	let closed = false
 	let state: TrackerState = {
 		status: "loading",
 		profiles: [],
@@ -124,15 +126,21 @@ export function createTracker(deps: TrackerDeps): Tracker {
 	}
 
 	function ready(): Store {
+		if (closed) throw new Error("Store closed by another tab")
 		if (!store) throw new Error("Tracker not initialised")
 		return store
+	}
+
+	/** The error a failed write shows: the true cause when the store was closed under us. */
+	function writeError(): TrackerError {
+		return closed ? "closed" : "storage"
 	}
 
 	async function guard(fn: () => Promise<void>): Promise<void> {
 		try {
 			await fn()
 		} catch {
-			fail("storage")
+			fail(writeError())
 		}
 	}
 
@@ -196,7 +204,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 				: undefined
 			set({ records, announcement, error: undefined })
 		} catch {
-			fail("storage")
+			fail(writeError())
 		}
 	}
 
@@ -209,6 +217,10 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			// Armed after the silent default-profile write: the persistence request (and Firefox's
 			// prompt for it) follows the first write the player makes.
 			db.onFirstWrite(requestPersist)
+			db.onClosed(() => {
+				closed = true
+				fail("closed")
+			})
 			set({ ...(await profilePatch(db, profile)), status: "ready" })
 		} catch {
 			set({ status: "error" })

@@ -26,3 +26,15 @@ describe("copy rules (spec §9)", () => {
 		expect(text).not.toContain("ROOKDEX")
 	})
 })
+
+describe("soft hyphens (spec §5, §11)", () => {
+	it("appear only in the Norwegian Settings tab label", () => {
+		const withShy = all.filter(([, text]) => text.includes("­")).map(([path]) => path)
+		expect(withShy).toEqual(["no.nav.settings"])
+	})
+
+	it("leave the page title whole", () => {
+		expect(no.settings.title).toBe("Innstillinger")
+		expect(no.nav.settings.replace("­", "")).toBe(no.settings.title)
+	})
+})

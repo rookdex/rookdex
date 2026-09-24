@@ -1,0 +1,260 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n"
+import pkg from "../../../package.json"
+import { isLocale, type Locale, locales, t } from "../../i18n"
+import Base from "../../layouts/Base.astro"
+import { appVersion } from "../../model/version"
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale }, props: {} }))
+}
+
+// Settings acts on the whole device; per-profile export, import and delete stay in the Tracker's
+// profile menu (spec §7).
+const { locale } = Astro.params
+if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
+const s = t(locale as Locale)
+const version = appVersion(pkg.version, process.env.GITHUB_SHA)
+---
+
+<Base locale={locale} title={s.settings.title} description={s.settings.description} path="settings">
+	<h1>{s.settings.title}</h1>
+
+	<section class="settings-group" aria-labelledby="settings-language">
+		<h2 id="settings-language">{s.settings.language}</h2>
+		<ul class="rows">
+			{
+				locales.map((l) => (
+					<li class="row">
+						{l === locale ? (
+							<span aria-current="page" lang={l}>
+								{s.languageNames[l]}
+							</span>
+						) : (
+							<a href={getRelativeLocaleUrl(l, "settings")} hreflang={l} lang={l}>
+								{s.languageNames[l]}
+							</a>
+						)}
+						{l === locale && (
+							<svg
+								class="check"
+								viewBox="0 0 24 24"
+								width="16"
+								height="16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								aria-hidden="true"
+							>
+								<path d="M5 12.5l4.5 4.5L19 7.5" />
+							</svg>
+						)}
+					</li>
+				))
+			}
+		</ul>
+	</section>
+
+	<section class="settings-group" aria-labelledby="settings-data">
+		<h2 id="settings-data">{s.settings.data}</h2>
+		<dl class="rows">
+			<div class="row">
+				<dt>{s.settings.stored}</dt>
+				<dd>{s.settings.storedValue}</dd>
+			</div>
+			<div class="row" data-storage-row data-yes={s.settings.yes} data-no={s.settings.no} hidden>
+				<dt>{s.settings.persisted}</dt>
+				<dd data-value></dd>
+			</div>
+			<div class="row">
+				<dt>{s.settings.transfer}</dt>
+				<dd><a href={getRelativeLocaleUrl(locale, "tracker")}>{s.settings.transferLink}</a></dd>
+			</div>
+		</dl>
+		<div class="danger" data-delete>
+			<p>{s.settings.dangerBody}</p>
+			<button type="button" class="danger-button" data-delete-open>{s.settings.deleteAll}</button>
+			<p class="delete-status" role="status" data-delete-status></p>
+			<dialog
+				class="modal"
+				aria-labelledby="delete-all-title"
+				data-blocked={s.settings.blocked}
+				data-failed={s.settings.failed}
+				data-done={s.settings.done}
+			>
+				<h2 id="delete-all-title" tabindex="-1">{s.settings.dialogTitle}</h2>
+				<p>{s.settings.dangerBody}</p>
+				<p class="tracker-alert" role="alert" data-delete-alert></p>
+				<div class="actions">
+					<button type="button" data-delete-cancel>{s.settings.cancel}</button>
+					<button type="button" class="danger-button" data-delete-confirm>{s.settings.confirm}</button>
+				</div>
+			</dialog>
+		</div>
+	</section>
+
+	<section class="settings-group" aria-labelledby="settings-app">
+		<h2 id="settings-app">{s.settings.app}</h2>
+		<dl class="rows">
+			<div class="row" data-install-row hidden>
+				<dt>{s.settings.install}</dt>
+				<dd>
+					<button type="button" class="row-button" data-install-button hidden>
+						{s.settings.installButton}
+					</button>
+					<span data-install-installed hidden>{s.settings.installed}</span>
+					<span data-install-ios hidden>{s.settings.iosHowTo}</span>
+				</dd>
+			</div>
+			<div class="row">
+				<dt>{s.settings.version}</dt>
+				<dd>{version}</dd>
+			</div>
+			<div class="row">
+				<dt>{s.settings.source}</dt>
+				<dd><a href="https://github.com/rookdex/rookdex">{s.settings.sourceLink}</a></dd>
+			</div>
+		</dl>
+	</section>
+</Base>
+
+<script>
+	import { deleteAllData } from "../../scripts/delete-all"
+	import { wireDeleteDialog, wireInstallRow, wireStorageRow } from "../../scripts/settings"
+
+	// Either store can be missing or throw on access (private modes, blocked site data).
+	function database(): IDBFactory | undefined {
+		try {
+			return window.indexedDB ?? undefined
+		} catch {
+			return undefined
+		}
+	}
+
+	function flags(): Storage | undefined {
+		try {
+			return window.localStorage
+		} catch {
+			return undefined
+		}
+	}
+
+	const storageRow = document.querySelector<HTMLElement>("[data-storage-row]")
+	if (storageRow) wireStorageRow(storageRow, navigator.storage)
+
+	const installRow = document.querySelector<HTMLElement>("[data-install-row]")
+	if (installRow) wireInstallRow(installRow, window)
+
+	const danger = document.querySelector<HTMLElement>("[data-delete]")
+	if (danger) {
+		wireDeleteDialog(danger, (onBlocked) => deleteAllData(database(), flags(), onBlocked))
+	}
+</script>
+
+<style>
+	.settings-group {
+		margin-bottom: var(--space-5);
+	}
+
+	.settings-group > h2 {
+		margin: 0 0 var(--space-2);
+		color: var(--text-muted);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.rows {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		background: var(--bg-raised);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+	}
+
+	/* Muted label left, value or action right, the pattern phone settings screens use. */
+	.row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-3);
+		min-height: 48px;
+		padding: 0 14px;
+		font-size: 0.875rem;
+	}
+
+	.row + .row {
+		border-top: 1px solid var(--border);
+	}
+
+	.row dt {
+		color: var(--text-muted);
+	}
+
+	.row dd {
+		margin: 0;
+		color: var(--text);
+		text-align: right;
+	}
+
+	.row a,
+	.row-button {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tap);
+	}
+
+	.row-button {
+		padding: 0 var(--space-3);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg);
+		color: var(--text);
+		font: inherit;
+		cursor: pointer;
+	}
+
+	.check {
+		flex: none;
+		color: var(--accent);
+	}
+
+	.danger {
+		margin-top: var(--space-3);
+		padding: var(--space-3);
+		border: 1px solid var(--accent);
+		border-radius: var(--radius);
+	}
+
+	.danger > p {
+		color: var(--text-muted);
+		font-size: 0.875rem;
+	}
+
+	/* Danger is the accent as an outline; filled pink stays for positive actions (plan decision 8). */
+	.danger-button,
+	.actions .danger-button {
+		min-height: var(--tap);
+		padding: 0 var(--space-3);
+		border: 1px solid var(--accent);
+		border-radius: var(--radius);
+		background: transparent;
+		color: var(--accent);
+		font: inherit;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.danger-button:disabled {
+		opacity: 0.45;
+		cursor: default;
+	}
+
+	.delete-status {
+		margin: var(--space-2) 0 0;
+	}
+</style>

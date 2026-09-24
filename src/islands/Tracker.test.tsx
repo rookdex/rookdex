@@ -13,8 +13,7 @@ vi.mock("../model/seed", async (importOriginal) => {
 
 beforeEach(resetBrowser)
 
-const ready = (locale: "en" | "no" = "en") =>
-	renderReady(<Tracker locale={locale} rumoursHref="/en/tracker/rumours/" />)
+const ready = (locale: "en" | "no" = "en") => renderReady(<Tracker locale={locale} />)
 
 describe("Tracker list", () => {
 	it("renders groups, tiers, sources and a disabled report button", async () => {
@@ -63,12 +62,9 @@ describe("Category toggles", () => {
 		expect(window.location.search).toBe("?show=wildlife")
 	})
 
-	it("links to Rumours", async () => {
+	it("has no Rumours link now that News is a tab", async () => {
 		await ready()
-		expect(screen.getByRole("link", { name: "Rumours" })).toHaveAttribute(
-			"href",
-			"/en/tracker/rumours/"
-		)
+		expect(screen.queryByRole("link", { name: "Rumours" })).toBeNull()
 	})
 })
 

@@ -1,0 +1,34 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n"
+import { type Locale, t } from "../i18n"
+import { TAB_PATHS, TABS, type Tab } from "../model/tabs"
+import TabIcon from "./TabIcon.astro"
+
+interface Props {
+	locale: Locale
+	/** The tab to mark with aria-current; null marks none. */
+	current: Tab | null
+}
+
+// Bottom bar on phones, a text row under the header from 768 px (spec §5). Zero JavaScript.
+const { locale, current } = Astro.props
+const s = t(locale)
+---
+
+<nav class="tabbar" aria-label={s.nav.label}>
+	<ul>
+		{
+			TABS.map((id) => (
+				<li>
+					<a
+						href={getRelativeLocaleUrl(locale, TAB_PATHS[id])}
+						aria-current={id === current ? "page" : undefined}
+					>
+						<TabIcon name={id} />
+						<span>{s.nav[id]}</span>
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</nav>
