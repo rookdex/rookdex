@@ -295,7 +295,7 @@ p {
 .footer-pairs dd {
 	display: flex;
 	align-items: center;
-	min-height: 20px;
+	min-height: 1.25rem;
 	margin: 0;
 	color: var(--text);
 	font-size: 0.8125rem;
