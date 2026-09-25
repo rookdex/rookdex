@@ -39,7 +39,7 @@ Written 2026-09-25 from the feedback-round brainstorm (sessions 17–20). It ans
 | External links | One `ExternalLink.astro`, ↗ on every external text link, a build check over `dist/`. | s19 |
 | Update notice | The new worker waits; a notice offers Reload and Later. Placement: above the tab bar on phone, bottom right on desktop. | s19 |
 | Guide | New sections Editions, Pre-order bonus and GTA+. Facts verified 2026-09-24. | s19 |
-| Cross-links | Guide "install the site" → Settings install row; "the home page" → Home; Settings version → the GitHub commit. | s19 |
+| Cross-links | Guide "install the site" → Settings About (the install row lives there); "the home page" → Home; Settings version → the GitHub commit. | s19, target moved by the stress test |
 | Version guard | Responses carry `X-Rookdex-Version`; the worker never stores a page from another version. | s20 |
 | Build check | Runs in an Astro integration after the build, not in `npm test`. | s20 |
 | Update reload | Every open tab reloads once when the new version takes over. | s20 |
@@ -53,7 +53,9 @@ Written 2026-09-25 from the feedback-round brainstorm (sessions 17–20). It ans
 `src/components/ExternalLink.astro` renders every link that leaves rookdex.app.
 
 - Props: `href`, optional `class`, optional `icon` (default `true`), and a default slot for the link text.
-- Output: `<a href target="_blank" rel="noopener noreferrer">`, the slot, an `aria-hidden="true"` ↗ SVG at 0.8em when `icon` is true, and `<span class="visually-hidden"> (opens in a new tab)</span>` in the page's language.
+- Output: `<a href target="_blank" rel="noopener noreferrer">`, the slot, an `aria-hidden="true"` ↗ SVG at 0.8em when `icon` is true, and `<span class="visually-hidden new-tab-note"> (opens in a new tab)</span>`. The suffix language comes from `Astro.currentLocale`. The `new-tab-note` class is the marker the build check looks for (§11); nothing else emits it.
+- It throws at build time unless `href` starts with `https://`.
+- It never takes `aria-label`, which would override the hidden suffix. Icon-only links name themselves with visually hidden text in the slot.
 - `icon={false}` is for icon-only links such as the footer GitHub link. Its tooltip carries the ↗ instead, and the hidden suffix stays in the accessible name.
 - `mailto:` links and links inside the app do not use it.
 
@@ -72,8 +74,11 @@ Every external link in the app is rendered by Astro (footer, guide sources, Sett
 ### 3.3 Tooltips
 
 - Icon-only controls get a tooltip: 12 px text, padding 4 × 8 px, background `#1f1f1f`, border `#333`, placed above the icon.
-- Pure CSS shows the tooltip on `:hover` and `:focus-visible`. The tooltip text is also in the control's accessible name, so it is never the only label.
-- `src/scripts/tooltip.ts` adds one document-level `keydown` listener. Escape hides the visible tooltip until the pointer leaves or focus moves (WCAG 1.4.13). It covers the footer and the tracker without per-component code.
+- The tooltip is a child of the control with `aria-hidden="true"`. The control's accessible name comes from visually hidden text inside it, never `aria-label`, so the name is read once and the tooltip is never the only label.
+- Pure CSS shows the tooltip on `:hover` and `:focus-visible`. A transparent `::before` on the tooltip bridges the gap to the icon, so the pointer can move onto the tooltip without it vanishing (WCAG 1.4.13, hoverable).
+- Tooltips on icons at a card's or the screen's right edge are anchored to the right, so they never overflow at 320 px.
+- `src/scripts/tooltip.ts` adds delegated `keydown`, `focusout` and `pointerout` listeners on the document. Escape hides the visible tooltip until the pointer leaves or focus moves (WCAG 1.4.13, dismissible). It never calls `preventDefault`, so Escape still closes dialogs. It covers the footer and the tracker without per-component code.
+- **Touch:** a tap on an `[aria-disabled="true"]` control that has a tooltip shows the tooltip for about 2 s, or until the pointer leaves, focus moves or Escape is pressed. This rule is not inside `(hover: hover)`, because a tapped disabled control must still explain itself on a phone.
 
 ## 4. Tracker cards
 
@@ -81,30 +86,39 @@ Every external link in the app is rendered by Astro (footer, guide sources, Sett
 
 **Grid.** Each group heading spans the full width. Inside a group, the item list is a grid: `repeat(auto-fill, minmax(16rem, 1fr))`, gap 12 px. That gives two columns in the 640 px content column and one on phones. Rows stretch, so cards in one row share one height and one bottom edge.
 
-**Card.** One `<li>` per item: padding 12 px 12 px 12 px 16 px, radius 8 px, 1 px `--border`, background `--bg-raised`. Contents top to bottom: checkbox and name, tier badge, description. The source list leaves the card.
+**Card.** One `<li>` per item: padding 12 px 12 px 12 px 16 px, radius 8 px, 1 px `--border`, background `--bg-raised`, a flex column. Contents top to bottom: checkbox and name, tier badge, description, and a footer row. The source list leaves the card.
 
-- Checkbox 20 × 20 px, 2 px border, radius 4 px; done = pink fill with a white check.
+- The name row has `padding-right: 40px`, so no text runs under the book icon.
+- The footer row sits in the flow with `margin-top: auto` and holds the flag at its right. The flag never overlaps the book, even on a card without a description, and the card is always tall enough for both icons.
+- Checkbox 20 × 20 px, 2 px border, radius 4 px; done = pink fill with a check in `--accent-text`.
 - Name 15 px / 600. Tier badge 12 px, radius 999 px, padding 1 × 8 px. Description 14 px / 1.5, muted.
 
 **Whole card toggles.** The card is `position: relative`. The label's `::after` covers the card (`position: absolute; inset: 0`), so a click anywhere on the card toggles the checkbox. The corner icons sit above it (`position: relative; z-index: 1`). A disabled tracker shows the default cursor.
 
 **Corner icons.** Both are 44 × 44 px, radius 8 px, with a 22 px SVG. Measured insets: 13 px top and bottom, 7 px right.
 
-- **Book, top right:** a link to `sources/#<item id>`. Tooltip and accessible name "Sources" / "Kilder". Rest muted; hover and focus cyan on 12 % cyan.
+- **Book, top right:** a link to `sources/#<item id>`. Tooltip "Sources" / "Kilder". The accessible name adds the item: "Sources<span class="visually-hidden">: {name}</span>", so a links list tells the dozens of book links apart. Rest muted; hover and focus cyan on 12 % cyan.
 - **Flag, bottom right:** `<button aria-disabled="true">`, not `disabled`, so it stays focusable and its tooltip is reachable. Tooltip "Report: coming soon" / "Rapporter: kommer snart". A click does nothing.
 
 **Hover and focus.** Hover lifts the card to `--bg-hover` and warms the border to 50 % pink. A faint glow is added, and it goes away under reduced motion. Focus is `.item:has(input:focus-visible)` with the 2 px pink outline.
 
-**Arriving from the Sources page.** When the URL hash is `#item-<id>`, `Tracker.tsx` finds that checkbox after its first render, scrolls it into view and focuses it. An unknown or retired id does nothing. Links from the Sources page carry no `?show=`, so the tracker opens on All and the item is always visible.
+**Arriving from the Sources page.** `Tracker.tsx` handles a `#item-<id>` hash once, when `status` first becomes `ready`. Before that the checkboxes are disabled and cannot take focus.
+
+1. Decode `location.hash.slice(1)` inside a try/catch (a hash like `#item-%` throws a `URIError`).
+2. Require the `item-` prefix.
+3. Look the element up with `document.getElementById`, never `querySelector`: the id contains a slash, which is an invalid selector and would throw.
+4. Call `focus({ preventScroll: true })`, then `scrollIntoView({ block: "center" })`, so the item doesn't land under the fixed bar.
+
+Any failure (malformed, unknown or retired id, or an `error` status) does nothing. An exception here must never reach React, because an uncaught one would unmount the whole Tracker. Links from the Sources page carry no `?show=`, so the tracker opens on All and the item is always visible.
 
 ## 5. Sources page
 
-`src/pages/[locale]/tracker/sources.astro`, built from the seed. Zero JavaScript, precached like every page, crawlable. The Tracker tab stays active.
+`src/pages/[locale]/tracker/sources.astro`, built from the seed. Zero JavaScript, precached like every page, crawlable. The Tracker tab keeps its active look, but with `aria-current="true"` instead of `"page"`, because the tab links to a different page. `Base` passes a `sub` flag to `TabBar`, which picks the value from it.
 
 - **Header:** `<h1>` "Sources" / "Kilder" (28 px / 700), and a lede "Where every item in the tracker comes from." / "Hvor hvert element i trackeren kommer fra." (14 px / 1.5, muted).
 - **Category chips:** anchor links to each category section, in the tracker's order, each with its count of live items. 44 px min height, padding 0 16 px, radius 999 px, 15 px text, count 12 px muted.
 - **Sections:** one per category, `<h2>` with the category name. Entries follow in the tracker's group order, with no group headings.
-- **Entry:** `<article id="<item id>">` (the seed id contains one slash, valid in an id and a fragment), padding 12 px 12 px 12 px 16 px, `--bg-raised`, radius 8 px. `<h3>` item name (15 px / 600). A list of its sources, each one an `ExternalLink` with the source title in cyan and the outlet domain (`outletOf`) in 12 px muted under it, 44 px min height. Then "Back to the item in the tracker" / "Tilbake til elementet i trackeren", linking to `../#item-<id>`, 13 px muted, 44 px min height.
+- **Entry:** `<article id="<item id>">` (the seed id contains one slash, valid in an id and a fragment), padding 12 px 12 px 12 px 16 px, `--bg-raised`, radius 8 px. `<h3>` item name (15 px / 600). A list of its sources, each one an `ExternalLink` with the source title in cyan and the outlet domain (`outletOf`) in 12 px muted under it, 44 px min height. Then "Back to the item in the tracker" / "Tilbake til elementet i trackeren", with a visually hidden ": {name}" appended to its accessible name, linking to `../#item-<id>`, 13 px muted, 44 px min height.
 - **`:target`:** the entry arrived at from a book icon gets a cyan border and a faint cyan shadow.
 - Retired items are left out, as in the tracker. The schema requires at least one source per item, so no entry is empty.
 
@@ -118,7 +132,7 @@ Every external link in the app is rendered by Astro (footer, guide sources, Sett
 - **Icon links,** each 44 × 44 px, radius 8 px, muted, lifting to `--text` on `--bg-hover`:
   - GitHub: `ExternalLink` with `icon={false}`, name "Source code on GitHub" / "Kildekode på GitHub", tooltip with ↗.
   - Envelope: `mailto:legal@rookdex.app`, name "Takedown and legal: email" / "Fjerning og juridisk: e-post".
-  - ⓘ: Settings About, name "About and licences" / "Om og lisenser".
+  - ⓘ: `/{locale}/settings/#about`, name "About and licences" / "Om og lisenser".
 - **© line:** "© ROOKDEX {build year}" in Bebas Neue 400, uppercase, letter-spacing 0.14em.
 - **Status chip,** a link to Home: 44 px min height, padding 0 14 px, radius 999 px, border 55 % pink. An 8 × 8 px pink dot with a 10 px glow pulses every 2 s (35 % opacity at the midpoint) and is static under reduced motion.
   - Without JavaScript: "19 NOV 2026".
@@ -132,9 +146,9 @@ The label and value pairs that were in the footer move to Settings About (§7.1)
 
 ### 7.1 About (was "App")
 
-The group heading becomes "About" / "Om". Rows, in order:
+The group heading becomes "About" / "Om", and the `<section>` gets `id="about"`, the target of the guide's install link and the footer ⓘ. The section is always visible; the install row inside it only appears after `beforeinstallprompt`, too late for the browser to scroll to it. Install is the group's first row, so it is on screen as soon as it appears. Rows, in order:
 
-1. Install (unchanged behaviour). The row gets `id="install"` for the guide's cross-link. If the row is hidden, because the browser offers no install, the link lands at the top of Settings.
+1. Install (unchanged behaviour).
 2. Version. The commit part links to `https://github.com/rookdex/rookdex/commit/<full sha>` through `ExternalLink`. A dev build without a sha stays plain text.
 3. Source code: `ExternalLink` to the repository.
 4. Code licence: MIT.
@@ -153,7 +167,7 @@ The link to the other language fills its row (`flex: 1`, stretched to the row's 
 
 ## 8. Install prompt
 
-`InstallPrompt.tsx` returns nothing when `isStandalone(window)` is true (`src/scripts/standalone.ts`), before reading any flag. Together with §7.3, the prompt no longer comes back after delete-all, and it never appears inside the installed app.
+`InstallPrompt.tsx` ignores `beforeinstallprompt` when `isStandalone(window)` is true (`src/scripts/standalone.ts`): the handler's existing guard becomes `if (isStandalone(window) || readFlag(SEEN_KEY)) return`. It is not an early return before the component's hooks, which would break the rules of hooks. Together with §7.3, the prompt no longer comes back after delete-all, and it never appears inside the installed app.
 
 ## 9. "Before you start" guide
 
@@ -167,9 +181,11 @@ Sections, in order:
 4. **GTA+ (new):** a digital pre-order includes one month of GTA+. On PlayStation it renews automatically until it is cancelled, and must be redeemed by 31 March 2027. GTA+ perks apply to GTA Online and the games library, not GTA VI's single-player. A plain warning: cancel before it renews if you don't want to pay. No buying advice.
 5. **Preload,** plus: a physical box contains a download code and is sold from 12 November. This replaces the wrong "check that they ship for release day" line.
 6. **Buying in Norway,** plus: the PlayStation Store charges at pre-order.
-7. **What Rookdex does on launch night:** "install the site" links to `/{locale}/settings/#install`; "the home page" links to `/{locale}/`.
+7. **What Rookdex does on launch night:** "install the site" links to `/{locale}/settings/#about`; "the home page" links to `/{locale}/`.
 
-**Sources front matter:** the Newswire pre-order article replaces the Newswire index (the build rejects two sources from one outlet), and the PlayStation Store page is added.
+**Sources front matter:** the Newswire pre-order article replaces the Newswire index (the build rejects two sources from one outlet), and the PlayStation Store page is added. The guide schema in `src/model/guides.ts` tightens `sources` to `https` URLs only, matching the seed schema.
+
+**No inline external links in guide bodies.** Markdown renders them as plain `<a>`, which the build check (§11) would reject. Citations go in the `sources` front matter; the body links only inside the app.
 
 **Sources line wrap fix,** `src/components/Sources.astro`: today the links are `nowrap` with no whitespace between the `<li>`s, so two or more sources overflow at 320 px. Fix: `li { display: inline-block }`, and the separator moves to `li:not(:last-child)::after`. The links render through `ExternalLink`. Measured: two lines, no overflow at 320 px.
 
@@ -189,28 +205,37 @@ Sections, in order:
 
 `integrations/precache.mjs` already computes `version` after the build. It also writes `X-Rookdex-Version: <version>` into the `/*` block of `dist/_headers`. `_headers` is already excluded from the hash, so the version does not change. The version is already public in `sw.js`.
 
+If it cannot find exactly one `/*` block, the integration fails the build. A missing header silently switches the guard off (§10.1), so a missed edit must be loud. Cloudflare applies `_headers` to static asset responses, page navigations included, but not to responses a Worker script generates.
+
 ### 10.3 The notice
 
 - `register-sw.ts` hands its registration to `src/scripts/update-notice.ts`. No island; about 1 KB.
-- **Shows** when `registration.waiting` exists at load, or when an installing worker reaches `installed` while `navigator.serviceWorker.controller` is set. Never on a first visit (no controller).
-- **Markup** in `Base.astro`, right after `<main>`: a container with `hidden`, holding a live region `role="status"` that gets its text only when the notice shows, so screen readers announce it once. Copy: "A new version is ready" / "En ny versjon er klar". Buttons: "Reload" / "Oppdater" (primary) and "Later" / "Senere".
-- **Reload** posts `SKIP_WAITING` to the waiting worker. If there is no waiting worker any more, because another tab already switched it, it calls `location.reload()`.
-- **Every tab reloads once** on `controllerchange`, but only if it had a controller when it loaded. That keeps a first install's `clients.claim()` from reloading. An old page left running under the new worker could ask for a script chunk that no longer exists. Tracker ticks are already in IndexedDB, so a reload only loses text typed into an open dialog.
+- **Shows** when `registration.waiting` exists at load, or when an installing worker reaches `installed` while `navigator.serviceWorker.controller` is set. `register()` resolves after `load`, when `updatefound` may already have fired, so the script also watches `registration.installing` if one exists at startup. Never on a first visit (no controller).
+- **Markup** in `Base.astro`, right after `<main>`: a card container with `hidden` and the buttons. The live region `role="status"` sits outside the card, always rendered, visually hidden and empty. A live region inside a `display: none` container is not in the accessibility tree, and unhiding it and filling it in one step is often never announced. The script shows the card, then puts the text in the live region on the next task, so screen readers announce it once. Copy: "A new version is ready" / "En ny versjon er klar". Buttons: "Reload" / "Oppdater" (primary) and "Later" / "Senere".
+- **Reload** reads `registration.waiting` at the moment of the click, never a reference captured when the notice appeared (a newer deploy makes that one redundant), and posts `SKIP_WAITING` to it. If there is no waiting worker any more, because another tab already switched it, it calls `location.reload()`.
+- **Every tab reloads once** when the new version takes over. The script keeps `hadController = Boolean(navigator.serviceWorker.controller)`. On `controllerchange`, a tab without a controller only sets `hadController = true` and returns (that is a first install's `clients.claim()`); any later change reloads once, and so does a change after this tab's own Reload click. That covers a tab that stays open from the first install until an update. An old page left running under the new worker could ask for a script chunk that no longer exists. Tracker ticks are already in IndexedDB, so a reload only loses text typed into an open dialog.
 - **Later** hides the notice and sets a `sessionStorage` flag, so it stays hidden for the rest of that tab's session. Storage access is wrapped in try/catch; blocked storage means the notice can return on the next page.
 - The notice never takes focus.
 
 ### 10.4 Placement
 
-- Phone: fixed, left and right 16 px, bottom `calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 8px)`.
+- Phone (below 768 px, where the tab bar is fixed at the bottom): fixed, left and right 16 px, bottom `calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 8px)`.
+- 768–1023 px (the tab bar moves to the top): fixed, left and right 16 px, bottom 16 px.
 - Desktop (≥ 1024 px): fixed bottom right, 16 px in, width 22rem.
 - It overlays and never shifts content (no CLS). It sits below dialogs in stacking order. It fades in, with no fade under reduced motion.
+- **It never hides the focused control (WCAG 2.4.11).** While the notice is visible, `update-notice.ts` sets `--notice-h` on `<html>` to the card's height plus its gap, and every `scroll-padding-bottom` rule in `global.css` adds `var(--notice-h, 0px)`. Hiding the notice clears the variable.
 - Measured targets: the English card is 62 px tall with 44 px buttons sharing one bottom edge. "Last inn på nytt" was rejected because it pushed the text to three lines at 320 px.
 
 ## 11. External-link build check
 
 `integrations/external-links.mjs`, registered after `precache` in `astro.config.mjs`.
 
-- A pure `findUnsafeLinks(html, site)` returns every `<a>` whose `href` is absolute `http(s)` on a host other than rookdex.app and that lacks `target="_blank"`, a `rel` containing both `noopener` and `noreferrer`, or a `.visually-hidden` descendant.
+- A pure `findUnsafeLinks(html, site)` parses the page with `jsdom` (already a devDependency, and the build always installs devDependencies) and never with a regex.
+- **External** means an absolute `http(s)` or protocol-relative `//` URL on a host other than rookdex.app. An external `<a>` fails unless it has all three:
+  - `target="_blank"`
+  - a `rel` whose case-insensitive, whitespace-separated tokens include both `noopener` and `noreferrer`
+  - a `.new-tab-note` descendant, the marker only `ExternalLink` emits (a plain visually hidden name does not count)
+- **Scheme:** any `<a href>` whose scheme is not `https:` or `mailto:` and which is not relative fails too, so a `javascript:` or `data:` href can never ship.
 - The `astro:build:done` hook runs it over every `dist/**/*.html` and fails the build with a list of page and `href` pairs.
 - `mailto:`, relative and same-origin links pass. `<link>` elements (canonical, hreflang) are not `<a>` and are not checked.
 
@@ -244,19 +269,21 @@ New and changed strings go in `src/i18n/en.ts` and `no.ts`, and `copy.test.ts` c
 
 **Vitest,** following the existing patterns (node environment with `renderDoc` for `.astro`, jsdom for islands and scripts):
 
-1. `findUnsafeLinks`: missing `target`, missing `rel` token, missing suffix, and passes for `mailto:`, relative and same-origin links.
-2. `ExternalLink.astro`: attributes, `aria-hidden` icon, hidden suffix in both locales, `icon={false}`.
+1. `findUnsafeLinks`: missing `target`, missing `rel` token, missing `.new-tab-note`, a visually hidden name without the suffix fails, `//host` counts as external, `REL="NoOpener NoReferrer"` passes, `javascript:` fails, and `mailto:`, relative and same-origin links pass.
+2. `ExternalLink.astro`: attributes, `aria-hidden` icon, hidden suffix in both locales, `icon={false}`, no `aria-label`, a non-`https` href throws.
 3. `sw.js`, loaded in a `node:vm` context with fake `self`, `caches` and `fetch`. Install does not call `skipWaiting`; `SKIP_WAITING` does; a mismatched version is returned but not stored; a missing header is stored.
-4. Precache integration: `_headers` gains the version line inside `/*`, and the hash is unchanged.
+4. Precache integration: `_headers` gains the version line inside `/*`, the hash is unchanged, and a `_headers` without exactly one `/*` block fails.
 5. `update-notice.ts`:
    - no notice without a controller
-   - shows for a waiting worker
-   - Reload posts `SKIP_WAITING`
-   - one reload on `controllerchange`
+   - shows for a waiting worker, and for a worker already installing at startup
+   - the status text arrives only after the live region is in the tree
+   - Reload posts `SKIP_WAITING` to the worker waiting at click time
+   - one reload on `controllerchange`; a first claim followed by an update reloads on the second change
    - Later sets and respects the session flag, and survives blocked storage
-6. `ItemList`: one card per item, no source links, the book `href`, the flag's `aria-disabled`, a click on the card toggles it.
-7. Sources page: every live item with its links, anchors equal seed ids, counts per category derived from the seed.
-8. `Tracker`: `#item-<id>` focuses that checkbox; an unknown hash does nothing.
+   - `--notice-h` is set while visible and cleared when hidden
+6. `ItemList`: one card per item, no source links, the book `href` and its name with the item, the flag's `aria-disabled`, a click on the card toggles it. Tapping the flag shows its tooltip.
+7. Sources page: every live item with its links, anchors equal seed ids, counts per category derived from the seed, back links named with the item. The Tracker tab has `aria-current="true"` there (Base test).
+8. `Tracker`: `#item-<id>` does nothing while loading and focuses that checkbox once ready; an id with a slash is found; an unknown hash and malformed percent-encoding do nothing and the Tracker stays mounted.
 9. Footer: three icon links with accessible names, the no-JS fallback. The countdown at a date before launch, on launch day and after launch.
 10. Settings and delete-all: the two flags survive, the About rows are present. `InstallPrompt` does not mount in standalone.
 11. Copy keys in both locales. One test that the countdown templates contain `{n}` (closes brand Task 5's untested branch).
@@ -264,7 +291,7 @@ New and changed strings go in `src/i18n/en.ts` and `no.ts`, and `copy.test.ts` c
 **Measured in the Browser pane at 320 and 1024 px,** numbers go in the PR:
 
 - cards in a row share height and bottom edge
-- corner insets are symmetric
+- corner insets are symmetric; no text runs under either icon; a card without a description keeps both icons apart
 - footer heights and one centre line
 - the language link's box equals its row's box
 - the update card's buttons are 44 px on one bottom edge, with no layout shift
@@ -282,4 +309,7 @@ Version previews cannot test this, because every version has its own origin.
 
 - Spec B: the profile dashboard, with the Progress title linking to it.
 - SEO spec, before this one ships.
-- Phase 1c: reporting behind the flag, the `preview` job posting its URL on the PR.
+- Phase 1c: reporting behind the flag, the `preview` job posting its URL on the PR. When 1c adds a Worker script, HTML must stay static assets, or the Worker must set `X-Rookdex-Version` itself; otherwise the version guard (§10.1) is off.
+- The offline notice (`src/scripts/offline-notice.ts`) fills a live region inside a hidden container, the same pattern §10.3 fixes, so it is probably never announced. Fix it the same way.
+
+The stress test for this spec, including what it considered and rejected, is in `2026-09-25-rookdex-feedback-round-stress-test.md`.
