@@ -4,12 +4,14 @@ import Sources from "../../../components/Sources.astro"
 import { defaultLocale, fill, isLocale, type Locale, locales, t } from "../../../i18n"
 import Base from "../../../layouts/Base.astro"
 import { guideSlugs, resolveGuide } from "../../../model/guides"
+import { validSlugs } from "../../../model/seo"
 
 export async function getStaticPaths() {
 	const entries = await getCollection("guides")
-	// Every slug exists in every language; missing translations render the English copy.
+	// Every slug exists in every language; missing translations render the English copy. A slug
+	// that isn't URL-safe fails the build here and in the sitemap (SEO spec §4.1).
 	return locales.flatMap((locale) =>
-		guideSlugs(entries).map((slug) => ({ params: { locale, slug } }))
+		validSlugs(guideSlugs(entries)).map((slug) => ({ params: { locale, slug } }))
 	)
 }
 
