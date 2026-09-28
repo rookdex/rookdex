@@ -76,3 +76,10 @@ describe("main navigation (spec §5, §12)", () => {
 		expect(brand && group ? group.compareDocumentPosition(brand) & 4 : 0).toBe(4)
 	})
 })
+
+describe("title (SEO spec §4.4)", () => {
+	it("writes the title prop verbatim, with no suffix added", async () => {
+		const doc = await page("tracker")
+		expect(doc.title).toBe("T")
+	})
+})

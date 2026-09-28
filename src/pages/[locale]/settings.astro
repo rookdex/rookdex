@@ -17,7 +17,7 @@ const s = t(locale as Locale)
 const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 ---
 
-<Base locale={locale} title={s.settings.title} description={s.settings.description} path="settings">
+<Base locale={locale} title={s.seo.titles.settings} description={s.settings.description} path="settings">
 	<h1>{s.settings.title}</h1>
 
 	<section class="settings-group" aria-labelledby="settings-language">

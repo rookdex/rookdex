@@ -10,6 +10,8 @@ import { duplicateOutlet } from "./outlet"
 export const guideSchema = z.object({
 	title: z.string(),
 	summary: z.string(),
+	/** The full <title> text for search; the page falls back to "{title} · Rookdex". */
+	searchTitle: z.string().max(65).optional(),
 	updated: z.coerce.date(),
 	sources: z
 		.array(z.string().url())

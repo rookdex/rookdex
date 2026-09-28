@@ -191,4 +191,18 @@ export const no: Strings = {
 		source: "Kildekode",
 		sourceLink: "GitHub",
 	},
+	seo: {
+		titles: {
+			home: "Rookdex: GTA 6-nedtelling, sjekkliste og lanseringsguide",
+			tracker: "GTA 6-sjekkliste for samleobjekter og dyreliv · Rookdex",
+			news: "GTA 6-nyheter og rykter · Rookdex",
+			settings: "Innstillinger · Rookdex",
+			// The 404 is English-only today; the key exists because `no` is typed as `Strings`.
+			notFound: "Siden finnes ikke · Rookdex",
+		},
+		homeDescription:
+			"Nedtelling til GTA 6 den 19. november 2026, sjekkliste for samleobjekter, steder, kjøretøy og dyreliv, og hva du bør ordne før lansering. Gratis, virker uten nett.",
+		// The banner's own text is English.
+		ogImageAlt: "Rookdex-banner: The open-source GTA VI companion.",
+	},
 }

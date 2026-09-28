@@ -15,6 +15,7 @@ import "../styles/global.css"
 
 interface Props {
 	locale: Locale
+	/** The complete <title> text: `s.seo.titles.*`, or a guide's `searchTitle`. */
 	title: string
 	description: string
 	/** Route without the locale prefix: "" for the hub, "guides/before-you-start" for a guide. */
@@ -32,7 +33,7 @@ const s = t(locale)
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-		<title>{title === s.siteName ? title : `${title} · ${s.siteName}`}</title>
+		<title>{title}</title>
 		<meta name="description" content={description} />
 		<meta name="color-scheme" content="dark" />
 		<meta name="theme-color" content="#000000" />

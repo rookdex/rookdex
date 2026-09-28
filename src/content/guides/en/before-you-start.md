@@ -1,5 +1,6 @@
 ---
 title: Before you start
+searchTitle: "Before you start: GTA 6 launch checklist · Rookdex"
 summary: What to sort out before launch night so you can play at midnight.
 updated: 2026-09-09
 sources:

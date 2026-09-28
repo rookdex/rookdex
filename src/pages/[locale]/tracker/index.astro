@@ -12,7 +12,7 @@ if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const s = t(locale as Locale)
 ---
 
-<Base locale={locale} title={s.tracker.title} description={s.tracker.description} path="tracker">
+<Base locale={locale} title={s.seo.titles.tracker} description={s.tracker.description} path="tracker">
 	<h1>{s.tracker.title}</h1>
 	<noscript><p>{s.tracker.needsJs}</p></noscript>
 	<Tracker client:only="react" locale={locale} />
