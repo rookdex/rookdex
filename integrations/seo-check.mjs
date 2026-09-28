@@ -79,10 +79,10 @@ export function seoErrors(files, site) {
 		}
 	}
 
-	// Rule 3: the 404 claims no address. Its body links each language with hreflang, so only the
-	// head is searched; substrings can't be dodged by attribute order.
+	// Rule 3: the 404 claims no address and carries no JSON-LD. Its body links each language with
+	// hreflang, so only the head is searched; substrings can't be dodged by attribute order.
 	const notFoundHead = head(files["404.html"] ?? "")
-	for (const needle of ['rel="canonical"', "hreflang=", "og:url"]) {
+	for (const needle of ['rel="canonical"', "hreflang=", "og:url", "application/ld+json"]) {
 		if (notFoundHead.includes(needle)) errors.push(`[seo 3] 404.html head contains ${needle}`)
 	}
 

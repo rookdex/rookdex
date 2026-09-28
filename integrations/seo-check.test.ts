@@ -94,6 +94,7 @@ describe("seoErrors (SEO spec §4.8)", () => {
 		'<link rel="canonical" href="https://rookdex.app/en/">',
 		'<link href="https://rookdex.app/en/" hreflang="en" rel="alternate">',
 		'<meta content="https://rookdex.app/en/" property="og:url">',
+		'<script type="application/ld+json">{}</script>',
 	])("rule 3: the 404 head contains %s", (tag) => {
 		const files = good()
 		files["404.html"] = files["404.html"].replace("</head>", `${tag}</head>`)
