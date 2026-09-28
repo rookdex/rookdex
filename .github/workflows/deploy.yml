@@ -28,6 +28,8 @@ jobs:
 
   deploy:
     needs: test
+    # workflow_dispatch can target any branch; only main may reach production (SEO spec §4.6).
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -46,3 +48,26 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
+      - name: Ping IndexNow
+        # Search engines learn about changed pages sooner. A failed ping shows as a failed step,
+        # never a failed deploy; the key file is public by design and no secret is used.
+        continue-on-error: true
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          mapfile -t urls < <(grep -o '<loc>[^<]*</loc>' dist/sitemap.xml | sed -e 's/<loc>//' -e 's#</loc>##')
+          if [ "${#urls[@]}" -eq 0 ]; then
+            echo "## IndexNow: no URLs in dist/sitemap.xml" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          jq -n --rawfile key public/indexnow-key.txt \
+            '{host: "rookdex.app", key: $key, keyLocation: "https://rookdex.app/indexnow-key.txt", urlList: $ARGS.positional}' \
+            --args "${urls[@]}" > body.json
+          status=$(curl -sS --max-time 20 -o resp.txt -w '%{http_code}' -X POST https://api.indexnow.org/indexnow \
+            -H 'Content-Type: application/json; charset=utf-8' --data @body.json) || true
+          {
+            echo "## IndexNow"
+            echo "HTTP ${status:-none} for ${#urls[@]} URLs"
+            cat resp.txt 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "$status" = 200 ] || [ "$status" = 202 ] || exit 1
