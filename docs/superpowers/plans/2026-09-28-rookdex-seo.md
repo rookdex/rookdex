@@ -1201,16 +1201,10 @@ describe("hosts and deploy (SEO spec §4.5, §4.6)", () => {
 	})
 
 	it("deploys only from main, and the IndexNow ping can't fail the deploy", () => {
-		const workflow = read(".github/workflows/deploy.yml").replace(/
-/g, "
-")
-		const job = workflow.slice(workflow.indexOf("
-  deploy:
-"))
+		const workflow = read(".github/workflows/deploy.yml").replace(/\r\n/g, "\n")
+		const job = workflow.slice(workflow.indexOf("\n  deploy:\n"))
 		// The guard sits on the job, not a step, and the ping runs after the deploy it announces.
-		expect(job.split("
-    steps:")[0]).toContain("
-    if: github.ref == 'refs/heads/main'")
+		expect(job.split("\n    steps:")[0]).toContain("\n    if: github.ref == 'refs/heads/main'")
 		expect(job.indexOf("- name: Ping IndexNow")).toBeGreaterThan(job.indexOf("- name: Deploy"))
 		const ping = workflow.slice(workflow.indexOf("- name: Ping IndexNow"))
 		expect(ping).toContain("continue-on-error: true")
