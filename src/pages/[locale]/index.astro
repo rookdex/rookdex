@@ -15,7 +15,7 @@ if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const s = t(locale as Locale)
 ---
 
-<Base locale={locale} title={s.siteName} description={s.tagline} path="">
+<Base locale={locale} title={s.seo.titles.home} description={s.seo.homeDescription} path="">
 	<div class="hub">
 		<header class="hub-intro">
 			<h1 class="lockup" aria-label="Rookdex">

@@ -1,5 +1,6 @@
 ---
 title: Før du begynner
+searchTitle: "Før du begynner: GTA 6-sjekkliste for lanseringen · Rookdex"
 summary: Det du bør ordne før lanseringskvelden, så du kan spille ved midnatt.
 updated: 2026-09-09
 sources:

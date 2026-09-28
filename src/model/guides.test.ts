@@ -56,4 +56,10 @@ describe("guideSchema (spec §9)", () => {
 		expect(result.success).toBe(false)
 		expect(result.error?.issues[0]?.message).toContain("ign.com")
 	})
+
+	it("takes an optional search title of at most 65 characters", () => {
+		expect(guideSchema.parse(guide).searchTitle).toBeUndefined()
+		expect(guideSchema.safeParse({ ...guide, searchTitle: "x".repeat(65) }).success).toBe(true)
+		expect(guideSchema.safeParse({ ...guide, searchTitle: "x".repeat(66) }).success).toBe(false)
+	})
 })

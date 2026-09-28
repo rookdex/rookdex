@@ -14,7 +14,7 @@ if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const s = t(locale as Locale)
 ---
 
-<Base locale={locale} title={s.news.title} description={s.news.description} path="news">
+<Base locale={locale} title={s.seo.titles.news} description={s.news.description} path="news">
 	<article class="news">
 		<h1>{s.news.title}</h1>
 		<p class="tagline">{s.rumours.intro}</p>

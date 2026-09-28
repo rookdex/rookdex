@@ -8,8 +8,9 @@
 		"not_found_handling": "404-page",
 		"html_handling": "auto-trailing-slash"
 	},
-	// Every `wrangler versions upload` gets its own URL; `main` deploys to the custom domain.
+	// Every `wrangler versions upload` gets its own preview URL; Cloudflare keeps those only while
+	// this is explicit. `main` deploys to the custom domain; the workers.dev mirror is off (SEO spec D2).
 	"preview_urls": true,
-	"workers_dev": true,
+	"workers_dev": false,
 	"routes": [{ "pattern": "rookdex.app", "custom_domain": true }]
 }

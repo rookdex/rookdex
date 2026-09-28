@@ -4,12 +4,14 @@ import Sources from "../../../components/Sources.astro"
 import { defaultLocale, fill, isLocale, type Locale, locales, t } from "../../../i18n"
 import Base from "../../../layouts/Base.astro"
 import { guideSlugs, resolveGuide } from "../../../model/guides"
+import { validSlugs } from "../../../model/seo"
 
 export async function getStaticPaths() {
 	const entries = await getCollection("guides")
-	// Every slug exists in every language; missing translations render the English copy.
+	// Every slug exists in every language; missing translations render the English copy. A slug
+	// that isn't URL-safe fails the build here and in the sitemap (SEO spec §4.1).
 	return locales.flatMap((locale) =>
-		guideSlugs(entries).map((slug) => ({ params: { locale, slug } }))
+		validSlugs(guideSlugs(entries)).map((slug) => ({ params: { locale, slug } }))
 	)
 }
 
@@ -28,7 +30,12 @@ const dateLocale = locale === "no" ? "nb-NO" : "en-GB"
 const updated = entry.data.updated.toLocaleDateString(dateLocale, { dateStyle: "long" })
 ---
 
-<Base locale={locale} title={entry.data.title} description={entry.data.summary} path={`guides/${slug}`}>
+<Base
+	locale={locale}
+	title={entry.data.searchTitle ?? `${entry.data.title} · ${s.siteName}`}
+	description={entry.data.summary}
+	path={`guides/${slug}`}
+>
 	<article class="guide" lang={fellBack ? defaultLocale : undefined}>
 		{fellBack && <p class="notice" lang={locale}>{s.guides.inEnglish}</p>}
 		<h1>{entry.data.title}</h1>

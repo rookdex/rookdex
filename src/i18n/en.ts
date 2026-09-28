@@ -191,6 +191,19 @@ export const en = {
 		source: "Source code",
 		sourceLink: "GitHub",
 	},
+	seo: {
+		// Full <title> texts. Visible headings keep their own keys; these are what search shows.
+		titles: {
+			home: "Rookdex: GTA 6 countdown, tracker and launch guide",
+			tracker: "GTA 6 collectibles and wildlife tracker · Rookdex",
+			news: "GTA 6 news and rumours · Rookdex",
+			settings: "Settings · Rookdex",
+			notFound: "Page not found · Rookdex",
+		},
+		homeDescription:
+			"Countdown to GTA 6 on 19 November 2026, a tracker for collectibles, places, vehicles and wildlife, and what to sort out before launch night. Free, works offline.",
+		ogImageAlt: "Rookdex banner: The open-source GTA VI companion.",
+	},
 }
 
 export type Strings = typeof en

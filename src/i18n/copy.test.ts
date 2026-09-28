@@ -38,3 +38,28 @@ describe("soft hyphens (spec §5, §11)", () => {
 		expect(no.nav.settings.replace("­", "")).toBe(no.settings.title)
 	})
 })
+
+describe("search titles and description (SEO spec §4.4)", () => {
+	it.each([
+		["en", en],
+		["no", no],
+	] as const)("%s titles fit in a result and name the site", (_locale, s) => {
+		for (const title of Object.values(s.seo.titles)) {
+			expect([...title].length, title).toBeLessThanOrEqual(65)
+			expect(title).toContain("Rookdex")
+		}
+	})
+
+	it.each([
+		["en", en],
+		["no", no],
+	] as const)("%s home description is at most 165 characters", (_locale, s) => {
+		expect([...s.seo.homeDescription].length).toBeLessThanOrEqual(165)
+	})
+
+	it("keeps the visible headings as they were", () => {
+		expect(en.tracker.title).toBe("Tracker")
+		expect(no.tracker.title).toBe("Oversikt")
+		expect(en.seo.titles.home).toBe("Rookdex: GTA 6 countdown, tracker and launch guide")
+	})
+})

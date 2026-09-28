@@ -7,7 +7,14 @@ import Base from "../layouts/Base.astro"
 const s = t("en")
 ---
 
-<Base locale="en" title={s.notFound.title} description={s.notFound.body} path="" tab={null}>
+<Base
+	locale="en"
+	title={s.seo.titles.notFound}
+	description={s.notFound.body}
+	path=""
+	tab={null}
+	indexable={false}
+>
 	<h1>{s.notFound.title}</h1>
 	<p>{s.notFound.body}</p>
 	<ul class="tap-links">

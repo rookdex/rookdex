@@ -24,4 +24,13 @@ describe("News page (spec §8)", () => {
 		const doc = await renderDoc(News, { params: { locale: "en" } })
 		expect(doc.querySelector('main a[href="/en/tracker/"]')).toBeNull()
 	})
+
+	it("has a search title that differs from the heading", async () => {
+		expect((await renderDoc(News, { params: { locale: "en" } })).title).toBe(
+			"GTA 6 news and rumours · Rookdex"
+		)
+		expect((await renderDoc(News, { params: { locale: "no" } })).title).toBe(
+			"GTA 6-nyheter og rykter · Rookdex"
+		)
+	})
 })

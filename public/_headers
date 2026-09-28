@@ -10,3 +10,6 @@
 
 /sw.js
   Cache-Control: no-cache
+
+https://:version.:subdomain.workers.dev/*
+  X-Robots-Tag: noindex

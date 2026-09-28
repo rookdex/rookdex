@@ -10,21 +10,28 @@ import LanguageSwitch from "../components/LanguageSwitch.astro"
 import Mark from "../components/Mark.astro"
 import TabBar from "../components/TabBar.astro"
 import { defaultLocale, type Locale, locales, t } from "../i18n"
+import { jsonLd, SITE } from "../model/seo"
 import { currentTab, type Tab } from "../model/tabs"
 import "../styles/global.css"
 
 interface Props {
 	locale: Locale
+	/** The complete <title> text: `s.seo.titles.*`, or a guide's `searchTitle`. */
 	title: string
 	description: string
 	/** Route without the locale prefix: "" for the hub, "guides/before-you-start" for a guide. */
 	path: string
 	/** Overrides the tab `path` implies; `null` marks none (the 404 passes "" but is not Home). */
 	tab?: Tab | null
+	/** false drops the canonical, hreflang links, og:url and JSON-LD: the 404 has no address of
+	 *  its own and is served with a real 404 status, so it needs no noindex (SEO spec §4.4). */
+	indexable?: boolean
 }
 
-const { locale, title, description, path, tab } = Astro.props
+const { locale, title, description, path, tab, indexable = true } = Astro.props
 const s = t(locale)
+const canonical = getAbsoluteLocaleUrl(locale, path)
+const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
 ---
 
 <!doctype html>
@@ -32,7 +39,7 @@ const s = t(locale)
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-		<title>{title === s.siteName ? title : `${title} · ${s.siteName}`}</title>
+		<title>{title}</title>
 		<meta name="description" content={description} />
 		<meta name="color-scheme" content="dark" />
 		<meta name="theme-color" content="#000000" />
@@ -41,9 +48,50 @@ const s = t(locale)
 		<link rel="icon" href="/favicon.ico" sizes="48x48" />
 		<link rel="icon" href="/icon.svg" type="image/svg+xml" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
-		<link rel="canonical" href={getAbsoluteLocaleUrl(locale, path)} />
-		{locales.map((l) => <link rel="alternate" hreflang={l} href={getAbsoluteLocaleUrl(l, path)} />)}
-		<link rel="alternate" hreflang="x-default" href={getAbsoluteLocaleUrl(defaultLocale, path)} />
+		{
+			indexable && (
+				<>
+					<link rel="canonical" href={canonical} />
+					{locales.map((l) => (
+						<link rel="alternate" hreflang={l} href={getAbsoluteLocaleUrl(l, path)} />
+					))}
+					<link rel="alternate" hreflang="x-default" href={getAbsoluteLocaleUrl(defaultLocale, path)} />
+					<meta property="og:url" content={canonical} />
+				</>
+			)
+		}
+		<meta property="og:site_name" content={s.siteName} />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:locale" content={ogLocale[locale]} />
+		{
+			locales
+				.filter((l) => l !== locale)
+				.map((l) => <meta property="og:locale:alternate" content={ogLocale[l]} />)
+		}
+		<meta property="og:image" content={`${SITE}/og.png`} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={s.seo.ogImageAlt} />
+		<meta name="twitter:card" content="summary_large_image" />
+		{
+			/* Site name (spec D7): Google reads it at the domain root, which redirects to /en/. The
+			   block is data, never runs, and needs no CSP hash; jsonLd escapes "<". */
+			path === "" && indexable && (
+				<script
+					type="application/ld+json"
+					is:inline
+					set:html={jsonLd({
+						"@context": "https://schema.org",
+						"@type": "WebSite",
+						name: s.siteName,
+						url: `${SITE}/`,
+						inLanguage: locale === "no" ? "nb" : "en",
+					})}
+				></script>
+			)
+		}
 	</head>
 	<body>
 		<a class="skip" href="#main">{s.skipToContent}</a>
