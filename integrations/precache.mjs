@@ -5,13 +5,22 @@ import { readdir, readFile, writeFile } from "node:fs/promises"
 import { join, relative, sep } from "node:path"
 import { fileURLToPath } from "node:url"
 
-const SKIP = new Set(["404.html", "sw.js", "_headers", "_redirects"])
+const SKIP = new Set([
+	"404.html",
+	"sw.js",
+	"_headers",
+	"_redirects",
+	"robots.txt",
+	"sitemap.xml",
+	"indexnow-key.txt",
+])
 /** A face's latin subset, matched on the part of the basename before the first dot, because
  *  Astro's base64url hashes can contain "-" themselves. "-latin-ext-" is not "-latin-". */
 const LATIN_FONT = /^[^.]*-latin-(?!ext-)/
 
 /** Which built files the worker precaches: pages and assets, minus the worker's own files, the
- *  OG banner (crawlers only) and every non-latin font subset (they load on demand online). */
+ *  crawler-only files (robots, sitemap, IndexNow key, OG banner) and every non-latin font subset
+ *  (they load on demand online). */
 export function shouldPrecache(file) {
 	if (SKIP.has(file)) return false
 	if (/^og\./.test(file)) return false
@@ -33,7 +42,8 @@ export function precacheUrls(files) {
 		.sort()
 }
 
-async function listFiles(root) {
+/** Every file under `root`, as posix paths relative to it. */
+export async function listFiles(root) {
 	const entries = await readdir(root, { recursive: true, withFileTypes: true })
 	return entries
 		.filter((entry) => entry.isFile())

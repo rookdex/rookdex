@@ -61,4 +61,10 @@ describe("shouldPrecache", () => {
 		expect(shouldPrecache("og.png")).toBe(false)
 		expect(shouldPrecache("_astro/inter-latin-ext-wght-normal.DO1Apj_S.woff2")).toBe(false)
 	})
+
+	it("skips the crawler-only files (SEO spec §4.7)", () => {
+		for (const file of ["robots.txt", "sitemap.xml", "indexnow-key.txt"]) {
+			expect(shouldPrecache(file), file).toBe(false)
+		}
+	})
 })
