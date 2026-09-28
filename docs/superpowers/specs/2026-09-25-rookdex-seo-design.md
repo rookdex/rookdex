@@ -38,7 +38,7 @@ When someone searches for a GTA 6 countdown, tracker or launch checklist, Rookde
 export function indexablePaths(guideSlugs: string[]): string[]
 ```
 
-It returns `["", "tracker", "news", ...guideSlugs.map((s) => `guides/${s}`)]`, with guide slugs deduplicated and sorted. It throws if a slug does not match `^[a-z0-9-]+$`; both the sitemap and the guide pages' `getStaticPaths` go through it, so a bad slug fails the build. The same module exports `jsonLd(obj)`, which returns `JSON.stringify(obj).replace(/</g, "\\u003c")`, so no value can close the `<script>` tag. Both functions are pure and has no Astro imports, so it is unit-testable. It is the single list the sitemap and IndexNow both read. Future indexable pages (Spec A's `tracker/sources`, Spec B's profile if public, 1c news pages) are added here.
+It returns `["", "tracker", "news", ...guideSlugs.map((s) => `guides/${s}`)]`, with guide slugs deduplicated and sorted. It throws if a slug does not match `^[a-z0-9-]+$`; both the sitemap and the guide pages' `getStaticPaths` go through it, so a bad slug fails the build. The same module exports `jsonLd(obj)`, which returns `JSON.stringify(obj).replace(/</g, "\\u003c")`, so no value can close the `<script>` tag. Both functions are pure and have no Astro imports, so they are unit-testable. It is the single list the sitemap and IndexNow both read. Future indexable pages (Spec A's `tracker/sources`, Spec B's profile if public, 1c news pages) are added here.
 
 ### 4.2 Sitemap: `src/pages/sitemap.xml.ts`
 
