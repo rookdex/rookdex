@@ -118,10 +118,12 @@ const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
 		</p>
 		<script>
 			import { wireOfflineNotice } from "../scripts/offline-notice"
+			import { wireTooltips } from "../scripts/tooltip"
 			import "../scripts/register-sw"
 
 			const el = document.getElementById("offline-notice")
 			if (el) wireOfflineNotice(el, window, el.dataset.text ?? "")
+			wireTooltips(document)
 		</script>
 		<Footer locale={locale} />
 	</body>

@@ -43,6 +43,7 @@ describe("token set (spec §4.1)", () => {
 		expect(counts).toEqual({
 			"--bg": 1,
 			"--bg-raised": 1,
+			"--bg-hover": 1,
 			"--border": 1,
 			"--text": 1,
 			"--text-muted": 1,
@@ -106,6 +107,9 @@ describe("contrast (spec §4.3)", () => {
 		["--text", "--bg", 7],
 		["--text-muted", "--bg", 7],
 		["--text-muted", "--bg-raised", 7],
+		["--text", "--bg-hover", 7],
+		["--text-muted", "--bg-hover", 7],
+		["--link", "--bg-hover", 7],
 		["--accent", "--bg", 4.5],
 		["--accent", "--bg-raised", 4.5],
 		["--accent-text", "--accent", 4.5],

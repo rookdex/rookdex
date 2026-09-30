@@ -4,6 +4,8 @@
 	/* Surfaces: true black content, lifted chrome. */
 	--bg: #000000;
 	--bg-raised: #0d0d0d;
+	/* Hover lift: one step above raised chrome (feedback spec §3.2). */
+	--bg-hover: #161616;
 	--border: #262626;
 
 	/* Text hierarchy by brightness, not hue. */

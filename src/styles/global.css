@@ -41,6 +41,8 @@ a {
 	color: var(--link);
 	text-decoration: underline;
 	text-underline-offset: 0.15em;
+	text-decoration-thickness: 1px;
+	text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
 }
 
 :focus-visible {
@@ -142,10 +144,6 @@ p {
 	cursor: pointer;
 }
 
-.history button:hover:not(:disabled) {
-	background: color-mix(in srgb, var(--text) 9%, var(--bg));
-}
-
 /* Dimmed but kept in place, so the mark never shifts when history runs out. */
 .history button:disabled {
 	opacity: 0.45;
@@ -211,7 +209,7 @@ p {
 
 .lang details[open] > summary {
 	border-color: color-mix(in srgb, var(--text) 24%, var(--bg));
-	background: color-mix(in srgb, var(--text) 9%, var(--bg));
+	background: var(--bg-hover);
 }
 
 .lang-globe,
@@ -248,9 +246,8 @@ p {
 	text-decoration: none;
 }
 
-.lang a:hover,
 .lang a[aria-current="page"] {
-	background: color-mix(in srgb, var(--text) 9%, var(--bg));
+	background: var(--bg-hover);
 }
 
 .lang-check {
@@ -411,6 +408,220 @@ p {
 	clip: rect(0 0 0 0);
 	clip-path: inset(50%);
 	white-space: nowrap;
+}
+
+/* Hover and focus (feedback spec §3.2). Hover lifts to --bg-hover; things that can be selected
+   also preview their selected marker. Hover lives behind (hover: hover), so touch gets :active. */
+
+.tabbar a,
+.chips button,
+.chips a,
+.history button,
+.lang summary,
+.lang a,
+.menu button,
+.actions button,
+.profile-menu > button,
+.hint button,
+.deleted-list button,
+.icon-link,
+.item,
+.item-icon {
+	transition:
+		background-color 120ms,
+		border-color 120ms,
+		color 120ms,
+		box-shadow 120ms,
+		filter 120ms;
+}
+
+@media (hover: hover) {
+	a:hover {
+		text-decoration-color: var(--link);
+		text-decoration-thickness: 2px;
+	}
+
+	.tabbar a:hover,
+	.history button:hover:not(:disabled),
+	.lang summary:hover,
+	.lang a:hover,
+	.menu button:hover,
+	.actions button:not(.primary):hover,
+	.profile-menu > button:hover,
+	.hint button:hover,
+	.deleted-list button:hover,
+	.icon-link:hover,
+	.chips button:not([aria-pressed="true"]):hover {
+		background: var(--bg-hover);
+		color: var(--text);
+	}
+
+	.chips a:hover {
+		background: var(--bg-hover);
+	}
+
+	/* Preview: a faint copy of the selected marker. */
+	.chips button:not([aria-pressed="true"]):hover {
+		border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+	}
+
+	.tabbar a:not([aria-current]):hover::before {
+		content: "";
+		position: absolute;
+		top: -1px;
+		left: 50%;
+		width: 32px;
+		height: 2px;
+		margin-left: -16px;
+		border-radius: 0 0 2px 2px;
+		background: color-mix(in srgb, var(--accent) 45%, transparent);
+	}
+
+	.actions .primary:hover {
+		filter: brightness(1.12);
+		box-shadow: var(--glow);
+	}
+}
+
+@media (hover: hover) and (min-width: 768px) {
+	.tabbar a:not([aria-current]):hover::before {
+		content: none;
+	}
+
+	.tabbar a:not([aria-current]):hover::after {
+		content: "";
+		position: absolute;
+		left: 12px;
+		right: 12px;
+		bottom: -1px;
+		height: 2px;
+		background: color-mix(in srgb, var(--accent) 45%, transparent);
+	}
+}
+
+/* Touch: a press state instead of hover. */
+@media (hover: none) {
+	.tabbar a:active,
+	.history button:active:not(:disabled),
+	.lang a:active,
+	.menu button:active,
+	.actions button:not(.primary):active,
+	.profile-menu > button:active,
+	.hint button:active,
+	.deleted-list button:active,
+	.icon-link:active,
+	.chips button:not([aria-pressed="true"]):active,
+	.chips a:active {
+		background: var(--bg-hover);
+	}
+}
+
+/* Focus is the hover lift plus the pink outline. */
+.tabbar a:focus-visible,
+.history button:focus-visible,
+.lang summary:focus-visible,
+.lang a:focus-visible,
+.menu button:focus-visible,
+.actions button:not(.primary):focus-visible,
+.profile-menu > button:focus-visible,
+.hint button:focus-visible,
+.deleted-list button:focus-visible,
+.icon-link:focus-visible,
+.chips button:not([aria-pressed="true"]):focus-visible {
+	background: var(--bg-hover);
+	color: var(--text);
+}
+
+/* The Sources chip keeps its cyan text: focus is the lift plus the outline. */
+.chips a:focus-visible {
+	background: var(--bg-hover);
+}
+
+.actions .primary:focus-visible {
+	filter: brightness(1.12);
+	box-shadow: var(--glow);
+}
+
+.tabbar a:focus-visible,
+.history button:focus-visible,
+.icon-link:focus-visible,
+.item-icon:focus-visible {
+	outline-offset: -2px;
+}
+
+/* Tooltips (feedback spec §3.3). The tip is an aria-hidden child of its control, so the control
+   keeps its own name and the pointer can move onto the tip without it closing. */
+
+.has-tip {
+	position: relative;
+}
+
+.tip {
+	position: absolute;
+	bottom: calc(100% + 6px);
+	left: 50%;
+	z-index: 6;
+	padding: 4px 8px;
+	border: 1px solid color-mix(in srgb, var(--text) 21%, var(--bg));
+	border-radius: 4px;
+	background: color-mix(in srgb, var(--text) 13%, var(--bg));
+	color: var(--text);
+	font-family: var(--font-sans);
+	font-size: 0.75rem;
+	font-weight: 500;
+	letter-spacing: normal;
+	line-height: 1.4;
+	text-transform: none;
+	white-space: nowrap;
+	transform: translateX(-50%);
+	visibility: hidden;
+	opacity: 0;
+	transition:
+		opacity 120ms,
+		visibility 120ms;
+}
+
+/* Bridges the 6 px gap, so the pointer can travel onto the tip (WCAG 1.4.13, hoverable). */
+.tip::before {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	top: 100%;
+	height: 8px;
+}
+
+/* Icons at a card's or the screen's right edge: anchor the tip right, so it never overflows. */
+.tip-end .tip {
+	left: auto;
+	right: 0;
+	transform: none;
+}
+
+@media (hover: hover) {
+	.has-tip:hover > .tip {
+		visibility: visible;
+		opacity: 1;
+	}
+}
+
+.has-tip:focus-visible > .tip,
+.has-tip[data-tip-open] > .tip {
+	visibility: visible;
+	opacity: 1;
+}
+
+/* Last, so Escape beats hover and focus (same specificity). */
+.has-tip[data-tip-hidden] > .tip {
+	visibility: hidden;
+	opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition: none !important;
+	}
 }
 
 /* Hub */
@@ -832,11 +1043,6 @@ p {
 .menu button[aria-checked="true"] {
 	color: var(--accent);
 	font-weight: 600;
-}
-
-.menu button:hover,
-.menu button:focus-visible {
-	background: var(--bg);
 }
 
 .modal label {

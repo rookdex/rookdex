@@ -257,4 +257,32 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 	.delete-status {
 		margin: var(--space-2) 0 0;
 	}
+
+	/* Hover and focus lift (feedback spec §3.2). Here, not in global.css: these scoped rules load
+	   after it and win every tie. */
+	.row-button,
+	.danger-button {
+		transition:
+			background-color 120ms,
+			color 120ms;
+	}
+
+	@media (hover: hover) {
+		.row-button:hover,
+		.danger-button:not(:disabled):hover {
+			background: var(--bg-hover);
+		}
+	}
+
+	@media (hover: none) {
+		.row-button:active,
+		.danger-button:not(:disabled):active {
+			background: var(--bg-hover);
+		}
+	}
+
+	.row-button:focus-visible,
+	.danger-button:not(:disabled):focus-visible {
+		background: var(--bg-hover);
+	}
 </style>
