@@ -4,6 +4,7 @@ export const en = {
 	siteName: "Rookdex",
 	tagline: "A launch-night companion for GTA VI. Track what you find, see what is confirmed.",
 	skipToContent: "Skip to content",
+	newTab: "opens in a new tab",
 	nav: {
 		label: "Main",
 		home: "Home",

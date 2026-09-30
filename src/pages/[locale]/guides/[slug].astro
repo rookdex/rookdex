@@ -42,7 +42,7 @@ const updated = entry.data.updated.toLocaleDateString(dateLocale, { dateStyle: "
 		<p class="tagline">{entry.data.summary}</p>
 		<p class="meta" lang={fellBack ? locale : undefined}>{fill(s.guides.updated, { date: updated })}</p>
 		<Content />
-		<Sources urls={entry.data.sources} label={s.guides.sources} />
+		<Sources urls={entry.data.sources} label={s.guides.sources} locale={locale as Locale} />
 	</article>
 </Base>
 

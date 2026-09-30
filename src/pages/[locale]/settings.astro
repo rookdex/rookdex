@@ -1,6 +1,7 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n"
 import pkg from "../../../package.json"
+import ExternalLink from "../../components/ExternalLink.astro"
 import { isLocale, type Locale, locales, t } from "../../i18n"
 import Base from "../../layouts/Base.astro"
 import { appVersion } from "../../model/version"
@@ -114,7 +115,7 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 			</div>
 			<div class="row">
 				<dt>{s.settings.source}</dt>
-				<dd><a href="https://github.com/rookdex/rookdex">{s.settings.sourceLink}</a></dd>
+				<dd><ExternalLink href="https://github.com/rookdex/rookdex" locale={locale as Locale}>{s.settings.sourceLink}</ExternalLink></dd>
 			</div>
 		</dl>
 	</section>
@@ -201,7 +202,7 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 		text-align: right;
 	}
 
-	.row a,
+	.row :global(a),
 	.row-button {
 		display: inline-flex;
 		align-items: center;

@@ -1,14 +1,18 @@
 ---
+import type { Locale } from "../i18n"
 import { outletOf } from "../model/outlet"
+import ExternalLink from "./ExternalLink.astro"
 
 interface Props {
 	urls: string[]
 	label: string
+	locale: Locale
 }
 
 // A quiet line under the guide: the label and the outlet links flow like one sentence (spec §9).
 // The <h2> stays a real heading, because the section is labelled by it; only its look shrinks.
-const { urls, label } = Astro.props
+// Each <li> is an inline block, so a line can break between sources (feedback spec §9).
+const { urls, label, locale } = Astro.props
 ---
 
 {
@@ -18,9 +22,9 @@ const { urls, label } = Astro.props
 			<ul>
 				{urls.map((url) => (
 					<li>
-						<a href={url} rel="noopener">
+						<ExternalLink href={url} locale={locale}>
 							{outletOf(url)}
-						</a>
+						</ExternalLink>
 					</li>
 				))}
 			</ul>
@@ -46,27 +50,24 @@ const { urls, label } = Astro.props
 		color: var(--text-muted);
 	}
 
-	.sources ul,
-	.sources li {
+	.sources ul {
 		display: inline;
 		margin: 0;
 		padding: 0;
 	}
 
-	.sources li + li::before {
+	.sources li {
+		display: inline-block;
+	}
+
+	.sources li:not(:last-child)::after {
 		content: "·";
 		margin-inline: var(--space-2);
 		color: var(--text-muted);
 	}
 
-	.sources a {
+	/* The link is rendered by ExternalLink, outside this component's scope. */
+	.sources :global(a) {
 		white-space: nowrap;
-		text-decoration-thickness: 1px;
-		text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
-	}
-
-	.sources a:hover,
-	.sources a:focus-visible {
-		text-decoration-color: var(--link);
 	}
 </style>

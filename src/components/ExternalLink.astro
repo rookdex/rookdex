@@ -1,0 +1,41 @@
+---
+import { type Locale, t } from "../i18n"
+
+interface Props {
+	href: string
+	locale: Locale
+	class?: string
+	/** false for icon-only links: their tooltip carries the ↗ instead. */
+	icon?: boolean
+}
+
+// Every link that leaves rookdex.app (feedback spec §3.1). No aria-label prop on purpose: it would
+// override the hidden note. The new-tab-note class is the marker the build check looks for, and
+// nothing else emits it.
+const { href, locale, class: className, icon = true } = Astro.props
+if (!href.startsWith("https://")) {
+	throw new Error(`ExternalLink needs an https:// href, got "${href}"`)
+}
+const s = t(locale)
+---
+
+<a href={href} class={className} target="_blank" rel="noopener noreferrer"
+	><slot />{
+		icon && (
+			<svg
+				class="ext-icon"
+				viewBox="0 0 24 24"
+				width="16"
+				height="16"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<path d="M7 17 17 7M9 7h8v8" />
+			</svg>
+		)
+	}<span class="visually-hidden new-tab-note">{` (${s.newTab})`}</span></a
+>

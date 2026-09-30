@@ -5,6 +5,7 @@ export const no: Strings = {
 	tagline:
 		"En følgesvenn for lanseringskvelden til GTA VI. Hold oversikt over det du finner, og se hva som er bekreftet.",
 	skipToContent: "Hopp til innhold",
+	newTab: "åpnes i ny fane",
 	nav: {
 		label: "Hoved",
 		home: "Hjem",

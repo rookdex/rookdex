@@ -26,12 +26,9 @@ describe("footer values (spec §10)", () => {
 			"Guidelisens",
 			"Kildekode",
 		])
-		expect([...doc.querySelectorAll("dd")].map((dd) => dd.textContent?.trim())).toEqual([
-			"legal@rookdex.app",
-			"MIT",
-			"CC BY-SA 4.0",
-			"GitHub",
-		])
+		expect(
+			[...doc.querySelectorAll("dd")].map((dd) => dd.textContent?.replace(/\s+/g, " ").trim())
+		).toEqual(["legal@rookdex.app", "MIT", "CC BY-SA 4.0", "GitHub (åpnes i ny fane)"])
 		expect([...doc.querySelectorAll("dd a")].map((a) => a.getAttribute("href"))).toEqual([
 			"mailto:legal@rookdex.app",
 			"https://github.com/rookdex/rookdex",

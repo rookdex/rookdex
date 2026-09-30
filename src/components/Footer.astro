@@ -1,5 +1,6 @@
 ---
 import { type Locale, t } from "../i18n"
+import ExternalLink from "./ExternalLink.astro"
 
 interface Props {
 	locale: Locale
@@ -27,7 +28,7 @@ const s = t(locale)
 		</div>
 		<div>
 			<dt>{s.footer.sourceLabel}</dt>
-			<dd><a href="https://github.com/rookdex/rookdex">{s.footer.source}</a></dd>
+			<dd><ExternalLink href="https://github.com/rookdex/rookdex" locale={locale}>{s.footer.source}</ExternalLink></dd>
 		</div>
 	</dl>
 </footer>
