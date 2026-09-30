@@ -23,7 +23,7 @@
 - **Astro scoped styles do not reach into child components.** A page's `<style>` rule like `.row a` never matches the `<a>` that `ExternalLink` renders. Use `:global(a)` inside the scoped selector, or put the rule in `global.css`.
 - Copy lives in `src/i18n/en.ts` and `src/i18n/no.ts` (`no` is typed as `Strings`, so both change in the same task). No `!`, no "leak", no "ROOKDEX" in strings (`copy.test.ts`). Copy quoted in the spec is final.
 - Mobile-first CSS: base rules target the phone; only `min-width: 768px` and `min-width: 1024px` queries.
-- Code style: Biome (tabs, double quotes, no semicolons, line width 100). Local lint: `npx biome ci --line-ending=auto .`. This checkout shows CRLF-only errors, so confirm lint in an LF worktree (`git -c core.autocrlf=false worktree add ../rookdex-lf HEAD`) before trusting a red local run.
+- Code style: Biome (tabs, double quotes, no semicolons, line width 100). Local lint: `npx biome ci --line-ending=auto .`. Before every commit, run `npx biome check --write <the files this task touched>`: it fixes format and import order, which the plan's snippets don't always match. This checkout shows CRLF-only errors, so confirm lint in an LF worktree (`git -c core.autocrlf=false worktree add ../rookdex-lf HEAD`) before trusting a red local run.
 - Commits: imperative sentence subject like the repo history ("Add …", "Keep …"), author `malinfossum.dev@proton.me`, no `Co-Authored-By`, no AI attribution, no em dashes anywhere (code, comments, copy, commits, PR).
 - Branch: `feedback-spec` (already rebased on `main` at `d219974`). Test one file with `npx vitest run <path>`; the whole suite with `npm test`; types with `npm run check`; the build (which runs all three integrations) with `npm run build`.
 
@@ -39,6 +39,10 @@
 9. Tab bar CSS switches `[aria-current="page"]` to `[aria-current]`, so the Tracker tab keeps its look on the Sources page.
 10. `tooltip.ts` also listens to `pointerover` (to know which control is hovered when Escape is pressed) and `click` (the tap rule), on top of the spec's three listeners.
 11. The ≥ 1024 px two-column `.item-groups` grid goes: each group heading now spans the list, and the cards form the grid.
+12. The update notice also counts an active worker as "had a controller" (`registration.active`), not only `container.controller`. A hard reload leaves a page uncontrolled under an active worker. Without this, that page would keep running old code after an update and 404 on late chunks. Cost: two tabs opened on the very first visit can reload once.
+13. On a phone the footer strip is a two-row grid: icons and © share one centre line, the chip takes the second row. The spec's "icons, chip and © share one centre line" can't hold with the 169 px target at 320 px (the Norwegian chip is 219 px wide). This is the layout of the mockup Malin approved; from 768 px all three share one line as the spec says.
+14. The update card sits right after the tab bar, before `<main>`, not after it (spec §10.3). On the Tracker, keyboard users would otherwise Tab through every card to reach Reload. The phone tab bar sets the precedent: first in the DOM, at the bottom of the screen. Malin's call at the stress test.
+15. While the update card shows, the body's bottom padding grows by its height (spec §10.4 says it never shifts content). Without it the card hides the footer's links at the end of every page, which fails WCAG 2.4.11. Cost: on a page shorter than the screen, the footer moves up once when the card appears. Malin's call at the stress test.
 
 **Open question for Malin (not a blocker):** the spec's Norwegian Sources lede says "trackeren", while the Norwegian tab is called "Oversikt". The spec copy is final, so the plan uses it as written. Ask at review.
 
@@ -61,6 +65,7 @@
 - Create: `src/styles/hover.test.ts`
 - Create: `src/scripts/tooltip.ts`, `src/scripts/tooltip.test.ts`
 - Modify: `src/layouts/Base.astro:119-125` (wire the tooltips)
+- Modify: `src/pages/[locale]/settings.astro` (hover and focus lift for `.row-button` and `.danger-button`, in its scoped `<style>`)
 
 **Interfaces:**
 - Consumes: nothing new.
@@ -130,11 +135,13 @@ describe("hover and focus rules (feedback spec §3.2)", () => {
 		expect(css).toContain("var(--bg-hover)")
 	})
 
-	it("switches transitions off under reduced motion", () => {
+	it("switches every transition off under reduced motion", () => {
 		const reduced = topLevel(css).filter(([prelude]) =>
 			prelude.startsWith("@media (prefers-reduced-motion: reduce)")
 		)
-		expect(reduced.some(([, body]) => body.includes("transition: none"))).toBe(true)
+		// The universal rule, not any rule: `.bar-fill` already has `transition: none` today.
+		const universal = /\*,\s*\*::before,\s*\*::after\s*\{\s*transition: none !important;/
+		expect(reduced.some(([, body]) => universal.test(body))).toBe(true)
 	})
 })
 ```
@@ -201,7 +208,6 @@ Insert after the `.visually-hidden { … }` rule (end of "Utilities"):
 .profile-menu > button,
 .hint button,
 .deleted-list button,
-.row-button,
 .icon-link,
 .item,
 .item-icon {
@@ -228,7 +234,6 @@ Insert after the `.visually-hidden { … }` rule (end of "Utilities"):
 	.profile-menu > button:hover,
 	.hint button:hover,
 	.deleted-list button:hover,
-	.row-button:hover,
 	.icon-link:hover,
 	.chips button:not([aria-pressed="true"]):hover {
 		background: var(--bg-hover);
@@ -288,7 +293,6 @@ Insert after the `.visually-hidden { … }` rule (end of "Utilities"):
 	.profile-menu > button:active,
 	.hint button:active,
 	.deleted-list button:active,
-	.row-button:active,
 	.icon-link:active,
 	.chips button:not([aria-pressed="true"]):active,
 	.chips a:active {
@@ -299,18 +303,23 @@ Insert after the `.visually-hidden { … }` rule (end of "Utilities"):
 /* Focus is the hover lift plus the pink outline. */
 .tabbar a:focus-visible,
 .history button:focus-visible,
+.lang summary:focus-visible,
 .lang a:focus-visible,
 .menu button:focus-visible,
 .actions button:not(.primary):focus-visible,
 .profile-menu > button:focus-visible,
 .hint button:focus-visible,
 .deleted-list button:focus-visible,
-.row-button:focus-visible,
 .icon-link:focus-visible,
 .chips button:not([aria-pressed="true"]):focus-visible,
 .chips a:focus-visible {
 	background: var(--bg-hover);
 	color: var(--text);
+}
+
+.actions .primary:focus-visible {
+	filter: brightness(1.12);
+	box-shadow: var(--glow);
 }
 
 .tabbar a:focus-visible,
@@ -395,6 +404,40 @@ Insert after the `.visually-hidden { … }` rule (end of "Utilities"):
 	}
 }
 ```
+
+Then, at the end of the `<style>` in `src/pages/[locale]/settings.astro`, add the Settings buttons' lift. It can't go in `global.css`: the scoped `.row-button` rule compiles to the same specificity, loads after `global.css` and wins every tie (measured: a focused Install button stayed `rgb(0, 0, 0)`).
+
+```css
+	/* Hover and focus lift (feedback spec §3.2). Here, not in global.css: these scoped rules load
+	   after it and win every tie. */
+	.row-button,
+	.danger-button {
+		transition:
+			background-color 120ms,
+			color 120ms;
+	}
+
+	@media (hover: hover) {
+		.row-button:hover,
+		.danger-button:not(:disabled):hover {
+			background: var(--bg-hover);
+		}
+	}
+
+	@media (hover: none) {
+		.row-button:active,
+		.danger-button:not(:disabled):active {
+			background: var(--bg-hover);
+		}
+	}
+
+	.row-button:focus-visible,
+	.danger-button:not(:disabled):focus-visible {
+		background: var(--bg-hover);
+	}
+```
+
+`:not(:disabled)` puts the danger rules at (0,4,0), so they also beat `.actions .danger-button` inside the dialog. Pink on `#161616` is about 5.4:1.
 
 - [ ] **Step 6: Run the stylesheet tests**
 
@@ -599,7 +642,7 @@ Expected: all tests PASS, `0 errors`.
 - [ ] **Step 13: Commit**
 
 ```bash
-git add src/styles src/scripts/tooltip.ts src/scripts/tooltip.test.ts src/layouts/Base.astro
+git add src/styles src/scripts/tooltip.ts src/scripts/tooltip.test.ts src/layouts/Base.astro src/pages/[locale]/settings.astro
 git commit -m "Add the hover token, hover and focus states and the tooltip pattern"
 ```
 
@@ -764,9 +807,7 @@ describe("guide sources are https only (feedback spec §9)", () => {
 	)
 
 	it("accepts https", () => {
-		expect(guideSchema.safeParse({ ...base, sources: ["https://example.com/"] }).success).toBe(
-			true
-		)
+		expect(guideSchema.safeParse({ ...base, sources: ["https://example.com/"] }).success).toBe(true)
 	})
 })
 ```
@@ -919,7 +960,7 @@ Add to `src/test/news-page.test.ts`:
 	})
 ```
 
-Run: `npx vitest run src/test/news-page.test.ts` (expect FAIL), then in `src/pages/[locale]/news.astro` import `ExternalLink from "../../components/ExternalLink.astro"` and replace lines 36-38 with:
+Run: `npx vitest run src/test/news-page.test.ts` (expect FAIL), then in `src/pages/[locale]/news.astro` import `ExternalLink from "../../components/ExternalLink.astro"` (first in the frontmatter imports; Biome sorts them) and replace lines 36-38 with:
 
 ```astro
 											<ExternalLink href={press.url} locale={locale as Locale}>
@@ -932,7 +973,7 @@ Expected: PASS.
 
 - [ ] **Step 9: Settings and footer GitHub links**
 
-In `src/pages/[locale]/settings.astro`: import `ExternalLink from "../../components/ExternalLink.astro"`; replace line 117 with
+In `src/pages/[locale]/settings.astro`: import `ExternalLink from "../../components/ExternalLink.astro"` (first in the frontmatter imports; Biome sorts them); replace line 117 with
 
 ```astro
 				<dd><ExternalLink href="https://github.com/rookdex/rookdex" locale={locale as Locale}>{s.settings.sourceLink}</ExternalLink></dd>
@@ -996,12 +1037,12 @@ describe("findUnsafeLinks (feedback spec §11)", () => {
 	})
 
 	it("fails when rel lacks either token", () => {
-		expect(check(safe("https://example.com/").replace("noopener noreferrer", "noopener"))).toEqual(
-			[{ href: "https://example.com/", reason: "rel lacks noopener or noreferrer" }]
-		)
-		expect(check(safe("https://example.com/").replace("noopener noreferrer", "noreferrer"))).toEqual(
-			[{ href: "https://example.com/", reason: "rel lacks noopener or noreferrer" }]
-		)
+		expect(check(safe("https://example.com/").replace("noopener noreferrer", "noopener"))).toEqual([
+			{ href: "https://example.com/", reason: "rel lacks noopener or noreferrer" },
+		])
+		expect(
+			check(safe("https://example.com/").replace("noopener noreferrer", "noreferrer"))
+		).toEqual([{ href: "https://example.com/", reason: "rel lacks noopener or noreferrer" }])
 	})
 
 	it("matches rel tokens case-insensitively and in any spacing", () => {
@@ -1150,7 +1191,7 @@ Expected: PASS (12 tests).
 
 - [ ] **Step 5: Register it after the precache integration**
 
-In `astro.config.mjs`, add `import externalLinks from "./integrations/external-links.mjs"` after the `seoCheck` import, and change the integrations line to:
+In `astro.config.mjs`, add `import externalLinks from "./integrations/external-links.mjs"` before the `precache` import (Biome sorts imports), and change the integrations line to:
 
 ```js
 	integrations: [react(), precache(), seoCheck(), externalLinks()],
@@ -1178,6 +1219,7 @@ git commit -m "Fail the build on any external link that is unsafe or doesn't say
 - Create: `src/scripts/footer-countdown.ts`, `src/scripts/footer-countdown.test.ts`
 - Modify: `src/styles/global.css` (replace the `.site-footer`/`.footer-pairs` rules at lines 266-310 and the `.site-footer` padding in the 768 px query)
 - Modify: `src/i18n/en.ts`, `src/i18n/no.ts` (`footer` block), `src/i18n/copy.test.ts`
+- Modify: `README.md` (§ Licence: credit the Octicons GitHub mark)
 
 **Interfaces:**
 - Consumes: `ExternalLink` (Task 2), the tooltip contract (Task 1), `daysToGo` and `hubPhase` from `src/model/launch.ts`.
@@ -1494,9 +1536,10 @@ const year = new Date().getFullYear()
 In `global.css`, replace everything from `.site-footer {` through the `.footer-pairs a { … }` rule (lines 266-310) with:
 
 ```css
-/* The footer "HUD strip" (feedback spec §6): icons, chip and © on one centre line. */
+/* The footer "HUD strip" (feedback spec §6). Phone: icons and © share the first row, the chip
+   takes the second (the approved mockup, measured 169 px at 320). From 768 px: one centre line. */
 .site-footer {
-	padding: var(--space-3);
+	padding: 12px var(--space-3) var(--space-3);
 	border-top: 1px solid var(--border);
 	background: var(--bg-raised);
 	color: var(--text-muted);
@@ -1506,18 +1549,26 @@ In `global.css`, replace everything from `.site-footer {` through the `.footer-p
 .footer-disclaimer {
 	max-width: none;
 	margin: 0 0 var(--space-2);
-	text-align: center;
 }
 
 .footer-strip {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: 1fr auto;
+	grid-template-areas:
+		"icons copy"
+		"chip chip";
 	align-items: center;
-	justify-content: center;
 	gap: var(--space-2) var(--space-3);
 }
 
+/* The icons sit at the left edge on a phone, so their tips open to the right. */
+.footer-icons .tip {
+	left: 0;
+	transform: none;
+}
+
 .footer-icons {
+	grid-area: icons;
 	display: flex;
 	gap: var(--space-1);
 	margin: 0;
@@ -1541,6 +1592,8 @@ In `global.css`, replace everything from `.site-footer {` through the `.footer-p
 }
 
 .status-chip {
+	grid-area: chip;
+	justify-self: start;
 	display: inline-flex;
 	align-items: center;
 	gap: var(--space-2);
@@ -1554,6 +1607,18 @@ In `global.css`, replace everything from `.site-footer {` through the `.footer-p
 	letter-spacing: 0.08em;
 	text-decoration: none;
 	text-transform: uppercase;
+	transition: background-color 120ms;
+}
+
+@media (hover: hover) {
+	.status-chip:hover {
+		background: var(--bg-hover);
+	}
+}
+
+.status-chip:active,
+.status-chip:focus-visible {
+	background: var(--bg-hover);
 }
 
 .status-dot {
@@ -1575,10 +1640,12 @@ In `global.css`, replace everything from `.site-footer {` through the `.footer-p
 @media (prefers-reduced-motion: reduce) {
 	.status-dot {
 		animation: none;
+		box-shadow: none;
 	}
 }
 
 .footer-copy {
+	grid-area: copy;
 	margin: 0;
 	font-family: var(--font-display);
 	font-size: 1rem;
@@ -1589,7 +1656,31 @@ In `global.css`, replace everything from `.site-footer {` through the `.footer-p
 }
 ```
 
-In the `@media (min-width: 768px)` block, the `.site-header, .site-footer { padding-inline: var(--space-4); }` rule stays. Add to the `@media (min-width: 1024px)` block:
+In the `@media (min-width: 768px)` block, the `.site-header, .site-footer { padding-inline: var(--space-4); }` rule stays. Add to that block:
+
+```css
+	/* From 768 px, icons, chip and © share one centre line (spec §6). */
+	.site-footer {
+		padding-top: var(--space-3);
+	}
+
+	.footer-disclaimer {
+		text-align: center;
+	}
+
+	.footer-strip {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.footer-icons .tip {
+		left: 50%;
+		transform: translateX(-50%);
+	}
+```
+
+Add to the `@media (min-width: 1024px)` block:
 
 ```css
 	/* One row: the disclaimer takes the free space, the strip sits at the right. */
@@ -1619,15 +1710,23 @@ Expected: all PASS; the build logs `external-link check passed`.
 - [ ] **Step 8: Measure in the Browser pane (Review Focus 3)**
 
 Build and serve (`npm run build`, then `npx astro preview`, or ask the controller for the `preview_start` config), open `/no/` and `/en/`, and read numbers with `getBoundingClientRect()` at 320 px and 1024 px wide:
-- Footer height: target 169 px or less on a phone at 320 px, one row of 77 px at 1024 px. If a phone footer is taller, tighten `.footer-disclaimer` margin and the strip's row gap first; never shrink a control below 44 px.
-- The icon links, the chip and the `.footer-copy` box share one vertical centre (difference 1 px or less) on each row they share.
-- Nothing overflows at 320 px: `document.documentElement.scrollWidth === 320`, with the chip showing "10 dager til lansering"-length text (set it by hand in devtools if today's count is shorter), and with the "Fjerning og juridisk: e-post" tooltip forced visible (`data-tip-open` on its link). If that tooltip overflows the left edge, add `tip-end`-style anchoring for the first icon (`.footer-icons li:first-child .tip { left: 0; transform: none }`) and re-measure.
+- Footer height: target 169 px or less on a phone at 320 px (icons and © on row 1, the chip on row 2), 103 px at 768 px, one row of 77 px at 1024 px. Never shrink a control below 44 px. The stress test measured the old flex layout at 197 px in three rows (the Norwegian chip can't share a row with the icons at 320 px), which is why the phone strip is a grid.
+- The boxes that share a row share one vertical centre (difference 1 px or less): the icon links and `.footer-copy` on a phone, all three from 768 px.
+- Nothing overflows at 320 px: `document.documentElement.scrollWidth === 320`, with the chip showing "10 dager til lansering"-length text (set it by hand in devtools if today's count is shorter), and with the "Fjerning og juridisk: e-post" tooltip forced visible (`data-tip-open` on its link). On a phone the icon tips open to the right (left-anchored), so they stay between 16 px and the right edge.
 Write the numbers into the task report; they go in the PR.
+
+- [ ] **Step 8b: Credit the GitHub mark**
+
+The footer's GitHub icon is the Octicons `mark-github` path (MIT, © GitHub Inc.), and MIT asks for the notice in copies. In `README.md` under `## Licence`, after the line that starts "Code is MIT", add:
+
+```
+The GitHub mark in the footer comes from Octicons (MIT, © GitHub Inc.) and is used under GitHub's logo guidelines to link to this repository.
+```
 
 - [ ] **Step 9: Commit**
 
 ```bash
-git add src/components/Footer.astro src/components/Footer.test.ts src/scripts/footer-countdown.ts src/scripts/footer-countdown.test.ts src/styles/global.css src/i18n
+git add src/components/Footer.astro src/components/Footer.test.ts src/scripts/footer-countdown.ts src/scripts/footer-countdown.test.ts src/styles/global.css src/i18n README.md
 git commit -m "Compact the footer into one strip with icon links and a launch chip"
 ```
 
@@ -1642,6 +1741,7 @@ git commit -m "Compact the footer into one strip with icon links and a launch ch
 - Modify: `src/scripts/delete-all.ts`, `src/scripts/delete-all.test.ts`
 - Modify: `src/islands/InstallPrompt.tsx:19-23`, `src/islands/InstallPrompt.test.tsx`
 - Modify: `src/i18n/en.ts`, `src/i18n/no.ts` (`settings` block)
+- Modify: `LICENSE` (scope paragraph: guide text is CC BY-SA 4.0)
 
 **Interfaces:**
 - Consumes: `ExternalLink` (Task 2), `isStandalone` from `src/scripts/standalone.ts`.
@@ -1772,7 +1872,7 @@ describe("deleteAllData (spec §7.2, feedback spec §7.3)", () => {
 })
 ```
 
-Run: `npx vitest run src/scripts/delete-all.test.ts` (FAIL: the first test sees `removeItem` called only if the old code reached a stubbed global; the type check fails on the arity). Then replace `src/scripts/delete-all.ts` with:
+Run: `npx vitest run src/scripts/delete-all.test.ts` (FAIL: the blocked test times out after 5 s, because the old code reads `onBlocked` as its storage argument and never calls it. The localStorage test passes even on the old code: it guards against a future `localStorage.removeItem` and is not the red step). Then replace `src/scripts/delete-all.ts` with:
 
 ```ts
 import { DB_NAME } from "../model/store"
@@ -1930,7 +2030,7 @@ Expected: FAIL.
 
 - [ ] **Step 6: Update `src/pages/[locale]/settings.astro`**
 
-Frontmatter: replace `import { appVersion } from "../../model/version"` with `import { appVersion, commitUrl } from "../../model/version"`, import `ExternalLink from "../../components/ExternalLink.astro"`, and replace `const version = appVersion(pkg.version, process.env.GITHUB_SHA)` with:
+Frontmatter: replace `import { appVersion } from "../../model/version"` with `import { appVersion, commitUrl } from "../../model/version"`, keep the `ExternalLink` import Task 2 added (don't add it twice), and replace `const version = appVersion(pkg.version, process.env.GITHUB_SHA)` with:
 
 ```ts
 // Read at render, so tests can stub it. A local build has no sha and shows "dev".
@@ -2016,18 +2116,29 @@ Style: add at the end of the `<style>`:
 		padding: 0;
 	}
 
+	/* Clips the link's fill to the list's rounded corners, so the separator stays straight. */
+	.rows:has(.row-link) {
+		overflow: hidden;
+	}
+
 	.row-link {
 		flex: 1;
 		align-self: stretch;
 		display: flex;
 		align-items: center;
 		padding: 0 14px;
-		border-radius: calc(var(--radius) - 1px);
 		outline-offset: -2px;
+		transition: background-color 120ms;
 	}
 
 	@media (hover: hover) {
 		.row-link:hover {
+			background: var(--bg-hover);
+		}
+	}
+
+	@media (hover: none) {
+		.row-link:active {
 			background: var(--bg-hover);
 		}
 	}
@@ -2050,10 +2161,29 @@ Style: add at the end of the `<style>`:
 Run: `npx vitest run src/test/settings-page.test.ts src/scripts src/islands/InstallPrompt.test.tsx`, then `npm test`, `npm run check`, `npm run build`
 Expected: all PASS.
 
+- [ ] **Step 7b: Make LICENSE agree with the guide licence**
+
+LICENSE's scope paragraph puts everything outside the brand files under MIT, which includes the guide text the About group now says is CC BY-SA 4.0. In `LICENSE`, replace
+
+```
+public/favicon.ico). Everything else in this repository is under the MIT
+License that follows.
+```
+
+with
+
+```
+public/favicon.ico). Guide text under src/content/ is licensed under CC BY-SA
+4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Everything else in this
+repository is under the MIT License that follows.
+```
+
+Then read LICENSE, `README.md` § Licence and the Settings About section side by side: all three say the same thing.
+
 - [ ] **Step 8: Commit**
 
 ```bash
-git add src
+git add src LICENSE
 git commit -m "Gather licences and links under Settings About and keep the seen-flags on delete"
 ```
 
@@ -2106,6 +2236,14 @@ In `src/islands/Tracker.test.tsx`, add `import { wireTooltips } from "../scripts
 		expect(flags[0]).toHaveAttribute("aria-disabled", "true")
 		// aria-disabled, not disabled: it stays focusable so its tooltip is reachable.
 		expect(flags[0]).not.toBeDisabled()
+
+		// Tab runs top to bottom: checkbox, book (top right), flag (bottom right).
+		const card = document.querySelector("li.item") as HTMLElement
+		expect([...card.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
+			"INPUT",
+			"A",
+			"BUTTON",
+		])
 	})
 
 	it("toggles an item from its label, and a flag tap shows the tooltip without toggling", async () => {
@@ -2205,6 +2343,17 @@ function ItemRow({ item, done, disabled, onToggle, sourcesHref, strings }: RowPr
 				/>
 				<label htmlFor={inputId}>{item.name}</label>
 			</div>
+			{/* Before the flag in the DOM, so Tab runs top to bottom. It is absolutely positioned, so
+			    its place here changes no layout. */}
+			<a className="item-icon item-book has-tip tip-end" href={`${sourcesHref}#${item.id}`}>
+				<BookIcon />
+				<span className="visually-hidden">
+					{strings.sources}: {item.name}
+				</span>
+				<span className="tip" aria-hidden="true">
+					{strings.sources}
+				</span>
+			</a>
 			<span className="tier" data-status={item.status}>
 				{tier}
 			</span>
@@ -2219,15 +2368,6 @@ function ItemRow({ item, done, disabled, onToggle, sourcesHref, strings }: RowPr
 					</span>
 				</button>
 			</div>
-			<a className="item-icon item-book has-tip tip-end" href={`${sourcesHref}#${item.id}`}>
-				<BookIcon />
-				<span className="visually-hidden">
-					{strings.sources}: {item.name}
-				</span>
-				<span className="tip" aria-hidden="true">
-					{strings.sources}
-				</span>
-			</a>
 		</li>
 	)
 }
@@ -2269,7 +2409,8 @@ In `global.css`, replace the rules from `.item-group ul {` through `.report { �
 ```css
 .item-group ul {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+	/* min() keeps one column inside a 320 px screen at 200 % text (reflow). */
+	grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
 	gap: 12px;
 	margin: 0 0 var(--space-4);
 	padding: 0;
@@ -2366,7 +2507,6 @@ In `global.css`, replace the rules from `.item-group ul {` through `.report { �
 	border-radius: 999px;
 	color: var(--text-muted);
 	font-size: 0.75rem;
-	white-space: nowrap;
 }
 
 /* Tier colours come from their own tokens so a theme can swap them without touching the accent. */
@@ -2385,12 +2525,12 @@ In `global.css`, replace the rules from `.item-group ul {` through `.report { �
 	line-height: 1.5;
 }
 
-/* In the flow, pushed to the bottom: the flag can never overlap the book. The negative margins
-   put its box 2 px from the bottom and 7 px from the right, mirroring the book (spec §4). */
+/* In the flow, pushed to the bottom: the flag can never overlap the book. The negative right
+   margin puts its box 13 px from the card's bottom edge and 7 px from its right edge (spec §4). */
 .item-foot {
 	display: flex;
 	justify-content: flex-end;
-	margin: auto -5px -10px 0;
+	margin: auto -6px 0 0;
 }
 
 /* .item .item-icon outranks the shared `.tracker button` reset. */
@@ -2420,8 +2560,8 @@ In `global.css`, replace the rules from `.item-group ul {` through `.report { �
 
 .item .item-book {
 	position: absolute;
-	top: 2px;
-	right: 7px;
+	top: 12px;
+	right: 6px;
 }
 
 .item .item-book:focus-visible {
@@ -2442,6 +2582,13 @@ In `global.css`, replace the rules from `.item-group ul {` through `.report { �
 	}
 
 	.item .item-book:hover {
+		color: var(--link);
+		background: color-mix(in srgb, var(--link) 12%, transparent);
+	}
+}
+
+@media (hover: none) {
+	.item .item-book:active {
 		color: var(--link);
 		background: color-mix(in srgb, var(--link) 12%, transparent);
 	}
@@ -2484,7 +2631,9 @@ Expected: all PASS.
 
 Find the longest live item name: `node -e "const fs=require('fs');const all=fs.readdirSync('src/seed').filter(f=>f!=='rumours.json').flatMap(f=>JSON.parse(fs.readFileSync('src/seed/'+f)));const i=all.filter(x=>!x.retired).sort((a,b)=>b.name.length-a.name.length)[0];console.log(i.id,i.name.length,!!i.description)"`. Serve the build, open `/en/tracker/` at 320 px and 1024 px, and read `getBoundingClientRect()`:
 - Cards in one row share `top` and `bottom` (difference 0.5 px or less).
-- Book box: 2 px from the card's top, 7 px from its right. Flag box: 2 px from the bottom, 7 px from the right.
+- Book box: 13 px below the card's top edge and 7 px in from its right edge, measured on the li's border box, and its vertical centre equals `.item-main`'s (0.5 px or less). Flag box: 13 px above the bottom edge and 7 px in from the right.
+- Reflow: at 320 px, run `document.documentElement.style.fontSize = "200%"` in the console; `scrollWidth === clientWidth` on `/en/tracker/` and `/no/tracker/`.
+- Keyboard walk on one card: Tab goes checkbox, book, flag.
 - The label's text right edge is left of the book box's left edge on every card, including the longest name. If that card has a description, also check a card without one: temporarily delete one description in devtools and confirm the book and flag boxes don't intersect.
 - Clicking the card's empty area (not the icons) toggles it; clicking the flag doesn't.
 Record the numbers for the PR.
@@ -2862,7 +3011,7 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 				{section.items.map((item) => (
 					<article id={item.id} class="source-entry">
 						<h3>{item.name}</h3>
-						<ul>
+						<ul class="tap-links">
 							{item.sources.map((source) => (
 								<li>
 									<ExternalLink href={source.url} locale={locale as Locale}>
@@ -2873,8 +3022,7 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 							))}
 						</ul>
 						<a class="back" href={`${tracker}#item-${item.id}`}>
-							{s.sources.back}
-							<span class="visually-hidden">: {item.name}</span>
+							{s.sources.back}<span class="visually-hidden">: {item.name}</span>
 						</a>
 					</article>
 				))}
@@ -2917,12 +3065,19 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 		color: var(--text);
 		font-size: 0.9375rem;
 		text-decoration: none;
+		transition: background-color 120ms, border-color 120ms;
 	}
 
 	@media (hover: hover) {
 		.source-chips a:hover {
 			background: var(--bg-hover);
 			border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+		}
+	}
+
+	@media (hover: none) {
+		.source-chips a:active {
+			background: var(--bg-hover);
 		}
 	}
 
@@ -2956,7 +3111,12 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 	/* The entry a book icon pointed at. */
 	.source-entry:target {
 		border-color: var(--link);
-		box-shadow: 0 0 16px color-mix(in srgb, var(--link) 20%, transparent);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.source-entry:target {
+			box-shadow: 0 0 16px color-mix(in srgb, var(--link) 20%, transparent);
+		}
 	}
 
 	.source-entry h3 {
@@ -2971,11 +3131,10 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 		list-style: none;
 	}
 
+	/* The 44 px target is the link itself (the global .tap-links utility), not the row. */
 	.source-entry li {
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
-		min-height: var(--tap);
 	}
 
 	.outlet {
@@ -3020,9 +3179,11 @@ git commit -m "Add a Sources page under the tracker and list it in the sitemap"
 - [ ] **Step 1: Re-check the facts (the spec requires it on the day the content is written)**
 
 Open both sources in the Browser pane and confirm each fact below still holds. If one changed, write the current fact and note the change in the task report.
-- `https://www.rockstargames.com/newswire/article/5171972o3ak5oa/pre-order-grand-theft-auto-vi-on-june-25` (the Newswire pre-order article; if this URL turns out to be a different article, the other candidate is `https://www.rockstargames.com/newswire/article/517oa135328155/grand-theft-auto-vi-pre-orders-begin-on-june-25`; use whichever carries the Vintage Vice City Pack and the GTA+ month)
+- `https://www.rockstargames.com/newswire/article/5171972o3ak5oa/pre-order-grand-theft-auto-vi-on-june-25` (the Newswire pre-order article; if this URL turns out to be a different article, the other candidate is `https://www.rockstargames.com/newswire/article/517oa135328155/grand-theft-auto-vi-pre-orders-begin-on-june-25`; use whichever carries the Vintage Vice City Pack and the GTA+ month. If neither is the pre-order article, find it from the Newswire index and use that URL)
 - `https://store.playstation.com/no-no/concept/10000730` (the PlayStation Store page for Norway)
-Facts: Standard 949 kr, Ultimate 1 189 kr, an Ultimate Upgrade sold separately; pre-order or purchase before 20 November gives the Vintage Vice City Pack (a car with a garage, outfits, a weapon pattern); a digital pre-order includes one month of GTA+, which on PlayStation renews until cancelled and must be redeemed by 31 March 2027; GTA+ perks are for GTA Online and the games library, not GTA VI single-player; physical boxes hold a download code and are sold from 12 November; the PlayStation Store charges at pre-order.
+Facts: Standard 949 kr, Ultimate 1 189 kr, an Ultimate Upgrade sold separately; pre-order or purchase before 20 November gives the Vintage Vice City Pack (a car with a garage, outfits, a weapon pattern); a digital pre-order includes one month of GTA+, which on PlayStation renews until cancelled and must be redeemed by 31 March 2027; GTA+ perks are for GTA Online and the games library, not GTA VI single-player; physical boxes hold a download code and are sold from 12 November; the PlayStation Store charges at pre-order; the standard digital edition's price on the Microsoft Store for Norway. If the Xbox price can't be confirmed, drop "and the Xbox Store" / "og Xbox Store" from Buying in Norway.
+
+If you can't open the Browser pane, or a page asks for a date of birth, a sign-in or anything beyond declining non-essential cookies, stop and report BLOCKED with what you saw. The controller or Malin then checks the facts by hand. Never enter personal data. If a fact changed in a way that changes the advice (a price, a date, what GTA+ covers or how it renews), report it before you write the copy. List each fact next to the URL you read it from.
 
 - [ ] **Step 2: Write the failing content test**
 
@@ -3058,7 +3219,7 @@ describe.each([
 		[
 			"Datoen",
 			"Utgaver",
-			"Forhåndsbestillingsbonus",
+			"Bonus ved forhåndsbestilling",
 			"GTA+",
 			"Forhåndsnedlasting",
 			"Kjøp i Norge",
@@ -3157,7 +3318,7 @@ Spillet slippes **19. november 2026** på PlayStation 5 og Xbox Series X|S. Digi
 
 To utgaver er i salg: Standard til 949 kr og Ultimate til 1 189 kr. Butikksiden viser hva Ultimate gir i tillegg. Kjøper du Standard, kan du gå over til Ultimate senere med Ultimate Upgrade i stedet for å kjøpe spillet på nytt.
 
-## Forhåndsbestillingsbonus
+## Bonus ved forhåndsbestilling
 
 Forhåndsbestiller du spillet, eller kjøper det før 20. november, får du Vintage Vice City Pack: en bil med en garasje å ha den i, noen antrekk og et våpenmønster.
 
@@ -3185,7 +3346,7 @@ Expected: all PASS; the build's content layer accepts the two https sources from
 
 - [ ] **Step 6: Measure the sources line (spec §9)**
 
-In the Browser pane at 320 px on `/en/guides/before-you-start/`: the sources line wraps onto two lines and `document.documentElement.scrollWidth` is 320. Record it for the PR.
+In the Browser pane at 320 px on `/en/guides/before-you-start/`: the sources line wraps onto two lines and `document.documentElement.scrollWidth` is 320. Then on `/no/guides/before-you-start/`: every `h2` has `scrollWidth` equal to its `clientWidth` ("Forhåndsbestillingsbonus" measured 297 in 288, which is why the heading is "Bonus ved forhåndsbestilling"). Record it for the PR.
 
 - [ ] **Step 7: Commit**
 
@@ -3244,7 +3405,9 @@ describe("withVersionHeader (feedback spec §10.2)", () => {
 	})
 
 	it("fails without exactly one /* block", () => {
-		expect(() => withVersionHeader("/sw.js\n  Cache-Control: no-cache\n", "v1")).toThrow(/exactly one/)
+		expect(() => withVersionHeader("/sw.js\n  Cache-Control: no-cache\n", "v1")).toThrow(
+			/exactly one/
+		)
 		expect(() => withVersionHeader("/*\n  A: b\n\n/*\n  C: d\n", "v1")).toThrow(/exactly one/)
 	})
 
@@ -3517,6 +3680,7 @@ export interface UpdateEnv {
 	registration: EventTarget & {
 		readonly waiting: WorkerLike | null
 		readonly installing: WorkerLike | null
+		readonly active: unknown
 	}
 	storage: () => Pick<Storage, "getItem" | "setItem"> | undefined
 	reload: () => void
@@ -3552,6 +3716,7 @@ class FakeWorker extends EventTarget implements WorkerLike {
 class FakeRegistration extends EventTarget {
 	waiting: FakeWorker | null = null
 	installing: FakeWorker | null = null
+	active: object | null = null
 }
 
 class FakeContainer extends EventTarget {
@@ -3572,6 +3737,7 @@ function setup(options: {
 	controller?: boolean
 	waiting?: boolean
 	installing?: boolean
+	active?: boolean
 	storage?: UpdateEnv["storage"]
 }) {
 	document.body.innerHTML = `
@@ -3588,6 +3754,7 @@ function setup(options: {
 	const registration = new FakeRegistration()
 	if (options.waiting) registration.waiting = new FakeWorker()
 	if (options.installing) registration.installing = new FakeWorker()
+	if (options.active) registration.active = {}
 	const reload = vi.fn()
 	const deferred: (() => void)[] = []
 	const store = memoryStorage()
@@ -3705,6 +3872,22 @@ describe("update notice (feedback spec §10.3)", () => {
 		expect(setup({ waiting: true, storage: blocked }).card.hidden).toBe(false)
 	})
 
+	it("sends focus back to where it was when Later hides the card", () => {
+		setup({ waiting: true })
+		const field = document.getElementById("field") as HTMLElement
+		const later = document.querySelector<HTMLElement>("[data-update-later]") as HTMLElement
+		field.focus()
+		later.focus()
+		later.click()
+		expect(document.activeElement).toBe(field)
+	})
+
+	it("reloads a hard-reloaded tab (no controller, an active worker) when the update takes over", () => {
+		const { container, reload } = setup({ controller: false, active: true })
+		container.dispatchEvent(new Event("controllerchange"))
+		expect(reload).toHaveBeenCalledOnce()
+	})
+
 	it("sets --notice-h while visible and clears it when hidden (WCAG 2.4.11)", () => {
 		const { click } = setup({ waiting: true })
 		const root = document.documentElement
@@ -3739,6 +3922,7 @@ export interface UpdateEnv {
 	registration: EventTarget & {
 		readonly waiting: WorkerLike | null
 		readonly installing: WorkerLike | null
+		readonly active: unknown
 	}
 	storage: () => Pick<Storage, "getItem" | "setItem"> | undefined
 	reload: () => void
@@ -3755,7 +3939,8 @@ export function wireUpdateNotice(doc: Document, env: UpdateEnv): void {
 
 	// A first install's clients.claim() also fires controllerchange; only a change after the page
 	// already had a controller is an update. This covers a tab kept open from the first install.
-	let hadController = Boolean(env.container.controller)
+	// A hard reload leaves a page without a controller while a worker is active; that page reloads too.
+	let hadController = Boolean(env.container.controller || env.registration.active)
 	let reloading = false
 	const reloadOnce = () => {
 		if (reloading) return
@@ -3778,10 +3963,13 @@ export function wireUpdateNotice(doc: Document, env: UpdateEnv): void {
 		}
 	}
 
+	// Re-measured on resize: a rotated phone can wrap the card taller than it first was.
+	const measure = () => root.style.setProperty("--notice-h", `${card.offsetHeight + GAP}px`)
+
 	const show = () => {
 		if (!env.container.controller || laterChosen() || !card.hidden) return
 		card.hidden = false
-		root.style.setProperty("--notice-h", `${card.offsetHeight + GAP}px`)
+		measure()
 		// Filled on the next task, once the region is known to be in the tree, so it is announced
 		// once. Showing never moves focus.
 		env.defer(() => {
@@ -3807,6 +3995,9 @@ export function wireUpdateNotice(doc: Document, env: UpdateEnv): void {
 	env.registration.addEventListener("updatefound", () => {
 		if (env.registration.installing) watch(env.registration.installing)
 	})
+	doc.defaultView?.addEventListener("resize", () => {
+		if (!card.hidden) measure()
+	})
 
 	reloadButton.addEventListener("click", () => {
 		// Read now: a newer deploy may have replaced the worker the notice first saw.
@@ -3815,8 +4006,18 @@ export function wireUpdateNotice(doc: Document, env: UpdateEnv): void {
 		else reloadOnce()
 	})
 
+	// Hiding the focused Later button would drop focus on <body>. Focus goes back to where it was
+	// before it entered the card.
+	let returnTo: HTMLElement | null = null
+	doc.addEventListener("focusin", (event) => {
+		const target = event.target as HTMLElement
+		if (!card.contains(target)) returnTo = target
+	})
+
 	laterButton.addEventListener("click", () => {
+		const hadFocus = card.contains(doc.activeElement)
 		hide()
+		if (hadFocus && returnTo?.isConnected) returnTo.focus()
 		try {
 			env.storage()?.setItem(LATER_KEY, "1")
 		} catch {
@@ -3827,7 +4028,7 @@ export function wireUpdateNotice(doc: Document, env: UpdateEnv): void {
 ```
 
 Run: `npx vitest run src/scripts/update-notice.test.ts`
-Expected: PASS (12 tests).
+Expected: PASS (14 tests).
 
 - [ ] **Step 4: Rewrite `src/scripts/register-sw.ts`**
 
@@ -3878,7 +4079,7 @@ describe("update notice markup (feedback spec §10.3)", () => {
 })
 ```
 
-Run it (FAIL), then in `src/layouts/Base.astro` add right after `</main>`:
+Run it (FAIL), then in `src/layouts/Base.astro` add right after `<TabBar … />`, before `<main>` (keyboard users reach Reload and Later without tabbing through a whole page; the skip link still jumps past it):
 
 ```astro
 		<div class="update-notice" data-update-notice data-text={s.update.ready} hidden>
@@ -3898,10 +4099,12 @@ Run: `npx vitest run src/layouts/Base.test.ts` (PASS; the existing "header, nav,
 In `global.css`:
 1. In the `html` rule, change the scroll padding to `scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--notice-h, 0px));` and extend its comment: "…plus the update notice while it shows."
 2. In the 768 px block, change `html { scroll-padding-bottom: 0; }` to `html { scroll-padding-bottom: var(--notice-h, 0px); }`.
+2b. Scroll padding can't scroll past the end of the page, so the footer would sit behind the card there (WCAG 2.4.11). In the `body` rule, change the padding to `padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--notice-h, 0px));`. In the 768 px block, change `body { padding-bottom: 0; }` to `body { padding-bottom: var(--notice-h, 0px); }`.
 3. Add after the `.offline` rule:
 
 ```css
-/* Update notice (feedback spec §10.4): overlays, never shifts content, sits under dialogs. */
+/* Update notice (feedback spec §10.4): overlays and sits under dialogs. The body's bottom padding grows
+   by its height, so the footer is never hidden behind it at the end of a page. */
 .update-notice {
 	position: fixed;
 	left: var(--space-3);
@@ -3956,7 +4159,7 @@ Expected: all PASS.
 
 - [ ] **Step 8: Measure the card (spec §10.4)**
 
-With the build served, make the card visible in devtools (`document.querySelector("[data-update-notice]").hidden = false`) and read at 320 px and 1024 px: English card height (target 62 px at 1024 px; at 320 px it may wrap, and its text must stay at two lines or fewer), both buttons 44 px tall with equal `bottom`, no change in `document.documentElement.scrollHeight` when it appears (no layout shift), and the Norwegian card at 320 px ("Oppdater" / "Senere") with text at two lines or fewer. Record the numbers.
+With the build served, make the card visible in devtools (`document.querySelector("[data-update-notice]").hidden = false`) and read at 320 px and 1024 px: English card height (target 62 px at 1024 px; at 320 px it may wrap, and its text must stay at two lines or fewer), both buttons 44 px tall with equal `bottom`, `main`'s `getBoundingClientRect().top` unchanged when it appears (no layout shift above the fold), and, scrolled to the end, every footer link's `bottom` above the card's `top`, and the Norwegian card at 320 px ("Oppdater" / "Senere") with text at two lines or fewer. Record the numbers.
 
 - [ ] **Step 9: Commit**
 
@@ -3981,16 +4184,16 @@ In the Browser pane at 320 px and 1024 px, confirm and record, reusing the numbe
 - tracker cards in a row share height and bottom edge; corner insets symmetric; no text under either icon
 - footer heights and one centre line
 - the Settings language link's box equals its row's box (`getBoundingClientRect()` of the `a.row-link` and its `li`)
-- the update card's buttons: 44 px, one bottom edge, no layout shift
+- the update card's buttons: 44 px, one bottom edge, no layout shift, and no footer link behind the card at the end of the page
 - the guide sources line wraps at 320 px without overflow
 - hover and focus states at both widths: screenshot a hovered tab, chip, card and footer icon, and a keyboard-focused card and book link
 - the Sources page: arriving via a book link scrolls to the entry with the cyan `:target` border; its back link lands on the tracker with that checkbox focused.
 
 - [ ] **Step 3: The real update flow (spec §15)**
 
-`preview_start` needs a `.claude/launch.json` entry for `npm run preview` (Wrangler, port 8787). **Ask Malin before creating or editing `.claude/launch.json`.** Then:
+`.claude/launch.json` already has a `preview` entry (`npm run preview`, port 8787). Start it with `preview_start` and the name `preview`, and don't edit the file. Then:
 1. Build, open `http://localhost:8787/en/`, reload once so the worker controls the page, open a second tab on `/en/tracker/`.
-2. Change one visible string, rebuild (the dev server serves the new `dist/`), and navigate in the first tab. The notice appears; `read_network_requests` shows `X-Rookdex-Version` on page responses; the page still runs the old version.
+2. Change one visible string, rebuild (the dev server serves the new `dist/`), and navigate in the first tab. The notice appears; `curl -sI http://localhost:8787/en/` shows `X-Rookdex-Version` with the new version; the page still runs the old version.
 3. Press Reload. Both tabs reload once onto the new version.
 4. Revert the string change and rebuild.
 
@@ -4011,7 +4214,7 @@ Spec A of the feedback round: `docs/superpowers/specs/2026-09-25-rookdex-feedbac
 - A new version waits, and a notice offers Reload or Later; pages carry `X-Rookdex-Version` so the worker never caches a page from another version.
 
 ## Rulings
-(the 11 deviations from the plan header, one line each)
+(the 15 deviations from the plan header, one line each)
 
 ## Measured
 | Check | 320 px | 1024 px |
@@ -4029,10 +4232,13 @@ Spec A of the feedback round: `docs/superpowers/specs/2026-09-25-rookdex-feedbac
 - Real update flow on `npm run preview`: notice shown, header present, both tabs switched on Reload.
 
 ## After merge
-- The first update after this ships still runs the old worker once (spec §10.1): expect one more silent switch.
+- This deploy is the first update under the new rules. The live worker has no version guard yet, so while the new worker waits, the old one can still cache new pages (spec §10.1). Tabs opened before the deploy show no notice. They switch when they all close, or from the notice on the next page they load. Every later update is guarded.
+- Check the header on production: `curl -sI https://rookdex.app/en/ | grep -i x-rookdex-version` prints the same 12-character version as `curl -s https://rookdex.app/sw.js | grep -m1 VERSION`.
 - Search Console: the two Sources pages come in through the sitemap; no action needed.
 ```
 
 - [ ] **Step 5: Hand-off notes for Malin**
 
-In the final summary, list: the rulings (especially 8, the Sources search titles), the open question about "trackeren" versus "Oversikt", and the follow-ups outside this spec: the offline notice's live region (spec §16), tooltips for the header's back and forward buttons (icon-only controls that still use `aria-label`), and the `preview` job posting its URL on the PR (1c).
+In the final summary, list: the rulings (especially 8, the Sources search titles), the open question about "trackeren" versus "Oversikt", and the follow-ups outside this spec: the offline notice's live region (spec §16), tooltips for the header's back and forward buttons (icon-only controls that still use `aria-label`), and the `preview` job posting its URL on the PR (1c); and for 1c: if a Worker script is added, HTML must stay static assets or the Worker must set `X-Rookdex-Version`, or the version guard is off. Also: guide `h2`s overflow at 320 px with 200 % text ("Forhåndsnedlasting" needs 458 px), so `overflow-wrap: break-word` on headings is a follow-up.
+
+> Stress-tested 2026-09-30 (skill 1fc847e): 22 applied, 3 adapted, 4 decided by me.
