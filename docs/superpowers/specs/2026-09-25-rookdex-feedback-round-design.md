@@ -115,10 +115,10 @@ Any failure (malformed, unknown or retired id, or an `error` status) does nothin
 
 `src/pages/[locale]/tracker/sources.astro`, built from the seed. Zero JavaScript, precached like every page, crawlable. The Tracker tab keeps its active look, but with `aria-current="true"` instead of `"page"`, because the tab links to a different page. `Base` passes a `sub` flag to `TabBar`, which picks the value from it.
 
-- **Header:** `<h1>` "Sources" / "Kilder" (28 px / 700), and a lede "Where every item in the tracker comes from." / "Hvor hvert element i trackeren kommer fra." (14 px / 1.5, muted).
+- **Header:** `<h1>` "Sources" / "Kilder" (28 px / 700), and a lede "Where every item in the tracker comes from." / "Hvor hvert element i oversikten kommer fra." (14 px / 1.5, muted).
 - **Category chips:** anchor links to each category section, in the tracker's order, each with its count of live items. 44 px min height, padding 0 16 px, radius 999 px, 15 px text, count 12 px muted.
 - **Sections:** one per category, `<h2>` with the category name. Entries follow in the tracker's group order, with no group headings.
-- **Entry:** `<article id="<item id>">` (the seed id contains one slash, valid in an id and a fragment), padding 12 px 12 px 12 px 16 px, `--bg-raised`, radius 8 px. `<h3>` item name (15 px / 600). A list of its sources, each one an `ExternalLink` with the source title in cyan and the outlet domain (`outletOf`) in 12 px muted under it, 44 px min height. Then "Back to the item in the tracker" / "Tilbake til elementet i trackeren", with a visually hidden ": {name}" appended to its accessible name, linking to `../#item-<id>`, 13 px muted, 44 px min height.
+- **Entry:** `<article id="<item id>">` (the seed id contains one slash, valid in an id and a fragment), padding 12 px 12 px 12 px 16 px, `--bg-raised`, radius 8 px. `<h3>` item name (15 px / 600). A list of its sources, each one an `ExternalLink` with the source title in cyan and the outlet domain (`outletOf`) in 12 px muted under it, 44 px min height. Then "Back to the item in the tracker" / "Tilbake til elementet i oversikten", with a visually hidden ": {name}" appended to its accessible name, linking to `../#item-<id>`, 13 px muted, 44 px min height.
 - **`:target`:** the entry arrived at from a book icon gets a cyan border and a faint cyan shadow.
 - Retired items are left out, as in the tracker. The schema requires at least one source per item, so no entry is empty.
 

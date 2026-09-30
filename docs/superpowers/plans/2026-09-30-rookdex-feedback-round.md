@@ -35,7 +35,7 @@
 5. The footer chip strings and the © line are stored in sentence case and set in capitals by CSS, so screen readers read words, not letters.
 6. `tracker.sources` stays (its text "Sources" is exactly the tooltip and chip text) and is reused; `tracker.report` goes; `tracker.reportSoon` becomes "Report: coming soon" and is both the tooltip and the flag's hidden name.
 7. `deleteAllData` drops its `storage` parameter, because it no longer touches localStorage.
-8. The Sources page needs search titles, which the spec doesn't give: "Sources for the GTA 6 tracker · Rookdex" and "Kilder for GTA 6-sjekklisten · Rookdex". Its description is the lede. **Ask Malin at review.**
+8. The Sources page needs search titles, which the spec doesn't give: "Sources for the GTA 6 tracker · Rookdex" and "Kilder for GTA 6-sjekklisten · Rookdex". Its description is the lede. Malin approved them at review (2026-09-30).
 9. Tab bar CSS switches `[aria-current="page"]` to `[aria-current]`, so the Tracker tab keeps its look on the Sources page.
 10. `tooltip.ts` also listens to `pointerover` (to know which control is hovered when Escape is pressed) and `click` (the tap rule), on top of the spec's three listeners.
 11. The ≥ 1024 px two-column `.item-groups` grid goes: each group heading now spans the list, and the cards form the grid.
@@ -44,7 +44,7 @@
 14. The update card sits right after the tab bar, before `<main>`, not after it (spec §10.3). On the Tracker, keyboard users would otherwise Tab through every card to reach Reload. The phone tab bar sets the precedent: first in the DOM, at the bottom of the screen. Malin's call at the stress test.
 15. While the update card shows, the body's bottom padding grows by its height (spec §10.4 says it never shifts content). Without it the card hides the footer's links at the end of every page, which fails WCAG 2.4.11. Cost: on a page shorter than the screen, the footer moves up once when the card appears. Malin's call at the stress test.
 
-**Open question for Malin (not a blocker):** the spec's Norwegian Sources lede says "trackeren", while the Norwegian tab is called "Oversikt". The spec copy is final, so the plan uses it as written. Ask at review.
+**Settled at review (2026-09-30):** the Norwegian Sources lede and back link say "oversikten", matching the tab name "Oversikt" and the rest of the Norwegian UI. Malin picked it from a rendered comparison; the spec copy is updated to match.
 
 ## Review Focus
 
@@ -2821,8 +2821,8 @@ and in `seo.titles` add `sources: "Sources for the GTA 6 tracker · Rookdex",`. 
 ```ts
 	sources: {
 		title: "Kilder",
-		lede: "Hvor hvert element i trackeren kommer fra.",
-		back: "Tilbake til elementet i trackeren",
+		lede: "Hvor hvert element i oversikten kommer fra.",
+		back: "Tilbake til elementet i oversikten",
 	},
 ```
 
@@ -4239,6 +4239,6 @@ Spec A of the feedback round: `docs/superpowers/specs/2026-09-25-rookdex-feedbac
 
 - [ ] **Step 5: Hand-off notes for Malin**
 
-In the final summary, list: the rulings (especially 8, the Sources search titles), the open question about "trackeren" versus "Oversikt", and the follow-ups outside this spec: the offline notice's live region (spec §16), tooltips for the header's back and forward buttons (icon-only controls that still use `aria-label`), and the `preview` job posting its URL on the PR (1c); and for 1c: if a Worker script is added, HTML must stay static assets or the Worker must set `X-Rookdex-Version`, or the version guard is off. Also: guide `h2`s overflow at 320 px with 200 % text ("Forhåndsnedlasting" needs 458 px), so `overflow-wrap: break-word` on headings is a follow-up.
+In the final summary, list: the rulings (8, the Sources search titles, approved at review), and the follow-ups outside this spec: the offline notice's live region (spec §16), tooltips for the header's back and forward buttons (icon-only controls that still use `aria-label`), and the `preview` job posting its URL on the PR (1c); and for 1c: if a Worker script is added, HTML must stay static assets or the Worker must set `X-Rookdex-Version`, or the version guard is off. Also: guide `h2`s overflow at 320 px with 200 % text ("Forhåndsnedlasting" needs 458 px), so `overflow-wrap: break-word` on headings is a follow-up.
 
 > Stress-tested 2026-09-30 (skill 1fc847e): 22 applied, 3 adapted, 4 decided by me.
