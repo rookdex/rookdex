@@ -4,9 +4,8 @@ import { wireUpdateNotice } from "./update-notice"
 
 if ("serviceWorker" in navigator) {
 	window.addEventListener("load", () => {
-		navigator.serviceWorker
-			.register("/sw.js")
-			.then((registration) => {
+		navigator.serviceWorker.register("/sw.js").then(
+			(registration) => {
 				wireUpdateNotice(document, {
 					container: navigator.serviceWorker,
 					registration,
@@ -14,9 +13,11 @@ if ("serviceWorker" in navigator) {
 					reload: () => window.location.reload(),
 					defer: (task) => window.setTimeout(task, 0),
 				})
-			})
-			.catch(() => {
-				// No service worker is a degraded mode, not an error the visitor can act on.
-			})
+			},
+			() => {
+				// No service worker is a degraded mode, not an error the visitor can act on. Only a
+				// failed register() lands here: an error while wiring the notice must stay visible.
+			}
+		)
 	})
 }
