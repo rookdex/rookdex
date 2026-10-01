@@ -270,9 +270,11 @@ p {
 }
 
 /* The footer "HUD strip" (feedback spec §6). Phone: icons and © share the first row, the chip
-   takes the second (the approved mockup, measured 169 px at 320). From 768 px: one centre line. */
+   takes the second. The gaps are tightened so the English footer is 169 px at 320 (the Norwegian
+   one is 151 px); copy, type size and the 44 px controls are unchanged. From 768 px the gaps are
+   restored and everything sits on one centre line. */
 .site-footer {
-	padding: 12px var(--space-3) var(--space-3);
+	padding: var(--space-2) var(--space-3) 10px;
 	border-top: 1px solid var(--border);
 	background: var(--bg-raised);
 	color: var(--text-muted);
@@ -281,7 +283,7 @@ p {
 
 .footer-disclaimer {
 	max-width: none;
-	margin: 0 0 var(--space-2);
+	margin: 0 0 var(--space-1);
 }
 
 .footer-strip {
@@ -291,7 +293,7 @@ p {
 		"icons copy"
 		"chip chip";
 	align-items: center;
-	gap: var(--space-2) var(--space-3);
+	gap: var(--space-1) var(--space-3);
 }
 
 /* The icons sit at the left edge on a phone, so their tips open to the right. */
@@ -1449,9 +1451,11 @@ p {
 	/* From 768 px, icons, chip and © share one centre line (spec §6). */
 	.site-footer {
 		padding-top: var(--space-3);
+		padding-bottom: var(--space-3);
 	}
 
 	.footer-disclaimer {
+		margin-bottom: var(--space-2);
 		text-align: center;
 	}
 
@@ -1459,6 +1463,7 @@ p {
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: center;
+		row-gap: var(--space-2);
 	}
 
 	.footer-icons .tip {
