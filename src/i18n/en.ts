@@ -162,6 +162,11 @@ export const en = {
 		description:
 			"News about GTA VI, including what the press reports that Rockstar has not confirmed.",
 	},
+	sources: {
+		title: "Sources",
+		lede: "Where every item in the tracker comes from.",
+		back: "Back to the item in the tracker",
+	},
 	settings: {
 		title: "Settings",
 		description: "Language, the data Rookdex keeps on this device, and app details.",
@@ -203,6 +208,7 @@ export const en = {
 			home: "Rookdex: GTA 6 countdown, tracker and launch guide",
 			tracker: "GTA 6 collectibles and wildlife tracker · Rookdex",
 			news: "GTA 6 news and rumours · Rookdex",
+			sources: "Sources for the GTA 6 tracker · Rookdex",
 			settings: "Settings · Rookdex",
 			notFound: "Page not found · Rookdex",
 		},

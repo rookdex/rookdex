@@ -161,6 +161,11 @@ export const no: Strings = {
 		description:
 			"Nyheter om GTA VI, blant annet det pressen melder som Rockstar ikke har bekreftet.",
 	},
+	sources: {
+		title: "Kilder",
+		lede: "Hvor hvert element i oversikten kommer fra.",
+		back: "Tilbake til elementet i oversikten",
+	},
 	settings: {
 		title: "Innstillinger",
 		description: "Språk, dataene Rookdex lagrer på denne enheten, og appdetaljer.",
@@ -201,6 +206,7 @@ export const no: Strings = {
 			home: "Rookdex: GTA 6-nedtelling, sjekkliste og lanseringsguide",
 			tracker: "GTA 6-sjekkliste for samleobjekter og dyreliv · Rookdex",
 			news: "GTA 6-nyheter og rykter · Rookdex",
+			sources: "Kilder for GTA 6-sjekklisten · Rookdex",
 			settings: "Innstillinger · Rookdex",
 			// The 404 is English-only today; the key exists because `no` is typed as `Strings`.
 			notFound: "Siden finnes ikke · Rookdex",

@@ -11,7 +11,7 @@ import Mark from "../components/Mark.astro"
 import TabBar from "../components/TabBar.astro"
 import { defaultLocale, type Locale, locales, t } from "../i18n"
 import { jsonLd, SITE } from "../model/seo"
-import { currentTab, type Tab } from "../model/tabs"
+import { currentTab, TAB_PATHS, type Tab } from "../model/tabs"
 import "../styles/global.css"
 
 interface Props {
@@ -30,6 +30,8 @@ interface Props {
 
 const { locale, title, description, path, tab, indexable = true } = Astro.props
 const s = t(locale)
+const current = currentTab(path, tab)
+const sub = current !== null && path !== TAB_PATHS[current]
 const canonical = getAbsoluteLocaleUrl(locale, path)
 const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
 ---
@@ -103,7 +105,7 @@ const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
 			</a>
 			<LanguageSwitch locale={locale} path={path} />
 		</header>
-		<TabBar locale={locale} current={currentTab(path, tab)} />
+		<TabBar locale={locale} current={current} sub={sub} />
 		<main id="main" class="wrap">
 			<slot />
 		</main>

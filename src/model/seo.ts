@@ -22,7 +22,13 @@ export function validSlugs(slugs: string[]): string[] {
 /** Locale-less paths the sitemap lists and IndexNow pings, in the same form pages pass to Base.
  *  New indexable pages are added here. */
 export function indexablePaths(guideSlugs: string[]): string[] {
-	return ["", "tracker", "news", ...validSlugs(guideSlugs).map((slug) => `guides/${slug}`)]
+	return [
+		"",
+		"tracker",
+		"tracker/sources",
+		"news",
+		...validSlugs(guideSlugs).map((slug) => `guides/${slug}`),
+	]
 }
 
 /** JSON for a `set:html` script block: `<` is escaped, so no value can close the tag. */

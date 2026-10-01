@@ -437,15 +437,15 @@ p {
 	flex: none;
 }
 
-.tabbar a[aria-current="page"] {
+.tabbar a[aria-current] {
 	color: var(--text);
 }
 
-.tabbar a[aria-current="page"] .tab-icon {
+.tabbar a[aria-current] .tab-icon {
 	color: var(--accent);
 }
 
-.tabbar a[aria-current="page"]::before {
+.tabbar a[aria-current]::before {
 	content: "";
 	position: absolute;
 	top: -1px;
@@ -1371,11 +1371,11 @@ p {
 		line-height: 1.5;
 	}
 
-	.tabbar a[aria-current="page"]::before {
+	.tabbar a[aria-current]::before {
 		content: none;
 	}
 
-	.tabbar a[aria-current="page"]::after {
+	.tabbar a[aria-current]::after {
 		content: "";
 		position: absolute;
 		left: 12px;

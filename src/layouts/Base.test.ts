@@ -15,6 +15,14 @@ function page(
 }
 
 describe("main navigation (spec §5, §12)", () => {
+	it("keeps the Tracker tab lit on its Sources page, without claiming to be that page", async () => {
+		const doc = await page("tracker/sources")
+		const lit = doc.querySelectorAll('nav[aria-label="Main"] [aria-current]')
+		expect(lit).toHaveLength(1)
+		expect(lit[0].textContent?.trim()).toBe("Tracker")
+		expect(lit[0].getAttribute("aria-current")).toBe("true")
+	})
+
 	it("puts one Main nav between the header and main", async () => {
 		const doc = await page("")
 		expect(doc.querySelectorAll('nav[aria-label="Main"]')).toHaveLength(1)
