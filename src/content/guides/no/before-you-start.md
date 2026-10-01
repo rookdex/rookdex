@@ -18,7 +18,7 @@ To utgaver er i salg: Standard til 949 kr og Ultimate til 1 189 kr. Ultimate er 
 
 ## Bonus ved forhåndsbestilling
 
-Forhåndsbestiller du spillet, eller kjøper det før 20. november, får du Vintage Vice City Pack: en bil med en garasje å ha den i, noen antrekk og et våpenmønster.
+Forhåndsbestiller du spillet, eller kjøper det før 20. november, får du Vintage Vice City Pack.
 
 ## GTA+
 

@@ -18,7 +18,7 @@ Two editions are on sale: Standard at 949 kr and Ultimate at 1 189 kr. Ultimate 
 
 ## Pre-order bonus
 
-Pre-order the game, or buy it before 20 November, and you get the Vintage Vice City Pack: a car with a garage to keep it in, a few outfits and a weapon pattern.
+Pre-order the game, or buy it before 20 November, and you get the Vintage Vice City Pack.
 
 ## GTA+
 
