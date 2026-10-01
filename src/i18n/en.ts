@@ -64,6 +64,7 @@ export const en = {
 	offline: {
 		notice: "Offline, showing saved data",
 	},
+	update: { ready: "A new version is ready", reload: "Reload", later: "Later" },
 	// Category and group labels are keyed by seed id. The seed test checks every id has a label
 	// in both languages, so the type stays open.
 	category: {

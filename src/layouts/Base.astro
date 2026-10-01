@@ -106,6 +106,14 @@ const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
 			<LanguageSwitch locale={locale} path={path} />
 		</header>
 		<TabBar locale={locale} current={current} sub={sub} />
+		<div class="update-notice" data-update-notice data-text={s.update.ready} hidden>
+			<p>{s.update.ready}</p>
+			<div class="actions">
+				<button type="button" class="primary" data-update-reload>{s.update.reload}</button>
+				<button type="button" data-update-later>{s.update.later}</button>
+			</div>
+		</div>
+		<p class="visually-hidden" role="status" data-update-status></p>
 		<main id="main" class="wrap">
 			<slot />
 		</main>

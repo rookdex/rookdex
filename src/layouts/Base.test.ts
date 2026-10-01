@@ -160,3 +160,19 @@ describe("link previews and indexing (SEO spec §4.4)", () => {
 		expect(tracker.querySelector('script[type="application/ld+json"]')).toBeNull()
 	})
 })
+
+describe("update notice markup (feedback spec §10.3)", () => {
+	it("ships the card hidden and the live region outside it, empty", async () => {
+		const doc = await page("", { locale: "no" })
+		const card = doc.querySelector<HTMLElement>("[data-update-notice]")
+		expect(card?.hasAttribute("hidden")).toBe(true)
+		expect(card?.dataset.text).toBe("En ny versjon er klar")
+		expect([...(card?.querySelectorAll("button") ?? [])].map((b) => b.textContent?.trim())).toEqual(
+			["Oppdater", "Senere"]
+		)
+		const live = doc.querySelector('[data-update-status][role="status"]')
+		expect(live?.textContent).toBe("")
+		expect(live?.closest("[data-update-notice]")).toBeNull()
+		expect(live?.classList.contains("visually-hidden")).toBe(true)
+	})
+})

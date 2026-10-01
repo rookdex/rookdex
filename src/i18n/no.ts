@@ -65,6 +65,7 @@ export const no: Strings = {
 	offline: {
 		notice: "Frakoblet, viser lagrede data",
 	},
+	update: { ready: "En ny versjon er klar", reload: "Oppdater", later: "Senere" },
 	category: {
 		wildlife: "Dyreliv",
 		vehicles: "Kjøretøy",
