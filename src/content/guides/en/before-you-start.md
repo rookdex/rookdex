@@ -14,7 +14,7 @@ The game releases on **19 November 2026** on PlayStation 5 and Xbox Series X|S. 
 
 ## Editions
 
-Two editions are on sale: Standard at 949 kr and Ultimate at 1 189 kr. The store page lists what Ultimate adds. If you buy Standard, you can move up later with the Ultimate Upgrade instead of buying the game again.
+Two editions are on sale: Standard at 949 kr and Ultimate at 1 189 kr. Ultimate is the game plus the Ultimate Edition Upgrade: premium vehicles, weapons and clothes for Jason and Lucia across the whole story, with new items unlocked in each chapter. Both PlayStation and Xbox sell it.
 
 ## Pre-order bonus
 
@@ -22,7 +22,7 @@ Pre-order the game, or buy it before 20 November, and you get the Vintage Vice C
 
 ## GTA+
 
-A digital pre-order includes one month of GTA+. On PlayStation the membership renews by itself until you cancel it, and you have to redeem the month by 31 March 2027. GTA+ perks apply to GTA Online and the GTA+ games library, not to single-player GTA VI. If you don't want to pay for a second month, cancel before it renews.
+A digital pre-order includes one month of GTA+. On PlayStation the membership renews by itself until you cancel it, and you have to redeem the month by 31 March 2027. If you don't want to pay for a second month, cancel before it renews.
 
 ## Preload
 

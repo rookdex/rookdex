@@ -14,7 +14,7 @@ Spillet slippes **19. november 2026** på PlayStation 5 og Xbox Series X|S. Digi
 
 ## Utgaver
 
-To utgaver er i salg: Standard til 949 kr og Ultimate til 1 189 kr. Butikksiden viser hva Ultimate gir i tillegg. Kjøper du Standard, kan du gå over til Ultimate senere med Ultimate Upgrade i stedet for å kjøpe spillet på nytt.
+To utgaver er i salg: Standard til 949 kr og Ultimate til 1 189 kr. Ultimate er spillet pluss Ultimate Edition Upgrade: eksklusive kjøretøy, våpen og klær til Jason og Lucia gjennom hele historien, med nye gjenstander som låses opp i hvert kapittel. Både PlayStation og Xbox selger den.
 
 ## Bonus ved forhåndsbestilling
 
@@ -22,7 +22,7 @@ Forhåndsbestiller du spillet, eller kjøper det før 20. november, får du Vint
 
 ## GTA+
 
-En digital forhåndsbestilling gir én måned med GTA+. På PlayStation fornyes medlemskapet av seg selv til du sier det opp, og måneden må løses inn innen 31. mars 2027. GTA+-fordelene gjelder GTA Online og GTA+-spillbiblioteket, ikke enspillerdelen av GTA VI. Vil du ikke betale for en måned til, må du si opp før det fornyes.
+En digital forhåndsbestilling gir én måned med GTA+. På PlayStation fornyes medlemskapet av seg selv til du sier det opp, og måneden må løses inn innen 31. mars 2027. Vil du ikke betale for en måned til, må du si opp før det fornyes.
 
 ## Forhåndsnedlasting
 
