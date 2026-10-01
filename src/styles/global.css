@@ -43,7 +43,7 @@ a {
 	text-decoration: underline;
 	text-underline-offset: 0.15em;
 	text-decoration-thickness: 1px;
-	text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
+	text-decoration-color: color-mix(in srgb, var(--link) 50%, transparent);
 }
 
 /* The ↗ on external text links (feedback spec §3.1). */

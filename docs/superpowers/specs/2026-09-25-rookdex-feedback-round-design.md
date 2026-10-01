@@ -68,7 +68,7 @@ Every external link in the app is rendered by Astro (footer, guide sources, Sett
 - **Lift:** hover raises the background to `--bg-hover` and brightens muted text to `--text`.
 - **Preview:** things that can be selected (tabs, chips, cards) also show a faint version of their selected marker. The phone tab shows a 2 px top line at 45 % pink; the desktop tab shows a 2 px bottom line at 45 % pink; chips and cards get a border at 50 % pink.
 - Plain buttons lift only. Primary buttons get `filter: brightness(1.12)` plus `--glow`.
-- Links: the underline goes from 40 % cyan to solid cyan at 2 px.
+- Links: the underline goes from 50 % cyan to solid cyan at 2 px. (50 % gives 3.65:1 on the background, so the underline meets 3:1.)
 - **Focus** is the hover lift plus the existing 2 px pink outline at 2 px offset (inset −2 px for tabs and icon buttons). On pink-filled surfaces the outline is white.
 
 ### 3.3 Tooltips
