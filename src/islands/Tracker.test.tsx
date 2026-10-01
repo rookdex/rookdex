@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, screen, waitFor } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
 import { wireTooltips } from "../scripts/tooltip"
@@ -114,4 +114,33 @@ describe("Tracker accessibility", () => {
 		const { container } = await ready()
 		expect(await axe(container)).toHaveNoViolations()
 	})
+})
+
+describe("Arriving from the Sources page (feedback spec §4)", () => {
+	const scroll = vi.fn()
+	beforeEach(() => {
+		scroll.mockClear()
+		Element.prototype.scrollIntoView = scroll
+	})
+
+	it("waits for the store, then focuses the checkbox once, even with a slash in the id", async () => {
+		window.history.replaceState(null, "", "/en/tracker/#item-wildlife/pelican")
+		render(<Tracker locale="en" />)
+		const box = await screen.findByRole("checkbox", { name: "Pelican" })
+		await waitFor(() => expect(document.activeElement).toBe(box))
+		expect(box).toBeEnabled()
+		expect(scroll).toHaveBeenCalledOnce()
+		expect(scroll).toHaveBeenCalledWith({ block: "center" })
+	})
+
+	it.each(["#item-wildlife/dodo", "#item-%", "#nothing"])(
+		"does nothing for %j and the tracker stays mounted",
+		async (hash) => {
+			window.history.replaceState(null, "", `/en/tracker/${hash}`)
+			await ready()
+			expect(document.activeElement).toBe(document.body)
+			expect(scroll).not.toHaveBeenCalled()
+			expect(screen.getByRole("checkbox", { name: "Pelican" })).toBeInTheDocument()
+		}
+	)
 })

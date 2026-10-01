@@ -1,4 +1,4 @@
-import { type ChangeEvent, useRef, useState } from "react"
+import { type ChangeEvent, useEffect, useRef, useState } from "react"
 import { fill, type Locale, t } from "../i18n"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { categoryIds, seedItems } from "../model/seed"
@@ -9,6 +9,7 @@ import { HINT_SEEN_KEY, readFlag, writeFlag } from "./seenFlag"
 import { CategoryNav } from "./tracker/CategoryNav"
 import { DeleteDialog } from "./tracker/DeleteDialog"
 import { DeletedDialog } from "./tracker/DeletedDialog"
+import { hashTarget } from "./tracker/hash"
 import { ImportDialog } from "./tracker/ImportDialog"
 import { ItemList } from "./tracker/ItemList"
 import { NameDialog } from "./tracker/NameDialog"
@@ -55,6 +56,23 @@ export function Tracker({ locale }: Props) {
 	const fileInput = useRef<HTMLInputElement>(null)
 	const current = state.profiles.find((p) => p.id === state.profileId)
 	const currentName = current?.name ?? ""
+
+	// Arriving from a Sources page back link (feedback spec §4): once, when the store is ready and
+	// the checkboxes can take focus. Nothing here may throw into React: an uncaught error would
+	// unmount the whole Tracker, and the hash survives a reload.
+	const arrived = useRef(false)
+	useEffect(() => {
+		if (state.status !== "ready" || arrived.current) return
+		arrived.current = true
+		try {
+			const box = hashTarget(window.location.hash, document)
+			if (!box) return
+			box.focus({ preventScroll: true })
+			box.scrollIntoView({ block: "center" })
+		} catch {
+			// A browser without scrollIntoView options still got the focus.
+		}
+	}, [state.status])
 
 	function openDialog(kind: "new" | "rename" | "delete" | "deleted") {
 		setOpening((n) => n + 1)
