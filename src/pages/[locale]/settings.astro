@@ -118,9 +118,11 @@ const sha = process.env.GITHUB_SHA
 						sha ? (
 							<>
 								{pkg.version} ·{" "}
-								<ExternalLink href={commitUrl(sha)} locale={locale as Locale}>
-									{sha.slice(0, 7)}
-								</ExternalLink>
+								<span data-build-stamp>
+									<ExternalLink href={commitUrl(sha)} locale={locale as Locale}>
+										{sha.slice(0, 7)}
+									</ExternalLink>
+								</span>
 							</>
 						) : (
 							appVersion(pkg.version, sha)

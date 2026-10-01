@@ -134,6 +134,44 @@ describe("computeVersion", () => {
 	})
 })
 
+describe("computeVersion and build stamps", () => {
+	async function version(html: string, asset = "body{}") {
+		const root = await mkdtemp(join(tmpdir(), "rookdex-"))
+		await mkdir(join(root, "en"))
+		await mkdir(join(root, "_astro"))
+		await writeFile(join(root, "en/index.html"), html)
+		await writeFile(join(root, "_astro/app.js"), asset)
+		return computeVersion(root, ["en/index.html", "_astro/app.js"])
+	}
+	const page = (stamped: string, outside = "static") =>
+		`<html><body><p>${outside}</p><div data-build-stamp>${stamped}</div></body></html>`
+
+	it("gives the same version when HTML differs only inside a build stamp", async () => {
+		const a = await version(page('<astro-island props="12:00:01"><b>12:00:01</b></astro-island>'))
+		const b = await version(page('<astro-island props="12:00:09"><b>12:00:09</b></astro-island>'))
+		expect(a).toBe(b)
+	})
+
+	it("changes the version when HTML differs outside every build stamp", async () => {
+		expect(await version(page("x", "one"))).not.toBe(await version(page("x", "two")))
+	})
+
+	it("changes the version when the stamp element itself is added, removed or renamed", async () => {
+		const stamped = await version(page("x"))
+		const bare = await version("<html><body><p>static</p><div>x</div></body></html>")
+		expect(stamped).not.toBe(bare)
+	})
+
+	it("still hashes a non-HTML file byte for byte", async () => {
+		expect(await version(page("x"), "a")).not.toBe(await version(page("x"), "b"))
+		// Stamp markup in a non-HTML file is just bytes, so it is not emptied.
+		const withStamp = (id: string) => `<div data-build-stamp>${id}</div>`
+		expect(await version(page("x"), withStamp("1"))).not.toBe(
+			await version(page("x"), withStamp("2"))
+		)
+	})
+})
+
 describe("fillWorker", () => {
 	it("fills both placeholders", () => {
 		const out = fillWorker('const VERSION = "__VERSION__"\nconst PRECACHE = "__PRECACHE__"', "v1", [

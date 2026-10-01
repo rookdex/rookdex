@@ -5,6 +5,7 @@ import { createHash } from "node:crypto"
 import { readdir, readFile, writeFile } from "node:fs/promises"
 import { join, relative, sep } from "node:path"
 import { fileURLToPath } from "node:url"
+import { JSDOM } from "jsdom"
 
 const SKIP = new Set([
 	"404.html",
@@ -58,13 +59,28 @@ export function fillWorker(template, version, urls) {
 		.replace('"__PRECACHE__"', JSON.stringify(urls))
 }
 
-/** A 12-character hash of every precached file's path and content. `_headers` is not precached,
+/**
+ * The HTML with every `[data-build-stamp]` element emptied. A stamp marks something that changes
+ * on every build without a real change (the countdown's server-rendered time, the commit link).
+ * Only the hash input is normalised; the page written to dist/ keeps its content.
+ */
+export function withoutBuildStamps(html) {
+	const dom = new JSDOM(html)
+	for (const stamp of dom.window.document.querySelectorAll("[data-build-stamp]")) {
+		stamp.replaceChildren()
+	}
+	return dom.serialize()
+}
+
+/** A 12-character hash of every precached file's path and content. HTML is hashed with its build
+ *  stamps emptied, so an identical build gives an identical version. `_headers` is not precached,
  *  so the version line written into it never changes the version. */
 export async function computeVersion(root, files) {
 	const hash = createHash("sha256")
 	for (const file of files.filter(shouldPrecache)) {
 		hash.update(file)
-		hash.update(await readFile(join(root, file)))
+		const bytes = await readFile(join(root, file))
+		hash.update(file.endsWith(".html") ? withoutBuildStamps(bytes.toString("utf8")) : bytes)
 	}
 	return hash.digest("hex").slice(0, 12)
 }

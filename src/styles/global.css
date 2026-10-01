@@ -715,6 +715,11 @@ p {
 	gap: var(--space-4);
 }
 
+/* Marks build-volatile markup for the version hash. It must not change layout. */
+.build-stamp {
+	display: contents;
+}
+
 .hub-state {
 	padding: var(--space-4);
 	border: 1px solid var(--border);
