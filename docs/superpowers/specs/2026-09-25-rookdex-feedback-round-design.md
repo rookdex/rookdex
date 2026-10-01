@@ -173,12 +173,14 @@ The link to the other language fills its row (`flex: 1`, stretched to the row's 
 
 Both `src/content/guides/{en,no}/before-you-start.md`. The copy summarises in my own words and never copies Rockstar's or the store's lists. Facts verified on 2026-09-24 against the Rockstar Newswire pre-order article and the PlayStation Store page (concept 10000730). Re-check both on the day the content is written, and bump `updated`.
 
+Rule (2026-10-01): the guide states only what a store or Rockstar page confirms. Unconfirmed lines are cut, not hedged.
+
 Sections, in order:
 
 1. **The date,** unchanged.
-2. **Editions (new):** Standard 949 kr, Ultimate 1 189 kr. An Ultimate Upgrade can be bought later.
-3. **Pre-order bonus (new):** pre-ordering or buying before 20 November gives the Vintage Vice City Pack (a car with a garage, outfits, a weapon pattern).
-4. **GTA+ (new):** a digital pre-order includes one month of GTA+. On PlayStation it renews automatically until it is cancelled, and must be redeemed by 31 March 2027. GTA+ perks apply to GTA Online and the games library, not GTA VI's single-player. A plain warning: cancel before it renews if you don't want to pay. No buying advice.
+2. **Editions (new):** Standard 949 kr, Ultimate 1 189 kr. Ultimate is the game plus the Ultimate Edition Upgrade, with contents as the store lists them.
+3. **Pre-order bonus (new):** pre-ordering or buying before 20 November gives the Vintage Vice City Pack.
+4. **GTA+ (new):** a digital pre-order includes one month of GTA+. On PlayStation it renews automatically until it is cancelled, and must be redeemed by 31 March 2027. A plain warning: cancel before it renews if you don't want to pay. No buying advice.
 5. **Preload,** plus: a physical box contains a download code and is sold from 12 November. This replaces the wrong "check that they ship for release day" line.
 6. **Buying in Norway,** plus: the PlayStation Store charges at pre-order.
 7. **What Rookdex does on launch night:** "install the site" links to `/{locale}/settings/#about`; "the home page" links to `/{locale}/`.
