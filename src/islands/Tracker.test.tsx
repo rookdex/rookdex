@@ -148,6 +148,24 @@ describe("Arriving from the Sources page (feedback spec §4)", () => {
 		}
 	})
 
+	it("marks the card you land on, and unmarks it when the checkbox loses focus", async () => {
+		window.history.replaceState(null, "", "/en/tracker/#item-wildlife/pelican")
+		render(<Tracker locale="en" />)
+		const box = await screen.findByRole("checkbox", { name: "Pelican" })
+		await waitFor(() => expect(document.activeElement).toBe(box))
+		const card = box.closest(".item")
+		expect(card).toHaveAttribute("data-arrived")
+		expect(document.querySelectorAll("[data-arrived]")).toHaveLength(1)
+		box.blur()
+		expect(card).not.toHaveAttribute("data-arrived")
+	})
+
+	it("marks no card when the hash names nothing", async () => {
+		window.history.replaceState(null, "", "/en/tracker/#nothing")
+		await ready()
+		expect(document.querySelector("[data-arrived]")).toBeNull()
+	})
+
 	it.each(["#item-wildlife/dodo", "#item-%", "#nothing"])(
 		"does nothing for %j and the tracker stays mounted",
 		async (hash) => {

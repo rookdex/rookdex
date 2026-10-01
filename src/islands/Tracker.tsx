@@ -59,8 +59,9 @@ export function Tracker({ locale }: Props) {
 
 	// Arriving from a Sources page back link (feedback spec §4): once, when the store is ready and
 	// the checkboxes can take focus. focusVisible is passed because a focus right after a page load
-	// counts as non-keyboard focus, so the ring would not draw. Nothing here may throw into React:
-	// an uncaught error would unmount the whole Tracker, and the hash survives a reload.
+	// counts as non-keyboard focus, so the ring would not draw. Chromium ignores focusVisible, so
+	// the card is marked and styled while the checkbox keeps that focus. Nothing here may throw
+	// into React: an uncaught error would unmount the whole Tracker, and the hash survives a reload.
 	const arrived = useRef(false)
 	useEffect(() => {
 		if (state.status !== "ready" || arrived.current) return
@@ -68,6 +69,11 @@ export function Tracker({ locale }: Props) {
 		try {
 			const box = hashTarget(window.location.hash, document)
 			if (!box) return
+			const card = box.closest(".item")
+			if (card) {
+				card.setAttribute("data-arrived", "")
+				box.addEventListener("blur", () => card.removeAttribute("data-arrived"), { once: true })
+			}
 			box.focus({ preventScroll: true, focusVisible: true })
 			box.scrollIntoView({ block: "center" })
 		} catch {

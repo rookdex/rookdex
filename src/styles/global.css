@@ -1140,7 +1140,10 @@ p {
 	background: color-mix(in srgb, var(--link) 12%, transparent);
 }
 
-.item:has(input:focus-visible) {
+/* data-arrived marks the card you land on from a Sources back link: Chromium does not report
+   :focus-visible after a page load, so :focus is enough there and ends when focus leaves. */
+.item:has(input:focus-visible),
+.item[data-arrived]:has(input:focus) {
 	outline: 2px solid var(--accent);
 	outline-offset: 2px;
 	background: var(--bg-hover);
