@@ -43,14 +43,14 @@ export const no: Strings = {
 	},
 	footer: {
 		disclaimer:
-			"Rookdex er et uoffisielt fanprosjekt. Det er ikke tilknyttet eller godkjent av Rockstar Games eller Take-Two Interactive. Alle varemerker tilhører sine eiere.",
-		source: "GitHub",
-		legalLabel: "Fjerning og juridisk",
-		codeLicenceLabel: "Kodelisens",
-		codeLicence: "MIT",
-		guideLicenceLabel: "Guidelisens",
-		guideLicence: "CC BY-SA 4.0",
-		sourceLabel: "Kildekode",
+			"Uoffisielt fanprosjekt. Ikke tilknyttet eller godkjent av Rockstar Games eller Take-Two Interactive.",
+		github: "Kildekode på GitHub",
+		legal: "Fjerning og juridisk: e-post",
+		about: "Om og lisenser",
+		launchDate: "19 Nov 2026",
+		daysToLaunch: "{n} dager til lansering",
+		oneDayToLaunch: "{n} dag til lansering",
+		outNow: "Ute nå",
 	},
 	notFound: {
 		title: "Siden finnes ikke",

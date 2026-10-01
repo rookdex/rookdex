@@ -33,4 +33,6 @@ The Rookdex name, mark and banner are not under the MIT licence (`LICENSE` names
 
 Code is MIT (see `LICENSE`; the brand files listed there are excluded). Guide text under `src/content/` is CC BY-SA 4.0.
 
+The GitHub mark in the footer comes from Octicons (MIT, © GitHub Inc.) and is used under GitHub's logo guidelines to link to this repository.
+
 Design spec and plans live in `docs/superpowers/`.

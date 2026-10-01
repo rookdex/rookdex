@@ -268,50 +268,123 @@ p {
 	font-size: 1.125rem;
 }
 
+/* The footer "HUD strip" (feedback spec §6). Phone: icons and © share the first row, the chip
+   takes the second (the approved mockup, measured 169 px at 320). From 768 px: one centre line. */
 .site-footer {
-	padding: var(--space-4) var(--space-3);
+	padding: 12px var(--space-3) var(--space-3);
 	border-top: 1px solid var(--border);
 	background: var(--bg-raised);
 	color: var(--text-muted);
-	font-size: 0.875rem;
-}
-
-.site-footer p {
-	max-width: none;
-}
-
-/* A hairline under the disclaimer, then pairs: 2 × 2 on a phone, four across from about 720 px. */
-.footer-pairs {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-	gap: var(--space-3) var(--space-4);
-	margin: 0;
-	padding-top: var(--space-3);
-	border-top: 1px solid var(--border);
-}
-
-.footer-pairs dt {
-	color: var(--text-muted);
 	font-size: 0.75rem;
-	font-weight: 500;
 }
 
-/* Flex and a fixed minimum put link and text values on one baseline (measured 0.9 px off without). */
-.footer-pairs dd {
-	display: flex;
+.footer-disclaimer {
+	max-width: none;
+	margin: 0 0 var(--space-2);
+}
+
+.footer-strip {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	grid-template-areas:
+		"icons copy"
+		"chip chip";
 	align-items: center;
-	min-height: 1.25rem;
-	margin: 0;
-	color: var(--text);
-	font-size: 0.8125rem;
+	gap: var(--space-2) var(--space-3);
 }
 
-/* 44 px tap area; the negative margins keep it from stretching the row. */
-.footer-pairs a {
+/* The icons sit at the left edge on a phone, so their tips open to the right. */
+.footer-icons .tip {
+	left: 0;
+	transform: none;
+}
+
+.footer-icons {
+	grid-area: icons;
+	display: flex;
+	gap: var(--space-1);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.icon-link {
+	display: inline-grid;
+	place-items: center;
+	width: var(--tap);
+	height: var(--tap);
+	border-radius: var(--radius);
+	color: var(--text-muted);
+	text-decoration: none;
+}
+
+.icon-link svg {
+	width: 22px;
+	height: 22px;
+}
+
+.status-chip {
+	grid-area: chip;
+	justify-self: start;
 	display: inline-flex;
 	align-items: center;
+	gap: var(--space-2);
 	min-height: var(--tap);
-	margin-block: -12px;
+	padding: 0 14px;
+	border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+	border-radius: 999px;
+	color: var(--text);
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-decoration: none;
+	text-transform: uppercase;
+	transition: background-color 120ms;
+}
+
+@media (hover: hover) {
+	.status-chip:hover {
+		background: var(--bg-hover);
+	}
+}
+
+.status-chip:active,
+.status-chip:focus-visible {
+	background: var(--bg-hover);
+}
+
+.status-dot {
+	flex: none;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--accent);
+	box-shadow: 0 0 10px var(--accent);
+	animation: status-pulse 2s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+	50% {
+		opacity: 0.35;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.status-dot {
+		animation: none;
+		box-shadow: none;
+	}
+}
+
+.footer-copy {
+	grid-area: copy;
+	margin: 0;
+	font-family: var(--font-display);
+	font-size: 1rem;
+	font-weight: 400;
+	letter-spacing: 0.14em;
+	line-height: 1;
+	text-transform: uppercase;
 }
 
 /* Navigation */
@@ -1193,6 +1266,26 @@ p {
 		padding-inline: var(--space-4);
 	}
 
+	/* From 768 px, icons, chip and © share one centre line (spec §6). */
+	.site-footer {
+		padding-top: var(--space-3);
+	}
+
+	.footer-disclaimer {
+		text-align: center;
+	}
+
+	.footer-strip {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.footer-icons .tip {
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
 	.unit .value {
 		font-size: 3rem;
 	}
@@ -1263,5 +1356,23 @@ p {
 
 	.stats-grid {
 		grid-template-columns: 1fr;
+	}
+
+	/* One row: the disclaimer takes the free space, the strip sits at the right. */
+	.site-footer {
+		display: flex;
+		align-items: center;
+		gap: var(--space-4);
+		padding-block: var(--space-3);
+	}
+
+	.footer-disclaimer {
+		flex: 1;
+		margin: 0;
+		text-align: left;
+	}
+
+	.footer-strip {
+		flex-wrap: nowrap;
 	}
 }

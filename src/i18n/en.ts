@@ -41,14 +41,15 @@ export const en = {
 	},
 	footer: {
 		disclaimer:
-			"Rookdex is an unofficial fan project. It is not affiliated with or endorsed by Rockstar Games or Take-Two Interactive. All trademarks belong to their owners.",
-		source: "GitHub",
-		legalLabel: "Takedown and legal",
-		codeLicenceLabel: "Code licence",
-		codeLicence: "MIT",
-		guideLicenceLabel: "Guide licence",
-		guideLicence: "CC BY-SA 4.0",
-		sourceLabel: "Source code",
+			"Unofficial fan project. Not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.",
+		github: "Source code on GitHub",
+		legal: "Takedown and legal: email",
+		about: "About and licences",
+		// Set in capitals by CSS, so screen readers read words (feedback spec §6).
+		launchDate: "19 Nov 2026",
+		daysToLaunch: "{n} days to launch",
+		oneDayToLaunch: "{n} day to launch",
+		outNow: "Out now",
 	},
 	notFound: {
 		title: "Page not found",
