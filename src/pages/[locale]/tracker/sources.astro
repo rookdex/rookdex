@@ -1,0 +1,189 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n"
+import ExternalLink from "../../../components/ExternalLink.astro"
+import { isLocale, type Locale, locales, t } from "../../../i18n"
+import Base from "../../../layouts/Base.astro"
+import { outletOf } from "../../../model/outlet"
+import { categoryIds, groupItems, seedItems } from "../../../model/seed"
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale }, props: {} }))
+}
+
+// Where every tracker item comes from (feedback spec §5). Built from the seed, zero JavaScript.
+// Categories and entries follow the tracker's order; retired items are left out, as there.
+const { locale } = Astro.params
+if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
+const s = t(locale as Locale)
+const live = seedItems.filter((item) => !item.retired)
+const sections = categoryIds(live).map((category) => ({
+	category,
+	label: s.category[category] ?? category,
+	items: [...groupItems(live.filter((item) => item.category === category)).values()].flat(),
+}))
+const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
+---
+
+<Base locale={locale} title={s.seo.titles.sources} description={s.sources.lede} path="tracker/sources">
+	<h1>{s.sources.title}</h1>
+	<p class="lede">{s.sources.lede}</p>
+	<nav aria-label={s.tracker.categories}>
+		<ul class="source-chips">
+			{
+				sections.map((section) => (
+					<li>
+						<a href={`#cat-${section.category}`}>
+							{section.label}
+							<span class="count">{section.items.length}</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</nav>
+	{
+		sections.map((section) => (
+			<section class="source-section" aria-labelledby={`cat-${section.category}`}>
+				<h2 id={`cat-${section.category}`}>{section.label}</h2>
+				{section.items.map((item) => (
+					<article id={item.id} class="source-entry">
+						<h3>{item.name}</h3>
+						<ul class="tap-links">
+							{item.sources.map((source) => (
+								<li>
+									<ExternalLink href={source.url} locale={locale as Locale}>
+										{source.title}
+									</ExternalLink>
+									<span class="outlet">{outletOf(source.url)}</span>
+								</li>
+							))}
+						</ul>
+						<a class="back" href={`${tracker}#item-${item.id}`}>
+							{s.sources.back}<span class="visually-hidden">: {item.name}</span>
+						</a>
+					</article>
+				))}
+			</section>
+		))
+	}
+</Base>
+
+<style>
+	h1 {
+		font-size: 1.75rem;
+		font-weight: 700;
+		margin-bottom: var(--space-1);
+	}
+
+	.lede {
+		color: var(--text-muted);
+		font-size: 0.875rem;
+		line-height: 1.5;
+	}
+
+	.source-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+		margin: 0 0 var(--space-4);
+		padding: 0;
+		list-style: none;
+	}
+
+	.source-chips a {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		min-height: var(--tap);
+		padding: 0 var(--space-3);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		background: var(--bg-raised);
+		color: var(--text);
+		font-size: 0.9375rem;
+		text-decoration: none;
+		transition: background-color 120ms, border-color 120ms;
+	}
+
+	@media (hover: hover) {
+		.source-chips a:hover {
+			background: var(--bg-hover);
+			border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+		}
+	}
+
+	@media (hover: none) {
+		.source-chips a:active {
+			background: var(--bg-hover);
+		}
+	}
+
+	.source-chips a:focus-visible {
+		background: var(--bg-hover);
+	}
+
+	.count {
+		color: var(--text-muted);
+		font-size: 0.75rem;
+	}
+
+	.source-section {
+		display: grid;
+		gap: 12px;
+		margin-bottom: var(--space-5);
+	}
+
+	.source-section h2 {
+		margin-bottom: 0;
+		font-size: 1.25rem;
+	}
+
+	.source-entry {
+		padding: 12px 12px 12px 16px;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg-raised);
+	}
+
+	/* The entry a book icon pointed at. */
+	.source-entry:target {
+		border-color: var(--link);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.source-entry:target {
+			box-shadow: 0 0 16px color-mix(in srgb, var(--link) 20%, transparent);
+		}
+	}
+
+	.source-entry h3 {
+		margin: 0 0 var(--space-1);
+		font-size: 0.9375rem;
+		font-weight: 600;
+	}
+
+	.source-entry ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	/* The 44 px target is the link itself (the global .tap-links utility), not the row. */
+	.source-entry li {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.outlet {
+		color: var(--text-muted);
+		font-size: 0.75rem;
+	}
+
+	.back {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tap);
+		color: var(--text-muted);
+		font-size: 0.8125rem;
+	}
+</style>

@@ -1,9 +1,10 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n"
 import pkg from "../../../package.json"
+import ExternalLink from "../../components/ExternalLink.astro"
 import { isLocale, type Locale, locales, t } from "../../i18n"
 import Base from "../../layouts/Base.astro"
-import { appVersion } from "../../model/version"
+import { appVersion, commitUrl } from "../../model/version"
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale }, props: {} }))
@@ -14,7 +15,8 @@ export function getStaticPaths() {
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const s = t(locale as Locale)
-const version = appVersion(pkg.version, process.env.GITHUB_SHA)
+// Read at render, so tests can stub it. A local build has no sha and shows "dev".
+const sha = process.env.GITHUB_SHA
 ---
 
 <Base locale={locale} title={s.seo.titles.settings} description={s.settings.description} path="settings">
@@ -25,13 +27,13 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 		<ul class="rows">
 			{
 				locales.map((l) => (
-					<li class="row">
+					<li class={l === locale ? "row" : "row row-has-link"}>
 						{l === locale ? (
 							<span aria-current="page" lang={l}>
 								{s.languageNames[l]}
 							</span>
 						) : (
-							<a href={getRelativeLocaleUrl(l, "settings")} hreflang={l} lang={l}>
+							<a href={getRelativeLocaleUrl(l, "settings")} hreflang={l} lang={l} class="row-link">
 								{s.languageNames[l]}
 							</a>
 						)}
@@ -86,6 +88,7 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 			>
 				<h2 id="delete-all-title" tabindex="-1">{s.settings.dialogTitle}</h2>
 				<p>{s.settings.dangerBody}</p>
+				<p>{s.settings.keepsChoices}</p>
 				<p class="tracker-alert" role="alert" data-delete-alert></p>
 				<div class="actions">
 					<button type="button" data-delete-cancel>{s.settings.cancel}</button>
@@ -95,8 +98,8 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 		</div>
 	</section>
 
-	<section class="settings-group" aria-labelledby="settings-app">
-		<h2 id="settings-app">{s.settings.app}</h2>
+	<section id="about" class="settings-group" aria-labelledby="settings-about">
+		<h2 id="settings-about">{s.settings.about}</h2>
 		<dl class="rows">
 			<div class="row" data-install-row hidden>
 				<dt>{s.settings.install}</dt>
@@ -110,13 +113,52 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 			</div>
 			<div class="row">
 				<dt>{s.settings.version}</dt>
-				<dd>{version}</dd>
+				<dd>
+					{
+						sha ? (
+							<>
+								{pkg.version} ·{" "}
+								<span data-build-stamp>
+									<ExternalLink href={commitUrl(sha)} locale={locale as Locale}>
+										{sha.slice(0, 7)}
+									</ExternalLink>
+								</span>
+							</>
+						) : (
+							appVersion(pkg.version, sha)
+						)
+					}
+				</dd>
 			</div>
 			<div class="row">
 				<dt>{s.settings.source}</dt>
-				<dd><a href="https://github.com/rookdex/rookdex">{s.settings.sourceLink}</a></dd>
+				<dd>
+					<ExternalLink href="https://github.com/rookdex/rookdex" locale={locale as Locale}>
+						{s.settings.sourceLink}
+					</ExternalLink>
+				</dd>
+			</div>
+			<div class="row">
+				<dt>{s.settings.codeLicence}</dt>
+				<dd>MIT</dd>
+			</div>
+			<div class="row">
+				<dt>{s.settings.guideLicence}</dt>
+				<dd>
+					<ExternalLink
+						href="https://creativecommons.org/licenses/by-sa/4.0/"
+						locale={locale as Locale}
+					>
+						CC BY-SA 4.0
+					</ExternalLink>
+				</dd>
+			</div>
+			<div class="row">
+				<dt>{s.settings.legal}</dt>
+				<dd><a href="mailto:legal@rookdex.app">legal@rookdex.app</a></dd>
 			</div>
 		</dl>
+		<p class="note">{s.settings.trademarks}</p>
 	</section>
 </Base>
 
@@ -133,14 +175,6 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 		}
 	}
 
-	function flags(): Storage | undefined {
-		try {
-			return window.localStorage
-		} catch {
-			return undefined
-		}
-	}
-
 	const storageRow = document.querySelector<HTMLElement>("[data-storage-row]")
 	if (storageRow) wireStorageRow(storageRow, navigator.storage)
 
@@ -149,7 +183,7 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 
 	const danger = document.querySelector<HTMLElement>("[data-delete]")
 	if (danger) {
-		wireDeleteDialog(danger, (onBlocked) => deleteAllData(database(), flags(), onBlocked))
+		wireDeleteDialog(danger, (onBlocked) => deleteAllData(database(), onBlocked))
 	}
 </script>
 
@@ -201,7 +235,7 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 		text-align: right;
 	}
 
-	.row a,
+	.row :global(a),
 	.row-button {
 		display: inline-flex;
 		align-items: center;
@@ -256,5 +290,75 @@ const version = appVersion(pkg.version, process.env.GITHUB_SHA)
 
 	.delete-status {
 		margin: var(--space-2) 0 0;
+	}
+
+	/* Hover and focus lift (feedback spec §3.2). Here, not in global.css: these scoped rules load
+	   after it and win every tie. */
+	.row-button,
+	.danger-button {
+		transition:
+			background-color 120ms,
+			color 120ms;
+	}
+
+	@media (hover: hover) {
+		.row-button:hover,
+		.danger-button:not(:disabled):hover {
+			background: var(--bg-hover);
+		}
+	}
+
+	@media (hover: none) {
+		.row-button:active,
+		.danger-button:not(:disabled):active {
+			background: var(--bg-hover);
+		}
+	}
+
+	.row-button:focus-visible,
+	.danger-button:not(:disabled):focus-visible {
+		background: var(--bg-hover);
+	}
+
+	/* The other language's link fills its row, so the whole row switches (feedback spec §7.2). */
+	.row-has-link {
+		padding: 0;
+	}
+
+	/* Clips the link's fill to the list's rounded corners, so the separator stays straight. */
+	.rows:has(.row-link) {
+		overflow: hidden;
+	}
+
+	.row-link {
+		flex: 1;
+		align-self: stretch;
+		display: flex;
+		align-items: center;
+		padding: 0 14px;
+		outline-offset: -2px;
+		transition: background-color 120ms;
+	}
+
+	@media (hover: hover) {
+		.row-link:hover {
+			background: var(--bg-hover);
+		}
+	}
+
+	@media (hover: none) {
+		.row-link:active {
+			background: var(--bg-hover);
+		}
+	}
+
+	.row-link:focus-visible {
+		background: var(--bg-hover);
+	}
+
+	.note {
+		margin: var(--space-2) 0 0;
+		color: var(--text-muted);
+		font-size: 0.8125rem;
 	}
 </style>

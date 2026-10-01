@@ -5,8 +5,9 @@ licence below. That is these files: public/icon.svg,
 assets/favicon-source.svg, src/components/Mark.astro, docs/brand/og.html,
 public/og.png and the generated icons (public/pwa-*.png,
 public/maskable-icon-512x512.png, public/apple-touch-icon-180x180.png,
-public/favicon.ico). Everything else in this repository is under the MIT
-License that follows.
+public/favicon.ico). Guide text under src/content/ is licensed under CC BY-SA
+4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Everything else in this
+repository is under the MIT License that follows.
 
 MIT License
 

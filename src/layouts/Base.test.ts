@@ -15,6 +15,14 @@ function page(
 }
 
 describe("main navigation (spec §5, §12)", () => {
+	it("keeps the Tracker tab lit on its Sources page, without claiming to be that page", async () => {
+		const doc = await page("tracker/sources")
+		const lit = doc.querySelectorAll('nav[aria-label="Main"] [aria-current]')
+		expect(lit).toHaveLength(1)
+		expect(lit[0].textContent?.trim()).toBe("Tracker")
+		expect(lit[0].getAttribute("aria-current")).toBe("true")
+	})
+
 	it("puts one Main nav between the header and main", async () => {
 		const doc = await page("")
 		expect(doc.querySelectorAll('nav[aria-label="Main"]')).toHaveLength(1)
@@ -150,5 +158,21 @@ describe("link previews and indexing (SEO spec §4.4)", () => {
 		})
 		const tracker = await page("tracker", { locale })
 		expect(tracker.querySelector('script[type="application/ld+json"]')).toBeNull()
+	})
+})
+
+describe("update notice markup (feedback spec §10.3)", () => {
+	it("ships the card hidden and the live region outside it, empty", async () => {
+		const doc = await page("", { locale: "no" })
+		const card = doc.querySelector<HTMLElement>("[data-update-notice]")
+		expect(card?.hasAttribute("hidden")).toBe(true)
+		expect(card?.dataset.text).toBe("En ny versjon er klar")
+		expect([...(card?.querySelectorAll("button") ?? [])].map((b) => b.textContent?.trim())).toEqual(
+			["Oppdater", "Senere"]
+		)
+		const live = doc.querySelector('[data-update-status][role="status"]')
+		expect(live?.textContent).toBe("")
+		expect(live?.closest("[data-update-notice]")).toBeNull()
+		expect(live?.classList.contains("visually-hidden")).toBe(true)
 	})
 })

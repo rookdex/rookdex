@@ -4,6 +4,7 @@ export const en = {
 	siteName: "Rookdex",
 	tagline: "A launch-night companion for GTA VI. Track what you find, see what is confirmed.",
 	skipToContent: "Skip to content",
+	newTab: "opens in a new tab",
 	nav: {
 		label: "Main",
 		home: "Home",
@@ -40,14 +41,15 @@ export const en = {
 	},
 	footer: {
 		disclaimer:
-			"Rookdex is an unofficial fan project. It is not affiliated with or endorsed by Rockstar Games or Take-Two Interactive. All trademarks belong to their owners.",
-		source: "GitHub",
-		legalLabel: "Takedown and legal",
-		codeLicenceLabel: "Code licence",
-		codeLicence: "MIT",
-		guideLicenceLabel: "Guide licence",
-		guideLicence: "CC BY-SA 4.0",
-		sourceLabel: "Source code",
+			"Unofficial fan project. Not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.",
+		github: "Source code on GitHub",
+		legal: "Takedown and legal: email",
+		about: "About and licences",
+		// Set in capitals by CSS, so screen readers read words (feedback spec §6).
+		launchDate: "19 Nov 2026",
+		daysToLaunch: "{n} days to launch",
+		oneDayToLaunch: "{n} day to launch",
+		outNow: "Out now",
 	},
 	notFound: {
 		title: "Page not found",
@@ -62,6 +64,7 @@ export const en = {
 	offline: {
 		notice: "Offline, showing saved data",
 	},
+	update: { ready: "A new version is ready", reload: "Reload", later: "Later" },
 	// Category and group labels are keyed by seed id. The seed test checks every id has a label
 	// in both languages, so the type stays open.
 	category: {
@@ -108,8 +111,7 @@ export const en = {
 		confirmed: "Confirmed",
 		expectedFrom: "Expected, as in {precedent}",
 		sources: "Sources",
-		report: "Report",
-		reportSoon: "Reporting a wrong item comes in the next release",
+		reportSoon: "Report: coming soon",
 		persistHint:
 			"This browser may clear saved progress after a week without a visit. Install Rookdex or export your profile to keep it safe.",
 		dismiss: "Got it",
@@ -161,12 +163,17 @@ export const en = {
 		description:
 			"News about GTA VI, including what the press reports that Rockstar has not confirmed.",
 	},
+	sources: {
+		title: "Sources",
+		lede: "Where every item in the tracker comes from.",
+		back: "Back to the item in the tracker",
+	},
 	settings: {
 		title: "Settings",
 		description: "Language, the data Rookdex keeps on this device, and app details.",
 		language: "Language",
 		data: "Your data",
-		app: "App",
+		about: "About",
 		stored: "Stored",
 		storedValue: "In this browser only",
 		persisted: "Protected from clearing",
@@ -190,6 +197,11 @@ export const en = {
 		version: "Version",
 		source: "Source code",
 		sourceLink: "GitHub",
+		legal: "Takedown and legal",
+		codeLicence: "Code licence",
+		guideLicence: "Guide licence",
+		trademarks: "All trademarks belong to their owners.",
+		keepsChoices: "Your choices about the install prompt and hints stay, so they do not return.",
 	},
 	seo: {
 		// Full <title> texts. Visible headings keep their own keys; these are what search shows.
@@ -197,6 +209,7 @@ export const en = {
 			home: "Rookdex: GTA 6 countdown, tracker and launch guide",
 			tracker: "GTA 6 collectibles and wildlife tracker · Rookdex",
 			news: "GTA 6 news and rumours · Rookdex",
+			sources: "Sources for the GTA 6 tracker · Rookdex",
 			settings: "Settings · Rookdex",
 			notFound: "Page not found · Rookdex",
 		},

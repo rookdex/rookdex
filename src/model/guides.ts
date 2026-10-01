@@ -5,7 +5,8 @@ import { duplicateOutlet } from "./outlet"
 /**
  * Guide frontmatter. One page per outlet: two links showing the same domain to different pages fail
  * WCAG 2.4.4, and one best page per outlet is the better citation anyway (spec §9). Astro names the
- * guide when the build fails.
+ * guide when the build fails. Sources are https only, like the seed's, so no other scheme can reach
+ * a link (feedback spec §9).
  */
 export const guideSchema = z.object({
 	title: z.string(),
@@ -14,7 +15,7 @@ export const guideSchema = z.object({
 	searchTitle: z.string().max(65).optional(),
 	updated: z.coerce.date(),
 	sources: z
-		.array(z.string().url())
+		.array(z.url({ protocol: /^https$/ }))
 		.default([])
 		.superRefine((urls, ctx) => {
 			const outlet = duplicateOutlet(urls)

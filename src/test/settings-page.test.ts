@@ -1,12 +1,11 @@
-import { describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import pkg from "../../package.json"
 import Settings from "../pages/[locale]/settings.astro"
 import { renderDoc } from "./render"
 
-/** Escapes the version for use inside a RegExp, so a dot in "0.1.0" doesn't match any character. */
-const versionPattern = pkg.version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-
 const settings = (locale: "en" | "no") => renderDoc(Settings, { params: { locale } })
+
+afterEach(() => vi.unstubAllEnvs())
 
 describe("Settings page (spec §7)", () => {
 	it("is the Settings tab, with three groups", async () => {
@@ -18,7 +17,7 @@ describe("Settings page (spec §7)", () => {
 		expect([...doc.querySelectorAll("main section > h2")].map((h) => h.textContent)).toEqual([
 			"Language",
 			"Your data",
-			"App",
+			"About",
 		])
 	})
 
@@ -63,16 +62,78 @@ describe("Settings page (spec §7)", () => {
 		expect(status?.closest("dialog")).toBeNull()
 	})
 
-	it("shows the version and links the source", async () => {
+	const rowsOf = (doc: Document) => [...doc.querySelectorAll("#about dl > div")]
+	const label = (row: Element) => row.querySelector("dt")?.textContent
+
+	it("names the About group and gives it the #about anchor, install first", async () => {
 		const doc = await settings("en")
-		const rows = [...doc.querySelectorAll("main dl > div")]
-		const value = (label: string) =>
-			rows.find((row) => row.querySelector("dt")?.textContent === label)?.querySelector("dd")
-		expect(value("Version")?.textContent?.trim()).toMatch(
-			new RegExp(`^${versionPattern} · ([0-9a-f]{7}|dev)$`)
+		const about = doc.getElementById("about")
+		expect(about?.tagName).toBe("SECTION")
+		expect(doc.getElementById(about?.getAttribute("aria-labelledby") ?? "")?.textContent).toBe(
+			"About"
 		)
-		expect(value("Source code")?.querySelector("a")?.getAttribute("href")).toBe(
-			"https://github.com/rookdex/rookdex"
+		expect(rowsOf(doc).map(label)).toEqual([
+			"Install",
+			"Version",
+			"Source code",
+			"Code licence",
+			"Guide licence",
+			"Takedown and legal",
+		])
+		expect(rowsOf(doc)[0].hasAttribute("data-install-row")).toBe(true)
+		expect(about?.querySelector("p.note")?.textContent).toBe(
+			"All trademarks belong to their owners."
+		)
+	})
+
+	it("links the licence, the repository and the legal address", async () => {
+		const doc = await settings("no")
+		const rows = rowsOf(doc)
+		const href = (i: number) => rows[i].querySelector("dd a")?.getAttribute("href")
+		expect(href(2)).toBe("https://github.com/rookdex/rookdex")
+		expect(rows[3].querySelector("dd")?.textContent?.trim()).toBe("MIT")
+		expect(href(4)).toBe("https://creativecommons.org/licenses/by-sa/4.0/")
+		expect(href(5)).toBe("mailto:legal@rookdex.app")
+		expect(rows.map(label).slice(2)).toEqual([
+			"Kildekode",
+			"Kodelisens",
+			"Guidelisens",
+			"Fjerning og juridisk",
+		])
+	})
+
+	it("links the version's commit when the build has a sha", async () => {
+		const sha = "0123456789abcdef0123456789abcdef01234567"
+		vi.stubEnv("GITHUB_SHA", sha)
+		const doc = await settings("en")
+		const dd = rowsOf(doc)[1].querySelector("dd")
+		expect(dd?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+			`${pkg.version} · 0123456 (opens in a new tab)`
+		)
+		expect(dd?.querySelector("a")?.getAttribute("href")).toBe(
+			`https://github.com/rookdex/rookdex/commit/${sha}`
+		)
+	})
+
+	it("keeps a dev build's version as plain text", async () => {
+		vi.stubEnv("GITHUB_SHA", "")
+		const doc = await settings("en")
+		const dd = rowsOf(doc)[1].querySelector("dd")
+		expect(dd?.textContent?.trim()).toBe(`${pkg.version} · dev`)
+		expect(dd?.querySelector("a")).toBeNull()
+	})
+
+	it("lets the other language's link fill its row", async () => {
+		const doc = await settings("en")
+		const link = doc.querySelector('section[aria-labelledby="settings-language"] a')
+		expect(link?.classList.contains("row-link")).toBe(true)
+		expect(link?.closest("li")?.classList.contains("row-has-link")).toBe(true)
+	})
+
+	it("tells people the install and hint choices stay", async () => {
+		const doc = await settings("en")
+		expect(doc.querySelector("dialog")?.textContent).toContain(
+			"Your choices about the install prompt and hints stay, so they do not return."
 		)
 	})
 })

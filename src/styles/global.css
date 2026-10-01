@@ -14,8 +14,9 @@ html {
 	-webkit-text-size-adjust: 100%;
 	/* The phone tab bar's measured two-line height (spec §5), in rem so it follows the text size. */
 	--tabbar-h: 4.25rem;
-	/* Keeps a focused control from scrolling in behind the fixed bar (WCAG 2.4.11). */
-	scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+	/* Keeps a focused control from scrolling in behind the fixed bar (WCAG 2.4.11), plus the update
+	   notice while it shows. */
+	scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--notice-h, 0px));
 }
 
 body {
@@ -23,7 +24,7 @@ body {
 	min-height: 100dvh;
 	display: flex;
 	flex-direction: column;
-	padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+	padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--notice-h, 0px));
 }
 
 img,
@@ -41,6 +42,16 @@ a {
 	color: var(--link);
 	text-decoration: underline;
 	text-underline-offset: 0.15em;
+	text-decoration-thickness: 1px;
+	text-decoration-color: color-mix(in srgb, var(--link) 50%, transparent);
+}
+
+/* The ↗ on external text links (feedback spec §3.1). */
+.ext-icon {
+	width: 0.8em;
+	height: 0.8em;
+	margin-inline-start: 0.2em;
+	vertical-align: -0.05em;
 }
 
 :focus-visible {
@@ -142,10 +153,6 @@ p {
 	cursor: pointer;
 }
 
-.history button:hover:not(:disabled) {
-	background: color-mix(in srgb, var(--text) 9%, var(--bg));
-}
-
 /* Dimmed but kept in place, so the mark never shifts when history runs out. */
 .history button:disabled {
 	opacity: 0.45;
@@ -211,7 +218,7 @@ p {
 
 .lang details[open] > summary {
 	border-color: color-mix(in srgb, var(--text) 24%, var(--bg));
-	background: color-mix(in srgb, var(--text) 9%, var(--bg));
+	background: var(--bg-hover);
 }
 
 .lang-globe,
@@ -248,9 +255,8 @@ p {
 	text-decoration: none;
 }
 
-.lang a:hover,
 .lang a[aria-current="page"] {
-	background: color-mix(in srgb, var(--text) 9%, var(--bg));
+	background: var(--bg-hover);
 }
 
 .lang-check {
@@ -263,50 +269,125 @@ p {
 	font-size: 1.125rem;
 }
 
+/* The footer "HUD strip" (feedback spec §6). Phone: icons and © share the first row, the chip
+   takes the second. The gaps are tightened so the English footer is 169 px at 320 (the Norwegian
+   one is 151 px); copy, type size and the 44 px controls are unchanged. From 768 px the gaps are
+   restored and everything sits on one centre line. */
 .site-footer {
-	padding: var(--space-4) var(--space-3);
+	padding: var(--space-2) var(--space-3) 10px;
 	border-top: 1px solid var(--border);
 	background: var(--bg-raised);
 	color: var(--text-muted);
-	font-size: 0.875rem;
-}
-
-.site-footer p {
-	max-width: none;
-}
-
-/* A hairline under the disclaimer, then pairs: 2 × 2 on a phone, four across from about 720 px. */
-.footer-pairs {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-	gap: var(--space-3) var(--space-4);
-	margin: 0;
-	padding-top: var(--space-3);
-	border-top: 1px solid var(--border);
-}
-
-.footer-pairs dt {
-	color: var(--text-muted);
 	font-size: 0.75rem;
-	font-weight: 500;
 }
 
-/* Flex and a fixed minimum put link and text values on one baseline (measured 0.9 px off without). */
-.footer-pairs dd {
-	display: flex;
+.footer-disclaimer {
+	max-width: none;
+	margin: 0 0 var(--space-1);
+}
+
+.footer-strip {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	grid-template-areas:
+		"icons copy"
+		"chip chip";
 	align-items: center;
-	min-height: 1.25rem;
-	margin: 0;
-	color: var(--text);
-	font-size: 0.8125rem;
+	gap: var(--space-1) var(--space-3);
 }
 
-/* 44 px tap area; the negative margins keep it from stretching the row. */
-.footer-pairs a {
+/* The icons sit at the left edge on a phone, so their tips open to the right. */
+.footer-icons .tip {
+	left: 0;
+	transform: none;
+}
+
+.footer-icons {
+	grid-area: icons;
+	display: flex;
+	gap: var(--space-1);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.icon-link {
+	display: inline-grid;
+	place-items: center;
+	width: var(--tap);
+	height: var(--tap);
+	border-radius: var(--radius);
+	color: var(--text-muted);
+	text-decoration: none;
+}
+
+.icon-link svg {
+	width: 22px;
+	height: 22px;
+}
+
+.status-chip {
+	grid-area: chip;
+	justify-self: start;
 	display: inline-flex;
 	align-items: center;
+	gap: var(--space-2);
 	min-height: var(--tap);
-	margin-block: -12px;
+	padding: 0 14px;
+	border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+	border-radius: 999px;
+	color: var(--text);
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-decoration: none;
+	text-transform: uppercase;
+	transition: background-color 120ms;
+}
+
+@media (hover: hover) {
+	.status-chip:hover {
+		background: var(--bg-hover);
+	}
+}
+
+.status-chip:active,
+.status-chip:focus-visible {
+	background: var(--bg-hover);
+}
+
+.status-dot {
+	flex: none;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--accent);
+	box-shadow: 0 0 10px var(--accent);
+	animation: status-pulse 2s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+	50% {
+		opacity: 0.35;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.status-dot {
+		animation: none;
+		box-shadow: none;
+	}
+}
+
+.footer-copy {
+	grid-area: copy;
+	margin: 0;
+	font-family: var(--font-display);
+	font-size: 1rem;
+	font-weight: 400;
+	letter-spacing: 0.14em;
+	line-height: 1;
+	text-transform: uppercase;
 }
 
 /* Navigation */
@@ -359,15 +440,15 @@ p {
 	flex: none;
 }
 
-.tabbar a[aria-current="page"] {
+.tabbar a[aria-current] {
 	color: var(--text);
 }
 
-.tabbar a[aria-current="page"] .tab-icon {
+.tabbar a[aria-current] .tab-icon {
 	color: var(--accent);
 }
 
-.tabbar a[aria-current="page"]::before {
+.tabbar a[aria-current]::before {
 	content: "";
 	position: absolute;
 	top: -1px;
@@ -413,11 +494,230 @@ p {
 	white-space: nowrap;
 }
 
+/* Hover and focus (feedback spec §3.2). Hover lifts to --bg-hover; things that can be selected
+   also preview their selected marker. Hover lives behind (hover: hover), so touch gets :active. */
+
+.tabbar a,
+.chips button,
+.chips a,
+.history button,
+.lang summary,
+.lang a,
+.menu button,
+.actions button,
+.profile-menu > button,
+.hint button,
+.deleted-list button,
+.icon-link,
+.item,
+.item-icon {
+	transition:
+		background-color 120ms,
+		border-color 120ms,
+		color 120ms,
+		box-shadow 120ms,
+		filter 120ms;
+}
+
+@media (hover: hover) {
+	a:hover {
+		text-decoration-color: var(--link);
+		text-decoration-thickness: 2px;
+	}
+
+	.tabbar a:hover,
+	.history button:hover:not(:disabled),
+	.lang summary:hover,
+	.lang a:hover,
+	.menu button:hover,
+	.actions button:not(.primary):hover,
+	.profile-menu > button:hover,
+	.hint button:hover,
+	.deleted-list button:hover,
+	.icon-link:hover,
+	.chips button:not([aria-pressed="true"]):hover {
+		background: var(--bg-hover);
+		color: var(--text);
+	}
+
+	.chips a:hover {
+		background: var(--bg-hover);
+	}
+
+	/* Preview: a faint copy of the selected marker. */
+	.chips button:not([aria-pressed="true"]):hover {
+		border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+	}
+
+	.tabbar a:not([aria-current]):hover::before {
+		content: "";
+		position: absolute;
+		top: -1px;
+		left: 50%;
+		width: 32px;
+		height: 2px;
+		margin-left: -16px;
+		border-radius: 0 0 2px 2px;
+		background: color-mix(in srgb, var(--accent) 45%, transparent);
+	}
+
+	.actions .primary:hover {
+		filter: brightness(1.12);
+		box-shadow: var(--glow);
+	}
+}
+
+@media (hover: hover) and (min-width: 768px) {
+	.tabbar a:not([aria-current]):hover::before {
+		content: none;
+	}
+
+	.tabbar a:not([aria-current]):hover::after {
+		content: "";
+		position: absolute;
+		left: 12px;
+		right: 12px;
+		bottom: -1px;
+		height: 2px;
+		background: color-mix(in srgb, var(--accent) 45%, transparent);
+	}
+}
+
+/* Touch: a press state instead of hover. */
+@media (hover: none) {
+	.tabbar a:active,
+	.history button:active:not(:disabled),
+	.lang a:active,
+	.menu button:active,
+	.actions button:not(.primary):active,
+	.profile-menu > button:active,
+	.hint button:active,
+	.deleted-list button:active,
+	.icon-link:active,
+	.chips button:not([aria-pressed="true"]):active,
+	.chips a:active {
+		background: var(--bg-hover);
+	}
+}
+
+/* Focus is the hover lift plus the pink outline. */
+.tabbar a:focus-visible,
+.history button:focus-visible,
+.lang summary:focus-visible,
+.lang a:focus-visible,
+.menu button:focus-visible,
+.actions button:not(.primary):focus-visible,
+.profile-menu > button:focus-visible,
+.hint button:focus-visible,
+.deleted-list button:focus-visible,
+.icon-link:focus-visible,
+.chips button:not([aria-pressed="true"]):focus-visible {
+	background: var(--bg-hover);
+	color: var(--text);
+}
+
+/* The Sources chip keeps its cyan text: focus is the lift plus the outline. */
+.chips a:focus-visible {
+	background: var(--bg-hover);
+}
+
+.actions .primary:focus-visible {
+	filter: brightness(1.12);
+	box-shadow: var(--glow);
+}
+
+.tabbar a:focus-visible,
+.history button:focus-visible,
+.icon-link:focus-visible,
+.item-icon:focus-visible {
+	outline-offset: -2px;
+}
+
+/* Tooltips (feedback spec §3.3). The tip is an aria-hidden child of its control, so the control
+   keeps its own name and the pointer can move onto the tip without it closing. */
+
+.has-tip {
+	position: relative;
+}
+
+.tip {
+	position: absolute;
+	bottom: calc(100% + 6px);
+	left: 50%;
+	z-index: 6;
+	padding: 4px 8px;
+	border: 1px solid color-mix(in srgb, var(--text) 21%, var(--bg));
+	border-radius: 4px;
+	background: color-mix(in srgb, var(--text) 13%, var(--bg));
+	color: var(--text);
+	font-family: var(--font-sans);
+	font-size: 0.75rem;
+	font-weight: 500;
+	letter-spacing: normal;
+	line-height: 1.4;
+	text-transform: none;
+	white-space: nowrap;
+	transform: translateX(-50%);
+	visibility: hidden;
+	opacity: 0;
+	transition:
+		opacity 120ms,
+		visibility 120ms;
+}
+
+/* Bridges the 6 px gap, so the pointer can travel onto the tip (WCAG 1.4.13, hoverable). */
+.tip::before {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	top: 100%;
+	height: 8px;
+}
+
+/* Icons at a card's or the screen's right edge: anchor the tip right, so it never overflows. */
+.tip-end .tip {
+	left: auto;
+	right: 0;
+	transform: none;
+}
+
+@media (hover: hover) {
+	.has-tip:hover > .tip {
+		visibility: visible;
+		opacity: 1;
+	}
+}
+
+.has-tip:focus-visible > .tip,
+.has-tip[data-tip-open] > .tip {
+	visibility: visible;
+	opacity: 1;
+}
+
+/* Last, so Escape beats hover and focus (same specificity). */
+.has-tip[data-tip-hidden] > .tip {
+	visibility: hidden;
+	opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition: none !important;
+	}
+}
+
 /* Hub */
 
 .hub {
 	display: grid;
 	gap: var(--space-4);
+}
+
+/* Marks build-volatile markup for the version hash. It must not change layout. */
+.build-stamp {
+	display: contents;
 }
 
 .hub-state {
@@ -486,6 +786,53 @@ p {
 	max-width: none;
 }
 
+/* Update notice (feedback spec §10.4): overlays and sits under dialogs. The body's bottom padding grows
+   by its height, so the footer is never hidden behind it at the end of a page. */
+.update-notice {
+	position: fixed;
+	left: var(--space-3);
+	right: var(--space-3);
+	bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--space-2));
+	z-index: 4;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-2) var(--space-3);
+	padding: 8px 8px 8px var(--space-3);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
+	box-shadow: 0 8px 24px color-mix(in srgb, var(--bg) 60%, transparent);
+	animation: notice-in 160ms ease-out;
+}
+
+.update-notice p {
+	margin: 0;
+	font-size: 0.875rem;
+}
+
+.update-notice .actions {
+	flex-wrap: nowrap;
+}
+
+.update-notice .actions button {
+	padding-block: 0;
+	padding-inline: calc(var(--space-2) + var(--space-1));
+}
+
+@keyframes notice-in {
+	from {
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.update-notice {
+		animation: none;
+	}
+}
+
 .install,
 .modal {
 	background: var(--bg-raised);
@@ -529,6 +876,8 @@ p {
 
 .tracker {
 	display: grid;
+	/* minmax(0, 1fr), not auto: the card grid's minimum must not stretch the page at 200 % text. */
+	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-4);
 	grid-template-areas:
 		"top"
@@ -633,43 +982,107 @@ p {
 }
 
 .item-group ul {
-	list-style: none;
-	margin: 0 0 var(--space-3);
+	display: grid;
+	/* min() keeps one column inside a 320 px screen at 200 % text (reflow). */
+	grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+	gap: 12px;
+	margin: 0 0 var(--space-4);
 	padding: 0;
+	list-style: none;
 }
 
+/* One card per item; rows stretch, so cards in a row share one height and bottom edge. */
 .item {
-	padding: var(--space-2) 0;
-	border-bottom: 1px solid var(--border);
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-1);
+	padding: 12px 12px 12px 16px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
 }
 
+/* 40 px on the right keeps the name clear of the book icon. */
 .item-main {
 	display: flex;
 	align-items: center;
 	gap: var(--space-2);
 	min-height: var(--tap);
+	padding-right: 40px;
 }
 
 .item-main input {
-	width: 1.5rem;
-	height: 1.5rem;
-	margin: 0;
+	appearance: none;
+	display: grid;
+	place-content: center;
 	flex: none;
-	accent-color: var(--accent);
+	width: 20px;
+	height: 20px;
+	margin: 0;
+	border: 2px solid var(--text-muted);
+	border-radius: 4px;
+	background: transparent;
+}
+
+.item-main input::before {
+	content: "";
+	width: 12px;
+	height: 12px;
+	clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+	background: var(--accent-text);
+	transform: scale(0);
+}
+
+.item-main input:checked {
+	border-color: var(--accent);
+	background: var(--accent);
+}
+
+.item-main input:checked::before {
+	transform: scale(1);
+}
+
+@media (forced-colors: active) {
+	.item-main input::before {
+		background: CanvasText;
+	}
+}
+
+/* The card carries the focus ring instead (below). */
+.item-main input:focus-visible {
+	outline: none;
 }
 
 .item-main label {
 	flex: 1;
-	display: inline-flex;
-	align-items: center;
-	min-height: var(--tap);
+	font-size: 0.9375rem;
+	font-weight: 600;
+	/* A long word breaks instead of running under the book icon or out of the card. */
+	overflow-wrap: anywhere;
 	cursor: pointer;
 }
 
+/* The whole card is the label's click area. */
+.item-main label::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+}
+
+.item:has(input:disabled) label {
+	cursor: default;
+}
+
 .tier {
-	font-size: 0.75rem;
+	align-self: flex-start;
+	margin-inline-start: 28px;
+	padding: 1px 8px;
+	border: 1px solid color-mix(in srgb, currentColor 50%, transparent);
+	border-radius: 999px;
 	color: var(--text-muted);
-	white-space: nowrap;
+	font-size: 0.75rem;
 }
 
 /* Tier colours come from their own tokens so a theme can swap them without touching the accent. */
@@ -682,42 +1095,107 @@ p {
 }
 
 .item-desc {
-	margin: 0 0 var(--space-1);
+	margin: 0 0 0 28px;
 	color: var(--text-muted);
 	font-size: 0.875rem;
+	line-height: 1.5;
 }
 
+/* In the flow, pushed to the bottom: the flag can never overlap the book. The negative right
+   margin puts its box 13 px from the card's bottom edge and 7 px from its right edge (spec §4). */
 .item-foot {
 	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: var(--space-2);
-	font-size: 0.875rem;
+	justify-content: flex-end;
+	margin: auto -6px 0 0;
 }
 
-.item-sources {
-	list-style: none;
-	margin: 0;
+/* .item .item-icon outranks the shared `.tracker button` reset. */
+.item .item-icon {
+	position: relative;
+	z-index: 1;
+	display: inline-grid;
+	place-items: center;
+	width: var(--tap);
+	height: var(--tap);
 	padding: 0;
-	display: flex;
-	flex-wrap: wrap;
-	gap: var(--space-2);
-}
-
-.item-sources a {
-	display: inline-flex;
-	align-items: center;
-	min-height: var(--tap);
-	overflow-wrap: anywhere;
-}
-
-.report {
-	min-height: var(--tap);
-	font-size: 0.75rem;
-	padding: var(--space-1) var(--space-2);
+	border: 0;
 	border-radius: var(--radius);
 	background: none;
 	color: var(--text-muted);
+	cursor: pointer;
+}
+
+.item .item-icon svg {
+	width: 22px;
+	height: 22px;
+}
+
+.item .item-icon[aria-disabled="true"] {
+	cursor: default;
+}
+
+.item .item-book {
+	position: absolute;
+	top: 12px;
+	right: 6px;
+}
+
+.item .item-book:focus-visible {
+	color: var(--link);
+	background: color-mix(in srgb, var(--link) 12%, transparent);
+}
+
+/* data-arrived marks the card you land on from a Sources back link: Chromium does not report
+   :focus-visible after a page load, so :focus is enough there and ends when focus leaves. */
+.item:has(input:focus-visible),
+.item[data-arrived]:has(input:focus) {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+	background: var(--bg-hover);
+}
+
+@media (hover: hover) {
+	.item:hover {
+		background: var(--bg-hover);
+		border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+	}
+
+	.item .item-book:hover {
+		color: var(--link);
+		background: color-mix(in srgb, var(--link) 12%, transparent);
+	}
+}
+
+@media (hover: none) {
+	.item .item-book:active {
+		color: var(--link);
+		background: color-mix(in srgb, var(--link) 12%, transparent);
+	}
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+	.item:hover {
+		box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 15%, transparent);
+	}
+}
+
+/* The Sources chip: a link, drawn as an outlined cyan chip. */
+.chips a {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2);
+	min-height: var(--tap);
+	padding: var(--space-2) var(--space-3);
+	border: 1px solid var(--link);
+	border-radius: 999px;
+	color: var(--link);
+	text-decoration: none;
+}
+
+.chips a svg {
+	flex: none;
+	width: 18px;
+	height: 18px;
 }
 
 .tracker-alert {
@@ -834,11 +1312,6 @@ p {
 	font-weight: 600;
 }
 
-.menu button:hover,
-.menu button:focus-visible {
-	background: var(--bg);
-}
-
 .modal label {
 	display: block;
 	margin-bottom: var(--space-1);
@@ -919,11 +1392,15 @@ p {
 
 @media (min-width: 768px) {
 	html {
-		scroll-padding-bottom: 0;
+		scroll-padding-bottom: var(--notice-h, 0px);
 	}
 
 	body {
-		padding-bottom: 0;
+		padding-bottom: var(--notice-h, 0px);
+	}
+
+	.update-notice {
+		bottom: var(--space-3);
 	}
 
 	/* The tab row carries the chrome's bottom edge on desktop. */
@@ -956,11 +1433,11 @@ p {
 		line-height: 1.5;
 	}
 
-	.tabbar a[aria-current="page"]::before {
+	.tabbar a[aria-current]::before {
 		content: none;
 	}
 
-	.tabbar a[aria-current="page"]::after {
+	.tabbar a[aria-current]::after {
 		content: "";
 		position: absolute;
 		left: 12px;
@@ -977,6 +1454,29 @@ p {
 	.site-header,
 	.site-footer {
 		padding-inline: var(--space-4);
+	}
+
+	/* From 768 px, icons, chip and © share one centre line (spec §6). */
+	.site-footer {
+		padding-top: var(--space-3);
+		padding-bottom: var(--space-3);
+	}
+
+	.footer-disclaimer {
+		margin-bottom: var(--space-2);
+		text-align: center;
+	}
+
+	.footer-strip {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		row-gap: var(--space-2);
+	}
+
+	.footer-icons .tip {
+		left: 50%;
+		transform: translateX(-50%);
 	}
 
 	.unit .value {
@@ -1009,7 +1509,8 @@ p {
 		flex-direction: column;
 	}
 
-	.chips button {
+	.chips button,
+	.chips a {
 		width: 100%;
 		text-align: left;
 		border-radius: var(--radius);
@@ -1023,6 +1524,11 @@ p {
 }
 
 @media (min-width: 1024px) {
+	.update-notice {
+		left: auto;
+		width: 22rem;
+	}
+
 	.wrap {
 		padding: var(--space-6) var(--space-5);
 	}
@@ -1040,14 +1546,25 @@ p {
 		justify-content: center;
 	}
 
-	.item-groups {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: var(--space-3);
-		align-items: start;
-	}
-
 	.stats-grid {
 		grid-template-columns: 1fr;
+	}
+
+	/* One row: the disclaimer takes the free space, the strip sits at the right. */
+	.site-footer {
+		display: flex;
+		align-items: center;
+		gap: var(--space-4);
+		padding-block: var(--space-3);
+	}
+
+	.footer-disclaimer {
+		flex: 1;
+		margin: 0;
+		text-align: left;
+	}
+
+	.footer-strip {
+		flex-wrap: nowrap;
 	}
 }

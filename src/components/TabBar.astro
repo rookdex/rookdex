@@ -8,10 +8,13 @@ interface Props {
 	locale: Locale
 	/** The tab to mark with aria-current; null marks none. */
 	current: Tab | null
+	/** The page sits below the current tab (the Sources page under Tracker): the tab stays lit
+	 *  but says "true", because it links to a different page (feedback spec §5). */
+	sub?: boolean
 }
 
 // Bottom bar on phones, a text row under the header from 768 px (spec §5). Zero JavaScript.
-const { locale, current } = Astro.props
+const { locale, current, sub = false } = Astro.props
 const s = t(locale)
 ---
 
@@ -22,7 +25,7 @@ const s = t(locale)
 				<li>
 					<a
 						href={getRelativeLocaleUrl(locale, TAB_PATHS[id])}
-						aria-current={id === current ? "page" : undefined}
+						aria-current={id === current ? (sub ? "true" : "page") : undefined}
 					>
 						<TabIcon name={id} />
 						<span>{s.nav[id]}</span>

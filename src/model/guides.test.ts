@@ -63,3 +63,18 @@ describe("guideSchema (spec §9)", () => {
 		expect(guideSchema.safeParse({ ...guide, searchTitle: "x".repeat(66) }).success).toBe(false)
 	})
 })
+
+describe("guide sources are https only (feedback spec §9)", () => {
+	const base = { title: "T", summary: "S", updated: "2026-09-30" }
+
+	it.each(["http://example.com/", "javascript:alert(1)", "data:text/html,x"])(
+		"rejects %s",
+		(url) => {
+			expect(guideSchema.safeParse({ ...base, sources: [url] }).success).toBe(false)
+		}
+	)
+
+	it("accepts https", () => {
+		expect(guideSchema.safeParse({ ...base, sources: ["https://example.com/"] }).success).toBe(true)
+	})
+})

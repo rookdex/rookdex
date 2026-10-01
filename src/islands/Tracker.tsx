@@ -1,4 +1,4 @@
-import { type ChangeEvent, useRef, useState } from "react"
+import { type ChangeEvent, useEffect, useRef, useState } from "react"
 import { fill, type Locale, t } from "../i18n"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { categoryIds, seedItems } from "../model/seed"
@@ -9,6 +9,7 @@ import { HINT_SEEN_KEY, readFlag, writeFlag } from "./seenFlag"
 import { CategoryNav } from "./tracker/CategoryNav"
 import { DeleteDialog } from "./tracker/DeleteDialog"
 import { DeletedDialog } from "./tracker/DeletedDialog"
+import { hashTarget } from "./tracker/hash"
 import { ImportDialog } from "./tracker/ImportDialog"
 import { ItemList } from "./tracker/ItemList"
 import { NameDialog } from "./tracker/NameDialog"
@@ -55,6 +56,30 @@ export function Tracker({ locale }: Props) {
 	const fileInput = useRef<HTMLInputElement>(null)
 	const current = state.profiles.find((p) => p.id === state.profileId)
 	const currentName = current?.name ?? ""
+
+	// Arriving from a Sources page back link (feedback spec §4): once, when the store is ready and
+	// the checkboxes can take focus. focusVisible is passed because a focus right after a page load
+	// counts as non-keyboard focus, so the ring would not draw. Chromium ignores focusVisible, so
+	// the card is marked and styled while the checkbox keeps that focus. Nothing here may throw
+	// into React: an uncaught error would unmount the whole Tracker, and the hash survives a reload.
+	const arrived = useRef(false)
+	useEffect(() => {
+		if (state.status !== "ready" || arrived.current) return
+		arrived.current = true
+		try {
+			const box = hashTarget(window.location.hash, document)
+			if (!box) return
+			const card = box.closest(".item")
+			if (card) {
+				card.setAttribute("data-arrived", "")
+				box.addEventListener("blur", () => card.removeAttribute("data-arrived"), { once: true })
+			}
+			box.focus({ preventScroll: true, focusVisible: true })
+			box.scrollIntoView({ block: "center" })
+		} catch {
+			// A browser without scrollIntoView options still got the focus.
+		}
+	}, [state.status])
 
 	function openDialog(kind: "new" | "rename" | "delete" | "deleted") {
 		setOpening((n) => n + 1)
@@ -122,6 +147,8 @@ export function Tracker({ locale }: Props) {
 	const nameError = state.error === "name" ? error : ""
 	const pageError = state.error === "name" ? "" : error
 
+	const sourcesHref = `/${locale}/tracker/sources/`
+
 	if (state.status === "error") {
 		return (
 			<p className="tracker-alert" role="alert">
@@ -162,6 +189,7 @@ export function Tracker({ locale }: Props) {
 				onSelect={tracker.selectCategories}
 				allLabel={s.tracker.all}
 				navLabel={s.tracker.categories}
+				sources={{ href: sourcesHref, label: s.tracker.sources }}
 			/>
 			<ItemList
 				items={visible}
@@ -170,6 +198,7 @@ export function Tracker({ locale }: Props) {
 				categoryLabel={(id) => label(s.category, id)}
 				groupLabel={(id) => label(s.group, id)}
 				onToggle={(id, done) => (done ? tracker.tick(id) : tracker.untick(id))}
+				sourcesHref={sourcesHref}
 				strings={s.tracker}
 			/>
 			<StatsRail

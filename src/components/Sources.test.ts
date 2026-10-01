@@ -3,11 +3,12 @@ import { renderDoc } from "../test/render"
 import Sources from "./Sources.astro"
 
 describe("guide sources (spec §9)", () => {
-	it("is a section labelled by its h2, each link showing its outlet", async () => {
+	it("is a section labelled by its h2, each outlet link opening in a new tab", async () => {
 		const doc = await renderDoc(Sources, {
 			props: {
 				urls: ["https://www.rockstargames.com/VI", "https://www.ign.com/articles/x"],
 				label: "Kilder",
+				locale: "no",
 			},
 		})
 		const section = doc.querySelector("section")
@@ -15,18 +16,18 @@ describe("guide sources (spec §9)", () => {
 		expect(heading?.tagName).toBe("H2")
 		expect(heading?.textContent).toBe("Kilder")
 		const links = [...doc.querySelectorAll("section a")].map((a) => [
-			a.textContent?.trim(),
+			a.textContent?.replace(/\s+/g, " ").trim(),
 			a.getAttribute("href"),
-			a.getAttribute("rel"),
+			a.getAttribute("target"),
 		])
 		expect(links).toEqual([
-			["rockstargames.com", "https://www.rockstargames.com/VI", "noopener"],
-			["ign.com", "https://www.ign.com/articles/x", "noopener"],
+			["rockstargames.com (åpnes i ny fane)", "https://www.rockstargames.com/VI", "_blank"],
+			["ign.com (åpnes i ny fane)", "https://www.ign.com/articles/x", "_blank"],
 		])
 	})
 
 	it("renders nothing for a guide without sources", async () => {
-		const doc = await renderDoc(Sources, { props: { urls: [], label: "Sources" } })
+		const doc = await renderDoc(Sources, { props: { urls: [], label: "Sources", locale: "en" } })
 		expect(doc.querySelector("section")).toBeNull()
 	})
 })

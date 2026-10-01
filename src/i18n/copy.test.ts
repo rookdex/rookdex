@@ -63,3 +63,20 @@ describe("search titles and description (SEO spec §4.4)", () => {
 		expect(en.seo.titles.home).toBe("Rookdex: GTA 6 countdown, tracker and launch guide")
 	})
 })
+
+describe("countdown templates (brand Task 5, feedback spec §15.11)", () => {
+	it.each([
+		["en", en],
+		["no", no],
+	] as const)("%s keeps {n} in every countdown template", (_locale, s) => {
+		for (const template of [
+			s.hub.daysToGo,
+			s.hub.oneDayToGo,
+			s.hub.daySince,
+			s.footer.daysToLaunch,
+			s.footer.oneDayToLaunch,
+		]) {
+			expect(template).toContain("{n}")
+		}
+	})
+})

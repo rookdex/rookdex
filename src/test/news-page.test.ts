@@ -33,4 +33,15 @@ describe("News page (spec §8)", () => {
 			"GTA 6-nyheter og rykter · Rookdex"
 		)
 	})
+
+	it("links each rumour's report out in a new tab", async () => {
+		const doc = await renderDoc(News, { params: { locale: "en" } })
+		const links = [...doc.querySelectorAll(".rumour-list .meta a")]
+		expect(links).toHaveLength(rumours.length)
+		for (const a of links) {
+			expect(a.getAttribute("target")).toBe("_blank")
+			expect(a.getAttribute("rel")).toBe("noopener noreferrer")
+			expect(a.querySelector(".new-tab-note")).not.toBeNull()
+		}
+	})
 })

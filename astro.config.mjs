@@ -1,6 +1,7 @@
 // @ts-check
 import react from "@astrojs/react"
 import { defineConfig } from "astro/config"
+import externalLinks from "./integrations/external-links.mjs"
 import precache from "./integrations/precache.mjs"
 import seoCheck from "./integrations/seo-check.mjs"
 
@@ -8,7 +9,7 @@ import seoCheck from "./integrations/seo-check.mjs"
 export default defineConfig({
 	site: "https://rookdex.app",
 	output: "static",
-	integrations: [react(), precache(), seoCheck()],
+	integrations: [react(), precache(), seoCheck(), externalLinks()],
 	trailingSlash: "always",
 	i18n: {
 		defaultLocale: "en",

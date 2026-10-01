@@ -5,6 +5,7 @@ export const no: Strings = {
 	tagline:
 		"En følgesvenn for lanseringskvelden til GTA VI. Hold oversikt over det du finner, og se hva som er bekreftet.",
 	skipToContent: "Hopp til innhold",
+	newTab: "åpnes i ny fane",
 	nav: {
 		label: "Hoved",
 		home: "Hjem",
@@ -42,14 +43,14 @@ export const no: Strings = {
 	},
 	footer: {
 		disclaimer:
-			"Rookdex er et uoffisielt fanprosjekt. Det er ikke tilknyttet eller godkjent av Rockstar Games eller Take-Two Interactive. Alle varemerker tilhører sine eiere.",
-		source: "GitHub",
-		legalLabel: "Fjerning og juridisk",
-		codeLicenceLabel: "Kodelisens",
-		codeLicence: "MIT",
-		guideLicenceLabel: "Guidelisens",
-		guideLicence: "CC BY-SA 4.0",
-		sourceLabel: "Kildekode",
+			"Uoffisielt fanprosjekt. Ikke tilknyttet eller godkjent av Rockstar Games eller Take-Two Interactive.",
+		github: "Kildekode på GitHub",
+		legal: "Fjerning og juridisk: e-post",
+		about: "Om og lisenser",
+		launchDate: "19 Nov 2026",
+		daysToLaunch: "{n} dager til lansering",
+		oneDayToLaunch: "{n} dag til lansering",
+		outNow: "Ute nå",
 	},
 	notFound: {
 		title: "Siden finnes ikke",
@@ -64,6 +65,7 @@ export const no: Strings = {
 	offline: {
 		notice: "Frakoblet, viser lagrede data",
 	},
+	update: { ready: "En ny versjon er klar", reload: "Oppdater", later: "Senere" },
 	category: {
 		wildlife: "Dyreliv",
 		vehicles: "Kjøretøy",
@@ -108,8 +110,7 @@ export const no: Strings = {
 		confirmed: "Bekreftet",
 		expectedFrom: "Forventet, som i {precedent}",
 		sources: "Kilder",
-		report: "Rapporter",
-		reportSoon: "Rapportering av feil kommer i neste utgave",
+		reportSoon: "Rapporter: kommer snart",
 		persistHint:
 			"Denne nettleseren kan slette lagret fremgang etter en uke uten besøk. Installer Rookdex eller eksporter profilen din for å være trygg.",
 		dismiss: "Skjønner",
@@ -161,12 +162,17 @@ export const no: Strings = {
 		description:
 			"Nyheter om GTA VI, blant annet det pressen melder som Rockstar ikke har bekreftet.",
 	},
+	sources: {
+		title: "Kilder",
+		lede: "Hvor hvert element i oversikten kommer fra.",
+		back: "Tilbake til elementet i oversikten",
+	},
 	settings: {
 		title: "Innstillinger",
 		description: "Språk, dataene Rookdex lagrer på denne enheten, og appdetaljer.",
 		language: "Språk",
 		data: "Dine data",
-		app: "App",
+		about: "Om",
 		stored: "Lagret",
 		storedValue: "Bare i denne nettleseren",
 		persisted: "Beskyttet mot sletting",
@@ -190,12 +196,18 @@ export const no: Strings = {
 		version: "Versjon",
 		source: "Kildekode",
 		sourceLink: "GitHub",
+		legal: "Fjerning og juridisk",
+		codeLicence: "Kodelisens",
+		guideLicence: "Guidelisens",
+		trademarks: "Alle varemerker tilhører sine eiere.",
+		keepsChoices: "Valgene dine om installering og tips blir liggende, så de ikke kommer tilbake.",
 	},
 	seo: {
 		titles: {
 			home: "Rookdex: GTA 6-nedtelling, sjekkliste og lanseringsguide",
 			tracker: "GTA 6-sjekkliste for samleobjekter og dyreliv · Rookdex",
 			news: "GTA 6-nyheter og rykter · Rookdex",
+			sources: "Kilder for GTA 6-sjekklisten · Rookdex",
 			settings: "Innstillinger · Rookdex",
 			// The 404 is English-only today; the key exists because `no` is typed as `Strings`.
 			notFound: "Siden finnes ikke · Rookdex",

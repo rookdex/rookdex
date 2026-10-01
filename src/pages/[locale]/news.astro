@@ -1,4 +1,5 @@
 ---
+import ExternalLink from "../../components/ExternalLink.astro"
 import { fill, isLocale, type Locale, locales, t } from "../../i18n"
 import Base from "../../layouts/Base.astro"
 import { outletOf } from "../../model/outlet"
@@ -33,9 +34,9 @@ const s = t(locale as Locale)
 									<h3>{rumour.name}</h3>
 									<p class="summary">{rumour.summary}</p>
 									<p class="meta">
-										<a href={press.url} rel="noopener noreferrer">
+										<ExternalLink href={press.url} locale={locale as Locale}>
 											{fill(s.rumours.reportedBy, { outlet: outletOf(press.url) })}
-										</a>
+										</ExternalLink>
 									</p>
 								</li>
 							)

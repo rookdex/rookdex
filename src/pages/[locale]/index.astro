@@ -27,13 +27,16 @@ const s = t(locale as Locale)
 				<a href={getRelativeLocaleUrl(locale, "tracker")}>{s.hub.openTracker}</a>
 			</p>
 		</header>
-		<Countdown
-			client:load
-			locale={locale}
-			initialNow={new Date().toISOString()}
-			guideHref={getRelativeLocaleUrl(locale, "guides/before-you-start")}
-			trackerHref={getRelativeLocaleUrl(locale, "tracker")}
-		/>
+		{/* The server-rendered time changes every build; the version hash skips it (precache.mjs). */}
+		<div class="build-stamp" data-build-stamp>
+			<Countdown
+				client:load
+				locale={locale}
+				initialNow={new Date().toISOString()}
+				guideHref={getRelativeLocaleUrl(locale, "guides/before-you-start")}
+				trackerHref={getRelativeLocaleUrl(locale, "tracker")}
+			/>
+		</div>
 	</div>
 	<InstallPrompt client:idle locale={locale} />
 </Base>

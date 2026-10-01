@@ -2,6 +2,7 @@ import { fill, type Strings } from "../../i18n"
 import type { SeedItem } from "../../model/schema"
 import { categoryIds, groupItems } from "../../model/seed"
 import type { Records } from "../../model/stats"
+import { BookIcon, FlagIcon } from "./icons"
 
 interface Props {
 	items: SeedItem[]
@@ -10,6 +11,8 @@ interface Props {
 	categoryLabel: (id: string) => string
 	groupLabel: (id: string) => string
 	onToggle: (id: string, done: boolean) => void
+	/** The Sources page; each book link adds "#<item id>". */
+	sourcesHref: string
 	strings: Strings["tracker"]
 }
 
@@ -21,6 +24,7 @@ export function ItemList({
 	categoryLabel,
 	groupLabel,
 	onToggle,
+	sourcesHref,
 	strings,
 }: Props) {
 	const live = items.filter((item) => !item.retired)
@@ -49,6 +53,7 @@ export function ItemList({
 												done={records[item.id]?.done ?? false}
 												disabled={disabled}
 												onToggle={onToggle}
+												sourcesHref={sourcesHref}
 												strings={strings}
 											/>
 										))}
@@ -68,10 +73,15 @@ interface RowProps {
 	done: boolean
 	disabled: boolean
 	onToggle: (id: string, done: boolean) => void
+	sourcesHref: string
 	strings: Strings["tracker"]
 }
 
-function ItemRow({ item, done, disabled, onToggle, strings }: RowProps) {
+/**
+ * One card per item (feedback spec §4). The label's ::after covers the card, so a click anywhere
+ * toggles the one real checkbox; the corner icons sit above that layer.
+ */
+function ItemRow({ item, done, disabled, onToggle, sourcesHref, strings }: RowProps) {
 	// The seed id has exactly one slash (schema), so it is unique as a DOM id as it stands.
 	const inputId = `item-${item.id}`
 	const tier =
@@ -89,23 +99,30 @@ function ItemRow({ item, done, disabled, onToggle, strings }: RowProps) {
 					onChange={(event) => onToggle(item.id, event.target.checked)}
 				/>
 				<label htmlFor={inputId}>{item.name}</label>
-				<span className="tier" data-status={item.status}>
-					{tier}
-				</span>
 			</div>
+			{/* Before the flag in the DOM, so Tab runs top to bottom. It is absolutely positioned, so
+			    its place here changes no layout. */}
+			<a className="item-icon item-book has-tip tip-end" href={`${sourcesHref}#${item.id}`}>
+				<BookIcon />
+				<span className="visually-hidden">
+					{strings.sources}: {item.name}
+				</span>
+				<span className="tip" aria-hidden="true">
+					{strings.sources}
+				</span>
+			</a>
+			<span className="tier" data-status={item.status}>
+				{tier}
+			</span>
 			{item.description && <p className="item-desc">{item.description}</p>}
 			<div className="item-foot">
-				<ul className="item-sources" aria-label={strings.sources}>
-					{item.sources.map((source) => (
-						<li key={source.url}>
-							<a href={source.url} rel="noopener noreferrer">
-								{source.title}
-							</a>
-						</li>
-					))}
-				</ul>
-				<button type="button" className="report" disabled title={strings.reportSoon}>
-					{strings.report}
+				{/* aria-disabled keeps it focusable, so its tooltip explains it (spec §3.3). */}
+				<button type="button" className="item-icon has-tip tip-end" aria-disabled="true">
+					<FlagIcon />
+					<span className="visually-hidden">{strings.reportSoon}</span>
+					<span className="tip" aria-hidden="true">
+						{strings.reportSoon}
+					</span>
 				</button>
 			</div>
 		</li>
