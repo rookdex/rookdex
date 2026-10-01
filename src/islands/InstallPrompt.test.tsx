@@ -52,4 +52,16 @@ describe("InstallPrompt", () => {
 		})
 		expect(event.prompt).toHaveBeenCalledOnce()
 	})
+
+	it("never opens inside the installed app (feedback spec §8)", () => {
+		vi.spyOn(window, "matchMedia").mockImplementation(
+			(query: string) =>
+				({ matches: query === "(display-mode: standalone)", media: query }) as MediaQueryList
+		)
+		render(<InstallPrompt locale="en" />)
+		const event = fireInstallPrompt()
+		expect(event.defaultPrevented).toBe(false)
+		expect(screen.getByRole("dialog", { hidden: true })).not.toHaveAttribute("open")
+		vi.restoreAllMocks()
+	})
 })

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { type Locale, t } from "../i18n"
+import { isStandalone } from "../scripts/standalone"
 import { INSTALL_SEEN_KEY, readFlag, writeFlag } from "./seenFlag"
 
 export const SEEN_KEY = INSTALL_SEEN_KEY
@@ -17,7 +18,8 @@ export function InstallPrompt({ locale }: Props) {
 
 	useEffect(() => {
 		const onPrompt = (event: BeforeInstallPromptEvent) => {
-			if (readFlag(SEEN_KEY)) return
+			// Inside the handler, not before the hooks: an early return there breaks the rules of hooks.
+			if (isStandalone(window) || readFlag(SEEN_KEY)) return
 			event.preventDefault()
 			setDeferred(event)
 		}

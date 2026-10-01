@@ -168,7 +168,7 @@ export const en = {
 		description: "Language, the data Rookdex keeps on this device, and app details.",
 		language: "Language",
 		data: "Your data",
-		app: "App",
+		about: "About",
 		stored: "Stored",
 		storedValue: "In this browser only",
 		persisted: "Protected from clearing",
@@ -192,6 +192,11 @@ export const en = {
 		version: "Version",
 		source: "Source code",
 		sourceLink: "GitHub",
+		legal: "Takedown and legal",
+		codeLicence: "Code licence",
+		guideLicence: "Guide licence",
+		trademarks: "All trademarks belong to their owners.",
+		keepsChoices: "Your choices about the install prompt and hints stay, so they do not return.",
 	},
 	seo: {
 		// Full <title> texts. Visible headings keep their own keys; these are what search shows.

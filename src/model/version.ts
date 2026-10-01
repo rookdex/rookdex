@@ -5,3 +5,8 @@
 export function appVersion(pkgVersion: string, sha: string | undefined): string {
 	return `${pkgVersion} · ${sha ? sha.slice(0, 7) : "dev"}`
 }
+
+/** The commit page for the Settings version link (feedback spec §7.1). */
+export function commitUrl(sha: string): string {
+	return `https://github.com/rookdex/rookdex/commit/${sha}`
+}

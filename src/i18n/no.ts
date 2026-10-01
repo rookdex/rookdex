@@ -167,7 +167,7 @@ export const no: Strings = {
 		description: "Språk, dataene Rookdex lagrer på denne enheten, og appdetaljer.",
 		language: "Språk",
 		data: "Dine data",
-		app: "App",
+		about: "Om",
 		stored: "Lagret",
 		storedValue: "Bare i denne nettleseren",
 		persisted: "Beskyttet mot sletting",
@@ -191,6 +191,11 @@ export const no: Strings = {
 		version: "Versjon",
 		source: "Kildekode",
 		sourceLink: "GitHub",
+		legal: "Fjerning og juridisk",
+		codeLicence: "Kodelisens",
+		guideLicence: "Guidelisens",
+		trademarks: "Alle varemerker tilhører sine eiere.",
+		keepsChoices: "Valgene dine om installering og tips blir liggende, så de ikke kommer tilbake.",
 	},
 	seo: {
 		titles: {
