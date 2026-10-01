@@ -1,5 +1,6 @@
 // Astro integration. After the static build it lists every file in dist/, writes the list
-// and a content hash into the service worker, and saves it as dist/sw.js.
+// and a content hash into the service worker, saves it as dist/sw.js, and stamps the same version
+// into dist/_headers.
 import { createHash } from "node:crypto"
 import { readdir, readFile, writeFile } from "node:fs/promises"
 import { join, relative, sep } from "node:path"
@@ -50,6 +51,38 @@ export async function listFiles(root) {
 		.map((entry) => relative(root, join(entry.parentPath, entry.name)).split(sep).join("/"))
 }
 
+/** The worker with its two placeholders filled. */
+export function fillWorker(template, version, urls) {
+	return template
+		.replace('"__VERSION__"', JSON.stringify(version))
+		.replace('"__PRECACHE__"', JSON.stringify(urls))
+}
+
+/** A 12-character hash of every precached file's path and content. `_headers` is not precached,
+ *  so the version line written into it never changes the version. */
+export async function computeVersion(root, files) {
+	const hash = createHash("sha256")
+	for (const file of files.filter(shouldPrecache)) {
+		hash.update(file)
+		hash.update(await readFile(join(root, file)))
+	}
+	return hash.digest("hex").slice(0, 12)
+}
+
+/**
+ * `_headers` with `X-Rookdex-Version` added to its `/*` block (feedback spec §10.2). Throws unless
+ * there is exactly one: a missing header silently switches the worker's version guard off.
+ */
+export function withVersionHeader(headers, version) {
+	const lines = headers.split(/\r?\n/)
+	const blocks = lines.flatMap((line, i) => (line.trim() === "/*" ? [i] : []))
+	if (blocks.length !== 1) {
+		throw new Error(`_headers needs exactly one "/*" block, found ${blocks.length}`)
+	}
+	lines.splice(blocks[0] + 1, 0, `  X-Rookdex-Version: ${version}`)
+	return lines.join("\n")
+}
+
 export default function precache() {
 	return {
 		name: "rookdex-precache",
@@ -59,19 +92,17 @@ export default function precache() {
 				const files = await listFiles(root)
 				const urls = precacheUrls(files)
 
-				const hash = createHash("sha256")
-				for (const file of files.filter(shouldPrecache)) {
-					hash.update(file)
-					hash.update(await readFile(join(root, file)))
-				}
-				const version = hash.digest("hex").slice(0, 12)
+				const version = await computeVersion(root, files)
 
 				const template = await readFile(new URL("../src/sw/sw.js", import.meta.url), "utf8")
-				const worker = template
-					.replace('"__VERSION__"', JSON.stringify(version))
-					.replace('"__PRECACHE__"', JSON.stringify(urls))
-				await writeFile(join(root, "sw.js"), worker)
-				logger.info(`sw.js written: ${urls.length} URLs, version ${version}`)
+				await writeFile(join(root, "sw.js"), fillWorker(template, version, urls))
+
+				const headersFile = join(root, "_headers")
+				await writeFile(
+					headersFile,
+					withVersionHeader(await readFile(headersFile, "utf8"), version)
+				)
+				logger.info(`sw.js written: ${urls.length} URLs, version ${version}; _headers versioned`)
 			},
 		},
 	}

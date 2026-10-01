@@ -3,13 +3,14 @@ const VERSION = "__VERSION__"
 const PRECACHE = "__PRECACHE__"
 const CACHE = `rookdex-${VERSION}`
 
+// The new worker precaches, then waits. The page's update notice asks it to take over, so an open
+// page never runs half on the old version and half on the new (feedback spec §10.1).
 self.addEventListener("install", (event) => {
-	event.waitUntil(
-		caches
-			.open(CACHE)
-			.then((cache) => cache.addAll(PRECACHE))
-			.then(() => self.skipWaiting())
-	)
+	event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)))
+})
+
+self.addEventListener("message", (event) => {
+	if (event.data?.type === "SKIP_WAITING") self.skipWaiting()
 })
 
 self.addEventListener("activate", (event) => {
@@ -64,7 +65,7 @@ async function staleWhileRevalidate(event, url) {
 	const cached = await cache.match(key)
 	const refresh = fetch(event.request)
 		.then(async (response) => {
-			if (response.ok) {
+			if (response.ok && sameVersion(response)) {
 				try {
 					await cache.put(key, response.clone())
 				} catch {
@@ -83,4 +84,14 @@ async function staleWhileRevalidate(event, url) {
 	// Unknown page while offline: fall back to the home page of the same language.
 	const localeHome = `/${url.pathname.split("/")[1] || "en"}/`
 	return (await cache.match(localeHome)) ?? (await cache.match("/en/")) ?? Response.error()
+}
+
+/**
+ * A page belongs in this worker's cache only if the server built it for this worker's version
+ * (or didn't say). While a new worker waits, the old one still serves; without this, it would
+ * store new pages that ask for scripts its cache never had. The page is still shown either way.
+ */
+function sameVersion(response) {
+	const version = response.headers.get("X-Rookdex-Version")
+	return version === null || version === VERSION
 }
