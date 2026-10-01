@@ -110,8 +110,7 @@ export const en = {
 		confirmed: "Confirmed",
 		expectedFrom: "Expected, as in {precedent}",
 		sources: "Sources",
-		report: "Report",
-		reportSoon: "Reporting a wrong item comes in the next release",
+		reportSoon: "Report: coming soon",
 		persistHint:
 			"This browser may clear saved progress after a week without a visit. Install Rookdex or export your profile to keep it safe.",
 		dismiss: "Got it",

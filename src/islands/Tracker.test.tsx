@@ -2,6 +2,7 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
+import { wireTooltips } from "../scripts/tooltip"
 import { renderReady, resetBrowser } from "../test/tracker-fixtures"
 import { Tracker } from "./Tracker"
 
@@ -16,18 +17,47 @@ beforeEach(resetBrowser)
 const ready = (locale: "en" | "no" = "en") => renderReady(<Tracker locale={locale} />)
 
 describe("Tracker list", () => {
-	it("renders groups, tiers, sources and a disabled report button", async () => {
+	it("renders one card per item, with a book link and a flag instead of source links", async () => {
 		await ready()
 		expect(screen.getByRole("heading", { name: "Wildlife", level: 2 })).toBeInTheDocument()
 		expect(screen.getByRole("heading", { name: /reptiles/i, level: 3 })).toBeInTheDocument()
 		expect(screen.getByText("Expected, as in GTA V")).toBeInTheDocument()
-		expect(screen.getAllByRole("link", { name: "Site" })[0]).toHaveAttribute(
-			"rel",
-			"noopener noreferrer"
-		)
-		const report = screen.getAllByRole("button", { name: "Report" })[0]
-		expect(report).toBeDisabled()
-		expect(report).toHaveAttribute("title", "Reporting a wrong item comes in the next release")
+		expect(document.querySelectorAll("li.item")).toHaveLength(3)
+		expect(screen.queryByRole("link", { name: "Site" })).toBeNull()
+
+		const book = screen.getByRole("link", { name: "Sources: Pelican" })
+		expect(book).toHaveAttribute("href", "/en/tracker/sources/#wildlife/pelican")
+		expect(book).not.toHaveAttribute("aria-label")
+		expect(book.querySelector(".tip")).toHaveAttribute("aria-hidden", "true")
+		expect(book.querySelector(".tip")).toHaveTextContent("Sources")
+
+		const flags = screen.getAllByRole("button", { name: "Report: coming soon" })
+		expect(flags).toHaveLength(3)
+		expect(flags[0]).toHaveAttribute("aria-disabled", "true")
+		// aria-disabled, not disabled: it stays focusable so its tooltip is reachable.
+		expect(flags[0]).not.toBeDisabled()
+
+		// Tab runs top to bottom: checkbox, book (top right), flag (bottom right).
+		const card = document.querySelector("li.item") as HTMLElement
+		expect([...card.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
+			"INPUT",
+			"A",
+			"BUTTON",
+		])
+	})
+
+	it("toggles an item from its label, and a flag tap shows the tooltip without toggling", async () => {
+		await ready()
+		fireEvent.click(screen.getByText("Pelican"))
+		// The tick goes through IndexedDB before the controlled checkbox re-renders.
+		await waitFor(() => expect(screen.getByRole("checkbox", { name: "Pelican" })).toBeChecked())
+
+		const unwire = wireTooltips(document)
+		const flag = screen.getAllByRole("button", { name: "Report: coming soon" })[0]
+		fireEvent.click(flag)
+		expect(flag).toHaveAttribute("data-tip-open")
+		expect(screen.getByRole("checkbox", { name: "Bike" })).not.toBeChecked()
+		unwire()
 	})
 
 	it("ticking announces the category count in the live region", async () => {
@@ -52,6 +82,17 @@ describe("Category toggles", () => {
 		fireEvent.click(all)
 		expect(all).toHaveAttribute("aria-pressed", "true")
 		expect(window.location.search).toBe("")
+	})
+
+	it("ends the chip row with a Sources link, not a toggle", async () => {
+		await ready()
+		const nav = screen.getByRole("navigation", { name: "Categories" })
+		const items = [...nav.querySelectorAll("li")]
+		const last = items[items.length - 1].firstElementChild
+		expect(last?.tagName).toBe("A")
+		expect(last).toHaveAttribute("href", "/en/tracker/sources/")
+		expect(last).toHaveTextContent("Sources")
+		expect(last).not.toHaveAttribute("aria-pressed")
 	})
 
 	it("reads a deep link and drops unknown ids", async () => {

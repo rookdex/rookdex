@@ -122,6 +122,8 @@ export function Tracker({ locale }: Props) {
 	const nameError = state.error === "name" ? error : ""
 	const pageError = state.error === "name" ? "" : error
 
+	const sourcesHref = `/${locale}/tracker/sources/`
+
 	if (state.status === "error") {
 		return (
 			<p className="tracker-alert" role="alert">
@@ -162,6 +164,7 @@ export function Tracker({ locale }: Props) {
 				onSelect={tracker.selectCategories}
 				allLabel={s.tracker.all}
 				navLabel={s.tracker.categories}
+				sources={{ href: sourcesHref, label: s.tracker.sources }}
 			/>
 			<ItemList
 				items={visible}
@@ -170,6 +173,7 @@ export function Tracker({ locale }: Props) {
 				categoryLabel={(id) => label(s.category, id)}
 				groupLabel={(id) => label(s.group, id)}
 				onToggle={(id, done) => (done ? tracker.tick(id) : tracker.untick(id))}
+				sourcesHref={sourcesHref}
 				strings={s.tracker}
 			/>
 			<StatsRail

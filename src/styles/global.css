@@ -821,6 +821,8 @@ p {
 
 .tracker {
 	display: grid;
+	/* minmax(0, 1fr), not auto: the card grid's minimum must not stretch the page at 200 % text. */
+	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-4);
 	grid-template-areas:
 		"top"
@@ -925,43 +927,107 @@ p {
 }
 
 .item-group ul {
-	list-style: none;
-	margin: 0 0 var(--space-3);
+	display: grid;
+	/* min() keeps one column inside a 320 px screen at 200 % text (reflow). */
+	grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+	gap: 12px;
+	margin: 0 0 var(--space-4);
 	padding: 0;
+	list-style: none;
 }
 
+/* One card per item; rows stretch, so cards in a row share one height and bottom edge. */
 .item {
-	padding: var(--space-2) 0;
-	border-bottom: 1px solid var(--border);
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-1);
+	padding: 12px 12px 12px 16px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
 }
 
+/* 40 px on the right keeps the name clear of the book icon. */
 .item-main {
 	display: flex;
 	align-items: center;
 	gap: var(--space-2);
 	min-height: var(--tap);
+	padding-right: 40px;
 }
 
 .item-main input {
-	width: 1.5rem;
-	height: 1.5rem;
-	margin: 0;
+	appearance: none;
+	display: grid;
+	place-content: center;
 	flex: none;
-	accent-color: var(--accent);
+	width: 20px;
+	height: 20px;
+	margin: 0;
+	border: 2px solid var(--text-muted);
+	border-radius: 4px;
+	background: transparent;
+}
+
+.item-main input::before {
+	content: "";
+	width: 12px;
+	height: 12px;
+	clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+	background: var(--accent-text);
+	transform: scale(0);
+}
+
+.item-main input:checked {
+	border-color: var(--accent);
+	background: var(--accent);
+}
+
+.item-main input:checked::before {
+	transform: scale(1);
+}
+
+@media (forced-colors: active) {
+	.item-main input::before {
+		background: CanvasText;
+	}
+}
+
+/* The card carries the focus ring instead (below). */
+.item-main input:focus-visible {
+	outline: none;
 }
 
 .item-main label {
 	flex: 1;
-	display: inline-flex;
-	align-items: center;
-	min-height: var(--tap);
+	font-size: 0.9375rem;
+	font-weight: 600;
+	/* A long word breaks instead of running under the book icon or out of the card. */
+	overflow-wrap: anywhere;
 	cursor: pointer;
 }
 
+/* The whole card is the label's click area. */
+.item-main label::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+}
+
+.item:has(input:disabled) label {
+	cursor: default;
+}
+
 .tier {
-	font-size: 0.75rem;
+	align-self: flex-start;
+	margin-inline-start: 28px;
+	padding: 1px 8px;
+	border: 1px solid color-mix(in srgb, currentColor 50%, transparent);
+	border-radius: 999px;
 	color: var(--text-muted);
-	white-space: nowrap;
+	font-size: 0.75rem;
 }
 
 /* Tier colours come from their own tokens so a theme can swap them without touching the accent. */
@@ -974,42 +1040,104 @@ p {
 }
 
 .item-desc {
-	margin: 0 0 var(--space-1);
+	margin: 0 0 0 28px;
 	color: var(--text-muted);
 	font-size: 0.875rem;
+	line-height: 1.5;
 }
 
+/* In the flow, pushed to the bottom: the flag can never overlap the book. The negative right
+   margin puts its box 13 px from the card's bottom edge and 7 px from its right edge (spec §4). */
 .item-foot {
 	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: var(--space-2);
-	font-size: 0.875rem;
+	justify-content: flex-end;
+	margin: auto -6px 0 0;
 }
 
-.item-sources {
-	list-style: none;
-	margin: 0;
+/* .item .item-icon outranks the shared `.tracker button` reset. */
+.item .item-icon {
+	position: relative;
+	z-index: 1;
+	display: inline-grid;
+	place-items: center;
+	width: var(--tap);
+	height: var(--tap);
 	padding: 0;
-	display: flex;
-	flex-wrap: wrap;
-	gap: var(--space-2);
-}
-
-.item-sources a {
-	display: inline-flex;
-	align-items: center;
-	min-height: var(--tap);
-	overflow-wrap: anywhere;
-}
-
-.report {
-	min-height: var(--tap);
-	font-size: 0.75rem;
-	padding: var(--space-1) var(--space-2);
+	border: 0;
 	border-radius: var(--radius);
 	background: none;
 	color: var(--text-muted);
+	cursor: pointer;
+}
+
+.item .item-icon svg {
+	width: 22px;
+	height: 22px;
+}
+
+.item .item-icon[aria-disabled="true"] {
+	cursor: default;
+}
+
+.item .item-book {
+	position: absolute;
+	top: 12px;
+	right: 6px;
+}
+
+.item .item-book:focus-visible {
+	color: var(--link);
+	background: color-mix(in srgb, var(--link) 12%, transparent);
+}
+
+.item:has(input:focus-visible) {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+	background: var(--bg-hover);
+}
+
+@media (hover: hover) {
+	.item:hover {
+		background: var(--bg-hover);
+		border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+	}
+
+	.item .item-book:hover {
+		color: var(--link);
+		background: color-mix(in srgb, var(--link) 12%, transparent);
+	}
+}
+
+@media (hover: none) {
+	.item .item-book:active {
+		color: var(--link);
+		background: color-mix(in srgb, var(--link) 12%, transparent);
+	}
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+	.item:hover {
+		box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 15%, transparent);
+	}
+}
+
+/* The Sources chip: a link, drawn as an outlined cyan chip. */
+.chips a {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2);
+	min-height: var(--tap);
+	padding: var(--space-2) var(--space-3);
+	border: 1px solid var(--link);
+	border-radius: 999px;
+	color: var(--link);
+	text-decoration: none;
+}
+
+.chips a svg {
+	flex: none;
+	width: 18px;
+	height: 18px;
 }
 
 .tracker-alert {
@@ -1316,7 +1444,8 @@ p {
 		flex-direction: column;
 	}
 
-	.chips button {
+	.chips button,
+	.chips a {
 		width: 100%;
 		text-align: left;
 		border-radius: var(--radius);
@@ -1345,13 +1474,6 @@ p {
 			"top top top"
 			"nav list stats";
 		justify-content: center;
-	}
-
-	.item-groups {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: var(--space-3);
-		align-items: start;
 	}
 
 	.stats-grid {

@@ -109,8 +109,7 @@ export const no: Strings = {
 		confirmed: "Bekreftet",
 		expectedFrom: "Forventet, som i {precedent}",
 		sources: "Kilder",
-		report: "Rapporter",
-		reportSoon: "Rapportering av feil kommer i neste utgave",
+		reportSoon: "Rapporter: kommer snart",
 		persistHint:
 			"Denne nettleseren kan slette lagret fremgang etter en uke uten besøk. Installer Rookdex eller eksporter profilen din for å være trygg.",
 		dismiss: "Skjønner",

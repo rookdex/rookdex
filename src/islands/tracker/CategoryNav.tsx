@@ -1,3 +1,5 @@
+import { BookIcon } from "./icons"
+
 interface Category {
 	id: string
 	label: string
@@ -9,10 +11,18 @@ interface Props {
 	onSelect: (ids: string[]) => void
 	allLabel: string
 	navLabel: string
+	sources: { href: string; label: string }
 }
 
 /** Multi-select toggles with an explicit All, so a screen reader never hears "all, not pressed". */
-export function CategoryNav({ categories, selected, onSelect, allLabel, navLabel }: Props) {
+export function CategoryNav({
+	categories,
+	selected,
+	onSelect,
+	allLabel,
+	navLabel,
+	sources,
+}: Props) {
 	const allPressed = selected.length === 0
 
 	function toggle(id: string) {
@@ -41,6 +51,13 @@ export function CategoryNav({ categories, selected, onSelect, allLabel, navLabel
 						</button>
 					</li>
 				))}
+				{/* A link to another page, not a filter, so it has no aria-pressed (spec §5). */}
+				<li>
+					<a href={sources.href}>
+						<BookIcon />
+						{sources.label}
+					</a>
+				</li>
 			</ul>
 		</nav>
 	)
