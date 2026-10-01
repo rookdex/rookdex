@@ -101,8 +101,10 @@ export function wireUpdateNotice(doc: Document, env: UpdateEnv): void {
 	})
 
 	// Hiding the focused Later button would drop focus on <body>. Focus goes back to where it was
-	// before it entered the card.
-	let returnTo: HTMLElement | null = null
+	// before it entered the card. Focus that was already on a control when this wired is kept too.
+	const active = doc.activeElement
+	let returnTo: HTMLElement | null =
+		active instanceof HTMLElement && active !== doc.body && !card.contains(active) ? active : null
 	doc.addEventListener("focusin", (event) => {
 		const target = event.target as HTMLElement
 		if (!card.contains(target)) returnTo = target

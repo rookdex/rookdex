@@ -37,6 +37,8 @@ function setup(options: {
 	installing?: boolean
 	active?: boolean
 	storage?: UpdateEnv["storage"]
+	/** Runs after the markup exists and before the script wires, for state the page already had. */
+	beforeWire?: () => void
 }) {
 	document.body.innerHTML = `
 		<button id="field">field</button>
@@ -56,6 +58,7 @@ function setup(options: {
 	const reload = vi.fn()
 	const deferred: (() => void)[] = []
 	const store = memoryStorage()
+	options.beforeWire?.()
 	wireUpdateNotice(document, {
 		container,
 		registration,
@@ -175,6 +178,18 @@ describe("update notice (feedback spec §10.3)", () => {
 		const field = document.getElementById("field") as HTMLElement
 		const later = document.querySelector<HTMLElement>("[data-update-later]") as HTMLElement
 		field.focus()
+		later.focus()
+		later.click()
+		expect(document.activeElement).toBe(field)
+	})
+
+	it("sends focus back to a control that already had it when the script wired", () => {
+		setup({
+			waiting: true,
+			beforeWire: () => (document.getElementById("field") as HTMLElement).focus(),
+		})
+		const field = document.getElementById("field") as HTMLElement
+		const later = document.querySelector<HTMLElement>("[data-update-later]") as HTMLElement
 		later.focus()
 		later.click()
 		expect(document.activeElement).toBe(field)
