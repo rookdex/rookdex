@@ -133,6 +133,21 @@ describe("Arriving from the Sources page (feedback spec §4)", () => {
 		expect(scroll).toHaveBeenCalledWith({ block: "center" })
 	})
 
+	it("asks for a visible focus ring, because a focus right after load is not keyboard focus", async () => {
+		window.history.replaceState(null, "", "/en/tracker/#item-wildlife/pelican")
+		const focus = vi.spyOn(HTMLElement.prototype, "focus")
+		try {
+			render(<Tracker locale="en" />)
+			const box = await screen.findByRole("checkbox", { name: "Pelican" })
+			await waitFor(() => expect(document.activeElement).toBe(box))
+			const call = focus.mock.contexts.indexOf(box)
+			expect(call).toBeGreaterThanOrEqual(0)
+			expect(focus.mock.calls[call][0]).toEqual({ preventScroll: true, focusVisible: true })
+		} finally {
+			focus.mockRestore()
+		}
+	})
+
 	it.each(["#item-wildlife/dodo", "#item-%", "#nothing"])(
 		"does nothing for %j and the tracker stays mounted",
 		async (hash) => {

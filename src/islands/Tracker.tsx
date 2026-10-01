@@ -58,8 +58,9 @@ export function Tracker({ locale }: Props) {
 	const currentName = current?.name ?? ""
 
 	// Arriving from a Sources page back link (feedback spec §4): once, when the store is ready and
-	// the checkboxes can take focus. Nothing here may throw into React: an uncaught error would
-	// unmount the whole Tracker, and the hash survives a reload.
+	// the checkboxes can take focus. focusVisible is passed because a focus right after a page load
+	// counts as non-keyboard focus, so the ring would not draw. Nothing here may throw into React:
+	// an uncaught error would unmount the whole Tracker, and the hash survives a reload.
 	const arrived = useRef(false)
 	useEffect(() => {
 		if (state.status !== "ready" || arrived.current) return
@@ -67,7 +68,7 @@ export function Tracker({ locale }: Props) {
 		try {
 			const box = hashTarget(window.location.hash, document)
 			if (!box) return
-			box.focus({ preventScroll: true })
+			box.focus({ preventScroll: true, focusVisible: true })
 			box.scrollIntoView({ block: "center" })
 		} catch {
 			// A browser without scrollIntoView options still got the focus.
