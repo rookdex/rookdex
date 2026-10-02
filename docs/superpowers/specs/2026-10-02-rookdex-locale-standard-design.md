@@ -27,7 +27,10 @@ Plus the checks in §8 of this spec.
 - English is the layout baseline. Measured targets are met in English, and `nb` adapts.
 - Nothing on the page looks different apart from three things: the switcher trigger loses its
   "EN" text, the language name "Norsk" becomes the browser's autonym "Norsk bokmål", and prices
-  render through `Intl.NumberFormat`.
+  render through `Intl.NumberFormat`. That last one changes the English copy: `en` with NOK
+  gives "NOK 949" (read off Node's `Intl` on 2026-10-02), where today's English text says
+  "949 kr". The standard picks `currencyDisplay: "symbol"` on purpose: "kr" at home, "NOK"
+  abroad.
 - The vendored files are copied from Workbench and never edited in Rookdex. A gap gets fixed
   upstream, then re-copied.
 
@@ -39,7 +42,7 @@ Plus the checks in §8 of this spec.
 | D2 | `money()` gains an optional fourth argument `{ stripWhole: true }` in i18n 2.1.0 (Workbench). It maps to Intl's `trailingZeroDisplay: "stripIfInteger"`. | "949 kr" instead of "949,00 kr", and "949,50 kr" stays exact. Nothing gets rounded, and the default and the §13 test are unchanged. |
 | D3 | The full preference model now: a System row first, picking a language stores `lang`, and picking System removes it. | Someone whose phone is in English but who reads Rookdex in Norwegian lands in Norwegian from rookdex.app and from the installed app. |
 | D4 | One price file plus a `{price:<id>}` token in guide Markdown, swapped at build time by a remark plugin. | Each price lives in one line. The hub and both guides follow it. |
-| D5 | The root `/` is a real page: language links, hreflang, the site-name JSON-LD, and a hashed inline resolver. The manifest's `start_url` becomes `/`. | Google reads the site name from the domain root itself, and the installed app opens in the stored language. |
+| D5 | The root `/` is a real page: language links, hreflang, the site-name JSON-LD, and a hashed inline resolver. The manifest's `start_url` becomes `/`. The home pages keep their JSON-LD too (§6.4). | Google reads the site name from the domain root, and the installed app opens in the stored language. |
 | D6 | Vendor the DS `picker.js` (DS 3.8.0) untouched. It replaces `language-menu.ts`. Rookdex keeps its own picker CSS. | `picker.js` was ported from Rookdex and has since gained Home/End and one-open-at-a-time. `picker.css` uses DS token names Rookdex doesn't have. |
 | D7 | Keyed calls with typed keys: `t("hub.buyBody")`, with `Key` derived from `en.json`. | It's the standard's API, and a typo fails `astro check`. |
 | D8 | `translate.mjs` stays out for now. | It exempts `nb` by design, so with only `en` and `nb` it checks nothing. The key parity test proves `nb` complete. Vendor it when a third language arrives. |
@@ -120,6 +123,8 @@ The caller passes `money(prices.standard)`. No bundle value contains a price.
   `money(lang, amount, currency, { stripWhole: true })`.
 - `lang` comes from the entry's folder (`guides/en/`, `guides/no/`, later `guides/nb/`),
   passed through `resolveLang` so `no` formats as `nb`.
+- The plugin only changes a text node's `value`. It never emits an `html` node, so the price
+  stays plain text whatever `Intl` returns.
 - An unknown id, or a token in a file outside a locale folder, throws and fails the build.
 - The plugin imports `src/model/prices.ts` and the vendored library, so it shares one source
   with the pages.
@@ -127,7 +132,8 @@ The caller passes `money(prices.standard)`. No bundle value contains a price.
 ### 5.5 Tests
 
 - **Key parity:** both bundles have the same key set and no empty values. A plural key has
-  both `.one` and `.other`.
+  both `.one` and `.other`. It must go red on a fixture bundle with one key missing and on one
+  with an empty value.
 - **Copy test:** every value in `src/locales/*.json` and every guide Markdown body is checked
   against two patterns: a digit followed by a currency symbol or code (`949 kr`, `1 189 kr`,
   `949 NOK`), and a code followed by a digit (`NOK 949`). It must go red on fixtures with each
@@ -157,10 +163,13 @@ The caller passes `money(prices.standard)`. No bundle value contains a price.
 ```
 /no/tracker/rumours/  /nb/news/      301
 /en/tracker/rumours/  /en/news/      301
+/no                   /nb/           301
 /no/*                 /nb/:splat     301
 ```
 
 - The specific rumours line comes first and points straight at `/nb/`, so there's no chain.
+- `/no` without the slash gets its own line, so it doesn't depend on how the splat rule
+  treats a missing segment.
 - `/ /en/ 302` is removed.
 - `redirects.test.ts` pins all three lines and asserts there's no rule for `/`.
 
@@ -177,25 +186,38 @@ The caller passes `money(prices.standard)`. No bundle value contains a price.
   - Uses Base's head conventions without the header, tab bar or footer.
   - Title "Rookdex", the English site description, canonical `https://rookdex.app/`, and the
     hreflang set from §6.3.
-  - The WebSite JSON-LD (`name`, `url: https://rookdex.app/`) moves here from the home pages,
-    with no `inLanguage`, since the root is language-neutral.
-- **Body:** dark, the mark, and one plain link per language, labelled with its autonym and
-  carrying `lang` and `hreflang`. Styled with Rookdex tokens, and centred with no layout
-  beyond that.
+  - The WebSite JSON-LD (`name`, `url: https://rookdex.app/`) is added here, with no
+    `inLanguage`, since the root is language-neutral. The two home pages **keep** their copy
+    of it (SEO spec D7). Googlebot runs JavaScript and treats a `location.replace` like a
+    redirect (Google Search Central, "Redirects and Google Search", JavaScript redirects), so
+    it may still land on `/en/`. With the block in both places, Google finds the site name
+    whichever page it treats as the home.
+  - `<html lang="en">`, because the title and description are English. Each language link
+    carries its own `lang`.
+- **Body:** dark, a `<main>` with the mark and an `<h1>` "Rookdex", and one plain link per
+  language, labelled with its autonym and carrying `lang` and `hreflang`. Each link is at
+  least 44 px tall. Styled with Rookdex tokens, and centred with no layout beyond that.
 - **Resolver script:**
-  - One inline `<script>`. Astro's CSP hashes it automatically, as it does every other inline
-    script.
+  - One synchronous inline classic `<script>` in `<head>`, before any stylesheet, so it runs
+    before first paint and a JavaScript visitor never sees the link page flash. A bundled
+    module would be deferred and flash. Astro's CSP already hashes Rookdex's inline scripts
+    (three on `/en/` today), and this one is hashed the same way.
+  - It's a ten-line equivalent of `resolveLang` (strip the region, apply the `no`/`nn`
+    aliases, first match among the configured tags, else `en`). The configured tags are
+    written in at build time from `locales`. A unit test runs the same inputs through the
+    inline function and the vendored library and asserts they agree.
   - It reads `localStorage.lang` inside `try`, so blocked storage counts as unset.
-  - It passes it with `navigator.languages` to `resolveLang`. The library is imported as a
-    bundled module if that keeps the script small. Otherwise it's a ten-line inline equivalent
-    with a test asserting it agrees with the library. The plan picks one after measuring.
+    `navigator.languages` falls back to `[navigator.language]`.
   - It calls `location.replace("/" + resolved + "/")`, using the bundle key, never the stored
     string. `replace` keeps the root out of history, so Back doesn't bounce.
   - A stored value that isn't a configured language (`no`, `system`, garbage) is removed on
     read, as the standard requires.
-- **No JavaScript:** the links are the page. Crawlers see the same thing.
-- **Sitemap:** `/` is added, with its hreflang alternates. `indexablePaths` and `seo-check`
-  learn about the root.
+- **No JavaScript:** the links are the page. Crawlers that don't run scripts see the same.
+- **Sitemap:** `/` is not a `<loc>`. Googlebot treats the script's jump like a redirect, and
+  Search Console flags redirecting URLs in a sitemap. The home pages' hreflang still names `/`
+  as `x-default`, which is how Google finds it. `seo-check` learns the root page (canonical,
+  hreflang set, JSON-LD present). A sitemap test asserts `/` is absent as a `<loc>` and
+  present as the home pages' `x-default` alternate.
 
 ### 6.5 Manifest and service worker
 
@@ -203,6 +225,11 @@ The caller passes `money(prices.standard)`. No bundle value contains a price.
   keep their identity. `lang` and `description` stay English.
 - The precache integration already maps `index.html` to `/`, so the root gets precached once
   it exists. A test asserts `/` is in the precache list, so the installed app resolves offline.
+- `src/sw/sw.js` offline fallback: today an unknown page offline falls back to its language's
+  home, then `/en/`. The last resort becomes `/` instead of `/en/`. A Norwegian reader offline
+  on an old `/no/…` bookmark (no `/no/` home in the cache any more) then gets the root page,
+  which resolves to `/nb/` from `lang` or the browser, instead of English. A worker test
+  covers `/no/x` offline, which must answer with the cached `/`.
 
 ## 7. PR 3: the picker and the stored language
 
@@ -210,8 +237,11 @@ The caller passes `money(prices.standard)`. No bundle value contains a price.
 
 The markup follows the standard's §6.1:
 
-- `<details data-picker="lang">`. The trigger is the globe icon plus an `.sr-only` name. The
-  visible `{locale.toUpperCase()}` span is removed.
+- `<details data-picker="lang">`. The trigger is the globe icon plus an `.sr-only` span inside
+  `<summary>` with the name "Language: English" or "Språk: Norsk bokmål", built from
+  `picker.language` and `displayName(locale)` (standard §6.1, not `aria-label`). The visible
+  `{locale.toUpperCase()}` span is removed. The list gets `aria-label` from
+  `picker.language`.
 - The rows are `.picker-row` links (`<a href hreflang lang>`), with `aria-current="page"` on
   the active one.
 - First comes the **System row**: "System (<span lang>Norsk bokmål</span>)" using the reserved
@@ -242,7 +272,11 @@ The markup follows the standard's §6.1:
 ### 7.3 Delete all data
 
 - `deleteAllData` also removes `lang` after IndexedDB succeeds.
-- The settings copy for delete-all says the language choice goes too.
+- The settings copy for delete-all says the language choice goes too, and the Settings data
+  section names the language choice among what Rookdex keeps in this browser.
+- `lang` is stored only after the user picks a language, and it delivers exactly what they
+  asked for, so it is strictly necessary under ekomloven § 3-15. No consent banner is needed,
+  and nothing leaves the device.
 - The doc comment in `delete-all.ts` is updated: `lang` goes, and the install and hint flags
   stay.
 
@@ -274,13 +308,15 @@ The markup follows the standard's §6.1:
   - With `lang=en` stored it lands on `/en/`.
   - With JavaScript off it shows both links.
   - `curl -I https://<preview>/` gives 200, not 3xx.
-- **Redirects:** `curl -I` on `/no/`, `/no/tracker/`, `/no/tracker/rumours/` and
+- **Root, first paint:** with JavaScript on, the link page never paints before the jump
+  (manual, read off a performance trace or a screenshot sequence in headless Brave).
+- **Redirects:** `curl -I` on `/no`, `/no/`, `/no/tracker/`, `/no/tracker/rumours/` and
   `/no/guides/before-you-start/` gives one 301 each, to the `/nb/` equivalent.
 - **Installed app** (phone, production after merge, since version previews can't judge
   `start_url`): with Norwegian picked, launching opens `/nb/`, and launching offline still
   resolves.
 - **Gates:** `npm test`, `npm run check`, `npx biome ci .` and `npm run build`
-  (seo-check passes, and the sitemap count goes up by one for `/`).
+  (seo-check passes and covers one more page, the root; the sitemap count is unchanged).
 
 ## 9. Out of scope
 
@@ -300,3 +336,20 @@ The markup follows the standard's §6.1:
 | Old `/no/` URLs in search results and bookmarks. | 301s via a splat rule, pinned by a test, and checked with `curl` on the preview. |
 | The installed app on an old `start_url` (`/en/`). | Browsers refresh the manifest on their own. Until then, it opens `/en/`, which still works. |
 | The `money` output differs between engines (spaces in "1 189 kr"). | Tests compare against `Intl` output built in the same test run, not hard-coded spaces, except where §5.5 pins a value read off the run. |
+
+## 11. Stress test: considered and rejected
+
+- **A check that the vendored files still match Workbench.** Workbench is a separate repo, so
+  CI can't diff against it without a cross-repo fetch. `VERSION` plus the "do not edit" note
+  is enough for two small files; a re-copy is the update path.
+- **Islands carry both string bundles.** Same as today, where `t()` already pulls in both
+  `en.ts` and `no.ts`. Splitting per locale is an optimisation for a later spec, not part of
+  this migration.
+- **The old service worker serving cached `/no/` pages until the new one takes over.** The
+  update notice from Spec A already asks the user to reload, and after that the 301s apply.
+- **Server-side `Accept-Language` resolution at the root.** The standard rules out a 3xx at
+  the root, and Rookdex is static hosting.
+- **Hiding the jump from crawlers by user agent.** That's cloaking. The JSON-LD on both the
+  root and the home pages covers the same need honestly.
+
+> Stress-tested 2026-10-02 (skill 0b01b4c): 8 applied, 3 adapted, 1 decided by me.
