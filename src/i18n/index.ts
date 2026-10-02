@@ -2,9 +2,7 @@ import { createTranslator } from "../lib/i18n/index.js"
 import en from "../locales/en.json"
 import no from "../locales/no.json"
 import type { Price } from "../model/prices"
-import { en as legacyEn, type Strings } from "./en"
 import type { Locale } from "./locales"
-import { no as legacyNo } from "./no"
 
 export * from "./locales"
 
@@ -49,17 +47,4 @@ export function hasKey(key: string): key is Key {
 export function seedLabel(t: Translate, kind: "category" | "group", id: string): string {
 	const key = `${kind}.${id}`
 	return hasKey(key) ? t(key) : id
-}
-
-// The old API, removed in Task 5 once every caller has moved.
-export type { Strings }
-export function t(locale: Locale): Strings {
-	return { en: legacyEn, no: legacyNo }[locale]
-}
-
-/** Fills `{name}` placeholders. Unknown names stay visible on purpose. */
-export function fill(template: string, vars: Record<string, string | number>): string {
-	return template.replace(/\{(\w+)\}/g, (match, key: string) =>
-		key in vars ? String(vars[key]) : match
-	)
 }

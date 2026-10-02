@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { en } from "../i18n/en"
-import { no } from "../i18n/no"
+import en from "../locales/en.json"
+import no from "../locales/no.json"
 import type { Allowlist } from "./schema"
 import {
 	allowlist,
@@ -181,10 +181,14 @@ describe("shipped seed", () => {
 	it("has an English name and a label in both languages for every category and group", () => {
 		for (const item of seedItems) {
 			expect(item.name, item.id).toMatch(/^[\x20-\x7E]+$/)
-			expect(en.category[item.category], `en category ${item.category}`).toBeTruthy()
-			expect(no.category[item.category], `no category ${item.category}`).toBeTruthy()
-			expect(en.group[item.group], `en group ${item.group}`).toBeTruthy()
-			expect(no.group[item.group], `no group ${item.group}`).toBeTruthy()
+			for (const [lang, bundle] of [
+				["en", en],
+				["no", no],
+			] as const) {
+				const keys = bundle as Record<string, string>
+				expect(keys[`category.${item.category}`], `${lang} category ${item.category}`).toBeTruthy()
+				expect(keys[`group.${item.group}`], `${lang} group ${item.group}`).toBeTruthy()
+			}
 		}
 	})
 	it("keeps brand tokens out of item and rumour ids (whole segment only)", () => {
