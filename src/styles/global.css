@@ -12,8 +12,13 @@ html {
 	font-family: var(--font-sans);
 	line-height: 1.5;
 	-webkit-text-size-adjust: 100%;
-	/* The phone tab bar's measured two-line height (spec §5), in rem so it follows the text size. */
-	--tabbar-h: 4.25rem;
+	/* Below 13rem of screen the four tab labels no longer fit side by side, so the phone bar becomes
+	   2 x 2 (issue #28). In rem, so a larger text size moves the switch. Positive and huge below
+	   the line, negative above it: clamp() and min() turn that into a switch without a query. */
+	--tabbar-2x2: calc((13rem - 100vw) * 999);
+	/* The phone tab bar's measured two-line height (spec §5), in rem so it follows the text size.
+	   As 2 x 2 it is two one-line rows: 2 x (padding, icon, gap, label) plus the 1 px border. */
+	--tabbar-h: max(4.25rem, min(var(--tabbar-2x2), 3rem + 49px));
 	/* Keeps a focused control from scrolling in behind the fixed bar (WCAG 2.4.11), plus the update
 	   notice while it shows. */
 	scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--notice-h, 0px));
@@ -25,6 +30,9 @@ body {
 	display: flex;
 	flex-direction: column;
 	padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--notice-h, 0px));
+	/* A word longer than its line ("Forhåndsnedlasting" at 200 % text) breaks rather than
+	   pushing the page sideways (issue #28). Words that fit are never split. */
+	overflow-wrap: break-word;
 }
 
 img,
@@ -94,7 +102,9 @@ p {
 	width: 100%;
 	max-width: 72rem;
 	margin-inline: auto;
-	padding: var(--space-4) var(--space-3);
+	/* min(): the same 16 px at 320 and normal text, but it stops growing with large text so
+	   the content keeps its width (issue #28). The same pattern recurs below. */
+	padding: var(--space-4) min(var(--space-3), 5vw);
 	flex: 1;
 }
 
@@ -183,6 +193,7 @@ p {
 /* Hub h1: the same lockup, larger. It is the wordmark, not a heading, so the display face is right. */
 .lockup {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	gap: var(--space-2);
 	margin: 0 0 var(--space-3);
@@ -274,7 +285,7 @@ p {
    one is 151 px); copy, type size and the 44 px controls are unchanged. From 768 px the gaps are
    restored and everything sits on one centre line. */
 .site-footer {
-	padding: var(--space-2) var(--space-3) 10px;
+	padding: var(--space-2) min(var(--space-3), 5vw) 10px;
 	border-top: 1px solid var(--border);
 	background: var(--bg-raised);
 	color: var(--text-muted);
@@ -293,13 +304,23 @@ p {
 		"icons copy"
 		"chip chip";
 	align-items: center;
-	gap: var(--space-1) var(--space-3);
+	gap: var(--space-1) min(var(--space-3), 5vw);
 }
 
-/* The icons sit at the left edge on a phone, so their tips open to the right. */
+/* The icons sit at the left edge on a phone, so their tips open to the right. They may run to
+   the screen edge less the footer padding, which shrinks by one icon step per icon. */
 .footer-icons .tip {
 	left: 0;
+	max-width: calc(100vw - 2 * min(var(--space-3), 5vw) - var(--tip-inset, 0px));
 	transform: none;
+}
+
+.footer-icons li:nth-child(2) {
+	--tip-inset: calc(var(--tap) + var(--space-1));
+}
+
+.footer-icons li:nth-child(3) {
+	--tip-inset: calc(2 * (var(--tap) + var(--space-1)));
 }
 
 .footer-icons {
@@ -403,15 +424,17 @@ p {
 }
 
 .tabbar ul {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	display: flex;
+	flex-wrap: wrap;
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
+/* A quarter each, or half each once the labels stop fitting (--tabbar-2x2). */
 .tabbar li {
 	display: flex;
+	flex: 1 1 clamp(25%, var(--tabbar-2x2), 50%);
 	min-width: 0;
 }
 
@@ -656,7 +679,11 @@ p {
 	letter-spacing: normal;
 	line-height: 1.4;
 	text-transform: none;
-	white-space: nowrap;
+	/* One line while it fits; with large text it wraps inside max-width instead of widening the
+	   page, even while hidden (issue #28). */
+	width: max-content;
+	max-width: calc(100vw - 2 * var(--space-3));
+	overflow-wrap: anywhere;
 	transform: translateX(-50%);
 	visibility: hidden;
 	opacity: 0;
@@ -712,6 +739,7 @@ p {
 
 .hub {
 	display: grid;
+	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-4);
 }
 
@@ -721,7 +749,7 @@ p {
 }
 
 .hub-state {
-	padding: var(--space-4);
+	padding: var(--space-4) min(var(--space-4), 7.5vw);
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
 	background: var(--bg-raised);
@@ -1417,8 +1445,12 @@ p {
 	}
 
 	.tabbar ul {
-		display: flex;
+		flex-wrap: nowrap;
 		gap: var(--space-1);
+	}
+
+	.tabbar li {
+		flex: initial;
 	}
 
 	.tabbar .tab-icon {
