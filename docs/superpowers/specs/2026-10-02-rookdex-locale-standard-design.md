@@ -41,7 +41,7 @@ Plus the checks in §8 of this spec.
 | D1 | Vendor the i18n library untouched in `src/lib/i18n/`. `src/i18n/index.ts` is a thin Rookdex layer on top. | It keeps Rookdex an honest consumer of the standard, and the folder no longer collides with the library's extract target. |
 | D2 | `money()` gains an optional fourth argument `{ stripWhole: true }` in i18n 2.1.0 (Workbench). It maps to Intl's `trailingZeroDisplay: "stripIfInteger"`. | "949 kr" instead of "949,00 kr", and "949,50 kr" stays exact. Nothing gets rounded, and the default and the §13 test are unchanged. |
 | D3 | The full preference model now: a System row first, picking a language stores `lang`, and picking System removes it. | Someone whose phone is in English but who reads Rookdex in Norwegian lands in Norwegian from rookdex.app and from the installed app. |
-| D4 | One price file plus a `{price:<id>}` token in guide Markdown, swapped at build time by a remark plugin. | Each price lives in one line. The hub and both guides follow it. |
+| D4 | One price file plus a `{price:<id>}` token in guide Markdown, swapped at build time by a Markdown plugin (Sätteri, the renderer Astro 7 uses). | Each price lives in one line. The hub and both guides follow it. |
 | D5 | The root `/` is a real page: language links, hreflang, the site-name JSON-LD, and a hashed inline resolver. The manifest's `start_url` becomes `/`. The home pages keep their JSON-LD too (§6.4). | Google reads the site name from the domain root, and the installed app opens in the stored language. |
 | D6 | Vendor the DS `picker.js` (DS 3.8.0) untouched. It replaces `language-menu.ts`. Rookdex keeps its own picker CSS. | `picker.js` was ported from Rookdex and has since gained Home/End and one-open-at-a-time. `picker.css` uses DS token names Rookdex doesn't have. |
 | D7 | Keyed calls with typed keys: `t("hub.buyBody")`, with `Key` derived from `en.json`. | It's the standard's API, and a typo fails `astro check`. |
@@ -82,7 +82,7 @@ formatting. PR 3 is the visible change, checked on the phone against the preview
 | `src/i18n/index.ts` | Keeps `locales`, `Locale`, `defaultLocale` and `isLocale`. Adds `translator(locale)` and the `Key` type. `t(locale)` and `fill()` go. |
 | `src/model/prices.ts` | `export const prices = { standard: { amount: 949, currency: "NOK" }, ultimate: { amount: 1189, currency: "NOK" } } as const`. |
 | `src/config/preferences.ts` | Same shape as the React scaffold: `currencies: ["NOK"]`, `baseCurrency: "NOK"`, `regionCurrency: { NO: "NOK" }`. With one currency, there's no currency picker. |
-| `integrations/remark-price.mjs` | The guide token plugin (§5.4). |
+| `integrations/markdown-price.mjs` | The guide token plugin (§5.4). |
 | removed | `src/i18n/en.ts`, `src/i18n/no.ts`. |
 
 ### 5.2 The Rookdex layer
@@ -118,8 +118,8 @@ The caller passes `money(prices.standard)`. No bundle value contains a price.
 ### 5.4 Prices in guides
 
 - The guides write `{price:standard}` and `{price:ultimate}` in the prose.
-- `integrations/remark-price.mjs` runs on guide Markdown (registered in
-  `astro.config` → `markdown.remarkPlugins`). It visits text nodes and swaps each token for
+- `integrations/markdown-price.mjs` runs on guide Markdown (registered in
+  `astro.config` → `markdown.processor: satteri({ mdastPlugins })`; Astro 7.3 rejects `remarkPlugins` without `@astrojs/markdown-remark`). It visits text nodes and swaps each token for
   `money(lang, amount, currency, { stripWhole: true })`.
 - `lang` comes from the entry's folder (`guides/en/`, `guides/no/`, later `guides/nb/`),
   passed through `resolveLang` so `no` formats as `nb`.
@@ -141,7 +141,7 @@ The caller passes `money(prices.standard)`. No bundle value contains a price.
 - **Translator:** placeholders, plural one/other, fallback to `en` for a missing key, and
   `money` giving "949 kr" for `nb` and "NOK 949" for `en`. The exact `en` output is read off
   the test run and pinned.
-- **Remark plugin:** a token becomes the formatted price per locale, and an unknown id throws.
+- **Markdown plugin:** a token becomes the formatted price per locale, and an unknown id throws.
 - **Existing tests** keep passing after a mechanical update to the new API. The rendered pages
   under `dist/` match `main` except for price text. The plan defines how to diff them.
 
