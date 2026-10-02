@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>README screenshots</title>
+		<!--
+			Compose source for docs/readme/screens.png. capture.mjs fills the three img elements with
+			fresh screenshots of the live site and saves the canvas at 2x. Opened on its own, the
+			frames are empty.
+		-->
+		<style>
+			html,
+			body {
+				margin: 0;
+				background: #000000;
+			}
+			.canvas {
+				position: relative;
+				display: flex;
+				gap: 28px;
+				align-items: center;
+				justify-content: center;
+				width: 1280px;
+				height: 600px;
+				overflow: hidden;
+				background: #000000;
+			}
+			.canvas::before {
+				position: absolute;
+				inset: auto -10% -55% -10%;
+				height: 90%;
+				content: "";
+				background: radial-gradient(closest-side, rgb(255 61 129 / 22%), rgb(255 138 61 / 8%) 60%, transparent);
+			}
+			.frame {
+				position: relative;
+				overflow: hidden;
+				background: #0d0d0d;
+				border: 2px solid #262626;
+				box-shadow: 0 24px 60px rgb(0 0 0 / 60%);
+			}
+			.frame img {
+				display: block;
+				width: 100%;
+			}
+			.desktop {
+				width: 720px;
+				aspect-ratio: 1280 / 800;
+				border-radius: 14px;
+			}
+			.phones {
+				display: flex;
+				gap: 24px;
+			}
+			.phone {
+				width: 196px;
+				aspect-ratio: 390 / 844;
+				border-radius: 28px;
+			}
+			.stripe {
+				position: absolute;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				height: 12px;
+				background: linear-gradient(90deg, #ff3d81, #ff8a3d);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="canvas">
+			<div class="frame desktop"><img id="desktop-tracker" alt="" /></div>
+			<div class="phones">
+				<div class="frame phone"><img id="phone-hub" alt="" /></div>
+				<div class="frame phone"><img id="phone-tracker" alt="" /></div>
+			</div>
+			<div class="stripe"></div>
+		</div>
+	</body>
+</html>
