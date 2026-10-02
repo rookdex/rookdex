@@ -1,5 +1,5 @@
 import { useState } from "react"
-import type { Strings } from "../../i18n"
+import type { Translate } from "../../i18n"
 import { Modal } from "./Modal"
 
 interface Props {
@@ -7,13 +7,13 @@ interface Props {
 	title: string
 	initial: string
 	error: string
-	strings: Strings["profile"]
+	t: Translate
 	onSave: (name: string) => void
 	onCancel: () => void
 }
 
 /** The parent passes a `key` that changes per opening, so the field resets without an effect. */
-export function NameDialog({ open, title, initial, error, strings, onSave, onCancel }: Props) {
+export function NameDialog({ open, title, initial, error, t, onSave, onCancel }: Props) {
 	const [name, setName] = useState(initial)
 	return (
 		<Modal open={open} labelledBy="name-title" onClose={onCancel}>
@@ -24,7 +24,7 @@ export function NameDialog({ open, title, initial, error, strings, onSave, onCan
 				}}
 			>
 				<h2 id="name-title">{title}</h2>
-				<label htmlFor="name-input">{strings.nameLabel}</label>
+				<label htmlFor="name-input">{t("profile.nameLabel")}</label>
 				<input
 					id="name-input"
 					value={name}
@@ -37,10 +37,10 @@ export function NameDialog({ open, title, initial, error, strings, onSave, onCan
 				</p>
 				<div className="actions">
 					<button type="submit" className="primary">
-						{strings.save}
+						{t("profile.save")}
 					</button>
 					<button type="button" onClick={onCancel}>
-						{strings.cancel}
+						{t("profile.cancel")}
 					</button>
 				</div>
 			</form>

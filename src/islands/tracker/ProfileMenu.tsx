@@ -1,5 +1,5 @@
 import { type KeyboardEvent, type RefObject, useEffect, useId, useRef, useState } from "react"
-import { fill, type Strings } from "../../i18n"
+import type { Translate } from "../../i18n"
 import type { Profile } from "../../model/schema"
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 	onImport: () => void
 	onDelete: () => void
 	onDeleted: () => void
-	strings: Strings["profile"]
+	t: Translate
 	/** The parent may own the trigger ref so a dialog opened from the menu can return focus to it. */
 	triggerRef?: RefObject<HTMLButtonElement | null>
 }
@@ -34,7 +34,7 @@ export function ProfileMenu({
 	onImport,
 	onDelete,
 	onDeleted,
-	strings,
+	t,
 	triggerRef,
 }: Props) {
 	const [open, setOpen] = useState(false)
@@ -85,12 +85,12 @@ export function ProfileMenu({
 	}
 
 	const actions: [string, () => void][] = [
-		[strings.new, onNew],
-		[strings.rename, onRename],
-		[strings.export, onExport],
-		[strings.import, onImport],
-		[strings.delete, onDelete],
-		[strings.deleted, onDeleted],
+		[t("profile.new"), onNew],
+		[t("profile.rename"), onRename],
+		[t("profile.export"), onExport],
+		[t("profile.import"), onImport],
+		[t("profile.delete"), onDelete],
+		[t("profile.deleted"), onDeleted],
 	]
 
 	return (
@@ -103,7 +103,7 @@ export function ProfileMenu({
 				aria-controls={menuId}
 				onClick={() => setOpen((value) => !value)}
 			>
-				{fill(strings.menu, { name: current?.name ?? "" })}
+				{t("profile.menu", { name: current?.name ?? "" })}
 			</button>
 			{open && (
 				// biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: WAI-ARIA menu button pattern; the list is the menu and its buttons are the items.

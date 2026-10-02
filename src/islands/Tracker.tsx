@@ -1,5 +1,5 @@
 import { type ChangeEvent, useEffect, useRef, useState } from "react"
-import { fill, type Locale, t } from "../i18n"
+import { type Locale, seedLabel, translator } from "../i18n"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, recentFinds } from "../model/stats"
@@ -38,14 +38,10 @@ function buildTracker(defaultProfileName: string): TrackerModel {
 	})
 }
 
-function label(map: Record<string, string>, key: string): string {
-	return map[key] ?? key
-}
-
 /** Island root. `client:only`: the first render reads the URL and IndexedDB. */
 export function Tracker({ locale }: Props) {
-	const s = t(locale)
-	const [tracker] = useState(() => buildTracker(s.profile.defaultName))
+	const { t } = translator(locale)
+	const [tracker] = useState(() => buildTracker(t("profile.defaultName")))
 	const state = useTracker(tracker)
 	const [dialog, setDialog] = useState<"new" | "rename" | "delete" | "deleted" | null>(null)
 	// Bumped per opening: the NameDialog keys on this alone, so its field resets on each opening
@@ -130,20 +126,20 @@ export function Tracker({ locale }: Props) {
 	const categories = perCategory(countable(state.items), state.records).map((c) => ({
 		...c,
 		id: c.category,
-		label: label(s.category, c.category),
+		label: seedLabel(t, "category", c.category),
 	}))
 	const visible =
 		state.selected.length === 0
 			? state.items
 			: state.items.filter((item) => state.selected.includes(item.category))
 	const announcement = state.announcement
-		? fill(s.tracker.announce, {
-				category: label(s.category, state.announcement.category),
+		? t("tracker.announce", {
+				category: seedLabel(t, "category", state.announcement.category),
 				done: state.announcement.done,
 				total: state.announcement.total,
 			})
 		: ""
-	const error = state.error ? s.tracker.errors[state.error] : ""
+	const error = state.error ? t(`tracker.errors.${state.error}`) : ""
 	const nameError = state.error === "name" ? error : ""
 	const pageError = state.error === "name" ? "" : error
 
@@ -152,14 +148,14 @@ export function Tracker({ locale }: Props) {
 	if (state.status === "error") {
 		return (
 			<p className="tracker-alert" role="alert">
-				{s.tracker.storageError}
+				{t("tracker.storageError")}
 			</p>
 		)
 	}
 
 	return (
 		<div className="tracker" aria-busy={state.status === "loading"}>
-			{state.status === "loading" && <p className="visually-hidden">{s.tracker.loading}</p>}
+			{state.status === "loading" && <p className="visually-hidden">{t("tracker.loading")}</p>}
 			<div className="tracker-top">
 				<ProfileMenu
 					triggerRef={menuButton}
@@ -172,13 +168,13 @@ export function Tracker({ locale }: Props) {
 					onImport={() => fileInput.current?.click()}
 					onDelete={() => openDialog("delete")}
 					onDeleted={() => openDialog("deleted")}
-					strings={s.profile}
+					t={t}
 				/>
 				{state.persistHint && (
 					<p className="hint" role="status">
-						{s.tracker.persistHint}{" "}
+						{t("tracker.persistHint")}{" "}
 						<button type="button" onClick={dismissHint}>
-							{s.tracker.dismiss}
+							{t("tracker.dismiss")}
 						</button>
 					</p>
 				)}
@@ -187,25 +183,25 @@ export function Tracker({ locale }: Props) {
 				categories={categories}
 				selected={state.selected}
 				onSelect={tracker.selectCategories}
-				allLabel={s.tracker.all}
-				navLabel={s.tracker.categories}
-				sources={{ href: sourcesHref, label: s.tracker.sources }}
+				allLabel={t("tracker.all")}
+				navLabel={t("tracker.categories")}
+				sources={{ href: sourcesHref, label: t("tracker.sources") }}
 			/>
 			<ItemList
 				items={visible}
 				records={state.records}
 				disabled={state.status !== "ready"}
-				categoryLabel={(id) => label(s.category, id)}
-				groupLabel={(id) => label(s.group, id)}
+				categoryLabel={(id) => seedLabel(t, "category", id)}
+				groupLabel={(id) => seedLabel(t, "group", id)}
 				onToggle={(id, done) => (done ? tracker.tick(id) : tracker.untick(id))}
 				sourcesHref={sourcesHref}
-				strings={s.tracker}
+				t={t}
 			/>
 			<StatsRail
 				overall={countItems(state.items, state.records)}
 				categories={categories}
 				recent={recentFinds(state.items, state.records)}
-				strings={s.tracker}
+				t={t}
 			/>
 			<p className="visually-hidden" role="status" aria-live="polite">
 				{announcement}
@@ -218,19 +214,19 @@ export function Tracker({ locale }: Props) {
 				open={dialog === "new" || dialog === "rename"}
 				title={
 					dialog === "rename"
-						? fill(s.profile.renameTitle, { name: currentName })
-						: s.profile.newTitle
+						? t("profile.renameTitle", { name: currentName })
+						: t("profile.newTitle")
 				}
 				initial={dialog === "rename" ? currentName : ""}
 				error={nameError}
-				strings={s.profile}
+				t={t}
 				onSave={saveName}
 				onCancel={closeDialog}
 			/>
 			<DeleteDialog
 				open={dialog === "delete"}
 				name={currentName}
-				strings={s.profile}
+				t={t}
 				onExport={exportNow}
 				onDelete={deleteCurrent}
 				onCancel={closeDialog}
@@ -238,14 +234,14 @@ export function Tracker({ locale }: Props) {
 			<DeletedDialog
 				open={dialog === "deleted"}
 				profiles={deletedProfiles(state.profiles)}
-				strings={s.profile}
+				t={t}
 				onRestore={tracker.restoreProfile}
 				onClose={closeDialog}
 			/>
 			<ImportDialog
 				file={state.pendingImport}
 				into={currentName}
-				strings={s.profile}
+				t={t}
 				onInto={() => tracker.confirmImport("current")}
 				onCreate={() => tracker.confirmImport("new")}
 				onCancel={tracker.cancelImport}
@@ -257,7 +253,7 @@ export function Tracker({ locale }: Props) {
 				accept=".json,application/json"
 				className="visually-hidden"
 				tabIndex={-1}
-				aria-label={s.profile.import}
+				aria-label={t("profile.import")}
 				onChange={onFile}
 			/>
 		</div>
