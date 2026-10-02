@@ -2,7 +2,7 @@
 import { getRelativeLocaleUrl } from "astro:i18n"
 import pkg from "../../../package.json"
 import ExternalLink from "../../components/ExternalLink.astro"
-import { isLocale, type Locale, locales, t } from "../../i18n"
+import { isLocale, type Locale, locales, translator } from "../../i18n"
 import Base from "../../layouts/Base.astro"
 import { appVersion, commitUrl } from "../../model/version"
 
@@ -14,27 +14,27 @@ export function getStaticPaths() {
 // profile menu (spec §7).
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
-const s = t(locale as Locale)
+const { t, displayName } = translator(locale as Locale)
 // Read at render, so tests can stub it. A local build has no sha and shows "dev".
 const sha = process.env.GITHUB_SHA
 ---
 
-<Base locale={locale} title={s.seo.titles.settings} description={s.settings.description} path="settings">
-	<h1>{s.settings.title}</h1>
+<Base locale={locale} title={t("seo.titles.settings")} description={t("settings.description")} path="settings">
+	<h1>{t("settings.title")}</h1>
 
 	<section class="settings-group" aria-labelledby="settings-language">
-		<h2 id="settings-language">{s.settings.language}</h2>
+		<h2 id="settings-language">{t("settings.language")}</h2>
 		<ul class="rows">
 			{
 				locales.map((l) => (
 					<li class={l === locale ? "row" : "row row-has-link"}>
 						{l === locale ? (
 							<span aria-current="page" lang={l}>
-								{s.languageNames[l]}
+								{displayName(l)}
 							</span>
 						) : (
 							<a href={getRelativeLocaleUrl(l, "settings")} hreflang={l} lang={l} class="row-link">
-								{s.languageNames[l]}
+								{displayName(l)}
 							</a>
 						)}
 						{l === locale && (
@@ -60,59 +60,59 @@ const sha = process.env.GITHUB_SHA
 	</section>
 
 	<section class="settings-group" aria-labelledby="settings-data">
-		<h2 id="settings-data">{s.settings.data}</h2>
+		<h2 id="settings-data">{t("settings.data")}</h2>
 		<dl class="rows">
 			<div class="row">
-				<dt>{s.settings.stored}</dt>
-				<dd>{s.settings.storedValue}</dd>
+				<dt>{t("settings.stored")}</dt>
+				<dd>{t("settings.storedValue")}</dd>
 			</div>
-			<div class="row" data-storage-row data-yes={s.settings.yes} data-no={s.settings.no} hidden>
-				<dt>{s.settings.persisted}</dt>
+			<div class="row" data-storage-row data-yes={t("settings.yes")} data-no={t("settings.no")} hidden>
+				<dt>{t("settings.persisted")}</dt>
 				<dd data-value></dd>
 			</div>
 			<div class="row">
-				<dt>{s.settings.transfer}</dt>
-				<dd><a href={getRelativeLocaleUrl(locale, "tracker")}>{s.settings.transferLink}</a></dd>
+				<dt>{t("settings.transfer")}</dt>
+				<dd><a href={getRelativeLocaleUrl(locale, "tracker")}>{t("settings.transferLink")}</a></dd>
 			</div>
 		</dl>
 		<div class="danger" data-delete>
-			<p>{s.settings.dangerBody}</p>
-			<button type="button" class="danger-button" data-delete-open>{s.settings.deleteAll}</button>
+			<p>{t("settings.dangerBody")}</p>
+			<button type="button" class="danger-button" data-delete-open>{t("settings.deleteAll")}</button>
 			<p class="delete-status" role="status" data-delete-status></p>
 			<dialog
 				class="modal"
 				aria-labelledby="delete-all-title"
-				data-blocked={s.settings.blocked}
-				data-failed={s.settings.failed}
-				data-done={s.settings.done}
+				data-blocked={t("settings.blocked")}
+				data-failed={t("settings.failed")}
+				data-done={t("settings.done")}
 			>
-				<h2 id="delete-all-title" tabindex="-1">{s.settings.dialogTitle}</h2>
-				<p>{s.settings.dangerBody}</p>
-				<p>{s.settings.keepsChoices}</p>
+				<h2 id="delete-all-title" tabindex="-1">{t("settings.dialogTitle")}</h2>
+				<p>{t("settings.dangerBody")}</p>
+				<p>{t("settings.keepsChoices")}</p>
 				<p class="tracker-alert" role="alert" data-delete-alert></p>
 				<div class="actions">
-					<button type="button" data-delete-cancel>{s.settings.cancel}</button>
-					<button type="button" class="danger-button" data-delete-confirm>{s.settings.confirm}</button>
+					<button type="button" data-delete-cancel>{t("settings.cancel")}</button>
+					<button type="button" class="danger-button" data-delete-confirm>{t("settings.confirm")}</button>
 				</div>
 			</dialog>
 		</div>
 	</section>
 
 	<section id="about" class="settings-group" aria-labelledby="settings-about">
-		<h2 id="settings-about">{s.settings.about}</h2>
+		<h2 id="settings-about">{t("settings.about")}</h2>
 		<dl class="rows">
 			<div class="row" data-install-row hidden>
-				<dt>{s.settings.install}</dt>
+				<dt>{t("settings.install")}</dt>
 				<dd>
 					<button type="button" class="row-button" data-install-button hidden>
-						{s.settings.installButton}
+						{t("settings.installButton")}
 					</button>
-					<span data-install-installed hidden>{s.settings.installed}</span>
-					<span data-install-ios hidden>{s.settings.iosHowTo}</span>
+					<span data-install-installed hidden>{t("settings.installed")}</span>
+					<span data-install-ios hidden>{t("settings.iosHowTo")}</span>
 				</dd>
 			</div>
 			<div class="row">
-				<dt>{s.settings.version}</dt>
+				<dt>{t("settings.version")}</dt>
 				<dd>
 					{
 						sha ? (
@@ -131,19 +131,19 @@ const sha = process.env.GITHUB_SHA
 				</dd>
 			</div>
 			<div class="row">
-				<dt>{s.settings.source}</dt>
+				<dt>{t("settings.source")}</dt>
 				<dd>
 					<ExternalLink href="https://github.com/rookdex/rookdex" locale={locale as Locale}>
-						{s.settings.sourceLink}
+						{t("settings.sourceLink")}
 					</ExternalLink>
 				</dd>
 			</div>
 			<div class="row">
-				<dt>{s.settings.codeLicence}</dt>
+				<dt>{t("settings.codeLicence")}</dt>
 				<dd>MIT</dd>
 			</div>
 			<div class="row">
-				<dt>{s.settings.guideLicence}</dt>
+				<dt>{t("settings.guideLicence")}</dt>
 				<dd>
 					<ExternalLink
 						href="https://creativecommons.org/licenses/by-sa/4.0/"
@@ -154,11 +154,11 @@ const sha = process.env.GITHUB_SHA
 				</dd>
 			</div>
 			<div class="row">
-				<dt>{s.settings.legal}</dt>
+				<dt>{t("settings.legal")}</dt>
 				<dd><a href="mailto:legal@rookdex.app">legal@rookdex.app</a></dd>
 			</div>
 		</dl>
-		<p class="note">{s.settings.trademarks}</p>
+		<p class="note">{t("settings.trademarks")}</p>
 	</section>
 </Base>
 

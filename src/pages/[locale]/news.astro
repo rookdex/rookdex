@@ -1,6 +1,6 @@
 ---
 import ExternalLink from "../../components/ExternalLink.astro"
-import { fill, isLocale, type Locale, locales, t } from "../../i18n"
+import { isLocale, type Locale, locales, translator } from "../../i18n"
 import Base from "../../layouts/Base.astro"
 import { outletOf } from "../../model/outlet"
 import { rumours } from "../../model/seed"
@@ -12,18 +12,18 @@ export function getStaticPaths() {
 // The News tab (spec §8). Rumours are its first section; phase 1c adds the facts feed above them.
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
-const s = t(locale as Locale)
+const { t } = translator(locale as Locale)
 ---
 
-<Base locale={locale} title={s.seo.titles.news} description={s.news.description} path="news">
+<Base locale={locale} title={t("seo.titles.news")} description={t("news.description")} path="news">
 	<article class="news">
-		<h1>{s.news.title}</h1>
-		<p class="tagline">{s.rumours.intro}</p>
+		<h1>{t("news.title")}</h1>
+		<p class="tagline">{t("rumours.intro")}</p>
 		<section aria-labelledby="rumours">
-			<h2 id="rumours">{s.rumours.title}</h2>
+			<h2 id="rumours">{t("rumours.title")}</h2>
 			{
 				rumours.length === 0 ? (
-					<p>{s.rumours.empty}</p>
+					<p>{t("rumours.empty")}</p>
 				) : (
 					<ul class="rumour-list">
 						{rumours.map((rumour) => {
@@ -35,7 +35,7 @@ const s = t(locale as Locale)
 									<p class="summary">{rumour.summary}</p>
 									<p class="meta">
 										<ExternalLink href={press.url} locale={locale as Locale}>
-											{fill(s.rumours.reportedBy, { outlet: outletOf(press.url) })}
+											{t("rumours.reportedBy", { outlet: outletOf(press.url) })}
 										</ExternalLink>
 									</p>
 								</li>

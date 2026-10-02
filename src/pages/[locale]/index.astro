@@ -1,7 +1,7 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n"
 import Mark from "../../components/Mark.astro"
-import { isLocale, type Locale, locales, t } from "../../i18n"
+import { isLocale, type Locale, locales, translator } from "../../i18n"
 import { Countdown } from "../../islands/Countdown"
 import { InstallPrompt } from "../../islands/InstallPrompt"
 import Base from "../../layouts/Base.astro"
@@ -12,19 +12,19 @@ export function getStaticPaths() {
 
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
-const s = t(locale as Locale)
+const { t } = translator(locale as Locale)
 ---
 
-<Base locale={locale} title={s.seo.titles.home} description={s.seo.homeDescription} path="">
+<Base locale={locale} title={t("seo.titles.home")} description={t("seo.homeDescription")} path="">
 	<div class="hub">
 		<header class="hub-intro">
 			<h1 class="lockup" aria-label="Rookdex">
 				<Mark id="hub" size={48} />
 				<span class="wordmark">ROOKDEX</span>
 			</h1>
-			<p class="tagline">{s.tagline}</p>
+			<p class="tagline">{t("tagline")}</p>
 			<p class="tap-links">
-				<a href={getRelativeLocaleUrl(locale, "tracker")}>{s.hub.openTracker}</a>
+				<a href={getRelativeLocaleUrl(locale, "tracker")}>{t("hub.openTracker")}</a>
 			</p>
 		</header>
 		{/* The server-rendered time changes every build; the version hash skips it (precache.mjs). */}

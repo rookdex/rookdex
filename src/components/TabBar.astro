@@ -1,6 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n"
-import { type Locale, t } from "../i18n"
+import { type Locale, translator } from "../i18n"
 import { TAB_PATHS, TABS, type Tab } from "../model/tabs"
 import TabIcon from "./TabIcon.astro"
 
@@ -15,10 +15,10 @@ interface Props {
 
 // Bottom bar on phones, a text row under the header from 768 px (spec §5). Zero JavaScript.
 const { locale, current, sub = false } = Astro.props
-const s = t(locale)
+const { t } = translator(locale)
 ---
 
-<nav class="tabbar" aria-label={s.nav.label}>
+<nav class="tabbar" aria-label={t("nav.label")}>
 	<ul>
 		{
 			TABS.map((id) => (
@@ -28,7 +28,7 @@ const s = t(locale)
 						aria-current={id === current ? (sub ? "true" : "page") : undefined}
 					>
 						<TabIcon name={id} />
-						<span>{s.nav[id]}</span>
+						<span>{t(`nav.${id}`)}</span>
 					</a>
 				</li>
 			))

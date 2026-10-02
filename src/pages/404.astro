@@ -1,28 +1,28 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n"
-import { locales, t } from "../i18n"
+import { locales, translator } from "../i18n"
 import Base from "../layouts/Base.astro"
 
 // The 404 is English (there is no locale in an unknown URL) and links every language home.
-const s = t("en")
+const { t, displayName } = translator("en")
 ---
 
 <Base
 	locale="en"
-	title={s.seo.titles.notFound}
-	description={s.notFound.body}
+	title={t("seo.titles.notFound")}
+	description={t("notFound.body")}
 	path=""
 	tab={null}
 	indexable={false}
 >
-	<h1>{s.notFound.title}</h1>
-	<p>{s.notFound.body}</p>
+	<h1>{t("notFound.title")}</h1>
+	<p>{t("notFound.body")}</p>
 	<ul class="tap-links">
 		{
 			locales.map((l) => (
 				<li>
 					<a href={getRelativeLocaleUrl(l, "")} hreflang={l} lang={l}>
-						{s.languageNames[l]}
+						{displayName(l)}
 					</a>
 				</li>
 			))

@@ -1,5 +1,5 @@
 ---
-import { type Locale, t } from "../i18n"
+import { type Locale, translator } from "../i18n"
 
 interface Props {
 	href: string
@@ -16,7 +16,7 @@ const { href, locale, class: className, icon = true } = Astro.props
 if (!href.startsWith("https://")) {
 	throw new Error(`ExternalLink needs an https:// href, got "${href}"`)
 }
-const s = t(locale)
+const { t } = translator(locale)
 ---
 
 <a href={href} class={className} target="_blank" rel="noopener noreferrer"
@@ -37,5 +37,5 @@ const s = t(locale)
 				<path d="M7 17 17 7M9 7h8v8" />
 			</svg>
 		)
-	}<span class="visually-hidden new-tab-note">{` (${s.newTab})`}</span></a
+	}<span class="visually-hidden new-tab-note">{` (${t("newTab")})`}</span></a
 >

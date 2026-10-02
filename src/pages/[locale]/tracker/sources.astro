@@ -1,7 +1,7 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n"
 import ExternalLink from "../../../components/ExternalLink.astro"
-import { isLocale, type Locale, locales, t } from "../../../i18n"
+import { isLocale, type Locale, locales, seedLabel, translator } from "../../../i18n"
 import Base from "../../../layouts/Base.astro"
 import { outletOf } from "../../../model/outlet"
 import { categoryIds, groupItems, seedItems } from "../../../model/seed"
@@ -14,20 +14,20 @@ export function getStaticPaths() {
 // Categories and entries follow the tracker's order; retired items are left out, as there.
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
-const s = t(locale as Locale)
+const { t } = translator(locale as Locale)
 const live = seedItems.filter((item) => !item.retired)
 const sections = categoryIds(live).map((category) => ({
 	category,
-	label: s.category[category] ?? category,
+	label: seedLabel(t, "category", category),
 	items: [...groupItems(live.filter((item) => item.category === category)).values()].flat(),
 }))
 const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 ---
 
-<Base locale={locale} title={s.seo.titles.sources} description={s.sources.lede} path="tracker/sources">
-	<h1>{s.sources.title}</h1>
-	<p class="lede">{s.sources.lede}</p>
-	<nav aria-label={s.tracker.categories}>
+<Base locale={locale} title={t("seo.titles.sources")} description={t("sources.lede")} path="tracker/sources">
+	<h1>{t("sources.title")}</h1>
+	<p class="lede">{t("sources.lede")}</p>
+	<nav aria-label={t("tracker.categories")}>
 		<ul class="source-chips">
 			{
 				sections.map((section) => (
@@ -59,7 +59,7 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 							))}
 						</ul>
 						<a class="back" href={`${tracker}#item-${item.id}`}>
-							{s.sources.back}<span class="visually-hidden">: {item.name}</span>
+							{t("sources.back")}<span class="visually-hidden">: {item.name}</span>
 						</a>
 					</article>
 				))}

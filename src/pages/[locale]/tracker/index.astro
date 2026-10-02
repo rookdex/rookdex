@@ -1,5 +1,5 @@
 ---
-import { isLocale, type Locale, locales, t } from "../../../i18n"
+import { isLocale, type Locale, locales, translator } from "../../../i18n"
 import { Tracker } from "../../../islands/Tracker"
 import Base from "../../../layouts/Base.astro"
 
@@ -9,11 +9,11 @@ export function getStaticPaths() {
 
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
-const s = t(locale as Locale)
+const { t } = translator(locale as Locale)
 ---
 
-<Base locale={locale} title={s.seo.titles.tracker} description={s.tracker.description} path="tracker">
-	<h1>{s.tracker.title}</h1>
-	<noscript><p>{s.tracker.needsJs}</p></noscript>
+<Base locale={locale} title={t("seo.titles.tracker")} description={t("tracker.description")} path="tracker">
+	<h1>{t("tracker.title")}</h1>
+	<noscript><p>{t("tracker.needsJs")}</p></noscript>
 	<Tracker client:only="react" locale={locale} />
 </Base>
