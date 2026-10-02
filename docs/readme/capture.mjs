@@ -47,8 +47,12 @@ let nextId = 0
 const pending = new Map()
 socket.addEventListener("message", (event) => {
 	const message = JSON.parse(event.data)
-	pending.get(message.id)?.(message)
+	// Only replies to our own numbered requests resolve; protocol events carry no id.
+	if (!Number.isInteger(message.id)) return
+	const resolve = pending.get(message.id)
+	if (typeof resolve !== "function") return
 	pending.delete(message.id)
+	resolve(message)
 })
 const send = (method, params = {}) =>
 	new Promise((resolve) => {
