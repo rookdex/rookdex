@@ -225,6 +225,14 @@ const sha = process.env.GITHUB_SHA
 		border-top: 1px solid var(--border);
 	}
 
+	/* Label and value rows are a grid, so the value keeps its full width while it fits and the
+	   label gives way first; with large text the value breaks instead of widening the page
+	   (issue #28). */
+	dl .row {
+		display: grid;
+		grid-template-columns: minmax(min-content, 1fr) auto;
+	}
+
 	.row dt {
 		color: var(--text-muted);
 	}
@@ -233,6 +241,7 @@ const sha = process.env.GITHUB_SHA
 		margin: 0;
 		color: var(--text);
 		text-align: right;
+		overflow-wrap: anywhere;
 	}
 
 	.row :global(a),
