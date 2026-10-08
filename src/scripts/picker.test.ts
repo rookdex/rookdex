@@ -68,6 +68,25 @@ describe("vendored picker.js (standard §6.2)", () => {
 		expect(details().open).toBe(false)
 	})
 
+	it("closes on a pointer-down outside, but not on one inside", () => {
+		open()
+		rows()[0].dispatchEvent(new Event("pointerdown", { bubbles: true }))
+		expect(details().open).toBe(true)
+		document.getElementById("outside")?.dispatchEvent(new Event("pointerdown", { bubbles: true }))
+		expect(details().open).toBe(false)
+	})
+
+	it("keeps one picker open at a time", () => {
+		document.body.innerHTML = markup + markup.replace('data-picker="lang"', 'data-picker="other"')
+		const [first, second] = [...document.querySelectorAll("details")]
+		first.open = true
+		first.dispatchEvent(new Event("toggle"))
+		second.open = true
+		second.dispatchEvent(new Event("toggle"))
+		expect(second.open).toBe(true)
+		expect(first.open).toBe(false)
+	})
+
 	it("skips a hidden row without the picker class, and takes it in once it is shown", () => {
 		document.body.innerHTML = markup.replace(
 			'<ul class="picker-list">',
