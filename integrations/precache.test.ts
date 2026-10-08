@@ -1,7 +1,7 @@
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises"
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it } from "vitest"
 import {
 	computeVersion,
 	fillWorker,
@@ -9,6 +9,18 @@ import {
 	shouldPrecache,
 	withVersionHeader,
 } from "./precache.mjs"
+
+const tempRoots: string[] = []
+
+async function tempRoot() {
+	const root = await mkdtemp(join(tmpdir(), "rookdex-"))
+	tempRoots.push(root)
+	return root
+}
+
+afterEach(async () => {
+	await Promise.all(tempRoots.splice(0).map((root) => rm(root, { recursive: true, force: true })))
+})
 
 describe("precacheUrls", () => {
 	it("maps built files to URLs and skips the files the worker must not cache", () => {
@@ -125,7 +137,7 @@ describe("withVersionHeader (feedback spec §10.2)", () => {
 
 describe("computeVersion", () => {
 	it("ignores _headers, so writing the version line can't change the version", async () => {
-		const root = await mkdtemp(join(tmpdir(), "rookdex-"))
+		const root = await tempRoot()
 		await mkdir(join(root, "en"))
 		await writeFile(join(root, "en/index.html"), "<p>page</p>")
 		await writeFile(join(root, "_headers"), "/*\n")
@@ -140,7 +152,7 @@ describe("computeVersion", () => {
 
 describe("computeVersion and build stamps", () => {
 	async function version(html: string, asset = "body{}") {
-		const root = await mkdtemp(join(tmpdir(), "rookdex-"))
+		const root = await tempRoot()
 		await mkdir(join(root, "en"))
 		await mkdir(join(root, "_astro"))
 		await writeFile(join(root, "en/index.html"), html)
