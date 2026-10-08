@@ -133,6 +133,7 @@ const ogLocale: Record<Locale, string> = { en: "en_US", nb: "nb_NO" }
 		</p>
 		<script>
 			import "../lib/picker.js"
+			import { fillSystemRows, wireLanguageChoice } from "../scripts/language-choice"
 			import { wireOfflineNotice } from "../scripts/offline-notice"
 			import { wireTooltips } from "../scripts/tooltip"
 			import "../scripts/register-sw"
@@ -140,6 +141,15 @@ const ogLocale: Record<Locale, string> = { en: "en_US", nb: "nb_NO" }
 			const el = document.getElementById("offline-notice")
 			if (el) wireOfflineNotice(el, window, el.dataset.text ?? "")
 			wireTooltips(document)
+			fillSystemRows(document, navigator)
+			wireLanguageChoice(document, () => {
+				// Reading window.localStorage itself throws when site data is blocked.
+				try {
+					return window.localStorage
+				} catch {
+					return undefined
+				}
+			})
 		</script>
 		<Footer locale={locale} />
 	</body>

@@ -2,7 +2,8 @@
 import { getRelativeLocaleUrl } from "astro:i18n"
 import pkg from "../../../package.json"
 import ExternalLink from "../../components/ExternalLink.astro"
-import { isLocale, type Locale, locales, translator } from "../../i18n"
+import { defaultLocale, isLocale, type Locale, locales, translator } from "../../i18n"
+import { systemRow } from "../../i18n/system-row"
 import Base from "../../layouts/Base.astro"
 import { appVersion, commitUrl } from "../../model/version"
 
@@ -15,6 +16,7 @@ export function getStaticPaths() {
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const { t, displayName } = translator(locale as Locale)
+const { hrefs, before: systemBefore, after: systemAfter } = systemRow(t, "settings")
 // Read at render, so tests can stub it. A local build has no sha and shows "dev".
 const sha = process.env.GITHUB_SHA
 ---
@@ -25,6 +27,11 @@ const sha = process.env.GITHUB_SHA
 	<section class="settings-group" aria-labelledby="settings-language">
 		<h2 id="settings-language">{t("settings.language")}</h2>
 		<ul class="rows">
+			<li class="row row-has-link" data-system-item hidden>
+				<a href={hrefs[defaultLocale]} class="row-link" data-picker-row="" data-hrefs={JSON.stringify(hrefs)}>
+					<span>{systemBefore}<span data-system-name></span>{systemAfter}</span>
+				</a>
+			</li>
 			{
 				locales.map((l) => (
 					<li class={l === locale ? "row" : "row row-has-link"}>
@@ -33,7 +40,13 @@ const sha = process.env.GITHUB_SHA
 								{displayName(l)}
 							</span>
 						) : (
-							<a href={getRelativeLocaleUrl(l, "settings")} hreflang={l} lang={l} class="row-link">
+							<a
+								href={hrefs[l]}
+								hreflang={l}
+								lang={l}
+								class="row-link"
+								data-picker-row={l}
+							>
 								{displayName(l)}
 							</a>
 						)}
@@ -65,6 +78,10 @@ const sha = process.env.GITHUB_SHA
 			<div class="row">
 				<dt>{t("settings.stored")}</dt>
 				<dd>{t("settings.storedValue")}</dd>
+			</div>
+			<div class="row">
+				<dt>{t("settings.languageChoice")}</dt>
+				<dd>{t("settings.languageChoiceValue")}</dd>
 			</div>
 			<div class="row" data-storage-row data-yes={t("settings.yes")} data-no={t("settings.no")} hidden>
 				<dt>{t("settings.persisted")}</dt>
@@ -221,7 +238,7 @@ const sha = process.env.GITHUB_SHA
 		font-size: 0.875rem;
 	}
 
-	.row + .row {
+	.row:not([hidden]) ~ .row {
 		border-top: 1px solid var(--border);
 	}
 

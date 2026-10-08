@@ -12,7 +12,7 @@ afterEach(() => {
 })
 
 describe("deleteAllData (spec §7.2, feedback spec §7.3)", () => {
-	it("deletes the rookdex database and leaves localStorage alone", async () => {
+	it("deletes the rookdex database and the language choice, and keeps the one-shot flags", async () => {
 		const storage = { removeItem: vi.fn(), clear: vi.fn(), setItem: vi.fn() }
 		vi.stubGlobal("localStorage", storage)
 		const factory = new IDBFactory()
@@ -22,8 +22,17 @@ describe("deleteAllData (spec §7.2, feedback spec §7.3)", () => {
 		await expect(deleteAllData(factory, onBlocked)).resolves.toBe("deleted")
 		expect(await exists(factory)).toBe(false)
 		expect(onBlocked).not.toHaveBeenCalled()
-		expect(storage.removeItem).not.toHaveBeenCalled()
+		expect(storage.removeItem.mock.calls).toEqual([["lang"]])
 		expect(storage.clear).not.toHaveBeenCalled()
+	})
+
+	it("still reports deleted when removing the language choice throws", async () => {
+		vi.stubGlobal("localStorage", {
+			removeItem: () => {
+				throw new Error("SecurityError")
+			},
+		})
+		await expect(deleteAllData(new IDBFactory(), vi.fn())).resolves.toBe("deleted")
 	})
 
 	it("reports blocked once, then succeeds when the other tab closes, with one request", async () => {
