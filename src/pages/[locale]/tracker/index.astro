@@ -4,7 +4,7 @@ import { Tracker } from "../../../islands/Tracker"
 import Base from "../../../layouts/Base.astro"
 
 export function getStaticPaths() {
-	return locales.map((locale) => ({ params: { locale } }))
+	return locales.map((locale) => ({ params: { locale }, props: {} }))
 }
 
 const { locale } = Astro.params
@@ -15,5 +15,23 @@ const { t } = translator(locale as Locale)
 <Base locale={locale} title={t("seo.titles.tracker")} description={t("tracker.description")} path="tracker">
 	<h1>{t("tracker.title")}</h1>
 	<noscript><p>{t("tracker.needsJs")}</p></noscript>
-	<Tracker client:only="react" locale={locale} />
+	<Tracker client:only="react" locale={locale}>
+		<div slot="fallback" class="tracker-fallback"></div>
+	</Tracker>
 </Base>
+
+<style>
+	/* The island has no server HTML, so without this the footer paints right under the heading and
+	   the tracker shoves it away on mount (CLS 0.22 at 320 px). Every filter, even the smallest,
+	   renders taller than a screen, so one screen of reserve keeps the footer out of view throughout.
+	   Without scripting the island never mounts, so the reserve would only be a gap. */
+	.tracker-fallback {
+		min-height: 100dvh;
+	}
+
+	@media (scripting: none) {
+		.tracker-fallback {
+			min-height: 0;
+		}
+	}
+</style>
