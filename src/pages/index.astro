@@ -1,0 +1,108 @@
+---
+import "@fontsource-variable/inter"
+import "@fontsource-variable/dm-sans"
+import "@fontsource/bebas-neue"
+import { getAbsoluteLocaleUrl, getRelativeLocaleUrl } from "astro:i18n"
+import Mark from "../components/Mark.astro"
+import { defaultLocale, LANG_KEY, locales, translator } from "../i18n"
+import { rootScript, scriptHash } from "../model/root-resolver"
+import { jsonLd, SITE } from "../model/seo"
+import "../styles/global.css"
+
+// The language-neutral root (locale spec §6.4). With JavaScript, the inline resolver jumps to the
+// stored or browser language before first paint. Without it, and for crawlers, the page is one plain
+// link per language. Astro's CSP hashes only the scripts it bundles, so this one's hash is inserted by
+// hand, and seo-check rule 8 fails the build if the two drift, so a move of the CSP into a header
+// can't block it. The og tags are here because link unfurlers fetch the bare domain without JavaScript.
+const { t, displayName } = translator(defaultLocale)
+const resolver = rootScript(locales, defaultLocale, LANG_KEY)
+Astro.csp?.insertScriptHash(scriptHash(resolver))
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script is:inline set:html={resolver}></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<title>Rookdex</title>
+		<meta name="description" content={t("seo.homeDescription")} />
+		<meta name="color-scheme" content="dark" />
+		<meta name="theme-color" content="#000000" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<link rel="icon" href="/favicon.ico" sizes="48x48" />
+		<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+		<link rel="canonical" href={`${SITE}/`} />
+		{locales.map((l) => <link rel="alternate" hreflang={l} href={getAbsoluteLocaleUrl(l, "")} />)}
+		<link rel="alternate" hreflang="x-default" href={`${SITE}/`} />
+		<meta property="og:url" content={`${SITE}/`} />
+		<meta property="og:site_name" content="Rookdex" />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="Rookdex" />
+		<meta property="og:description" content={t("seo.homeDescription")} />
+		<meta property="og:image" content={`${SITE}/og.png`} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={t("seo.ogImageAlt")} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={jsonLd({
+				"@context": "https://schema.org",
+				"@type": "WebSite",
+				name: "Rookdex",
+				url: `${SITE}/`,
+			})}
+		></script>
+	</head>
+	<body class="root">
+		<main class="root-main">
+			<h1 class="lockup" aria-label="Rookdex">
+				<Mark id="root" size={48} />
+				<span class="wordmark">ROOKDEX</span>
+			</h1>
+			<ul class="root-links">
+				{
+					locales.map((l) => (
+						<li>
+							<a href={getRelativeLocaleUrl(l, "")} hreflang={l} lang={l}>
+								{displayName(l)}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</main>
+	</body>
+</html>
+
+<style>
+	/* No tab bar here, so none of the body's bottom padding for it. */
+	:global(body.root) {
+		justify-content: center;
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+	.root-main {
+		display: grid;
+		justify-items: center;
+		gap: var(--space-4);
+		padding: var(--space-5) var(--space-3);
+	}
+	.root-links {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--space-2);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.root-links a {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tap);
+		padding: 0 var(--space-3);
+	}
+</style>

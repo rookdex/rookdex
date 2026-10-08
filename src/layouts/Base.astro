@@ -57,7 +57,11 @@ const ogLocale: Record<Locale, string> = { en: "en_US", nb: "nb_NO" }
 					{locales.map((l) => (
 						<link rel="alternate" hreflang={l} href={getAbsoluteLocaleUrl(l, path)} />
 					))}
-					<link rel="alternate" hreflang="x-default" href={getAbsoluteLocaleUrl(defaultLocale, path)} />
+					<link
+						rel="alternate"
+						hreflang="x-default"
+						href={path === "" ? `${SITE}/` : getAbsoluteLocaleUrl(defaultLocale, path)}
+					/>
 					<meta property="og:url" content={canonical} />
 				</>
 			)
@@ -78,8 +82,9 @@ const ogLocale: Record<Locale, string> = { en: "en_US", nb: "nb_NO" }
 		<meta property="og:image:alt" content={t("seo.ogImageAlt")} />
 		<meta name="twitter:card" content="summary_large_image" />
 		{
-			/* Site name (spec D7): Google reads it at the domain root, which redirects to /en/. The
-			   block is data, never runs, and needs no CSP hash; jsonLd escapes "<". */
+			/* Site name (SEO spec D7, locale spec §6.4). Google reads it at the domain root, and the root page
+			   carries it. Googlebot may treat the root's jump as a redirect and land here, so the home pages
+			   keep their copy. The block is data, never runs, and needs no CSP hash; jsonLd escapes "<". */
 			path === "" && indexable && (
 				<script
 					type="application/ld+json"

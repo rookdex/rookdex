@@ -159,6 +159,20 @@ describe("link previews and indexing (SEO spec §4.4)", () => {
 		const tracker = await page("tracker", { locale })
 		expect(tracker.querySelector('script[type="application/ld+json"]')).toBeNull()
 	})
+
+	it.each(["en", "nb"] as const)(
+		"points the %s home page's x-default at the root",
+		async (locale) => {
+			const home = await page("", { locale })
+			expect(home.querySelector('link[hreflang="x-default"]')?.getAttribute("href")).toBe(
+				"https://rookdex.app/"
+			)
+			const tracker = await page("tracker", { locale })
+			expect(tracker.querySelector('link[hreflang="x-default"]')?.getAttribute("href")).toBe(
+				"https://rookdex.app/en/tracker/"
+			)
+		}
+	)
 })
 
 describe("update notice markup (feedback spec §10.3)", () => {
