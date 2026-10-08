@@ -17,6 +17,6 @@ describe("404 page", () => {
 		expect(doc.querySelector('script[type="application/ld+json"]')).toBeNull()
 		expect(
 			[...doc.querySelectorAll("main a[hreflang]")].map((a) => a.getAttribute("hreflang"))
-		).toEqual(["en", "no"])
+		).toEqual(["en", "nb"])
 	})
 })

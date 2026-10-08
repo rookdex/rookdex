@@ -50,3 +50,11 @@ describe("hosts and deploy (SEO spec §4.5, §4.6)", () => {
 		expect(ping).not.toContain("secrets.")
 	})
 })
+
+describe("manifest (locale spec §6.5)", () => {
+	it("starts the installed app at the root and keeps its identity", () => {
+		const manifest = JSON.parse(read("public/manifest.webmanifest"))
+		expect(manifest.start_url).toBe("/")
+		expect(manifest.id).toBe("/")
+	})
+})

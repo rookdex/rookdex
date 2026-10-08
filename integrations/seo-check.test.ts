@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto"
 import { describe, expect, it } from "vitest"
 import { seoErrors } from "./seo-check.mjs"
 
@@ -8,6 +9,15 @@ function page(url: string, head = "", title = "GTA 6 news and rumours · Rookdex
 	return `<!DOCTYPE html><html><head><title>${title}</title><meta name="description" content="D"><link rel="canonical" href="${url}"><meta property="og:image" content="${SITE}/og.png"><meta name="twitter:card" content="summary_large_image">${head}</head><body></body></html>`
 }
 
+const RESOLVER = 'location.replace("/en/")'
+const RESOLVER_HASH = `sha256-${createHash("sha256").update(RESOLVER).digest("base64")}`
+const XDEFAULT = `<link rel="alternate" hreflang="x-default" href="${SITE}/">`
+
+function root({ hash = RESOLVER_HASH, sheetFirst = false, xDefault = `${SITE}/` } = {}) {
+	const sheet = '<link rel="stylesheet" href="/_astro/a.css">'
+	return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="content-security-policy" content="script-src 'self' '${hash}'">${sheetFirst ? sheet : ""}<script>${RESOLVER}</script>${sheetFirst ? "" : sheet}<title>Rookdex</title><link rel="canonical" href="${SITE}/"><link rel="alternate" hreflang="en" href="${SITE}/en/"><link rel="alternate" hreflang="nb" href="${SITE}/nb/"><link rel="alternate" hreflang="x-default" href="${xDefault}"><meta property="og:image" content="${SITE}/og.png"><meta name="twitter:card" content="summary_large_image">${LD}</head><body></body></html>`
+}
+
 function sitemap(paths: string[]) {
 	return `<?xml version="1.0" encoding="UTF-8"?><urlset>${paths.map((p) => `<url><loc>${SITE}/${p}</loc></url>`).join("")}</urlset>`
 }
@@ -15,15 +25,16 @@ function sitemap(paths: string[]) {
 /** A dist/ that passes every rule. Settings is built but left out of the sitemap on purpose. */
 function good(): Record<string, string> {
 	return {
-		"en/index.html": page(`${SITE}/en/`, LD),
-		"no/index.html": page(`${SITE}/no/`, LD),
+		"index.html": root(),
+		"en/index.html": page(`${SITE}/en/`, LD + XDEFAULT),
+		"nb/index.html": page(`${SITE}/nb/`, LD + XDEFAULT),
 		"en/news/index.html": page(`${SITE}/en/news/`),
-		"no/news/index.html": page(`${SITE}/no/news/`),
+		"nb/news/index.html": page(`${SITE}/nb/news/`),
 		"en/settings/index.html": page(`${SITE}/en/settings/`),
-		"no/settings/index.html": page(`${SITE}/no/settings/`),
+		"nb/settings/index.html": page(`${SITE}/nb/settings/`),
 		// The body's language links carry hreflang; only the head is checked (rule 3).
 		"404.html": `<html><head><title>Page not found · Rookdex</title></head><body><a href="/en/" hreflang="en">English</a></body></html>`,
-		"sitemap.xml": sitemap(["en/", "no/", "en/news/", "no/news/"]),
+		"sitemap.xml": sitemap(["en/", "nb/", "en/news/", "nb/news/"]),
 		// CRLF, as a Windows checkout may have it.
 		"robots.txt": "User-agent: *\r\nAllow: /\r\n\r\nSitemap: https://rookdex.app/sitemap.xml\r\n",
 		"indexnow-key.txt": "0123456789abcdef0123456789abcdef",
@@ -65,7 +76,7 @@ describe("seoErrors (SEO spec §4.8)", () => {
 
 	it("rule 1: a sitemap URL with no built page", () => {
 		const files = good()
-		delete files["no/news/index.html"]
+		delete files["nb/news/index.html"]
 		expect(rules(files)).toContain("[seo 1]")
 	})
 
@@ -167,5 +178,44 @@ describe("seoErrors (SEO spec §4.8)", () => {
 		for (const html of variants) {
 			expect(rules({ ...good(), "en/index.html": html })).toContain("[seo 7]")
 		}
+	})
+
+	it("rule 8: the root page is missing, or its canonical, hreflang or JSON-LD is wrong", () => {
+		const missing = good()
+		delete missing["index.html"]
+		expect(rules(missing)).toContain("[seo 8]")
+		for (const html of [
+			root().replace(`rel="canonical" href="${SITE}/"`, `rel="canonical" href="${SITE}/en/"`),
+			root().replace(`hreflang="nb" href="${SITE}/nb/"`, `hreflang="nb" href="${SITE}/en/"`),
+			root({ xDefault: `${SITE}/en/` }),
+			root().replace(LD, ""),
+		]) {
+			expect(rules({ ...good(), "index.html": html })).toContain("[seo 8]")
+		}
+	})
+
+	it("rule 8: the resolver's hash is missing from the CSP, or a stylesheet loads first", () => {
+		expect(rules({ ...good(), "index.html": root({ hash: "sha256-stale" }) })).toContain("[seo 8]")
+		expect(rules({ ...good(), "index.html": root({ sheetFirst: true }) })).toContain("[seo 8]")
+	})
+
+	it("rule 8: the root has no og:image or twitter:card", () => {
+		for (const html of [
+			root().replace(/<meta property="og:image" [^>]*>/, ""),
+			root().replace(/<meta name="twitter:card" [^>]*>/, ""),
+		]) {
+			expect(rules({ ...good(), "index.html": html })).toContain("[seo 8]")
+		}
+	})
+
+	it("rule 8: the root is never a sitemap URL", () => {
+		const files = good()
+		files["sitemap.xml"] = sitemap(["", "en/", "nb/", "en/news/", "nb/news/"])
+		expect(rules(files)).toContain("[seo 8]")
+	})
+
+	it("rule 9: a home page whose x-default is not the root", () => {
+		const html = page(`${SITE}/en/`, LD + XDEFAULT.replace(`${SITE}/"`, `${SITE}/en/"`))
+		expect(rules({ ...good(), "en/index.html": html })).toContain("[seo 9]")
 	})
 })

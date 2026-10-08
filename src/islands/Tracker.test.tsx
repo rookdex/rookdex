@@ -14,7 +14,7 @@ vi.mock("../model/seed", async (importOriginal) => {
 
 beforeEach(resetBrowser)
 
-const ready = (locale: "en" | "no" = "en") => renderReady(<Tracker locale={locale} />)
+const ready = (locale: "en" | "nb" = "en") => renderReady(<Tracker locale={locale} />)
 
 describe("Tracker list", () => {
 	it("renders one card per item, with a book link and a flag instead of source links", async () => {

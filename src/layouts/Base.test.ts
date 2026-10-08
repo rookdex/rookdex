@@ -49,13 +49,13 @@ describe("main navigation (spec §5, §12)", () => {
 	})
 
 	it("links every tab in the page's language", async () => {
-		const doc = await page("", { locale: "no" })
+		const doc = await page("", { locale: "nb" })
 		const links = [...doc.querySelectorAll('nav[aria-label="Hoved"] a')]
 		expect(links.map((a) => a.getAttribute("href"))).toEqual([
-			"/no/",
-			"/no/tracker/",
-			"/no/news/",
-			"/no/settings/",
+			"/nb/",
+			"/nb/tracker/",
+			"/nb/news/",
+			"/nb/settings/",
 		])
 		expect(links[3].textContent?.trim()).toBe("Inn­stillinger")
 	})
@@ -75,7 +75,7 @@ describe("main navigation (spec §5, §12)", () => {
 	})
 
 	it("ships the history buttons hidden and labelled, before the brand (spec §4)", async () => {
-		const doc = await page("", { locale: "no" })
+		const doc = await page("", { locale: "nb" })
 		const group = doc.querySelector("header [data-history]")
 		const brand = doc.querySelector("header .brand")
 		expect(group?.hasAttribute("hidden")).toBe(true)
@@ -117,7 +117,7 @@ describe("link previews and indexing (SEO spec §4.4)", () => {
 
 	it.each([
 		["en", "en_US", "nb_NO"],
-		["no", "nb_NO", "en_US"],
+		["nb", "nb_NO", "en_US"],
 	] as const)("names the %s locale and the other one as alternate", async (locale, own, other) => {
 		const doc = await page("tracker", { locale })
 		expect(content(doc, 'meta[property="og:locale"]')).toEqual([own])
@@ -144,7 +144,7 @@ describe("link previews and indexing (SEO spec §4.4)", () => {
 
 	it.each([
 		["en", "en"],
-		["no", "nb"],
+		["nb", "nb"],
 	] as const)("puts one WebSite JSON-LD block on the %s home page only", async (locale, lang) => {
 		const home = await page("", { locale })
 		const blocks = home.querySelectorAll('script[type="application/ld+json"]')
@@ -159,11 +159,25 @@ describe("link previews and indexing (SEO spec §4.4)", () => {
 		const tracker = await page("tracker", { locale })
 		expect(tracker.querySelector('script[type="application/ld+json"]')).toBeNull()
 	})
+
+	it.each(["en", "nb"] as const)(
+		"points the %s home page's x-default at the root",
+		async (locale) => {
+			const home = await page("", { locale })
+			expect(home.querySelector('link[hreflang="x-default"]')?.getAttribute("href")).toBe(
+				"https://rookdex.app/"
+			)
+			const tracker = await page("tracker", { locale })
+			expect(tracker.querySelector('link[hreflang="x-default"]')?.getAttribute("href")).toBe(
+				"https://rookdex.app/en/tracker/"
+			)
+		}
+	)
 })
 
 describe("update notice markup (feedback spec §10.3)", () => {
 	it("ships the card hidden and the live region outside it, empty", async () => {
-		const doc = await page("", { locale: "no" })
+		const doc = await page("", { locale: "nb" })
 		const card = doc.querySelector<HTMLElement>("[data-update-notice]")
 		expect(card?.hasAttribute("hidden")).toBe(true)
 		expect(card?.dataset.text).toBe("En ny versjon er klar")

@@ -45,7 +45,7 @@ describe("InstallPrompt", () => {
 	})
 
 	it("calls prompt() on install", () => {
-		render(<InstallPrompt locale="no" />)
+		render(<InstallPrompt locale="nb" />)
 		const event = fireInstallPrompt()
 		act(() => {
 			screen.getByRole("button", { name: "Installer" }).click()

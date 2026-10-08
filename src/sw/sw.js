@@ -81,9 +81,10 @@ async function staleWhileRevalidate(event, url) {
 	}
 	const response = await refresh
 	if (response) return response
-	// Unknown page while offline: fall back to the home page of the same language.
+	// Unknown page while offline: the same language's home, else the root, which resolves the language
+	// itself (an old /no/ bookmark has no /no/ home in the cache any more).
 	const localeHome = `/${url.pathname.split("/")[1] || "en"}/`
-	return (await cache.match(localeHome)) ?? (await cache.match("/en/")) ?? Response.error()
+	return (await cache.match(localeHome)) ?? (await cache.match("/")) ?? Response.error()
 }
 
 /**

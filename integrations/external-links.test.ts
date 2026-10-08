@@ -60,7 +60,7 @@ describe("findUnsafeLinks (feedback spec §11)", () => {
 					'<a href="../#item-wildlife/pelican">back</a>',
 					'<a href="/en/settings/#about">about</a>',
 					'<a href="#cat-wildlife">chip</a>',
-					'<a href="https://rookdex.app/no/">home</a>',
+					'<a href="https://rookdex.app/nb/">home</a>',
 					'<a href="//rookdex.app/en/">home</a>',
 					"<a>no href</a>",
 				].join("")
@@ -71,7 +71,7 @@ describe("findUnsafeLinks (feedback spec §11)", () => {
 	it("never checks <link> elements", () => {
 		expect(
 			findUnsafeLinks(
-				'<html><head><link rel="alternate" hreflang="no" href="https://rookdex.app/no/"><link rel="canonical" href="http://example.com/"></head></html>',
+				'<html><head><link rel="alternate" hreflang="nb" href="https://rookdex.app/nb/"><link rel="canonical" href="http://example.com/"></head></html>',
 				SITE
 			)
 		).toEqual([])

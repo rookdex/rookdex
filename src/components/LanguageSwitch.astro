@@ -1,20 +1,24 @@
 ---
-import { getRelativeLocaleUrl } from "astro:i18n"
-import { type Locale, locales, translator } from "../i18n"
+import { defaultLocale, type Locale, locales, translator } from "../i18n"
+import { systemRow } from "../i18n/system-row"
 
 interface Props {
 	locale: Locale
 	path: string
 }
 
-// A disclosure of plain links, not an ARIA menu (spec §6). The URL is the language; nothing is stored.
+// A disclosure of plain links, not an ARIA menu (spec §6, standard §6.1). The URL is the language.
+// Behaviour comes from the vendored DS picker.js, imported once in Base. The System row ships hidden:
+// only the browser knows navigator.languages, so src/scripts/language-choice.ts fills it in.
 const { locale, path } = Astro.props
 const { t, displayName } = translator(locale)
+const name = `${t("picker.language")}: ${displayName(locale)}`
+const { hrefs, before: systemBefore, after: systemAfter } = systemRow(t, path)
 ---
 
-<nav class="lang" aria-label={t("languageSwitch.label")}>
-	<details data-language-menu>
-		<summary>
+<nav class="lang" aria-label={t("picker.language")}>
+	<details data-picker="lang">
+		<summary class="has-tip tip-end tip-below">
 			<svg
 				class="lang-globe"
 				viewBox="0 0 24 24"
@@ -31,29 +35,22 @@ const { t, displayName } = translator(locale)
 				<path d="M3 12h18"></path>
 				<path d="M12 3c2.5 2.6 3.7 5.6 3.7 9s-1.2 6.4-3.7 9c-2.5-2.6-3.7-5.6-3.7-9S9.5 5.6 12 3z"></path>
 			</svg>
-			<span>{locale.toUpperCase()}</span>{" "}
-			<span class="visually-hidden">{t("languageSwitch.current")}</span>
-			<svg
-				class="lang-chevron"
-				viewBox="0 0 24 24"
-				width="16"
-				height="16"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				aria-hidden="true"
-			>
-				<path d="M6 9l6 6 6-6"></path>
-			</svg>
+			<span class="visually-hidden">{name}</span>
+			<span class="tip" aria-hidden="true">{t("picker.language")}</span>
 		</summary>
-		<ul>
+		<ul class="picker-list" aria-label={t("picker.language")}>
+			<li data-system-item hidden>
+				<a href={hrefs[defaultLocale]} data-picker-row="" data-hrefs={JSON.stringify(hrefs)}>
+					<span>{systemBefore}<span data-system-name></span>{systemAfter}</span>
+				</a>
+			</li>
 			{
 				locales.map((l) => (
 					<li>
 						<a
-							href={getRelativeLocaleUrl(l, path)}
+							class="picker-row"
+							data-picker-row={l}
+							href={hrefs[l]}
 							hreflang={l}
 							lang={l}
 							aria-current={l === locale ? "page" : undefined}
@@ -82,10 +79,3 @@ const { t, displayName } = translator(locale)
 		</ul>
 	</details>
 </nav>
-
-<script>
-	import { wireLanguageMenu } from "../scripts/language-menu"
-
-	const details = document.querySelector<HTMLDetailsElement>("[data-language-menu]")
-	if (details) wireLanguageMenu(details, document)
-</script>

@@ -1,6 +1,7 @@
 // Astro integration. After the static build it checks the SEO rules that span several built files
 // (SEO spec §4.8) and fails the build when one breaks. CI runs tests before the build, so a check
 // of dist/ has to live here. Regex and substring checks only: Astro emits the head in a known shape.
+import { createHash } from "node:crypto"
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -9,9 +10,9 @@ import { listFiles } from "./precache.mjs"
 /** Built pages kept out of the sitemap on purpose (spec D4), as locale-less paths. */
 export const NOT_IN_SITEMAP = ["settings"]
 
-const LOCALES = ["en", "no"]
-const PAGE = /^(en|no)\/(.+\/)?index\.html$/
-const ROOT_FILES = ["404.html", "sitemap.xml", "robots.txt", "indexnow-key.txt"]
+const LOCALES = ["en", "nb"]
+const PAGE = /^(en|nb)\/(.+\/)?index\.html$/
+const ROOT_FILES = ["index.html", "404.html", "sitemap.xml", "robots.txt", "indexnow-key.txt"]
 const LD_BLOCK = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g
 
 /** The entities Astro writes in text and attributes, decoded so lengths count characters. */
@@ -41,10 +42,36 @@ function head(html) {
 	return end === -1 ? html : html.slice(0, end)
 }
 
+/** The `url` of the page's one JSON-LD block, or undefined when it has none, several or bad JSON. */
+function jsonLdUrl(html) {
+	const blocks = [...html.matchAll(LD_BLOCK)]
+	try {
+		return blocks.length === 1 ? JSON.parse(blocks[0][1]).url : undefined
+	} catch {
+		return undefined
+	}
+}
+
+/**
+ * The link-preview problems of a page, tagged with its rule: one og:image at /og.png and one
+ * twitter:card.
+ */
+function previewErrors(rule, file, html, base) {
+	const errors = []
+	const image = metas(html, "property", "og:image")
+	if (image.length !== 1 || attr(image[0], "content") !== `${base}/og.png`) {
+		errors.push(`[seo ${rule}] ${file} needs one og:image at ${base}/og.png`)
+	}
+	if (metas(html, "name", "twitter:card").length !== 1) {
+		errors.push(`[seo ${rule}] ${file} needs one twitter:card`)
+	}
+	return errors
+}
+
 /**
  * Every broken rule, as "[seo N] …" messages. `files` maps a dist-relative posix path to its text:
- * every page under en/ and no/, plus 404.html, sitemap.xml, robots.txt and indexnow-key.txt. A
- * missing entry counts as a missing file.
+ * every page under en/ and nb/, plus index.html (the root page), 404.html, sitemap.xml, robots.txt
+ * and indexnow-key.txt. A missing entry counts as a missing file.
  */
 export function seoErrors(files, site) {
 	const base = site.replace(/\/$/, "")
@@ -91,13 +118,7 @@ export function seoErrors(files, site) {
 		const file = pages.get(url)
 		if (!file) continue
 		const html = files[file]
-		const image = metas(html, "property", "og:image")
-		if (image.length !== 1 || attr(image[0], "content") !== `${base}/og.png`) {
-			errors.push(`[seo 4] ${file} needs one og:image at ${base}/og.png`)
-		}
-		if (metas(html, "name", "twitter:card").length !== 1) {
-			errors.push(`[seo 4] ${file} needs one twitter:card`)
-		}
+		errors.push(...previewErrors(4, file, html, base))
 		const description = metas(html, "name", "description")[0]
 		if (!decode(attr(description ?? "", "content") ?? "").trim()) {
 			errors.push(`[seo 4] ${file} has no description`)
@@ -121,14 +142,72 @@ export function seoErrors(files, site) {
 	// Rule 7: each home page has one WebSite block at the domain root.
 	for (const locale of LOCALES) {
 		const file = `${locale}/index.html`
-		const blocks = [...(files[file] ?? "").matchAll(LD_BLOCK)]
-		let url
-		try {
-			url = blocks.length === 1 ? JSON.parse(blocks[0][1]).url : undefined
-		} catch {
-			url = undefined
+		if (jsonLdUrl(files[file] ?? "") !== `${base}/`) {
+			errors.push(`[seo 7] ${file} needs one JSON-LD block with url ${base}/`)
 		}
-		if (url !== `${base}/`) errors.push(`[seo 7] ${file} needs one JSON-LD block with url ${base}/`)
+	}
+
+	// Rule 8: the root page (locale spec §6.4). It names itself, both languages and x-default,
+	// carries the site-name block, and its resolver runs before any stylesheet, with its exact hash
+	// in the CSP. A stale hash would leave every JavaScript visitor on the link page.
+	const rootHtml = files["index.html"]
+	if (rootHtml === undefined) {
+		errors.push("[seo 8] index.html (the root page) is missing")
+	} else {
+		const rootHead = head(rootHtml)
+		const links = tags(rootHead, "link")
+		const canonical = links.filter((tag) => attr(tag, "rel") === "canonical")
+		if (canonical.length !== 1 || attr(canonical[0], "href") !== `${base}/`) {
+			errors.push(`[seo 8] index.html needs exactly one canonical link, to ${base}/`)
+		}
+		const alternates = new Map(
+			links
+				.filter((tag) => attr(tag, "rel") === "alternate")
+				.map((tag) => [attr(tag, "hreflang"), attr(tag, "href")])
+		)
+		for (const locale of LOCALES) {
+			if (alternates.get(locale) !== `${base}/${locale}/`) {
+				errors.push(`[seo 8] index.html needs hreflang ${locale} pointing at ${base}/${locale}/`)
+			}
+		}
+		if (alternates.get("x-default") !== `${base}/`) {
+			errors.push(`[seo 8] index.html needs hreflang x-default pointing at ${base}/`)
+		}
+		if (jsonLdUrl(rootHtml) !== `${base}/`) {
+			errors.push(`[seo 8] index.html needs one JSON-LD block with url ${base}/`)
+		}
+		// Unfurlers fetch the bare domain without JavaScript, so the root carries the link preview.
+		errors.push(...previewErrors(8, "index.html", rootHead, base))
+		const resolver = /<script\s*>([\s\S]*?)<\/script\b[^>]*>/i.exec(rootHead)
+		if (!resolver) {
+			errors.push("[seo 8] index.html has no inline resolver script")
+		} else {
+			const hash = `'sha256-${createHash("sha256").update(resolver[1], "utf8").digest("base64")}'`
+			const csp = metas(rootHead, "http-equiv", "content-security-policy")[0]
+			if (!decode(attr(csp ?? "", "content") ?? "").includes(hash)) {
+				errors.push("[seo 8] index.html's CSP lacks the resolver's hash")
+			}
+			const sheet = rootHead.search(/<link\b[^>]*rel="stylesheet"|<style\b/i)
+			if (sheet !== -1 && sheet < resolver.index) {
+				errors.push(
+					"[seo 8] index.html loads a stylesheet before the resolver, so the link page can flash"
+				)
+			}
+		}
+	}
+	if (listed.includes(`${base}/`)) {
+		errors.push("[seo 8] the root is in the sitemap; Google treats its jump as a redirect")
+	}
+
+	// Rule 9: each home page names the root as x-default (locale spec §6.3).
+	for (const locale of LOCALES) {
+		const file = `${locale}/index.html`
+		const xDefault = tags(head(files[file] ?? ""), "link").filter(
+			(tag) => attr(tag, "rel") === "alternate" && attr(tag, "hreflang") === "x-default"
+		)
+		if (xDefault.length !== 1 || attr(xDefault[0], "href") !== `${base}/`) {
+			errors.push(`[seo 9] ${file} needs one hreflang x-default pointing at ${base}/`)
+		}
 	}
 
 	return errors

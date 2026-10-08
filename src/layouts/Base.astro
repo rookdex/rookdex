@@ -33,7 +33,7 @@ const { t } = translator(locale)
 const current = currentTab(path, tab)
 const sub = current !== null && path !== TAB_PATHS[current]
 const canonical = getAbsoluteLocaleUrl(locale, path)
-const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
+const ogLocale: Record<Locale, string> = { en: "en_US", nb: "nb_NO" }
 ---
 
 <!doctype html>
@@ -57,7 +57,11 @@ const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
 					{locales.map((l) => (
 						<link rel="alternate" hreflang={l} href={getAbsoluteLocaleUrl(l, path)} />
 					))}
-					<link rel="alternate" hreflang="x-default" href={getAbsoluteLocaleUrl(defaultLocale, path)} />
+					<link
+						rel="alternate"
+						hreflang="x-default"
+						href={path === "" ? `${SITE}/` : getAbsoluteLocaleUrl(defaultLocale, path)}
+					/>
 					<meta property="og:url" content={canonical} />
 				</>
 			)
@@ -78,8 +82,9 @@ const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
 		<meta property="og:image:alt" content={t("seo.ogImageAlt")} />
 		<meta name="twitter:card" content="summary_large_image" />
 		{
-			/* Site name (spec D7): Google reads it at the domain root, which redirects to /en/. The
-			   block is data, never runs, and needs no CSP hash; jsonLd escapes "<". */
+			/* Site name (SEO spec D7, locale spec §6.4). Google reads it at the domain root, and the root page
+			   carries it. Googlebot may treat the root's jump as a redirect and land here, so the home pages
+			   keep their copy. The block is data, never runs, and needs no CSP hash; jsonLd escapes "<". */
 			path === "" && indexable && (
 				<script
 					type="application/ld+json"
@@ -89,7 +94,7 @@ const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
 						"@type": "WebSite",
 						name: t("siteName"),
 						url: `${SITE}/`,
-						inLanguage: locale === "no" ? "nb" : "en",
+						inLanguage: locale,
 					})}
 				></script>
 			)
@@ -127,6 +132,8 @@ const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
 		>
 		</p>
 		<script>
+			import "../lib/picker.js"
+			import { fillSystemRows, wireLanguageChoice } from "../scripts/language-choice"
 			import { wireOfflineNotice } from "../scripts/offline-notice"
 			import { wireTooltips } from "../scripts/tooltip"
 			import "../scripts/register-sw"
@@ -134,6 +141,15 @@ const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
 			const el = document.getElementById("offline-notice")
 			if (el) wireOfflineNotice(el, window, el.dataset.text ?? "")
 			wireTooltips(document)
+			fillSystemRows(document, navigator)
+			wireLanguageChoice(document, () => {
+				// Reading window.localStorage itself throws when site data is blocked.
+				try {
+					return window.localStorage
+				} catch {
+					return undefined
+				}
+			})
 		</script>
 		<Footer locale={locale} />
 	</body>

@@ -26,7 +26,7 @@ if (!resolved) throw new Error(`No guide for slug: ${slug}`)
 const { entry, fellBack } = resolved
 const { Content } = await render(entry)
 
-const dateLocale = locale === "no" ? "nb-NO" : "en-GB"
+const dateLocale = locale === "nb" ? "nb-NO" : "en-GB"
 const updated = entry.data.updated.toLocaleDateString(dateLocale, { dateStyle: "long" })
 ---
 

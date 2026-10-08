@@ -6,7 +6,7 @@ import Footer from "./Footer.astro"
 const hiddenName = (a: Element) =>
 	a.querySelector(".visually-hidden:not(.new-tab-note)")?.textContent?.trim()
 
-describe.each(["en", "no"] as const)("footer in %s (feedback spec §6)", (locale) => {
+describe.each(["en", "nb"] as const)("footer in %s (feedback spec §6)", (locale) => {
 	const { t } = translator(locale)
 
 	it("has the one-sentence disclaimer", async () => {

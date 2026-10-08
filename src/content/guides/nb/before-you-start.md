@@ -34,4 +34,4 @@ Standard digital utgave koster {price:standard} i PlayStation Store og Xbox Stor
 
 ## Hva Rookdex gjør på lanseringskvelden
 
-[Forsiden](/no/) blir dashbordet ditt ved midnatt. [Installer siden](/no/settings/#about) på telefonen før det, så virker den selv når wifi-en er full.
+[Forsiden](/nb/) blir dashbordet ditt ved midnatt. [Installer siden](/nb/settings/#about) på telefonen før det, så virker den selv når wifi-en er full.

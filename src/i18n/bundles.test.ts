@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 import en from "../locales/en.json"
-import no from "../locales/no.json"
+import nb from "../locales/nb.json"
 import { hasPrice } from "../test/price-patterns"
 import { locales } from "./locales"
 
@@ -32,19 +32,21 @@ function bundleProblems(bundles: Record<string, Bundle>): string[] {
 describe("bundle parity (locale spec §5.5)", () => {
 	it("matches the locale list in astro.config.mjs", () => {
 		const config = readFileSync(new URL("../../astro.config.mjs", import.meta.url), "utf8")
-		expect(config).toContain(`const locales = ${JSON.stringify([...locales]).replace(",", ", ")}`)
+		expect(config).toContain(
+			`const locales = ${JSON.stringify([...locales]).replaceAll(",", ", ")}`
+		)
 	})
 
-	it("en and no carry the same keys, none empty, plurals complete", () => {
-		expect(bundleProblems({ en, no })).toEqual([])
+	it("en and nb carry the same keys, none empty, plurals complete", () => {
+		expect(bundleProblems({ en, nb })).toEqual([])
 	})
 
 	it("goes red on a missing key, an empty value and a half plural", () => {
-		expect(bundleProblems({ en: { a: "A", b: "B" }, no: { a: "A" } })).toEqual(["no is missing b"])
-		expect(bundleProblems({ en: { a: "A" }, no: { a: " " } })).toEqual(["no.a is empty"])
-		expect(bundleProblems({ en: { "x.one": "1" }, no: { "x.one": "1" } })).toEqual([
+		expect(bundleProblems({ en: { a: "A", b: "B" }, nb: { a: "A" } })).toEqual(["nb is missing b"])
+		expect(bundleProblems({ en: { a: "A" }, nb: { a: " " } })).toEqual(["nb.a is empty"])
+		expect(bundleProblems({ en: { "x.one": "1" }, nb: { "x.one": "1" } })).toEqual([
 			"en has x.one without x.other",
-			"no has x.one without x.other",
+			"nb has x.one without x.other",
 		])
 	})
 })
@@ -80,7 +82,7 @@ describe("no prices in copy (locale spec §5.5, standard §13)", () => {
 
 	it.each([
 		["en", en],
-		["no", no],
+		["nb", nb],
 	] as const)("%s has no price in any value", (_lang, bundle) => {
 		const priced = Object.entries(bundle).filter(([, value]) => hasPrice(value))
 		expect(priced).toEqual([])

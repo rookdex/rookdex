@@ -93,7 +93,7 @@ describe("no raw hex outside tokens.css (spec §13.1)", () => {
 		expect(files.length).toBeGreaterThan(10)
 		for (const file of files) {
 			let text = readFileSync(join(srcDir, file), "utf8")
-			if (file === "layouts/Base.astro") {
+			if (file === "layouts/Base.astro" || file === "pages/index.astro") {
 				expect(text, "the theme-color line must stay literal").toContain(themeColorLine)
 				text = text.replace(themeColorLine, "")
 			}

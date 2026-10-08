@@ -35,9 +35,9 @@ describe("precacheUrls", () => {
 	})
 
 	it("precaches the tracker and rumours pages like any other page", () => {
-		expect(precacheUrls(["en/tracker/index.html", "no/tracker/rumours/index.html"])).toEqual([
+		expect(precacheUrls(["en/tracker/index.html", "nb/tracker/rumours/index.html"])).toEqual([
 			"/en/tracker/",
-			"/no/tracker/rumours/",
+			"/nb/tracker/rumours/",
 		])
 	})
 
@@ -60,6 +60,10 @@ describe("precacheUrls", () => {
 
 	it("never precaches the OG banner", () => {
 		expect(precacheUrls(["og.png", "en/index.html"])).toEqual(["/en/"])
+	})
+
+	it("precaches the root page, so the installed app resolves offline", () => {
+		expect(precacheUrls(["index.html", "en/index.html", "nb/index.html"])).toContain("/")
 	})
 })
 

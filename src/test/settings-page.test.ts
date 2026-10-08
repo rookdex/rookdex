@@ -3,7 +3,7 @@ import pkg from "../../package.json"
 import Settings from "../pages/[locale]/settings.astro"
 import { renderDoc } from "./render"
 
-const settings = (locale: "en" | "no") => renderDoc(Settings, { params: { locale } })
+const settings = (locale: "en" | "nb") => renderDoc(Settings, { params: { locale } })
 
 afterEach(() => vi.unstubAllEnvs())
 
@@ -22,16 +22,18 @@ describe("Settings page (spec §7)", () => {
 	})
 
 	it("uses the whole word in the title, without the tab label's soft hyphen", async () => {
-		const doc = await settings("no")
+		const doc = await settings("nb")
 		expect(doc.querySelector("h1")?.textContent).toBe("Innstillinger")
 		expect(doc.title).toBe("Innstillinger · Rookdex")
 	})
 
 	it("marks the current language and links the other to its own Settings page", async () => {
-		const doc = await settings("no")
+		const doc = await settings("nb")
 		const group = doc.querySelector('section[aria-labelledby="settings-language"]')
-		expect(group?.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe("Norsk")
-		expect(group?.querySelector("a")?.getAttribute("href")).toBe("/en/settings/")
+		expect(group?.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe("Norsk bokmål")
+		expect(
+			group?.querySelector('a[data-picker-row]:not([data-picker-row=""])')?.getAttribute("href")
+		).toBe("/en/settings/")
 	})
 
 	it("ships the browser-dependent rows hidden until the script decides", async () => {
@@ -87,7 +89,7 @@ describe("Settings page (spec §7)", () => {
 	})
 
 	it("links the licence, the repository and the legal address", async () => {
-		const doc = await settings("no")
+		const doc = await settings("nb")
 		const rows = rowsOf(doc)
 		const href = (i: number) => rows[i].querySelector("dd a")?.getAttribute("href")
 		expect(href(2)).toBe("https://github.com/rookdex/rookdex")
@@ -125,9 +127,40 @@ describe("Settings page (spec §7)", () => {
 
 	it("lets the other language's link fill its row", async () => {
 		const doc = await settings("en")
-		const link = doc.querySelector('section[aria-labelledby="settings-language"] a')
+		const link = doc.querySelector(
+			'section[aria-labelledby="settings-language"] a[data-picker-row]:not([data-picker-row=""])'
+		)
 		expect(link?.classList.contains("row-link")).toBe(true)
 		expect(link?.closest("li")?.classList.contains("row-has-link")).toBe(true)
+	})
+
+	it("puts a hidden System row first and hooks the other language's link", async () => {
+		const doc = await settings("en")
+		const rows = doc.querySelectorAll('section[aria-labelledby="settings-language"] li')
+		expect(rows[0].hasAttribute("data-system-item")).toBe(true)
+		expect(rows[0].hasAttribute("hidden")).toBe(true)
+		const system = rows[0].querySelector("a")
+		expect(system?.getAttribute("data-picker-row")).toBe("")
+		expect(JSON.parse(system?.getAttribute("data-hrefs") ?? "")).toEqual({
+			en: "/en/settings/",
+			nb: "/nb/settings/",
+		})
+		expect(
+			doc
+				.querySelector('section[aria-labelledby="settings-language"] a[data-picker-row="nb"]')
+				?.getAttribute("href")
+		).toBe("/nb/settings/")
+		// One wrapping span, so the flex link holds one sentence, not three flex items (reflow at 200 %).
+		expect(system?.children).toHaveLength(1)
+		expect(system?.firstElementChild?.tagName).toBe("SPAN")
+	})
+
+	it("names the language choice among what this browser keeps", async () => {
+		const doc = await settings("en")
+		const terms = [...doc.querySelectorAll('section[aria-labelledby="settings-data"] dt')].map(
+			(dt) => dt.textContent?.trim()
+		)
+		expect(terms).toContain("Language choice")
 	})
 
 	it("tells people the install and hint choices stay", async () => {

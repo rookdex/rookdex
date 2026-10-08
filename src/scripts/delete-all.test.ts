@@ -12,7 +12,7 @@ afterEach(() => {
 })
 
 describe("deleteAllData (spec §7.2, feedback spec §7.3)", () => {
-	it("deletes the rookdex database and leaves localStorage alone", async () => {
+	it("deletes the rookdex database and the language choice, and keeps the one-shot flags", async () => {
 		const storage = { removeItem: vi.fn(), clear: vi.fn(), setItem: vi.fn() }
 		vi.stubGlobal("localStorage", storage)
 		const factory = new IDBFactory()
@@ -22,8 +22,17 @@ describe("deleteAllData (spec §7.2, feedback spec §7.3)", () => {
 		await expect(deleteAllData(factory, onBlocked)).resolves.toBe("deleted")
 		expect(await exists(factory)).toBe(false)
 		expect(onBlocked).not.toHaveBeenCalled()
-		expect(storage.removeItem).not.toHaveBeenCalled()
+		expect(storage.removeItem.mock.calls).toEqual([["lang"]])
 		expect(storage.clear).not.toHaveBeenCalled()
+	})
+
+	it("still reports deleted when removing the language choice throws", async () => {
+		vi.stubGlobal("localStorage", {
+			removeItem: () => {
+				throw new Error("SecurityError")
+			},
+		})
+		await expect(deleteAllData(new IDBFactory(), vi.fn())).resolves.toBe("deleted")
 	})
 
 	it("reports blocked once, then succeeds when the other tab closes, with one request", async () => {
@@ -43,22 +52,28 @@ describe("deleteAllData (spec §7.2, feedback spec §7.3)", () => {
 		expect(await exists(factory)).toBe(false)
 	})
 
-	it("reports failed on an error event", async () => {
+	it("reports failed on an error event and keeps the language choice", async () => {
+		const storage = { removeItem: vi.fn() }
+		vi.stubGlobal("localStorage", storage)
 		const request = {} as IDBOpenDBRequest
 		const factory = { deleteDatabase: () => request } as unknown as IDBFactory
 		const result = deleteAllData(factory, vi.fn())
 		const fireError = request.onerror as unknown as () => void
 		fireError()
 		await expect(result).resolves.toBe("failed")
+		expect(storage.removeItem).not.toHaveBeenCalled()
 	})
 
-	it("reports failed when deleteDatabase throws", async () => {
+	it("reports failed when deleteDatabase throws and keeps the language choice", async () => {
+		const storage = { removeItem: vi.fn() }
+		vi.stubGlobal("localStorage", storage)
 		const factory = {
 			deleteDatabase: () => {
 				throw new DOMException("denied", "SecurityError")
 			},
 		} as unknown as IDBFactory
 		await expect(deleteAllData(factory, vi.fn())).resolves.toBe("failed")
+		expect(storage.removeItem).not.toHaveBeenCalled()
 	})
 
 	it("reports unsupported without IndexedDB", async () => {

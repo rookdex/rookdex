@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
 import en from "../locales/en.json"
-import no from "../locales/no.json"
+import nb from "../locales/nb.json"
 
-const bundles = { en, no } as const
+const bundles = { en, nb } as const
 const all: [string, string][] = Object.entries(bundles).flatMap(([lang, bundle]) =>
 	Object.entries(bundle).map(([key, value]): [string, string] => [`${lang}.${key}`, value])
 )
@@ -28,19 +28,19 @@ describe("copy rules (spec §9)", () => {
 describe("soft hyphens (spec §5, §11)", () => {
 	it("appear only in the Norwegian Settings tab label", () => {
 		const withShy = all.filter(([, text]) => text.includes("\u00ad")).map(([path]) => path)
-		expect(withShy).toEqual(["no.nav.settings"])
+		expect(withShy).toEqual(["nb.nav.settings"])
 	})
 
 	it("leave the page title whole", () => {
-		expect(no["settings.title"]).toBe("Innstillinger")
-		expect(no["nav.settings"].replace("\u00ad", "")).toBe(no["settings.title"])
+		expect(nb["settings.title"]).toBe("Innstillinger")
+		expect(nb["nav.settings"].replace("\u00ad", "")).toBe(nb["settings.title"])
 	})
 })
 
 describe("search titles and description (SEO spec §4.4)", () => {
 	it.each([
 		["en", en],
-		["no", no],
+		["nb", nb],
 	] as const)("%s titles fit in a result and name the site", (_locale, bundle) => {
 		for (const title of titles(bundle)) {
 			expect([...title].length, title).toBeLessThanOrEqual(65)
@@ -50,14 +50,14 @@ describe("search titles and description (SEO spec §4.4)", () => {
 
 	it.each([
 		["en", en],
-		["no", no],
+		["nb", nb],
 	] as const)("%s home description is at most 165 characters", (_locale, bundle) => {
 		expect([...bundle["seo.homeDescription"]].length).toBeLessThanOrEqual(165)
 	})
 
 	it("keeps the visible headings as they were", () => {
 		expect(en["tracker.title"]).toBe("Tracker")
-		expect(no["tracker.title"]).toBe("Oversikt")
+		expect(nb["tracker.title"]).toBe("Oversikt")
 		expect(en["seo.titles.home"]).toBe("Rookdex: GTA 6 countdown, tracker and launch guide")
 	})
 })
@@ -65,7 +65,7 @@ describe("search titles and description (SEO spec §4.4)", () => {
 describe("countdown templates (brand Task 5, locale spec §5.2)", () => {
 	it.each([
 		["en", en],
-		["no", no],
+		["nb", nb],
 	] as const)("%s keeps its placeholder and no other digit", (_lang, s) => {
 		const plurals = [
 			s["hub.daysToGo.one"],

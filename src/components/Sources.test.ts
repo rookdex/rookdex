@@ -8,7 +8,7 @@ describe("guide sources (spec §9)", () => {
 			props: {
 				urls: ["https://www.rockstargames.com/VI", "https://www.ign.com/articles/x"],
 				label: "Kilder",
-				locale: "no",
+				locale: "nb",
 			},
 		})
 		const section = doc.querySelector("section")

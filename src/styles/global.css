@@ -210,9 +210,11 @@ p {
 .lang summary {
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
+	justify-content: center;
+	position: relative;
+	inline-size: var(--tap);
 	min-height: var(--tap);
-	padding: 0 8px 0 10px;
+	padding: 0;
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
 	color: var(--text);
@@ -232,18 +234,21 @@ p {
 	background: var(--bg-hover);
 }
 
-.lang-globe,
-.lang-chevron {
+.lang-globe {
 	flex: none;
 	color: var(--text-muted);
 }
 
-.lang ul {
+.lang .picker-list {
 	position: absolute;
 	top: calc(100% + var(--space-1));
 	right: 0;
 	z-index: 20;
 	min-width: 176px;
+	inline-size: max-content;
+	max-inline-size: min(22rem, 100vw - 2 * var(--space-4));
+	max-block-size: calc(100dvh - var(--tap) - var(--space-3));
+	overflow-y: auto;
 	margin: 0;
 	padding: var(--space-1);
 	list-style: none;
@@ -253,7 +258,7 @@ p {
 	box-shadow: 0 8px 24px color-mix(in srgb, var(--bg) 60%, transparent);
 }
 
-.lang a {
+.lang .picker-row {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -266,13 +271,24 @@ p {
 	text-decoration: none;
 }
 
-.lang a[aria-current="page"] {
+.lang .picker-row[aria-current="page"] {
 	background: var(--bg-hover);
 }
 
 .lang-check {
 	flex: none;
 	color: var(--accent);
+}
+
+/* Forced colours (standard §6.4): the active row uses the system selection colours. The extra class
+   outranks the later :hover and :focus-visible rules, so Highlight wins in every state. */
+@media (forced-colors: active) {
+	.lang .picker-list .picker-row[aria-current] {
+		forced-color-adjust: none;
+		background: Highlight;
+		color: HighlightText;
+		outline-color: CanvasText;
+	}
 }
 
 .tagline {
@@ -525,7 +541,7 @@ p {
 .chips a,
 .history button,
 .lang summary,
-.lang a,
+.lang .picker-row,
 .menu button,
 .actions button,
 .profile-menu > button,
@@ -551,7 +567,7 @@ p {
 	.tabbar a:hover,
 	.history button:hover:not(:disabled),
 	.lang summary:hover,
-	.lang a:hover,
+	.lang .picker-row:hover,
 	.menu button:hover,
 	.actions button:not(.primary):hover,
 	.profile-menu > button:hover,
@@ -610,7 +626,7 @@ p {
 @media (hover: none) {
 	.tabbar a:active,
 	.history button:active:not(:disabled),
-	.lang a:active,
+	.lang .picker-row:active,
 	.menu button:active,
 	.actions button:not(.primary):active,
 	.profile-menu > button:active,
@@ -627,7 +643,7 @@ p {
 .tabbar a:focus-visible,
 .history button:focus-visible,
 .lang summary:focus-visible,
-.lang a:focus-visible,
+.lang .picker-row:focus-visible,
 .menu button:focus-visible,
 .actions button:not(.primary):focus-visible,
 .profile-menu > button:focus-visible,
@@ -708,6 +724,18 @@ p {
 	transform: none;
 }
 
+/* A control with 8 px of room above it (the header's language button) opens its tip downward, with
+   the hover bridge on the tip's top edge. An open picker hides it, so it never covers the list. */
+.tip-below .tip {
+	top: calc(100% + 6px);
+	bottom: auto;
+}
+
+.tip-below .tip::before {
+	top: auto;
+	bottom: 100%;
+}
+
 @media (hover: hover) {
 	.has-tip:hover > .tip {
 		visibility: visible;
@@ -725,6 +753,11 @@ p {
 .has-tip[data-tip-hidden] > .tip {
 	visibility: hidden;
 	opacity: 0;
+}
+
+/* An open picker hides its tip so it never covers the list. */
+.lang details[open] > summary > .tip {
+	display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

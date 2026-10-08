@@ -38,7 +38,7 @@ describe("wireFooterStatus", () => {
 	})
 
 	it("swaps in the live state from the data attributes, in the page's language", () => {
-		document.documentElement.lang = "no"
+		document.documentElement.lang = "nb"
 		document.body.innerHTML = `<a data-footer-status data-one="{count} dag til lansering" data-other="{count} dager til lansering" data-out="Ute nå"><span data-status-text>19 Nov 2026</span></a>`
 		const chip = document.querySelector<HTMLElement>("[data-footer-status]")
 		if (!chip) throw new Error("no chip")
