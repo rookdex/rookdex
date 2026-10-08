@@ -178,7 +178,7 @@ export function seoErrors(files, site) {
 		}
 		// Unfurlers fetch the bare domain without JavaScript, so the root carries the link preview.
 		errors.push(...previewErrors(8, "index.html", rootHead, base))
-		const resolver = /<script>([\s\S]*?)<\/script>/.exec(rootHead)
+		const resolver = /<script\s*>([\s\S]*?)<\/script\b[^>]*>/i.exec(rootHead)
 		if (!resolver) {
 			errors.push("[seo 8] index.html has no inline resolver script")
 		} else {
@@ -187,7 +187,7 @@ export function seoErrors(files, site) {
 			if (!decode(attr(csp ?? "", "content") ?? "").includes(hash)) {
 				errors.push("[seo 8] index.html's CSP lacks the resolver's hash")
 			}
-			const sheet = rootHead.search(/<link\b[^>]*rel="stylesheet"|<style\b/)
+			const sheet = rootHead.search(/<link\b[^>]*rel="stylesheet"|<style\b/i)
 			if (sheet !== -1 && sheet < resolver.index) {
 				errors.push(
 					"[seo 8] index.html loads a stylesheet before the resolver, so the link page can flash"
