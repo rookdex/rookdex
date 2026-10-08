@@ -24,12 +24,35 @@ const header = `
 		<li><a class="picker-row" href="/nb/news/" data-picker-row="nb">Norsk bokmål</a></li>
 	</ul></details>`
 
+const disposers: Array<() => void> = []
+
+/** Wires the listener under test and keeps its disposer, so no test stacks on the last one. */
+function wire(storage: () => Storage | undefined) {
+	disposers.push(wireLanguageChoice(document, storage))
+}
+
+/**
+ * Stops jsdom's "Not implemented: navigation" noise on a row click. It runs after the listener
+ * under test (registered earlier on the same target), so `seen` is what that listener left behind.
+ */
+function blockNavigation() {
+	const seen = { defaultPrevented: false }
+	const onClick = (event: Event) => {
+		seen.defaultPrevented = event.defaultPrevented
+		event.preventDefault()
+	}
+	document.addEventListener("click", onClick)
+	disposers.push(() => document.removeEventListener("click", onClick))
+	return seen
+}
+
 afterEach(() => {
+	for (const dispose of disposers.splice(0)) dispose()
 	document.body.innerHTML = ""
 })
 
 describe("systemLanguage", () => {
-	it("resolves the browser languages, ignoring any stored choice", () => {
+	it("resolves the browser languages only", () => {
 		expect(systemLanguage(nav(["nb-NO", "en"]))).toBe("nb")
 		expect(systemLanguage(nav(["sv-SE"]))).toBe("en")
 		expect(systemLanguage(nav([], undefined))).toBe("en")
@@ -77,6 +100,7 @@ describe("fillSystemRows (locale spec §7.1)", () => {
 		const name = item?.querySelector<HTMLElement>("[data-system-name]")
 		expect(item?.hidden).toBe(false)
 		expect(link?.getAttribute("href")).toBe("/nb/news/")
+		expect(link?.hreflang).toBe("nb")
 		expect(link?.classList.contains("picker-row")).toBe(true)
 		expect(name?.textContent).toBe("Norsk bokmål")
 		expect(name?.lang).toBe("nb")
@@ -100,11 +124,12 @@ describe("wireLanguageChoice", () => {
 	it("stores on a row click and lets the link navigate", () => {
 		document.body.innerHTML = header
 		const { store, storage } = fakeStorage()
-		wireLanguageChoice(document, () => storage)
+		wire(() => storage)
+		const seen = blockNavigation()
 		const event = new MouseEvent("click", { bubbles: true, cancelable: true })
 		document.querySelector<HTMLElement>('[data-picker-row="nb"]')?.dispatchEvent(event)
 		expect(store.get("lang")).toBe("nb")
-		expect(event.defaultPrevented).toBe(false)
+		expect(seen.defaultPrevented).toBe(false)
 	})
 
 	// jsdom ignores cross-document navigation, so comparing location.href could never go red. The real
@@ -113,7 +138,8 @@ describe("wireLanguageChoice", () => {
 		document.body.innerHTML = header
 		const { storage } = fakeStorage()
 		const getItem = vi.spyOn(storage, "getItem")
-		wireLanguageChoice(document, () => storage)
+		wire(() => storage)
+		blockNavigation()
 		fillSystemRows(document, nav(["en"]))
 		document.querySelector<HTMLElement>('[data-picker-row="nb"]')?.click()
 		expect(getItem).not.toHaveBeenCalled()
