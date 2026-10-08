@@ -41,6 +41,7 @@ export function fillSystemRows(doc: Document, nav: Nav): void {
 		const href = (hrefs as Record<string, unknown> | null)?.[tag]
 		if (typeof href !== "string") continue
 		link.setAttribute("href", href)
+		link.hreflang = tag
 		name.lang = tag
 		name.textContent = resolver.displayName(tag)
 		// Only inside a picker does the row join picker.js's arrow-key list.
