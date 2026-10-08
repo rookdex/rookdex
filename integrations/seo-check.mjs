@@ -52,7 +52,10 @@ function jsonLdUrl(html) {
 	}
 }
 
-/** The link-preview problems of a page, tagged with its rule: one og:image at /og.png and one twitter:card. */
+/**
+ * The link-preview problems of a page, tagged with its rule: one og:image at /og.png and one
+ * twitter:card.
+ */
 function previewErrors(rule, file, html, base) {
 	const errors = []
 	const image = metas(html, "property", "og:image")
@@ -67,8 +70,8 @@ function previewErrors(rule, file, html, base) {
 
 /**
  * Every broken rule, as "[seo N] …" messages. `files` maps a dist-relative posix path to its text:
- * every page under en/ and nb/, plus index.html (the root page), 404.html, sitemap.xml, robots.txt and indexnow-key.txt. A
- * missing entry counts as a missing file.
+ * every page under en/ and nb/, plus index.html (the root page), 404.html, sitemap.xml, robots.txt
+ * and indexnow-key.txt. A missing entry counts as a missing file.
  */
 export function seoErrors(files, site) {
 	const base = site.replace(/\/$/, "")
@@ -144,9 +147,9 @@ export function seoErrors(files, site) {
 		}
 	}
 
-	// Rule 8: the root page (locale spec §6.4). It names itself, both languages and x-default, carries
-	// the site-name block, and its resolver runs first among scripts and stylesheets, with its exact
-	// hash in the CSP. A stale hash would leave every JavaScript visitor on the link page.
+	// Rule 8: the root page (locale spec §6.4). It names itself, both languages and x-default,
+	// carries the site-name block, and its resolver runs before any stylesheet, with its exact hash
+	// in the CSP. A stale hash would leave every JavaScript visitor on the link page.
 	const rootHtml = files["index.html"]
 	if (rootHtml === undefined) {
 		errors.push("[seo 8] index.html (the root page) is missing")
