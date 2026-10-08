@@ -32,7 +32,9 @@ function bundleProblems(bundles: Record<string, Bundle>): string[] {
 describe("bundle parity (locale spec §5.5)", () => {
 	it("matches the locale list in astro.config.mjs", () => {
 		const config = readFileSync(new URL("../../astro.config.mjs", import.meta.url), "utf8")
-		expect(config).toContain(`const locales = ${JSON.stringify([...locales]).replace(",", ", ")}`)
+		expect(config).toContain(
+			`const locales = ${JSON.stringify([...locales]).replaceAll(",", ", ")}`
+		)
 	})
 
 	it("en and nb carry the same keys, none empty, plurals complete", () => {
