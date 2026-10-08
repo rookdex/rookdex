@@ -280,12 +280,14 @@ p {
 	color: var(--accent);
 }
 
-/* Forced colours (standard §6.4): the active row uses the system selection colours. */
+/* Forced colours (standard §6.4): the active row uses the system selection colours. The extra class
+   outranks the later :hover and :focus-visible rules, so Highlight wins in every state. */
 @media (forced-colors: active) {
-	.lang .picker-row[aria-current] {
+	.lang .picker-list .picker-row[aria-current] {
 		forced-color-adjust: none;
 		background: Highlight;
 		color: HighlightText;
+		outline-color: CanvasText;
 	}
 }
 
@@ -734,10 +736,6 @@ p {
 	bottom: 100%;
 }
 
-.lang details[open] > summary > .tip {
-	display: none;
-}
-
 @media (hover: hover) {
 	.has-tip:hover > .tip {
 		visibility: visible;
@@ -755,6 +753,11 @@ p {
 .has-tip[data-tip-hidden] > .tip {
 	visibility: hidden;
 	opacity: 0;
+}
+
+/* An open picker hides its tip so it never covers the list. */
+.lang details[open] > summary > .tip {
+	display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
