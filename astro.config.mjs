@@ -1,9 +1,14 @@
 // @ts-check
+import { satteri } from "@astrojs/markdown-satteri"
 import react from "@astrojs/react"
 import { defineConfig } from "astro/config"
 import externalLinks from "./integrations/external-links.mjs"
+import pricePlugin from "./integrations/markdown-price.mjs"
 import precache from "./integrations/precache.mjs"
 import seoCheck from "./integrations/seo-check.mjs"
+
+// One list for routing and the price plugin. src/i18n/locales.ts must match it (bundles.test.ts).
+const locales = ["en", "no"]
 
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
@@ -11,9 +16,13 @@ export default defineConfig({
 	output: "static",
 	integrations: [react(), precache(), seoCheck(), externalLinks()],
 	trailingSlash: "always",
+	markdown: {
+		// Explicit satteri() uses the same features as Astro's implicit default, so guide HTML is unchanged.
+		processor: satteri({ mdastPlugins: [pricePlugin({ locales })] }),
+	},
 	i18n: {
 		defaultLocale: "en",
-		locales: ["en", "no"],
+		locales,
 		routing: {
 			prefixDefaultLocale: true,
 			redirectToDefaultLocale: false,

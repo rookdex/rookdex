@@ -14,7 +14,7 @@ Spillet slippes **19. november 2026** på PlayStation 5 og Xbox Series X|S. Digi
 
 ## Utgaver
 
-To utgaver er i salg: Standard til 949 kr og Ultimate til 1 189 kr. Ultimate er spillet pluss Ultimate Edition Upgrade: eksklusive kjøretøy, våpen og klær til Jason og Lucia gjennom hele historien, med nye gjenstander som låses opp i hvert kapittel. Både PlayStation og Xbox selger den.
+To utgaver er i salg: Standard til {price:standard} og Ultimate til {price:ultimate}. Ultimate er spillet pluss Ultimate Edition Upgrade: eksklusive kjøretøy, våpen og klær til Jason og Lucia gjennom hele historien, med nye gjenstander som låses opp i hvert kapittel. Både PlayStation og Xbox selger den.
 
 ## Bonus ved forhåndsbestilling
 
@@ -30,7 +30,7 @@ Forhåndsnedlasting åpner **12. november**. Start den samme dag: nedlastingen e
 
 ## Kjøp i Norge
 
-Standard digital utgave koster 949 kr i PlayStation Store og Xbox Store. PlayStation Store trekker pengene når du forhåndsbestiller, ikke på lanseringsdagen. Fysiske utgaver får du hos de vanlige norske butikkene.
+Standard digital utgave koster {price:standard} i PlayStation Store og Xbox Store. PlayStation Store trekker pengene når du forhåndsbestiller, ikke på lanseringsdagen. Fysiske utgaver får du hos de vanlige norske butikkene.
 
 ## Hva Rookdex gjør på lanseringskvelden
 

@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from "astro:content"
 import Sources from "../../../components/Sources.astro"
-import { defaultLocale, fill, isLocale, type Locale, locales, t } from "../../../i18n"
+import { defaultLocale, isLocale, type Locale, locales, translator } from "../../../i18n"
 import Base from "../../../layouts/Base.astro"
 import { guideSlugs, resolveGuide } from "../../../model/guides"
 import { validSlugs } from "../../../model/seo"
@@ -18,7 +18,7 @@ export async function getStaticPaths() {
 const { locale, slug } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 if (!slug) throw new Error("Missing slug")
-const s = t(locale as Locale)
+const { t } = translator(locale as Locale)
 
 const entries = await getCollection("guides")
 const resolved = resolveGuide(entries, locale, slug, defaultLocale)
@@ -32,17 +32,17 @@ const updated = entry.data.updated.toLocaleDateString(dateLocale, { dateStyle: "
 
 <Base
 	locale={locale}
-	title={entry.data.searchTitle ?? `${entry.data.title} · ${s.siteName}`}
+	title={entry.data.searchTitle ?? `${entry.data.title} · ${t("siteName")}`}
 	description={entry.data.summary}
 	path={`guides/${slug}`}
 >
 	<article class="guide" lang={fellBack ? defaultLocale : undefined}>
-		{fellBack && <p class="notice" lang={locale}>{s.guides.inEnglish}</p>}
+		{fellBack && <p class="notice" lang={locale}>{t("guides.inEnglish")}</p>}
 		<h1>{entry.data.title}</h1>
 		<p class="tagline">{entry.data.summary}</p>
-		<p class="meta" lang={fellBack ? locale : undefined}>{fill(s.guides.updated, { date: updated })}</p>
+		<p class="meta" lang={fellBack ? locale : undefined}>{t("guides.updated", { date: updated })}</p>
 		<Content />
-		<Sources urls={entry.data.sources} label={s.guides.sources} locale={locale as Locale} />
+		<Sources urls={entry.data.sources} label={t("guides.sources")} locale={locale as Locale} />
 	</article>
 </Base>
 

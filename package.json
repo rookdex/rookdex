@@ -20,6 +20,7 @@
 		"deploy:check": "astro build && wrangler deploy --dry-run"
 	},
 	"dependencies": {
+		"@astrojs/markdown-satteri": "0.4.2",
 		"@astrojs/react": "6.0.5",
 		"@fontsource-variable/dm-sans": "5.3.0",
 		"@fontsource-variable/inter": "5.3.0",

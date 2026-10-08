@@ -1,17 +1,15 @@
 import { describe, expect, it } from "vitest"
-import { en } from "./en"
-import { no } from "./no"
+import en from "../locales/en.json"
+import no from "../locales/no.json"
 
-/** Every string value with its path, walking nested objects (spec §13.6: values, not file text). */
-function strings(value: unknown, path: string): [string, string][] {
-	if (typeof value === "string") return [[path, value]]
-	if (value && typeof value === "object") {
-		return Object.entries(value).flatMap(([key, v]) => strings(v, `${path}.${key}`))
-	}
-	return []
-}
-
-const all = [...strings(en, "en"), ...strings(no, "no")]
+const bundles = { en, no } as const
+const all: [string, string][] = Object.entries(bundles).flatMap(([lang, bundle]) =>
+	Object.entries(bundle).map(([key, value]): [string, string] => [`${lang}.${key}`, value])
+)
+const titles = (bundle: Record<string, string>) =>
+	Object.entries(bundle)
+		.filter(([key]) => key.startsWith("seo.titles."))
+		.map(([, v]) => v)
 
 describe("copy rules (spec §9)", () => {
 	it("walks a real number of strings", () => {
@@ -29,13 +27,13 @@ describe("copy rules (spec §9)", () => {
 
 describe("soft hyphens (spec §5, §11)", () => {
 	it("appear only in the Norwegian Settings tab label", () => {
-		const withShy = all.filter(([, text]) => text.includes("­")).map(([path]) => path)
+		const withShy = all.filter(([, text]) => text.includes("\u00ad")).map(([path]) => path)
 		expect(withShy).toEqual(["no.nav.settings"])
 	})
 
 	it("leave the page title whole", () => {
-		expect(no.settings.title).toBe("Innstillinger")
-		expect(no.nav.settings.replace("­", "")).toBe(no.settings.title)
+		expect(no["settings.title"]).toBe("Innstillinger")
+		expect(no["nav.settings"].replace("\u00ad", "")).toBe(no["settings.title"])
 	})
 })
 
@@ -43,8 +41,8 @@ describe("search titles and description (SEO spec §4.4)", () => {
 	it.each([
 		["en", en],
 		["no", no],
-	] as const)("%s titles fit in a result and name the site", (_locale, s) => {
-		for (const title of Object.values(s.seo.titles)) {
+	] as const)("%s titles fit in a result and name the site", (_locale, bundle) => {
+		for (const title of titles(bundle)) {
 			expect([...title].length, title).toBeLessThanOrEqual(65)
 			expect(title).toContain("Rookdex")
 		}
@@ -53,30 +51,33 @@ describe("search titles and description (SEO spec §4.4)", () => {
 	it.each([
 		["en", en],
 		["no", no],
-	] as const)("%s home description is at most 165 characters", (_locale, s) => {
-		expect([...s.seo.homeDescription].length).toBeLessThanOrEqual(165)
+	] as const)("%s home description is at most 165 characters", (_locale, bundle) => {
+		expect([...bundle["seo.homeDescription"]].length).toBeLessThanOrEqual(165)
 	})
 
 	it("keeps the visible headings as they were", () => {
-		expect(en.tracker.title).toBe("Tracker")
-		expect(no.tracker.title).toBe("Oversikt")
-		expect(en.seo.titles.home).toBe("Rookdex: GTA 6 countdown, tracker and launch guide")
+		expect(en["tracker.title"]).toBe("Tracker")
+		expect(no["tracker.title"]).toBe("Oversikt")
+		expect(en["seo.titles.home"]).toBe("Rookdex: GTA 6 countdown, tracker and launch guide")
 	})
 })
 
-describe("countdown templates (brand Task 5, feedback spec §15.11)", () => {
+describe("countdown templates (brand Task 5, locale spec §5.2)", () => {
 	it.each([
 		["en", en],
 		["no", no],
-	] as const)("%s keeps {n} in every countdown template", (_locale, s) => {
-		for (const template of [
-			s.hub.daysToGo,
-			s.hub.oneDayToGo,
-			s.hub.daySince,
-			s.footer.daysToLaunch,
-			s.footer.oneDayToLaunch,
-		]) {
-			expect(template).toContain("{n}")
+	] as const)("%s keeps its placeholder and no other digit", (_lang, s) => {
+		const plurals = [
+			s["hub.daysToGo.one"],
+			s["hub.daysToGo.other"],
+			s["footer.daysToLaunch.one"],
+			s["footer.daysToLaunch.other"],
+		]
+		for (const template of plurals) expect(template).toContain("{count}")
+		expect(s["hub.daySince"]).toContain("{n}")
+		for (const template of [...plurals, s["hub.daySince"]]) {
+			// DaysLine finds the number in the filled sentence, so no other digit may appear.
+			expect(template.replace(/\{\w+\}/g, "")).not.toMatch(/\d/)
 		}
 	})
 })

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { t } from "../i18n"
+import { translator } from "../i18n"
 import { renderDoc } from "../test/render"
 import Footer from "./Footer.astro"
 
@@ -7,12 +7,12 @@ const hiddenName = (a: Element) =>
 	a.querySelector(".visually-hidden:not(.new-tab-note)")?.textContent?.trim()
 
 describe.each(["en", "no"] as const)("footer in %s (feedback spec §6)", (locale) => {
-	const s = t(locale)
+	const { t } = translator(locale)
 
 	it("has the one-sentence disclaimer", async () => {
 		const doc = await renderDoc(Footer, { props: { locale } })
 		expect(doc.querySelectorAll("footer p.footer-disclaimer")).toHaveLength(1)
-		expect(doc.querySelector(".footer-disclaimer")?.textContent).toBe(s.footer.disclaimer)
+		expect(doc.querySelector(".footer-disclaimer")?.textContent).toBe(t("footer.disclaimer"))
 	})
 
 	it("has three icon links named by hidden text, with hidden tooltips", async () => {
@@ -23,7 +23,11 @@ describe.each(["en", "no"] as const)("footer in %s (feedback spec §6)", (locale
 			"mailto:legal@rookdex.app",
 			`/${locale}/settings/#about`,
 		])
-		expect(icons.map(hiddenName)).toEqual([s.footer.github, s.footer.legal, s.footer.about])
+		expect(icons.map(hiddenName)).toEqual([
+			t("footer.github"),
+			t("footer.legal"),
+			t("footer.about"),
+		])
 		for (const a of icons) {
 			expect(a.hasAttribute("aria-label")).toBe(false)
 			expect(a.classList.contains("has-tip")).toBe(true)
@@ -34,7 +38,7 @@ describe.each(["en", "no"] as const)("footer in %s (feedback spec §6)", (locale
 		expect(icons[0].getAttribute("target")).toBe("_blank")
 		expect(icons[0].querySelector(".new-tab-note")).not.toBeNull()
 		expect(icons[0].querySelector(".ext-icon")).toBeNull()
-		expect(icons[0].querySelector(".tip")?.textContent).toBe(`${s.footer.github} ↗`)
+		expect(icons[0].querySelector(".tip")?.textContent).toBe(`${t("footer.github")} ↗`)
 	})
 
 	it("ships the launch date in the status chip, with the live templates beside it", async () => {
@@ -42,9 +46,9 @@ describe.each(["en", "no"] as const)("footer in %s (feedback spec §6)", (locale
 		const chip = doc.querySelector<HTMLElement>("a.status-chip")
 		expect(chip?.getAttribute("href")).toBe(`/${locale}/`)
 		expect(chip?.querySelector("[data-status-text]")?.textContent).toBe("19 Nov 2026")
-		expect(chip?.dataset.days).toBe(s.footer.daysToLaunch)
-		expect(chip?.dataset.oneDay).toBe(s.footer.oneDayToLaunch)
-		expect(chip?.dataset.out).toBe(s.footer.outNow)
+		expect(chip?.dataset.one).toBe(t("footer.daysToLaunch.one"))
+		expect(chip?.dataset.other).toBe(t("footer.daysToLaunch.other"))
+		expect(chip?.dataset.out).toBe(t("footer.outNow"))
 		expect(chip?.querySelector(".status-dot")?.getAttribute("aria-hidden")).toBe("true")
 	})
 

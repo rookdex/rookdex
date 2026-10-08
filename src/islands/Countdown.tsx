@@ -1,4 +1,5 @@
-import { type Locale, t } from "../i18n"
+import { type Locale, translator } from "../i18n"
+import { prices } from "../model/prices"
 import { useCountdown } from "./useCountdown"
 
 interface Props {
@@ -11,46 +12,48 @@ interface Props {
 
 /**
  * The sentence with its number in its own span, so CSS can give the number the display face
- * while the words stay in Inter (spec §7). Splitting on the placeholder keeps the translation
- * in charge of word order ("{n} days to go", "Dag {n} etter lansering").
+ * while the words stay in Inter (spec §7). The sentence comes filled from the translator, and the
+ * number is found in it, so the translation stays in charge of word order ("70 days to go",
+ * "Dag 3 etter lansering"). Countdown templates carry no other digits (copy.test.ts).
  */
-function DaysLine({ template, n }: { template: string; n: number }) {
-	const [before, after] = template.split("{n}")
-	if (after === undefined) return <>{template}</>
+function DaysLine({ text, n }: { text: string; n: number }) {
+	const digits = String(n)
+	const at = text.indexOf(digits)
+	if (at === -1) return <>{text}</>
 	return (
 		<>
-			{before}
-			<span className="days-number">{n}</span>
-			{after}
+			{text.slice(0, at)}
+			<span className="days-number">{digits}</span>
+			{text.slice(at + digits.length)}
 		</>
 	)
 }
 
 export function Countdown({ locale, initialNow, guideHref, trackerHref }: Props) {
-	const s = t(locale).hub
+	const { t, plural, money } = translator(locale)
 	const state = useCountdown(new Date(initialNow))
 	const after = state.phase === "after"
 
-	const template = after ? s.daySince : state.daysToGo === 1 ? s.oneDayToGo : s.daysToGo
 	const n = after ? state.daysSince : state.daysToGo
+	const text = after ? t("hub.daySince", { n }) : plural("hub.daysToGo", n)
 
 	const units: [number, string][] = [
-		[state.parts.days, s.days],
-		[state.parts.hours, s.hours],
-		[state.parts.minutes, s.minutes],
+		[state.parts.days, t("hub.days")],
+		[state.parts.hours, t("hub.hours")],
+		[state.parts.minutes, t("hub.minutes")],
 	]
-	if (!state.reducedMotion) units.push([state.parts.seconds, s.seconds])
+	if (!state.reducedMotion) units.push([state.parts.seconds, t("hub.seconds")])
 
 	return (
 		<section className="hub-state" aria-labelledby="hub-heading">
-			<h2 id="hub-heading">{after ? s.launched : s.countdownHeading}</h2>
+			<h2 id="hub-heading">{after ? t("hub.launched") : t("hub.countdownHeading")}</h2>
 			{/* One live region for both phases, so the flip itself is announced as one sentence. */}
 			<p className="days" aria-live="polite" aria-atomic="true">
-				<DaysLine template={template} n={n} />
+				<DaysLine text={text} n={n} />
 			</p>
 			{after ? (
 				<p>
-					<a href={trackerHref}>{s.openTracker}</a>
+					<a href={trackerHref}>{t("hub.openTracker")}</a>
 				</p>
 			) : (
 				<>
@@ -62,11 +65,11 @@ export function Countdown({ locale, initialNow, guideHref, trackerHref }: Props)
 							</div>
 						))}
 					</div>
-					<p>{s.preload}</p>
-					<h2>{s.buyHeading}</h2>
-					<p>{s.buyBody}</p>
+					<p>{t("hub.preload")}</p>
+					<h2>{t("hub.buyHeading")}</h2>
+					<p>{t("hub.buyBody", { standard: money(prices.standard) })}</p>
 					<p>
-						<a href={guideHref}>{s.beforeYouStart}</a>
+						<a href={guideHref}>{t("hub.beforeYouStart")}</a>
 					</p>
 				</>
 			)}

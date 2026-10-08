@@ -2,7 +2,7 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 import { axe } from "vitest-axe"
-import { en } from "../../i18n/en"
+import { translator } from "../../i18n"
 import type { SeedItem } from "../../model/schema"
 import { StatsRail } from "./StatsRail"
 
@@ -23,7 +23,7 @@ describe("StatsRail", () => {
 				overall={{ done: 1, total: 3 }}
 				categories={[{ category: "wildlife", label: "Wildlife", done: 1, total: 2 }]}
 				recent={[{ item: gator, updated_at: "2026-09-16T10:00:00.000Z" }]}
-				strings={en.tracker}
+				t={translator("en").t}
 			/>
 		)
 		const bars = screen.getAllByRole("progressbar")
@@ -40,7 +40,12 @@ describe("StatsRail", () => {
 
 	it("says when nothing is ticked and has no axe violations", async () => {
 		const { container } = render(
-			<StatsRail overall={{ done: 0, total: 0 }} categories={[]} recent={[]} strings={en.tracker} />
+			<StatsRail
+				overall={{ done: 0, total: 0 }}
+				categories={[]}
+				recent={[]}
+				t={translator("en").t}
+			/>
 		)
 		expect(screen.getByText("Nothing ticked yet.")).toBeInTheDocument()
 		expect(await axe(container)).toHaveNoViolations()

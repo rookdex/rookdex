@@ -59,6 +59,30 @@ describe("Countdown before launch", () => {
 		expect(daysLine()).toHaveTextContent("70 dager igjen")
 	})
 
+	it("states the price from the price model, formatted for the language", () => {
+		vi.setSystemTime(new Date(before))
+		render(<Countdown locale="en" initialNow={before} guideHref="#" trackerHref="/en/tracker/" />)
+		// textContent, not getByText: Testing Library folds the no-break space into a plain one.
+		expect(document.querySelector(".hub-state")?.textContent).toContain(
+			"The standard digital edition is NOK 949."
+		)
+	})
+
+	it("wraps the day count in its own span in both phrasings", () => {
+		vi.setSystemTime(new Date(before))
+		const { unmount } = render(
+			<Countdown locale="no" initialNow={before} guideHref="#" trackerHref="/no/tracker/" />
+		)
+		expect(daysLine().querySelector(".days-number")?.textContent).toBe("70")
+		expect(daysLine()).toHaveTextContent("70 dager igjen")
+		unmount()
+
+		vi.setSystemTime(new Date(after))
+		render(<Countdown locale="no" initialNow={before} guideHref="#" trackerHref="/no/tracker/" />)
+		expect(daysLine().querySelector(".days-number")?.textContent).toBe("3")
+		expect(daysLine()).toHaveTextContent("Dag 3 etter lansering")
+	})
+
 	it("has no axe violations", async () => {
 		vi.setSystemTime(new Date(before))
 		const { container } = render(

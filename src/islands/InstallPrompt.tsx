@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { type Locale, t } from "../i18n"
+import { type Locale, translator } from "../i18n"
 import { isStandalone } from "../scripts/standalone"
 import { INSTALL_SEEN_KEY, readFlag, writeFlag } from "./seenFlag"
 
@@ -11,7 +11,7 @@ interface Props {
 
 /** Native <dialog> shown once when the browser offers installation. Escape closes it. */
 export function InstallPrompt({ locale }: Props) {
-	const s = t(locale).install
+	const { t } = translator(locale)
 	const dialogRef = useRef<HTMLDialogElement>(null)
 	const returnFocus = useRef<HTMLElement | null>(null)
 	const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null)
@@ -55,14 +55,14 @@ export function InstallPrompt({ locale }: Props) {
 
 	return (
 		<dialog ref={dialogRef} className="install" aria-labelledby="install-title" onClose={onClose}>
-			<h2 id="install-title">{s.title}</h2>
-			<p>{s.body}</p>
+			<h2 id="install-title">{t("install.title")}</h2>
+			<p>{t("install.body")}</p>
 			<div className="actions">
 				<button type="button" className="primary" onClick={install}>
-					{s.accept}
+					{t("install.accept")}
 				</button>
 				<button type="button" onClick={dismiss}>
-					{s.dismiss}
+					{t("install.dismiss")}
 				</button>
 			</div>
 		</dialog>

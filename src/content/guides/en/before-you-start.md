@@ -14,7 +14,7 @@ The game releases on **19 November 2026** on PlayStation 5 and Xbox Series X|S. 
 
 ## Editions
 
-Two editions are on sale: Standard at 949 kr and Ultimate at 1 189 kr. Ultimate is the game plus the Ultimate Edition Upgrade: premium vehicles, weapons and clothes for Jason and Lucia across the whole story, with new items unlocked in each chapter. Both PlayStation and Xbox sell it.
+Two editions are on sale: Standard at {price:standard} and Ultimate at {price:ultimate}. Ultimate is the game plus the Ultimate Edition Upgrade: premium vehicles, weapons and clothes for Jason and Lucia across the whole story, with new items unlocked in each chapter. Both PlayStation and Xbox sell it.
 
 ## Pre-order bonus
 
@@ -30,7 +30,7 @@ Preload opens on **12 November**. Start it the day it opens: the download is lar
 
 ## Buying in Norway
 
-The standard digital edition is 949 kr on the PlayStation Store and the Xbox Store. The PlayStation Store charges you when you pre-order, not on release day. Physical copies come from the usual Norwegian retailers.
+The standard digital edition is {price:standard} on the PlayStation Store and the Xbox Store. The PlayStation Store charges you when you pre-order, not on release day. Physical copies come from the usual Norwegian retailers.
 
 ## What Rookdex does on launch night
 

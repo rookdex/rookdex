@@ -1,11 +1,11 @@
-import { fill, type Strings } from "../../i18n"
+import type { Translate } from "../../i18n"
 import type { CategoryCount, Count, RecentFind } from "../../model/stats"
 
 interface Props {
 	overall: Count
 	categories: (CategoryCount & { label: string })[]
 	recent: RecentFind[]
-	strings: Strings["tracker"]
+	t: Translate
 }
 
 interface BarProps {
@@ -39,15 +39,15 @@ function Bar({ id, label, count, countText }: BarProps) {
 	)
 }
 
-export function StatsRail({ overall, categories, recent, strings }: Props) {
-	const text = (count: Count) => fill(strings.count, { done: count.done, total: count.total })
+export function StatsRail({ overall, categories, recent, t }: Props) {
+	const text = (count: Count) => t("tracker.count", { done: count.done, total: count.total })
 	return (
 		<section className="stats" aria-labelledby="stats-heading">
-			<h2 id="stats-heading">{strings.progress}</h2>
+			<h2 id="stats-heading">{t("tracker.progress")}</h2>
 			<div className="stats-grid">
 				<Bar
 					id="progress-overall"
-					label={strings.overall}
+					label={t("tracker.overall")}
 					count={overall}
 					countText={text(overall)}
 				/>
@@ -61,9 +61,9 @@ export function StatsRail({ overall, categories, recent, strings }: Props) {
 					/>
 				))}
 			</div>
-			<h3 id="recent-heading">{strings.recent}</h3>
+			<h3 id="recent-heading">{t("tracker.recent")}</h3>
 			{recent.length === 0 ? (
-				<p className="stats-empty">{strings.noRecent}</p>
+				<p className="stats-empty">{t("tracker.noRecent")}</p>
 			) : (
 				<ul className="recent" aria-labelledby="recent-heading">
 					{recent.map((find) => (

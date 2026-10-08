@@ -2,7 +2,7 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
-import { en } from "../../i18n/en"
+import { translator } from "../../i18n"
 import { ProfileMenu } from "./ProfileMenu"
 
 const profiles = [
@@ -21,7 +21,7 @@ function setup() {
 		onDeleted: vi.fn(),
 	}
 	const view = render(
-		<ProfileMenu profiles={profiles} current={profiles[0]} strings={en.profile} {...handlers} />
+		<ProfileMenu profiles={profiles} current={profiles[0]} t={translator("en").t} {...handlers} />
 	)
 	return { ...handlers, ...view }
 }
