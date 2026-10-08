@@ -3,7 +3,7 @@
 	"name": "Rookdex",
 	"short_name": "Rookdex",
 	"description": "Launch-night companion: track what you find, see what is confirmed.",
-	"start_url": "/en/",
+	"start_url": "/",
 	"scope": "/",
 	"display": "standalone",
 	"background_color": "#000000",

@@ -41,11 +41,14 @@ function loadWorker(network: () => Promise<Response>) {
 	return { listeners, self, cache, put }
 }
 
-async function navigate(worker: ReturnType<typeof loadWorker>) {
+async function navigate(
+	worker: ReturnType<typeof loadWorker>,
+	url = "https://rookdex.app/en/news/"
+) {
 	let responded: Promise<Response> | undefined
 	const pending: Promise<unknown>[] = []
 	worker.listeners.get("fetch")?.({
-		request: { method: "GET", url: "https://rookdex.app/en/news/", mode: "navigate" },
+		request: { method: "GET", url, mode: "navigate" },
 		respondWith: (p: Promise<Response>) => {
 			responded = p
 		},
@@ -94,5 +97,25 @@ describe("service worker (feedback spec §10.1)", () => {
 		const worker = loadWorker(page({}))
 		await navigate(worker)
 		expect(worker.put).toHaveBeenCalledOnce()
+	})
+})
+
+describe("offline fallback (locale spec §6.5)", () => {
+	const offline = () => Promise.reject(new TypeError("offline"))
+
+	it("answers an old /no/ page with the cached root, which resolves the language itself", async () => {
+		const worker = loadWorker(offline)
+		await worker.put("/en/", new Response("english home"))
+		await worker.put("/", new Response("root"))
+		const response = await navigate(worker, "https://rookdex.app/no/x/")
+		expect(await response?.text()).toBe("root")
+	})
+
+	it("still prefers the same language's home when it is cached", async () => {
+		const worker = loadWorker(offline)
+		await worker.put("/nb/", new Response("norsk"))
+		await worker.put("/", new Response("root"))
+		const response = await navigate(worker, "https://rookdex.app/nb/unknown/")
+		expect(await response?.text()).toBe("norsk")
 	})
 })
