@@ -38,6 +38,12 @@ export default function pricePlugin({ locales }) {
 							const { amount, currency } = prices[id]
 							return i18n.money(lang, amount, currency, { stripWhole: true })
 						})
+						// An id TOKEN doesn't match (capital, space, underscore) would otherwise ship as raw text.
+						if (value.includes("{price:")) {
+							throw new Error(
+								`{price:…} token is malformed in ${path}; ids are lowercase letters, digits and hyphens`
+							)
+						}
 						ctx.replaceNode(node, { type: "text", value })
 					},
 				}

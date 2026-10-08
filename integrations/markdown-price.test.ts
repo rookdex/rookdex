@@ -30,6 +30,13 @@ describe("markdown-price (locale spec §5.4)", () => {
 		await expect(render("{price:deluxe}", guide("en"))).rejects.toThrow(/deluxe/)
 	})
 
+	it.each(["{price:Standard}", "{price: standard}", "{price:standard_2}", "{price:standard"])(
+		"fails the build on the malformed token %s",
+		async (token) => {
+			await expect(render(`Costs ${token}.`, guide("en"))).rejects.toThrow(/malformed/)
+		}
+	)
+
 	it("fails on a token outside a locale folder, and ignores files without tokens", async () => {
 		const notes = pathToFileURL("/repo/src/content/notes/x.md")
 		await expect(render("{price:standard}", notes)).rejects.toThrow(/locale folder/)
