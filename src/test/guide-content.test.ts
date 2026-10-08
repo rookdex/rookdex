@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
+import { hasPrice } from "./price-patterns"
 
 const read = (locale: string) =>
 	readFileSync(
@@ -52,5 +53,24 @@ describe.each([
 		expect(text).toContain("  - https://store.playstation.com/no-no/concept/10000730")
 		expect(text).not.toContain("https://www.rockstargames.com/newswire\n")
 		expect(text).not.toContain("updated: 2026-09-09")
+	})
+})
+
+describe.each(["en", "no"])("%s guide prices (locale spec §5.5)", (locale) => {
+	const file = read(locale)
+	const frontmatter = file.slice(0, file.indexOf("\n---\n", 4))
+
+	it("has no price string anywhere in the file", () => {
+		const priced = file.split("\n").filter((line) => hasPrice(line))
+		expect(priced).toEqual([])
+	})
+
+	it("uses the price tokens in the body", () => {
+		expect(body(file)).toContain("{price:standard}")
+		expect(body(file)).toContain("{price:ultimate}")
+	})
+
+	it("keeps tokens out of frontmatter, where the Markdown plugin never runs", () => {
+		expect(frontmatter).not.toContain("{price:")
 	})
 })

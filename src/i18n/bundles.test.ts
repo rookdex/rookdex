@@ -1,7 +1,9 @@
+import { readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 import en from "../locales/en.json"
 import no from "../locales/no.json"
 import { hasPrice } from "../test/price-patterns"
+import { locales } from "./locales"
 
 type Bundle = Record<string, string>
 
@@ -28,6 +30,11 @@ function bundleProblems(bundles: Record<string, Bundle>): string[] {
 }
 
 describe("bundle parity (locale spec §5.5)", () => {
+	it("matches the locale list in astro.config.mjs", () => {
+		const config = readFileSync(new URL("../../astro.config.mjs", import.meta.url), "utf8")
+		expect(config).toContain(`const locales = ${JSON.stringify([...locales]).replace(",", ", ")}`)
+	})
+
 	it("en and no carry the same keys, none empty, plurals complete", () => {
 		expect(bundleProblems({ en, no })).toEqual([])
 	})
