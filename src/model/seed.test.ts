@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import en from "../locales/en.json"
-import no from "../locales/no.json"
+import nb from "../locales/nb.json"
 import type { Allowlist } from "./schema"
 import {
 	allowlist,
@@ -183,7 +183,7 @@ describe("shipped seed", () => {
 			expect(item.name, item.id).toMatch(/^[\x20-\x7E]+$/)
 			for (const [lang, bundle] of [
 				["en", en],
-				["no", no],
+				["nb", nb],
 			] as const) {
 				const keys = bundle as Record<string, string>
 				expect(keys[`category.${item.category}`], `${lang} category ${item.category}`).toBeTruthy()

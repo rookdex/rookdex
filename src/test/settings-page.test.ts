@@ -3,7 +3,7 @@ import pkg from "../../package.json"
 import Settings from "../pages/[locale]/settings.astro"
 import { renderDoc } from "./render"
 
-const settings = (locale: "en" | "no") => renderDoc(Settings, { params: { locale } })
+const settings = (locale: "en" | "nb") => renderDoc(Settings, { params: { locale } })
 
 afterEach(() => vi.unstubAllEnvs())
 
@@ -22,15 +22,15 @@ describe("Settings page (spec §7)", () => {
 	})
 
 	it("uses the whole word in the title, without the tab label's soft hyphen", async () => {
-		const doc = await settings("no")
+		const doc = await settings("nb")
 		expect(doc.querySelector("h1")?.textContent).toBe("Innstillinger")
 		expect(doc.title).toBe("Innstillinger · Rookdex")
 	})
 
 	it("marks the current language and links the other to its own Settings page", async () => {
-		const doc = await settings("no")
+		const doc = await settings("nb")
 		const group = doc.querySelector('section[aria-labelledby="settings-language"]')
-		expect(group?.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe("Norsk")
+		expect(group?.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe("Norsk bokmål")
 		expect(group?.querySelector("a")?.getAttribute("href")).toBe("/en/settings/")
 	})
 
@@ -87,7 +87,7 @@ describe("Settings page (spec §7)", () => {
 	})
 
 	it("links the licence, the repository and the legal address", async () => {
-		const doc = await settings("no")
+		const doc = await settings("nb")
 		const rows = rowsOf(doc)
 		const href = (i: number) => rows[i].querySelector("dd a")?.getAttribute("href")
 		expect(href(2)).toBe("https://github.com/rookdex/rookdex")

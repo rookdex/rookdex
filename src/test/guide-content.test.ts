@@ -24,7 +24,7 @@ describe.each([
 		],
 	],
 	[
-		"no",
+		"nb",
 		[
 			"Datoen",
 			"Utgaver",
@@ -56,7 +56,7 @@ describe.each([
 	})
 })
 
-describe.each(["en", "no"])("%s guide prices (locale spec §5.5)", (locale) => {
+describe.each(["en", "nb"])("%s guide prices (locale spec §5.5)", (locale) => {
 	const file = read(locale)
 	const frontmatter = file.slice(0, file.indexOf("\n---\n", 4))
 

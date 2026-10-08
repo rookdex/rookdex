@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest"
 import { guideSchema, guideSlugs, resolveGuide, splitGuideId } from "./guides"
 
-const entries = [{ id: "en/before-you-start" }, { id: "no/before-you-start" }, { id: "en/regions" }]
+const entries = [{ id: "en/before-you-start" }, { id: "nb/before-you-start" }, { id: "en/regions" }]
 
 describe("splitGuideId", () => {
 	it("splits locale and slug", () => {
-		expect(splitGuideId("no/before-you-start")).toEqual({ locale: "no", slug: "before-you-start" })
+		expect(splitGuideId("nb/before-you-start")).toEqual({ locale: "nb", slug: "before-you-start" })
 	})
 })
 
@@ -17,13 +17,13 @@ describe("guideSlugs", () => {
 
 describe("resolveGuide", () => {
 	it("returns the entry in the requested language", () => {
-		expect(resolveGuide(entries, "no", "before-you-start")).toEqual({
-			entry: { id: "no/before-you-start" },
+		expect(resolveGuide(entries, "nb", "before-you-start")).toEqual({
+			entry: { id: "nb/before-you-start" },
 			fellBack: false,
 		})
 	})
 	it("falls back to English and says so", () => {
-		expect(resolveGuide(entries, "no", "regions")).toEqual({
+		expect(resolveGuide(entries, "nb", "regions")).toEqual({
 			entry: { id: "en/regions" },
 			fellBack: true,
 		})

@@ -33,7 +33,7 @@ const { t } = translator(locale)
 const current = currentTab(path, tab)
 const sub = current !== null && path !== TAB_PATHS[current]
 const canonical = getAbsoluteLocaleUrl(locale, path)
-const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
+const ogLocale: Record<Locale, string> = { en: "en_US", nb: "nb_NO" }
 ---
 
 <!doctype html>
@@ -89,7 +89,7 @@ const ogLocale: Record<Locale, string> = { en: "en_US", no: "nb_NO" }
 						"@type": "WebSite",
 						name: t("siteName"),
 						url: `${SITE}/`,
-						inLanguage: locale === "no" ? "nb" : "en",
+						inLanguage: locale,
 					})}
 				></script>
 			)

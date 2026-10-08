@@ -51,18 +51,18 @@ describe("jsonLd (SEO spec §4.4)", () => {
 
 describe("sitemapXml (SEO spec §4.2)", () => {
 	it("writes one sorted <url><loc> per URL, and nothing else per entry", () => {
-		const xml = sitemapXml([`${SITE}/no/`, `${SITE}/en/`])
+		const xml = sitemapXml([`${SITE}/nb/`, `${SITE}/en/`])
 		expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(true)
 		expect(xml).toContain('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
 		expect([...xml.matchAll(/<loc>([^<]*)<\/loc>/g)].map((m) => m[1])).toEqual([
 			`${SITE}/en/`,
-			`${SITE}/no/`,
+			`${SITE}/nb/`,
 		])
 		expect(xml).not.toMatch(/lastmod|priority|changefreq|hreflang/)
 	})
 
 	it("is byte-stable whatever order the URLs come in", () => {
-		const urls = [`${SITE}/en/`, `${SITE}/en/news/`, `${SITE}/no/`]
+		const urls = [`${SITE}/en/`, `${SITE}/en/news/`, `${SITE}/nb/`]
 		expect(sitemapXml([...urls].reverse())).toBe(sitemapXml(urls))
 	})
 })

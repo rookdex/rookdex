@@ -1,3 +1,4 @@
+/no/tracker/rumours/ /nb/news/ 301
 /en/tracker/rumours/ /en/news/ 301
-/no/tracker/rumours/ /no/news/ 301
-/ /en/ 302
+/no /nb/ 301
+/no/* /nb/:splat 301

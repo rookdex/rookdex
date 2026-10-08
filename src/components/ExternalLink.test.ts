@@ -21,8 +21,8 @@ describe("ExternalLink (feedback spec §3.1)", () => {
 		expect(en.querySelector(".visually-hidden.new-tab-note")?.textContent).toBe(
 			" (opens in a new tab)"
 		)
-		const no = await link({ href: "https://example.com/", locale: "no" })
-		expect(no.querySelector(".new-tab-note")?.textContent).toBe(" (åpnes i ny fane)")
+		const nb = await link({ href: "https://example.com/", locale: "nb" })
+		expect(nb.querySelector(".new-tab-note")?.textContent).toBe(" (åpnes i ny fane)")
 	})
 
 	it("drops the icon but keeps the note with icon={false}", async () => {

@@ -14,7 +14,7 @@ describe("News page (spec §8)", () => {
 	})
 
 	it("lists each rumour under an h3", async () => {
-		const doc = await renderDoc(News, { params: { locale: "no" } })
+		const doc = await renderDoc(News, { params: { locale: "nb" } })
 		expect(rumours.length).toBeGreaterThan(0)
 		const names = [...doc.querySelectorAll(".rumour-list h3")].map((h) => h.textContent)
 		expect(names).toEqual(rumours.map((r) => r.name))
@@ -29,7 +29,7 @@ describe("News page (spec §8)", () => {
 		expect((await renderDoc(News, { params: { locale: "en" } })).title).toBe(
 			"GTA 6 news and rumours · Rookdex"
 		)
-		expect((await renderDoc(News, { params: { locale: "no" } })).title).toBe(
+		expect((await renderDoc(News, { params: { locale: "nb" } })).title).toBe(
 			"GTA 6-nyheter og rykter · Rookdex"
 		)
 	})

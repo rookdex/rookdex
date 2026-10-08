@@ -8,7 +8,7 @@ import precache from "./integrations/precache.mjs"
 import seoCheck from "./integrations/seo-check.mjs"
 
 // One list for routing and the price plugin. src/i18n/locales.ts must match it (bundles.test.ts).
-const locales = ["en", "no"]
+const locales = ["en", "nb"]
 
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({

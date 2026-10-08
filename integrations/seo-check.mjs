@@ -9,8 +9,8 @@ import { listFiles } from "./precache.mjs"
 /** Built pages kept out of the sitemap on purpose (spec D4), as locale-less paths. */
 export const NOT_IN_SITEMAP = ["settings"]
 
-const LOCALES = ["en", "no"]
-const PAGE = /^(en|no)\/(.+\/)?index\.html$/
+const LOCALES = ["en", "nb"]
+const PAGE = /^(en|nb)\/(.+\/)?index\.html$/
 const ROOT_FILES = ["404.html", "sitemap.xml", "robots.txt", "indexnow-key.txt"]
 const LD_BLOCK = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g
 
@@ -43,7 +43,7 @@ function head(html) {
 
 /**
  * Every broken rule, as "[seo N] …" messages. `files` maps a dist-relative posix path to its text:
- * every page under en/ and no/, plus 404.html, sitemap.xml, robots.txt and indexnow-key.txt. A
+ * every page under en/ and nb/, plus 404.html, sitemap.xml, robots.txt and indexnow-key.txt. A
  * missing entry counts as a missing file.
  */
 export function seoErrors(files, site) {

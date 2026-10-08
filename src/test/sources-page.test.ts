@@ -4,7 +4,7 @@ import Sources from "../pages/[locale]/tracker/sources.astro"
 import { renderDoc } from "./render"
 
 const live = seedItems.filter((item) => !item.retired)
-const page = (locale: "en" | "no") => renderDoc(Sources, { params: { locale } })
+const page = (locale: "en" | "nb") => renderDoc(Sources, { params: { locale } })
 const text = (el: Element | null | undefined) => el?.textContent?.replace(/\s+/g, " ").trim()
 
 describe("Sources page (feedback spec §5)", () => {
@@ -30,7 +30,7 @@ describe("Sources page (feedback spec §5)", () => {
 	})
 
 	it("links every source out in a new tab, with its outlet under it", async () => {
-		const doc = await page("no")
+		const doc = await page("nb")
 		for (const item of live) {
 			const entry = doc.getElementById(item.id)
 			expect(text(entry?.querySelector("h3"))).toBe(item.name)

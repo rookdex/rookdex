@@ -4,7 +4,7 @@ import LanguageSwitch from "./LanguageSwitch.astro"
 
 describe("language picker markup (spec §6)", () => {
 	it("is a labelled nav holding a details disclosure, with no menu roles", async () => {
-		const doc = await renderDoc(LanguageSwitch, { props: { locale: "no", path: "tracker" } })
+		const doc = await renderDoc(LanguageSwitch, { props: { locale: "nb", path: "tracker" } })
 		expect(doc.querySelector('nav[aria-label="Språk"] > details > summary')).not.toBeNull()
 		expect(doc.querySelector('[role="menu"], [role="menuitem"]')).toBeNull()
 	})
@@ -16,7 +16,7 @@ describe("language picker markup (spec §6)", () => {
 	})
 
 	it("links the same page in each language and marks the current one", async () => {
-		const doc = await renderDoc(LanguageSwitch, { props: { locale: "no", path: "tracker" } })
+		const doc = await renderDoc(LanguageSwitch, { props: { locale: "nb", path: "tracker" } })
 		const links = [...doc.querySelectorAll("details a")].map((a) => [
 			a.getAttribute("href"),
 			a.getAttribute("hreflang"),
@@ -24,10 +24,10 @@ describe("language picker markup (spec §6)", () => {
 		])
 		expect(links).toEqual([
 			["/en/tracker/", "en", "en"],
-			["/no/tracker/", "no", "no"],
+			["/nb/tracker/", "nb", "nb"],
 		])
 		const current = doc.querySelectorAll('details a[aria-current="page"]')
 		expect(current).toHaveLength(1)
-		expect(current[0].textContent?.trim()).toBe("Norsk")
+		expect(current[0].textContent?.trim()).toBe("Norsk bokmål")
 	})
 })

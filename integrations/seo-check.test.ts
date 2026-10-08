@@ -16,14 +16,14 @@ function sitemap(paths: string[]) {
 function good(): Record<string, string> {
 	return {
 		"en/index.html": page(`${SITE}/en/`, LD),
-		"no/index.html": page(`${SITE}/no/`, LD),
+		"nb/index.html": page(`${SITE}/nb/`, LD),
 		"en/news/index.html": page(`${SITE}/en/news/`),
-		"no/news/index.html": page(`${SITE}/no/news/`),
+		"nb/news/index.html": page(`${SITE}/nb/news/`),
 		"en/settings/index.html": page(`${SITE}/en/settings/`),
-		"no/settings/index.html": page(`${SITE}/no/settings/`),
+		"nb/settings/index.html": page(`${SITE}/nb/settings/`),
 		// The body's language links carry hreflang; only the head is checked (rule 3).
 		"404.html": `<html><head><title>Page not found · Rookdex</title></head><body><a href="/en/" hreflang="en">English</a></body></html>`,
-		"sitemap.xml": sitemap(["en/", "no/", "en/news/", "no/news/"]),
+		"sitemap.xml": sitemap(["en/", "nb/", "en/news/", "nb/news/"]),
 		// CRLF, as a Windows checkout may have it.
 		"robots.txt": "User-agent: *\r\nAllow: /\r\n\r\nSitemap: https://rookdex.app/sitemap.xml\r\n",
 		"indexnow-key.txt": "0123456789abcdef0123456789abcdef",
@@ -65,7 +65,7 @@ describe("seoErrors (SEO spec §4.8)", () => {
 
 	it("rule 1: a sitemap URL with no built page", () => {
 		const files = good()
-		delete files["no/news/index.html"]
+		delete files["nb/news/index.html"]
 		expect(rules(files)).toContain("[seo 1]")
 	})
 

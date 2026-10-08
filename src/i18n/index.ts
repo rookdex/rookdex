@@ -1,6 +1,6 @@
 import { createTranslator } from "../lib/i18n/index.js"
 import en from "../locales/en.json"
-import no from "../locales/no.json"
+import nb from "../locales/nb.json"
 import type { Price } from "../model/prices"
 import type { Locale } from "./locales"
 
@@ -15,7 +15,7 @@ export type PluralKey = {
 }[Key]
 export type Vars = Record<string, string | number>
 
-const bundles = { en, no } satisfies Record<Locale, Record<Key, string>>
+const bundles = { en, nb } satisfies Record<Locale, Record<Key, string>>
 const i18n = createTranslator(bundles, { fallback: "en" })
 
 /** The vendored library bound to one locale, with Rookdex's money rule (whole kroner, no ",00"). */

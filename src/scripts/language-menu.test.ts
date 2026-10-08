@@ -13,7 +13,7 @@ function setup() {
 				<summary>EN</summary>
 				<ul>
 					<li><a href="/en/" aria-current="page">English</a></li>
-					<li><a href="/no/">Norsk</a></li>
+					<li><a href="/nb/">Norsk</a></li>
 				</ul>
 			</details>
 		</nav>`

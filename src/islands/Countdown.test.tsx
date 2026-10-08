@@ -55,7 +55,7 @@ describe("Countdown before launch", () => {
 
 	it("uses Norwegian strings", () => {
 		vi.setSystemTime(new Date(before))
-		render(<Countdown locale="no" initialNow={before} guideHref="#" trackerHref="/no/tracker/" />)
+		render(<Countdown locale="nb" initialNow={before} guideHref="#" trackerHref="/nb/tracker/" />)
 		expect(daysLine()).toHaveTextContent("70 dager igjen")
 	})
 
@@ -71,14 +71,14 @@ describe("Countdown before launch", () => {
 	it("wraps the day count in its own span in both phrasings", () => {
 		vi.setSystemTime(new Date(before))
 		const { unmount } = render(
-			<Countdown locale="no" initialNow={before} guideHref="#" trackerHref="/no/tracker/" />
+			<Countdown locale="nb" initialNow={before} guideHref="#" trackerHref="/nb/tracker/" />
 		)
 		expect(daysLine().querySelector(".days-number")?.textContent).toBe("70")
 		expect(daysLine()).toHaveTextContent("70 dager igjen")
 		unmount()
 
 		vi.setSystemTime(new Date(after))
-		render(<Countdown locale="no" initialNow={before} guideHref="#" trackerHref="/no/tracker/" />)
+		render(<Countdown locale="nb" initialNow={before} guideHref="#" trackerHref="/nb/tracker/" />)
 		expect(daysLine().querySelector(".days-number")?.textContent).toBe("3")
 		expect(daysLine()).toHaveTextContent("Dag 3 etter lansering")
 	})
