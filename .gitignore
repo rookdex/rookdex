@@ -12,3 +12,7 @@ dist/
 
 # Claude Code local config (Browser-pane launch config, local permissions)
 .claude/
+
+# Lighthouse CI output (lighthouserc.json)
+.lighthouseci/
+lighthouse-report/
