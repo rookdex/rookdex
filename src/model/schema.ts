@@ -2,6 +2,11 @@
 // Zod 4 via astro/zod, so no extra dependency.
 import { z } from "astro/zod"
 
+// Zod probes for eval with a caught Function("") before compiling fast parsers. Our CSP has no
+// 'unsafe-eval', so the browser blocks the probe and reports it as an issue on every page whose
+// island parses. Jitless skips the probe; the CSP would block the fast path anyway.
+z.config({ jitless: true })
+
 export const TEXT = {
 	name: 80,
 	description: 300,

@@ -1,3 +1,4 @@
+import { z } from "astro/zod"
 import { describe, expect, it } from "vitest"
 import {
 	exportFileSchema,
@@ -24,6 +25,12 @@ const record = {
 	updated_at: "2026-09-16T10:00:00.000Z",
 	origin: "manual",
 }
+
+describe("zod config", () => {
+	it("runs jitless, so the CSP never sees Zod's Function() probe", () => {
+		expect(z.config().jitless).toBe(true)
+	})
+})
 
 describe("text", () => {
 	it("trims and caps", () => {
