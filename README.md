@@ -34,7 +34,7 @@ npm install
 npm run dev
 ```
 
-`npm run build` writes the site to `dist/`, and `npm run preview` serves that folder the way Cloudflare does. `npm test` runs the unit tests and `npm run check` type-checks. Pull requests get a preview URL in the CI job summary. Merging to `main` deploys to https://rookdex.app through Cloudflare Workers static assets. Design specs and plans live in `docs/superpowers/`.
+`npm run build` writes the site to `dist/`, and `npm run preview` serves that folder the way Cloudflare does. `npm test` runs the unit tests and `npm run check` type-checks. Pull requests from branches in this repo get a comment that links to their preview build. Merging to `main` deploys to https://rookdex.app through Cloudflare Workers static assets. Design specs and plans live in `docs/superpowers/`.
 
 <details>
 <summary>Brand files, README art and how to rebuild them</summary>
