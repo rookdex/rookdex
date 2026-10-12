@@ -18,7 +18,7 @@ const { t } = translator(locale as Locale)
 <Base locale={locale} title={t("seo.titles.home")} description={t("seo.homeDescription")} path="">
 	<div class="hub">
 		<header class="hub-intro">
-			<h1 class="lockup" aria-label="Rookdex">
+			<h1 class="lockup" aria-label={t("siteName")}>
 				<Mark id="hub" size={48} />
 				<span class="wordmark">ROOKDEX</span>
 			</h1>

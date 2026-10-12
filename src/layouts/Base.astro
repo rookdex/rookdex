@@ -104,7 +104,7 @@ const ogLocale: Record<Locale, string> = { en: "en_US", nb: "nb_NO" }
 		<a class="skip" href="#main">{t("skipToContent")}</a>
 		<header class="site-header">
 			<HistoryButtons locale={locale} />
-			<a class="brand" href={getRelativeLocaleUrl(locale, "")} aria-label="Rookdex">
+			<a class="brand" href={getRelativeLocaleUrl(locale, "")} aria-label={t("siteName")}>
 				<Mark id="header" />
 				<span class="wordmark">ROOKDEX</span>
 			</a>
