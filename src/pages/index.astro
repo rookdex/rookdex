@@ -37,9 +37,9 @@ Astro.csp?.insertScriptHash(scriptHash(resolver))
 		{locales.map((l) => <link rel="alternate" hreflang={l} href={getAbsoluteLocaleUrl(l, "")} />)}
 		<link rel="alternate" hreflang="x-default" href={`${SITE}/`} />
 		<meta property="og:url" content={`${SITE}/`} />
-		<meta property="og:site_name" content="Rookdex" />
+		<meta property="og:site_name" content={t("siteName")} />
 		<meta property="og:type" content="website" />
-		<meta property="og:title" content="Rookdex" />
+		<meta property="og:title" content={t("siteName")} />
 		<meta property="og:description" content={t("seo.homeDescription")} />
 		<meta property="og:image" content={`${SITE}/og.png`} />
 		<meta property="og:image:width" content="1200" />
@@ -52,7 +52,7 @@ Astro.csp?.insertScriptHash(scriptHash(resolver))
 			set:html={jsonLd({
 				"@context": "https://schema.org",
 				"@type": "WebSite",
-				name: "Rookdex",
+				name: t("siteName"),
 				url: `${SITE}/`,
 			})}
 		></script>
