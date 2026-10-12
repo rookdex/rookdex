@@ -11,6 +11,9 @@ jobs:
     # Secrets are not exposed to forks or Dependabot; skip the upload there.
     if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -38,6 +41,24 @@ jobs:
             echo "$URL" >> "$GITHUB_STEP_SUMMARY"
           else
             printf '%s\n' "$OUT" | grep -i "preview" >> "$GITHUB_STEP_SUMMARY" || echo "no preview URL in output" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Comment preview URL
+        # One comment per PR, found by its marker and updated on every push.
+        if: steps.preview.outputs.deployment-url != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          URL: ${{ steps.preview.outputs.deployment-url }}
+        run: |
+          marker='<!-- rookdex-preview -->'
+          body=$(printf '%s\n**Preview:** %s\n\nBuilt from %s.' "$marker" "$URL" "$SHA")
+          id=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+            --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$marker\"))) | .id" | head -n 1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -f body="$body" > /dev/null
+          else
+            gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "$body"
           fi
 
   lighthouse:
