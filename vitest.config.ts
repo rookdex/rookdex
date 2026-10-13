@@ -7,5 +7,7 @@ export default getViteConfig({
 		environment: "node",
 		setupFiles: ["src/test/setup.ts"],
 		include: ["src/**/*.test.{ts,tsx}", "integrations/**/*.test.ts"],
+		// A worker on my machine sometimes stalls for a few seconds under the Stop hook; 5 s left no slack.
+		testTimeout: 15_000,
 	},
 })
