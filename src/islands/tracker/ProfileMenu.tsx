@@ -6,12 +6,16 @@ interface Props {
 	profiles: Profile[]
 	current: Profile | undefined
 	onSwitch: (id: string) => void
-	onNew: () => void
-	onRename: () => void
-	onExport: () => void
-	onImport: () => void
-	onDelete: () => void
-	onDeleted: () => void
+	// The actions are optional: the hub shows the menu in switch mode with none of them
+	// (dashboard spec §4). Each one given becomes a menu item.
+	onNew?: () => void
+	onRename?: () => void
+	onExport?: () => void
+	onImport?: () => void
+	onDelete?: () => void
+	onDeleted?: () => void
+	/** Adds a "Manage profiles" link under the profiles; the hub points it at the tracker. */
+	manageHref?: string
 	t: Translate
 	/** The parent may own the trigger ref so a dialog opened from the menu can return focus to it. */
 	triggerRef?: RefObject<HTMLButtonElement | null>
@@ -34,6 +38,7 @@ export function ProfileMenu({
 	onImport,
 	onDelete,
 	onDeleted,
+	manageHref,
 	t,
 	triggerRef,
 }: Props) {
@@ -84,14 +89,17 @@ export function ProfileMenu({
 		}
 	}
 
-	const actions: [string, () => void][] = [
-		[t("profile.new"), onNew],
-		[t("profile.rename"), onRename],
-		[t("profile.export"), onExport],
-		[t("profile.import"), onImport],
-		[t("profile.delete"), onDelete],
-		[t("profile.deleted"), onDeleted],
-	]
+	const actions = (
+		[
+			[t("profile.new"), onNew],
+			[t("profile.rename"), onRename],
+			[t("profile.export"), onExport],
+			[t("profile.import"), onImport],
+			[t("profile.delete"), onDelete],
+			[t("profile.deleted"), onDeleted],
+		] as const
+	).filter((entry): entry is readonly [string, () => void] => entry[1] !== undefined)
+	const hasExtras = actions.length > 0 || manageHref !== undefined
 
 	return (
 		<div className="profile-menu">
@@ -120,9 +128,11 @@ export function ProfileMenu({
 							</button>
 						</li>
 					))}
-					<li role="none">
-						<hr />
-					</li>
+					{hasExtras && (
+						<li role="none">
+							<hr />
+						</li>
+					)}
 					{actions.map(([label, action]) => (
 						<li key={label} role="none">
 							<button type="button" role="menuitem" onClick={() => run(action)}>
@@ -130,6 +140,13 @@ export function ProfileMenu({
 							</button>
 						</li>
 					))}
+					{manageHref && (
+						<li role="none">
+							<a role="menuitem" href={manageHref}>
+								{t("hub.manageProfiles")}
+							</a>
+						</li>
+					)}
 				</ul>
 			)}
 		</div>

@@ -26,6 +26,7 @@
 	"hub.launched": "It is out.",
 	"hub.daySince": "Day {n} since launch",
 	"hub.openTracker": "Open the tracker",
+	"hub.manageProfiles": "Manage profiles",
 	"guides.heading": "Guides",
 	"guides.inEnglish": "This guide is only in English so far.",
 	"guides.updated": "Updated {date}",
