@@ -20,8 +20,13 @@ html {
 	   As 2 x 2 it is two one-line rows: 2 x (padding, icon, gap, label) plus the 1 px border. */
 	--tabbar-h: max(4.25rem, min(var(--tabbar-2x2), 3rem + 49px));
 	/* Keeps a focused control from scrolling in behind the fixed bar (WCAG 2.4.11), plus the update
-	   notice while it shows. */
-	scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--notice-h, 0px));
+	   notice and the undo toast while they show. */
+	scroll-padding-bottom: calc(
+		var(--tabbar-h) +
+		env(safe-area-inset-bottom) +
+		var(--notice-h, 0px) +
+		var(--toast-h, 0px)
+	);
 }
 
 body {
@@ -543,7 +548,9 @@ p {
 .lang summary,
 .lang .picker-row,
 .menu button,
+.menu a,
 .actions button,
+.undo-toast button,
 .profile-menu > button,
 .hint button,
 .deleted-list button,
@@ -569,7 +576,9 @@ p {
 	.lang summary:hover,
 	.lang .picker-row:hover,
 	.menu button:hover,
+	.menu a:hover,
 	.actions button:not(.primary):hover,
+	.undo-toast button:hover,
 	.profile-menu > button:hover,
 	.hint button:hover,
 	.deleted-list button:hover,
@@ -628,7 +637,9 @@ p {
 	.history button:active:not(:disabled),
 	.lang .picker-row:active,
 	.menu button:active,
+	.menu a:active,
 	.actions button:not(.primary):active,
+	.undo-toast button:active,
 	.profile-menu > button:active,
 	.hint button:active,
 	.deleted-list button:active,
@@ -645,7 +656,9 @@ p {
 .lang summary:focus-visible,
 .lang .picker-row:focus-visible,
 .menu button:focus-visible,
+.menu a:focus-visible,
 .actions button:not(.primary):focus-visible,
+.undo-toast button:focus-visible,
 .profile-menu > button:focus-visible,
 .hint button:focus-visible,
 .deleted-list button:focus-visible,
@@ -835,6 +848,240 @@ p {
 	letter-spacing: 0.05em;
 }
 
+/* Hub after launch (dashboard spec §4). Every block has a fixed or reserved height, and the
+   skeleton uses the same classes, so swapping one for the other shifts nothing (spec §10). */
+
+.hub-live {
+	display: contents;
+}
+
+.dashboard {
+	display: grid;
+	gap: var(--space-4);
+	margin-bottom: var(--space-4);
+}
+
+.dash-top {
+	display: flex;
+	min-height: var(--tap);
+}
+
+.dashboard h2 {
+	margin: 0 0 var(--space-2);
+	font-size: 1rem;
+}
+
+.stat-pair {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--space-2);
+	margin: 0;
+}
+
+/* Number on top, label under it. The dt stays first in the DOM, so it is read first. */
+.stat-tile {
+	display: flex;
+	flex-direction: column-reverse;
+	justify-content: flex-end;
+	gap: var(--space-1);
+	min-height: 8rem;
+	padding: var(--space-3);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+}
+
+.stat-tile dt {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--text-muted);
+	overflow-wrap: anywhere;
+}
+
+.stat-tile dd {
+	margin: 0;
+	font-family: var(--font-display);
+	font-size: 3rem;
+	line-height: 1;
+	color: var(--text);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Two lines of the first half fit in the tap height, so the newcomer link and the count swap
+   without a shift. */
+.stat-strip {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	min-height: var(--tap);
+	margin: 0;
+	max-width: none;
+	font-size: 0.875rem;
+	color: var(--text-muted);
+}
+
+.stat-strip > span {
+	flex: none;
+}
+
+.stat-strip > .stat-strip-first {
+	flex: 0 1 auto;
+	min-width: 0;
+}
+
+.next-list,
+.next-done {
+	min-height: calc(3 * var(--tap) + 2 * var(--space-1));
+	margin: 0;
+}
+
+.next-list {
+	display: grid;
+	align-content: start;
+	gap: var(--space-1);
+	padding: 0;
+	list-style: none;
+	overflow: hidden;
+}
+
+.next-row {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	min-height: var(--tap);
+	padding: 0 var(--space-3);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
+}
+
+.next-row input {
+	flex: none;
+	width: 1.25rem;
+	height: 1.25rem;
+	margin: 0;
+	accent-color: var(--accent);
+}
+
+/* The label fills the row, so the whole 44 px row is the target. */
+.next-row label {
+	display: flex;
+	align-items: center;
+	align-self: stretch;
+	flex: 1;
+	min-width: 0;
+	padding: var(--space-1) 0;
+	overflow-wrap: anywhere;
+	cursor: pointer;
+}
+
+.next-row[data-leaving] {
+	animation: next-out 200ms ease-in forwards;
+}
+
+.next-row[data-entering] {
+	animation: next-in 200ms ease-out;
+}
+
+@keyframes next-out {
+	to {
+		opacity: 0;
+		transform: translateX(100%);
+	}
+}
+
+@keyframes next-in {
+	from {
+		opacity: 0;
+		transform: translateY(0.5rem);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.next-row[data-leaving],
+	.next-row[data-entering] {
+		animation: none;
+	}
+}
+
+.undo-toast {
+	position: fixed;
+	left: var(--space-3);
+	right: var(--space-3);
+	bottom: calc(
+		var(--tabbar-h) +
+		env(safe-area-inset-bottom) +
+		var(--notice-h, 0px) +
+		var(--space-2)
+	);
+	z-index: 4;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-2) var(--space-3);
+	padding: 8px 8px 8px var(--space-3);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
+	box-shadow: 0 8px 24px color-mix(in srgb, var(--bg) 60%, transparent);
+	animation: notice-in 160ms ease-out;
+}
+
+.undo-toast p {
+	margin: 0;
+	max-width: none;
+}
+
+.undo-toast .tracker-alert {
+	flex-basis: 100%;
+}
+
+.dash-progress .progress:last-child {
+	margin-bottom: 0;
+}
+
+.dash-recent .recent,
+.dash-recent .stats-empty {
+	min-height: calc(5 * 1.75rem);
+}
+
+.dash-recent .recent li {
+	min-height: 1.75rem;
+	overflow-wrap: anywhere;
+}
+
+.latest-list {
+	display: grid;
+	gap: var(--space-2);
+	margin: 0 0 var(--space-1);
+	padding: 0;
+	list-style: none;
+}
+
+.latest-list li {
+	display: grid;
+	overflow-wrap: anywhere;
+}
+
+.latest-list time {
+	display: block;
+	min-height: 1.3rem;
+	font-size: 0.875rem;
+	color: var(--text-muted);
+}
+
+.is-skeleton .skeleton {
+	background: var(--border);
+	opacity: 0.5;
+}
+
+.skeleton-chip {
+	display: block;
+	width: 10rem;
+	height: var(--tap);
+	border-radius: var(--radius);
+}
+
 /* PWA */
 
 .offline {
@@ -916,7 +1163,8 @@ p {
 	flex-wrap: wrap;
 }
 
-.actions button {
+.actions button,
+.undo-toast button {
 	min-height: var(--tap);
 	padding: var(--space-2) var(--space-3);
 	border-radius: var(--radius);
@@ -989,6 +1237,11 @@ p {
 
 .stats h2 {
 	font-size: 1rem;
+}
+
+/* From launch on, the heading links to the hub: same ink as the heading, still underlined. */
+.stats h2 a {
+	color: inherit;
 }
 
 .stats h3 {
@@ -1355,7 +1608,8 @@ p {
 	background: var(--border);
 }
 
-.menu button {
+.menu button,
+.menu a {
 	display: flex;
 	width: 100%;
 	min-height: var(--tap);
@@ -1366,6 +1620,7 @@ p {
 	background: none;
 	color: var(--text);
 	text-align: left;
+	text-decoration: none;
 }
 
 .menu button[aria-checked="true"] {
@@ -1453,7 +1708,7 @@ p {
 
 @media (min-width: 768px) {
 	html {
-		scroll-padding-bottom: var(--notice-h, 0px);
+		scroll-padding-bottom: calc(var(--notice-h, 0px) + var(--toast-h, 0px));
 	}
 
 	body {
@@ -1462,6 +1717,10 @@ p {
 
 	.update-notice {
 		bottom: var(--space-3);
+	}
+
+	.undo-toast {
+		bottom: calc(var(--notice-h, 0px) + var(--space-3));
 	}
 
 	/* The tab row carries the chrome's bottom edge on desktop. */
@@ -1589,7 +1848,8 @@ p {
 }
 
 @media (min-width: 1024px) {
-	.update-notice {
+	.update-notice,
+	.undo-toast {
 		left: auto;
 		width: 22rem;
 	}
