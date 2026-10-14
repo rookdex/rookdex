@@ -1,11 +1,12 @@
 import { type ChangeEvent, useEffect, useRef, useState } from "react"
 import { type Locale, seedLabel, translator } from "../i18n"
+import { hubPhase } from "../model/launch"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, recentFinds } from "../model/stats"
-import { openStore } from "../model/store"
-import { createTracker, parseShow, type Tracker as TrackerModel } from "../model/tracker"
-import { HINT_SEEN_KEY, readFlag, writeFlag } from "./seenFlag"
+import { parseShow } from "../model/tracker"
+import { buildTracker } from "./buildTracker"
+import { HINT_SEEN_KEY, writeFlag } from "./seenFlag"
 import { CategoryNav } from "./tracker/CategoryNav"
 import { DeleteDialog } from "./tracker/DeleteDialog"
 import { DeletedDialog } from "./tracker/DeletedDialog"
@@ -15,7 +16,7 @@ import { ItemList } from "./tracker/ItemList"
 import { NameDialog } from "./tracker/NameDialog"
 import { ProfileMenu } from "./tracker/ProfileMenu"
 import { StatsRail } from "./tracker/StatsRail"
-import { useTracker } from "./useTracker"
+import { useShowParam, useTrackerState } from "./useTracker"
 
 export const HINT_KEY = HINT_SEEN_KEY
 
@@ -23,26 +24,19 @@ interface Props {
 	locale: Locale
 }
 
-function buildTracker(defaultProfileName: string): TrackerModel {
-	return createTracker({
-		openStore: () => openStore(indexedDB),
-		items: seedItems,
-		defaultProfileName,
-		selected: parseShow(window.location.search, categoryIds(seedItems)),
-		persist:
-			typeof navigator.storage?.persist === "function"
-				? () => navigator.storage.persist()
-				: undefined,
-		installed: window.matchMedia("(display-mode: standalone)").matches,
-		hintSeen: readFlag(HINT_KEY),
-	})
-}
-
 /** Island root. `client:only`: the first render reads the URL and IndexedDB. */
 export function Tracker({ locale }: Props) {
 	const { t } = translator(locale)
-	const [tracker] = useState(() => buildTracker(t("profile.defaultName")))
-	const state = useTracker(tracker)
+	const [tracker] = useState(() =>
+		buildTracker(
+			t("profile.defaultName"),
+			parseShow(window.location.search, categoryIds(seedItems))
+		)
+	)
+	const state = useTrackerState(tracker)
+	useShowParam(state.selected)
+	// From launch on the hub is the dashboard, so Progress links there (dashboard spec §4).
+	const [hubHref] = useState(() => (hubPhase(new Date()) === "after" ? `/${locale}/` : undefined))
 	const [dialog, setDialog] = useState<"new" | "rename" | "delete" | "deleted" | null>(null)
 	// Bumped per opening: the NameDialog keys on this alone, so its field resets on each opening
 	// but the element is not remounted while it is closing (which would skip the focus return).
@@ -201,6 +195,7 @@ export function Tracker({ locale }: Props) {
 				overall={countItems(state.items, state.records)}
 				categories={categories}
 				recent={recentFinds(state.items, state.records)}
+				hubHref={hubHref}
 				t={t}
 			/>
 			<p className="visually-hidden" role="status" aria-live="polite">

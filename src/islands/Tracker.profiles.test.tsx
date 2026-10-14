@@ -15,6 +15,20 @@ beforeEach(resetBrowser)
 const ready = () => renderReady(<Tracker locale="en" />)
 
 describe("profiles in the island", () => {
+	it("reopens the profile picked last time after a reload (dashboard spec §5)", async () => {
+		const first = await ready()
+		openMenu()
+		fireEvent.click(screen.getByRole("menuitem", { name: "New profile" }))
+		const dialog = screen.getByRole("dialog", { name: "New profile" })
+		fireEvent.change(within(dialog).getByLabelText("Profile name"), { target: { value: "Dad" } })
+		fireEvent.click(within(dialog).getByRole("button", { name: "Save" }))
+		await screen.findByRole("button", { name: "Profile: Dad" })
+		first.unmount()
+
+		await ready()
+		expect(screen.getByRole("button", { name: "Profile: Dad" })).toBeInTheDocument()
+	})
+
 	it("creates a profile through the name dialog and switches to it", async () => {
 		await ready()
 		openMenu()

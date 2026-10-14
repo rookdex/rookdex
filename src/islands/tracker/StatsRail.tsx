@@ -5,6 +5,8 @@ interface Props {
 	overall: Count
 	categories: (CategoryCount & { label: string })[]
 	recent: RecentFind[]
+	/** From launch on, Progress links to the hub (dashboard spec §4). */
+	hubHref?: string
 	t: Translate
 }
 
@@ -15,7 +17,7 @@ interface BarProps {
 	countText: string
 }
 
-function Bar({ id, label, count, countText }: BarProps) {
+export function Bar({ id, label, count, countText }: BarProps) {
 	const percent = count.total === 0 ? 0 : Math.round((count.done / count.total) * 100)
 	return (
 		<div className="progress">
@@ -39,11 +41,13 @@ function Bar({ id, label, count, countText }: BarProps) {
 	)
 }
 
-export function StatsRail({ overall, categories, recent, t }: Props) {
+export function StatsRail({ overall, categories, recent, hubHref, t }: Props) {
 	const text = (count: Count) => t("tracker.count", { done: count.done, total: count.total })
 	return (
 		<section className="stats" aria-labelledby="stats-heading">
-			<h2 id="stats-heading">{t("tracker.progress")}</h2>
+			<h2 id="stats-heading">
+				{hubHref ? <a href={hubHref}>{t("tracker.progress")}</a> : t("tracker.progress")}
+			</h2>
 			<div className="stats-grid">
 				<Bar
 					id="progress-overall"

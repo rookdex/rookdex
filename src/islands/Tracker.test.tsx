@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
 import { wireTooltips } from "../scripts/tooltip"
 import { renderReady, resetBrowser } from "../test/tracker-fixtures"
@@ -176,4 +176,25 @@ describe("Arriving from the Sources page (feedback spec §4)", () => {
 			expect(screen.getByRole("checkbox", { name: "Pelican" })).toBeInTheDocument()
 		}
 	)
+})
+
+describe("Progress heading (dashboard spec §4)", () => {
+	afterEach(() => {
+		vi.useRealTimers()
+	})
+
+	it("is plain text before launch", async () => {
+		// Only Date is faked: fake-indexeddb and Testing Library keep their real timers.
+		vi.useFakeTimers({ toFake: ["Date"] })
+		vi.setSystemTime(new Date("2026-11-18T12:00:00Z"))
+		await renderReady(<Tracker locale="en" />)
+		expect(screen.queryByRole("link", { name: "Progress" })).toBeNull()
+	})
+
+	it("links to the hub from launch on", async () => {
+		vi.useFakeTimers({ toFake: ["Date"] })
+		vi.setSystemTime(new Date("2026-11-19T00:00:00+01:00"))
+		await renderReady(<Tracker locale="en" />)
+		expect(screen.getByRole("link", { name: "Progress" })).toHaveAttribute("href", "/en/")
+	})
 })

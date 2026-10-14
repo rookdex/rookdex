@@ -42,10 +42,11 @@ export const fixtures: SeedItem[] = [
 export const downloads: HTMLAnchorElement[] = []
 
 /**
- * Fresh IndexedDB, a clean tracker URL, stubbed blob URLs and a no-op anchor click that records
- * the anchor (jsdom would otherwise try to navigate). Call from `beforeEach`.
+ * Fresh IndexedDB and localStorage, a clean tracker URL, stubbed blob URLs and a no-op anchor click
+ * that records the anchor (jsdom would otherwise try to navigate). Call from `beforeEach`.
  */
 export function resetBrowser(): void {
+	localStorage.clear()
 	Object.defineProperty(globalThis, "indexedDB", { value: new IDBFactory(), configurable: true })
 	window.history.replaceState(null, "", "/en/tracker/")
 	URL.createObjectURL = vi.fn(() => "blob:rookdex")
