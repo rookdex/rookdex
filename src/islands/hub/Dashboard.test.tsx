@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react"
+import { IDBObjectStore } from "fake-indexeddb"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
 import { createProfile } from "../../model/profiles"
 import { setDone } from "../../model/progress"
-import { openStore } from "../../model/store"
+import { DB_NAME, openStore } from "../../model/store"
 import { resetBrowser } from "../../test/tracker-fixtures"
 import { Dashboard, type DashboardProps } from "./Dashboard"
 
@@ -14,11 +15,29 @@ vi.mock("../../model/seed", async (importOriginal) => {
 	return { ...actual, seedItems: fixtures }
 })
 
+/** While `hold` is set, every tick or untick waits for it before it writes, so a race can be staged. */
+const writes = vi.hoisted(() => ({ hold: undefined as Promise<void> | undefined }))
+
+vi.mock("../../model/progress", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("../../model/progress")>()
+	return {
+		...actual,
+		setDone: async (...args: Parameters<typeof actual.setDone>) => {
+			await writes.hold
+			return actual.setDone(...args)
+		},
+	}
+})
+
 const announce = vi.fn()
 
 beforeEach(() => {
 	resetBrowser()
 	announce.mockReset()
+	writes.hold = undefined
+})
+afterEach(() => {
+	vi.restoreAllMocks()
 })
 
 /** Profiles p1, p2, … in creation order; `found` maps item id to tick time, all on p1. */
@@ -58,7 +77,7 @@ function tile(label: string) {
 	return screen.getByText(label).nextElementSibling
 }
 
-// Midday UTC, so the local day matches in any time zone from UTC-11 to UTC+12.
+// Midday UTC, so the local day matches in any time zone from UTC-12 to UTC+11.
 const NOV_20 = "2026-11-20T12:00:00Z"
 const NOV_19 = "2026-11-19T12:00:00Z"
 
@@ -148,6 +167,140 @@ describe("Dashboard blocks (dashboard spec §4)", () => {
 		const { container } = render(<Dashboard {...props()} />)
 		expect(await axe(container)).toHaveNoViolations()
 		await screen.findByRole("button", { name: "Profile: Player 1" })
+		expect(await axe(container)).toHaveNoViolations()
+	})
+})
+
+describe("ticking on the hub (dashboard spec §6.1, §7)", () => {
+	const next = () => screen.getByRole("region", { name: "What's next" })
+
+	it("ticks from What's next, announces it, and Undo puts it back with focus on it", async () => {
+		await ready()
+		// Tracker order: the birds group before reptiles.
+		expect(
+			within(next())
+				.getAllByRole("checkbox")
+				.map((b) => b.getAttribute("id"))
+		).toEqual(["next-wildlife/pelican", "next-wildlife/american-alligator"])
+		fireEvent.click(within(next()).getByRole("checkbox", { name: "American alligator" }))
+		const undo = await screen.findByRole("button", { name: "Undo" })
+		expect(announce).toHaveBeenCalledWith("American alligator marked as found.")
+		await waitFor(() =>
+			expect(within(next()).queryByRole("checkbox", { name: "American alligator" })).toBeNull()
+		)
+		await waitFor(() =>
+			expect(within(next()).getByRole("checkbox", { name: "Pelican" })).toHaveFocus()
+		)
+		fireEvent.click(undo)
+		await waitFor(() =>
+			expect(within(next()).getByRole("checkbox", { name: "American alligator" })).toHaveFocus()
+		)
+		expect(announce).toHaveBeenCalledWith("American alligator marked as not found.")
+		expect(screen.queryByRole("button", { name: "Undo" })).toBeNull()
+	})
+
+	it("moves on when the closest category is done, and Undo brings it back", async () => {
+		await seed(["Player 1"], { "wildlife/pelican": NOV_20 })
+		await ready()
+		fireEvent.click(within(next()).getByRole("checkbox", { name: "American alligator" }))
+		const bike = await within(next()).findByRole("checkbox", { name: "Bike" })
+		await waitFor(() => expect(bike).toHaveFocus())
+		expect(screen.getByText("Closest: Vehicles")).toBeInTheDocument()
+		fireEvent.click(screen.getByRole("button", { name: "Undo" }))
+		await waitFor(() =>
+			expect(within(next()).getByRole("checkbox", { name: "American alligator" })).toHaveFocus()
+		)
+		expect(screen.getByText("Closest: Wildlife")).toBeInTheDocument()
+	})
+
+	it("shows the all-found line and no checkboxes when everything is found", async () => {
+		await seed(["Player 1"], {
+			"wildlife/pelican": NOV_20,
+			"wildlife/american-alligator": NOV_20,
+			"vehicles/bike": NOV_20,
+		})
+		await ready()
+		expect(within(next()).getByText("You've found everything tracked so far.")).toBeInTheDocument()
+		expect(within(next()).queryByRole("checkbox")).toBeNull()
+	})
+
+	it("closes the toast when the profile changes", async () => {
+		await seed(["Player 1", "Dad"])
+		await ready()
+		fireEvent.click(within(next()).getByRole("checkbox", { name: "Pelican" }))
+		await screen.findByRole("button", { name: "Undo" })
+		fireEvent.click(screen.getByRole("button", { name: "Profile: Player 1" }))
+		fireEvent.click(screen.getByRole("menuitemradio", { name: "Dad" }))
+		await waitFor(() => expect(announce).toHaveBeenCalledWith("Showing Dad."))
+		expect(screen.queryByRole("button", { name: "Undo" })).toBeNull()
+	})
+
+	it("never opens a toast for a tick that lands after a profile switch", async () => {
+		await seed(["Player 1", "Dad"])
+		await ready()
+		let release = () => {}
+		writes.hold = new Promise<void>((resolve) => {
+			release = resolve
+		})
+		fireEvent.click(within(next()).getByRole("checkbox", { name: "Pelican" }))
+		fireEvent.click(screen.getByRole("button", { name: "Profile: Player 1" }))
+		fireEvent.click(screen.getByRole("menuitemradio", { name: "Dad" }))
+		await waitFor(() => expect(announce).toHaveBeenCalledWith("Showing Dad."))
+		// The switch has landed and the tick is still waiting to write.
+		expect(within(next()).getByRole("checkbox", { name: "Pelican" })).toBeChecked()
+		await act(async () => {
+			release()
+		})
+		// What's next lets go of the checkbox once the tick has landed.
+		await waitFor(() =>
+			expect(within(next()).getByRole("checkbox", { name: "Pelican" })).not.toBeChecked()
+		)
+		expect(announce).not.toHaveBeenCalledWith("Pelican marked as found.")
+		expect(screen.queryByRole("button", { name: "Undo" })).toBeNull()
+	})
+
+	it("keeps the row and opens no toast when a tick fails", async () => {
+		await ready()
+		vi.spyOn(IDBObjectStore.prototype, "put").mockImplementation(() => {
+			throw new DOMException("Quota", "QuotaExceededError")
+		})
+		fireEvent.click(within(next()).getByRole("checkbox", { name: "Pelican" }))
+		expect(
+			await screen.findByText("Saving failed. Your browser may be blocking storage.")
+		).toBeInTheDocument()
+		expect(screen.queryByRole("button", { name: "Undo" })).toBeNull()
+		expect(within(next()).getByRole("checkbox", { name: "Pelican" })).not.toBeChecked()
+	})
+
+	it("leaves the item ticked and shows the error in the toast when Undo fails", async () => {
+		await ready()
+		fireEvent.click(within(next()).getByRole("checkbox", { name: "Pelican" }))
+		const undo = await screen.findByRole("button", { name: "Undo" })
+		vi.spyOn(IDBObjectStore.prototype, "put").mockImplementation(() => {
+			throw new DOMException("Quota", "QuotaExceededError")
+		})
+		fireEvent.click(undo)
+		const toast = undo.parentElement as HTMLElement
+		expect(await within(toast).findByRole("alert")).toHaveTextContent("Saving failed.")
+		// The ticked row stays out once its slide ends.
+		await waitFor(() =>
+			expect(within(next()).queryByRole("checkbox", { name: "Pelican" })).toBeNull()
+		)
+	})
+
+	it("disables ticking when another tab changes the data", async () => {
+		await ready()
+		indexedDB.deleteDatabase(DB_NAME)
+		expect(
+			await screen.findByText("Your data changed in another tab. Reload to continue.")
+		).toBeInTheDocument()
+		expect(within(next()).getByRole("checkbox", { name: "Pelican" })).toBeDisabled()
+	})
+
+	it("has no axe violations with the toast open", async () => {
+		const { container } = await ready()
+		fireEvent.click(within(next()).getByRole("checkbox", { name: "Pelican" }))
+		await screen.findByRole("button", { name: "Undo" })
 		expect(await axe(container)).toHaveNoViolations()
 	})
 })
