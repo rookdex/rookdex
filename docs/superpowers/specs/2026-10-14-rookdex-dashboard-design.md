@@ -19,7 +19,7 @@ GTA VI launches Thursday 19 November 2026 at 00:00 CET. This ships before the 1 
 - No "Remaining nearby" (design spec §6). The seed has no region field; it belongs to the phase 3 map.
 - No cross-tab sync. A hub tab sees ticks from another tab after a reload (section 7).
 - No profile dialogs on the hub. Create, rename, export, import and delete stay on the tracker page.
-- No new route. The dashboard takes over the hub at `/en/` and `/no/`.
+- No new route. The dashboard takes over the hub at `/en/` and `/nb/`.
 - No per-item anchors on News. Latest links to the News page as a whole.
 - No facts feed, pipeline or digest. Those are phase 1c, planned for December.
 - No Playwright. Layout is measured by hand in the browser pane (section 13).
@@ -46,8 +46,8 @@ GTA VI launches Thursday 19 November 2026 at 00:00 CET. This ships before the 1 
 - **`Hub`** (`src/islands/hub/Hub.tsx`) replaces `Countdown` in `src/pages/[locale]/index.astro`. Still `client:load`, same props (`locale`, `initialNow`, `guideHref`, `trackerHref`) plus `latest` and `newsHref`.
 - **`useHubPhase(initialNow)`** wraps the existing `useCountdown` and adds the override. It decides `before` or `after` once on mount and again when the countdown reaches zero.
 - **The override.** `?phase=after` counts only when the parameter is exactly `after` and the host ends in `.workers.dev`, is `localhost` or `127.0.0.1`, or `import.meta.env.DEV` is true. Anywhere else it is ignored without a message.
-- **`CountdownView`** is today's before-launch markup from `Countdown.tsx`, moved over with one change: the days line loses `aria-live`, because the hub's status region takes over its announcements (section 9). The after branch of `Countdown` (`hub.launched`, `hub.openTracker`) goes away; the dashboard replaces it.
-- **One status region.** `Hub` renders a visually hidden `role="status"` element from mount, outside both views, so it survives the flip. It carries the daily "N days to go" line, the flip to "Day 1 since launch", tick and Undo results, and profile switches.
+- **`CountdownView`** is today's before-launch markup from `Countdown.tsx`, moved over with one change: the days line loses `aria-live`, because the hub's status region takes over its announcements (section 9). The after branch of `Countdown` (`hub.launched`) goes away; `hub.openTracker` stays for the header link.
+- **One status region.** `Hub` renders a visually hidden `role="status"` element from mount, outside both views, so it survives the flip. It carries the daily "N days to go" line, the flip to "Day 0 since launch", tick and Undo results, and profile switches.
 - **`Dashboard`** is loaded with a dynamic `import()` only when the phase is `after`, so visitors before launch don't download the tracker model or IndexedDB code. `Hub` renders `DashboardSkeleton` while the chunk loads and while IndexedDB opens. If the import fails, `Hub` replaces the skeleton with an alert (`hub.loadFailed`) and Latest still renders.
 - **Shared tracker state.** `useTracker` splits in two:
   - `useTrackerState(tracker)` subscribes and calls `init()`. Used by both pages.
@@ -137,7 +137,7 @@ Today `init()` always opens the first active profile (`ensureActiveProfile`, `pr
 
 ## 8. Copy
 
-New keys go into both `src/locales/en.json` and `nb.json`; `copy.test.ts` checks the sets match. `hub.launched` and `hub.openTracker` are removed. Reused as they are: `hub.daySince`, `tracker.progress`, `tracker.recent`, `tracker.noRecent`, `tracker.count`, the category labels and the error strings.
+New keys go into both `src/locales/en.json` and `nb.json`; `copy.test.ts` checks the sets match. `hub.launched` is removed; `hub.openTracker` stays because the hub header's tap link uses it. Reused as they are: `hub.daySince`, `tracker.progress`, `tracker.recent`, `tracker.noRecent`, `tracker.count`, the category labels and the error strings.
 
 | Key | English | Norwegian |
 |---|---|---|
@@ -209,7 +209,7 @@ New keys go into both `src/locales/en.json` and `nb.json`; `copy.test.ts` checks
   - The error and edge states from section 7 render. `ProfileMenu` in switch mode renders only the profiles and the manage link.
 - **Seed and News.** A rumour without `added`, or with a bad date, fails validation. `news-page.test.ts` checks the order.
 - **Build variable.** An unparseable `ROOKDEX_NOW` fails with the variable's name in the message.
-- **Layout shift** (manual, me, before the PR merges). Build with `ROOKDEX_NOW` after launch, serve locally, open `/en/?phase=after` and `/no/?phase=after` in the browser pane at 320 px and desktop, with three profiles: 0 finds, 1 find, and 6 or more finds. Read layout-shift entries with a `PerformanceObserver`. Target 0. In the same pass: the toast doesn't cover the focused checkbox at 320 px, and long `nb` names wrap without overflow.
+- **Layout shift** (manual, me, before the PR merges). Build with `ROOKDEX_NOW` after launch, serve locally, open `/en/?phase=after` and `/nb/?phase=after` in the browser pane at 320 px and desktop, with three profiles: 0 finds, 1 find, and 6 or more finds. Read layout-shift entries with a `PerformanceObserver`. Target 0. In the same pass: the toast doesn't cover the focused checkbox at 320 px, and long `nb` names wrap without overflow.
 - **Keyboard and NVDA walk** (manual, me, before the PR merges). Tick, Tab to Undo, Undo, Escape, switch profile, each heard once.
 - **launch-rebuild.** The `workflow_dispatch` dry run from section 12.
 
