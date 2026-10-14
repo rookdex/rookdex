@@ -855,6 +855,12 @@ p {
 	display: contents;
 }
 
+/* Tighter side padding at 320 px, so a tile label like "Samleobjekter" fits without breaking
+   mid-word. The shared .hub-state padding returns from 768 px. */
+.hub-dashboard {
+	padding: var(--space-3);
+}
+
 .dashboard {
 	display: grid;
 	gap: var(--space-4);
@@ -885,7 +891,7 @@ p {
 	justify-content: flex-end;
 	gap: var(--space-1);
 	min-height: 8rem;
-	padding: var(--space-3);
+	padding: var(--space-3) var(--space-2);
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
 }
@@ -906,8 +912,8 @@ p {
 	font-variant-numeric: tabular-nums;
 }
 
-/* Two lines of the first half fit in the tap height, so the newcomer link and the count swap
-   without a shift. */
+/* Both text halves shrink and wrap, two lines at most at 14 px (42 px, inside the tap height),
+   so the newcomer link and the count swap without a shift. Only the dot keeps its size. */
 .stat-strip {
 	display: flex;
 	align-items: center;
@@ -920,12 +926,12 @@ p {
 }
 
 .stat-strip > span {
-	flex: none;
-}
-
-.stat-strip > .stat-strip-first {
 	flex: 0 1 auto;
 	min-width: 0;
+}
+
+.stat-strip > [aria-hidden="true"] {
+	flex: none;
 }
 
 .next-list,
@@ -1578,8 +1584,13 @@ p {
 	display: inline-block;
 }
 
+/* font, cursor and border are repeated from `.tracker button` because the hub's menu lives
+   outside .tracker; there the buttons would otherwise fall back to the browser default. */
 .profile-menu > button,
 .hint button {
+	font: inherit;
+	cursor: pointer;
+	border: 1px solid var(--border);
 	min-height: var(--tap);
 	padding: var(--space-2) var(--space-3);
 	border-radius: var(--radius);
@@ -1610,6 +1621,8 @@ p {
 
 .menu button,
 .menu a {
+	font: inherit;
+	cursor: pointer;
 	display: flex;
 	width: 100%;
 	min-height: var(--tap);
@@ -1707,6 +1720,14 @@ p {
 }
 
 @media (min-width: 768px) {
+	.hub-dashboard {
+		padding: var(--space-4) min(var(--space-4), 7.5vw);
+	}
+
+	.stat-tile {
+		padding: var(--space-3);
+	}
+
 	html {
 		scroll-padding-bottom: calc(var(--notice-h, 0px) + var(--toast-h, 0px));
 	}
