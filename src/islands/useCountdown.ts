@@ -9,6 +9,8 @@ import {
 } from "../model/launch"
 
 export interface CountdownState {
+	/** The moment this state was computed. The first render's is the build-time `initialNow`. */
+	now: Date
 	phase: HubPhase
 	parts: CountdownParts
 	daysToGo: number
@@ -19,6 +21,7 @@ export interface CountdownState {
 
 function compute(now: Date, reducedMotion: boolean): CountdownState {
 	return {
+		now,
 		phase: hubPhase(now),
 		parts: countdownParts(now),
 		daysToGo: daysToGo(now),
