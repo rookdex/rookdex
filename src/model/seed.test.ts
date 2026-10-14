@@ -137,6 +137,7 @@ describe("validateRumours", () => {
 		name: "Stock market",
 		claim_key: "stock-market",
 		summary: "A returning stock market has been reported.",
+		added: "2026-09-18",
 		sources: [press],
 	}
 	it("needs one press source", () => {
@@ -144,6 +145,13 @@ describe("validateRumours", () => {
 		expect(validateRumours([{ ...rumour, sources: [official] }], list).errors).toEqual([
 			"rumours/stock-market: rumour needs a press source",
 		])
+	})
+
+	it("needs an added date as YYYY-MM-DD (dashboard spec §6.3)", () => {
+		const { added: _added, ...undated } = rumour
+		expect(validateRumours([undated], list).errors).not.toEqual([])
+		expect(validateRumours([{ ...rumour, added: "18.09.2026" }], list).errors).not.toEqual([])
+		expect(validateRumours([{ ...rumour, added: "2026-02-30" }], list).errors).not.toEqual([])
 	})
 })
 

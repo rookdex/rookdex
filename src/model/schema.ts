@@ -63,6 +63,8 @@ export const rumourInputSchema = z.strictObject({
 	name: text(TEXT.name),
 	claim_key: z.string().regex(/^[a-z0-9-]{1,80}$/),
 	summary: text(TEXT.summary),
+	/** The day the rumour was added, `YYYY-MM-DD`. Latest and News sort by it (dashboard spec §6.3). */
+	added: z.iso.date(),
 	sources: z.array(sourceInputSchema).min(1),
 })
 export const rumourSchema = rumourInputSchema.extend({ sources: z.array(sourceSchema).min(1) })
