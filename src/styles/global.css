@@ -34,7 +34,12 @@ body {
 	min-height: 100dvh;
 	display: flex;
 	flex-direction: column;
-	padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--notice-h, 0px));
+	padding-bottom: calc(
+		var(--tabbar-h) +
+		env(safe-area-inset-bottom) +
+		var(--notice-h, 0px) +
+		var(--toast-h, 0px)
+	);
 	/* A word longer than its line ("Forhåndsnedlasting" at 200 % text) breaks rather than
 	   pushing the page sideways (issue #28). Words that fit are never split. */
 	overflow-wrap: break-word;
@@ -872,7 +877,8 @@ p {
 	min-height: var(--tap);
 }
 
-.dashboard h2 {
+.dashboard h2,
+.latest h2 {
 	margin: 0 0 var(--space-2);
 	font-size: 1rem;
 }
@@ -1159,7 +1165,8 @@ p {
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.update-notice {
+	.update-notice,
+	.undo-toast {
 		animation: none;
 	}
 }
@@ -1750,7 +1757,7 @@ p {
 	}
 
 	body {
-		padding-bottom: var(--notice-h, 0px);
+		padding-bottom: calc(var(--notice-h, 0px) + var(--toast-h, 0px));
 	}
 
 	.update-notice {
@@ -1758,7 +1765,7 @@ p {
 	}
 
 	.undo-toast {
-		bottom: calc(var(--notice-h, 0px) + var(--space-3));
+		bottom: calc(var(--notice-h, 0px) + var(--space-2));
 	}
 
 	/* The tab row carries the chrome's bottom edge on desktop. */
