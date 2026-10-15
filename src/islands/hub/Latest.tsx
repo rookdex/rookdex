@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import type { Locale, Translate } from "../../i18n"
 import { daysAgo } from "../../model/days"
 
@@ -26,7 +26,7 @@ interface Props {
 export function Latest({ latest, today, locale, newsHref, t }: Props) {
 	const [mounted, setMounted] = useState(false)
 	useEffect(() => setMounted(true), [])
-	const relative = new Intl.RelativeTimeFormat(locale, { numeric: "auto" })
+	const relative = useMemo(() => new Intl.RelativeTimeFormat(locale, { numeric: "auto" }), [locale])
 
 	return (
 		<section className="latest" aria-labelledby="latest-heading">
