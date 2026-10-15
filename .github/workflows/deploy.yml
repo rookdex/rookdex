@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths-ignore: ["docs/**", "README.md"]
   workflow_dispatch:
+  # launch-rebuild (dashboard spec §12): 23:05 UTC on 18 Nov is 00:05 CET on 19 Nov. The hub's
+  # server HTML is built with the build time, so this rebuild is what makes it the dashboard.
+  schedule:
+    - cron: "5 23 18 11 *"
 
 permissions:
   contents: read
@@ -16,7 +20,25 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Scheduled runs go ahead only in 2026, so the launch rebuild doesn't fire again next year.
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.year.outputs.go }}
+    steps:
+      - id: year
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" != "schedule" ] || [ "$(date -u +%Y)" = "2026" ]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=false" >> "$GITHUB_OUTPUT"
+          fi
+
   test:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -34,9 +56,13 @@ jobs:
         run: npm test
 
   deploy:
-    needs: test
+    needs: [gate, test]
     # workflow_dispatch can target any branch; only main may reach production (SEO spec §4.6).
-    if: github.ref == 'refs/heads/main'
+    # On the launch schedule a failed test is reported but doesn't stop the rebuild: the same
+    # commit already passed on its push (dashboard spec §12).
+    if: >-
+      !cancelled() && github.ref == 'refs/heads/main' && needs.gate.outputs.go == 'true' &&
+      (needs.test.result == 'success' || github.event_name == 'schedule')
     runs-on: ubuntu-latest
     environment: production
     steps:
