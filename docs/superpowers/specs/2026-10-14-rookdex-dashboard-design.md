@@ -32,7 +32,7 @@ GTA VI launches Thursday 19 November 2026 at 00:00 CET. This ships before the 1 
 | Layout | Profile chip in the top bar, big pair Overall % + Closest %, slim strip, What's next, Progress, Recent finds, Latest | Mockup B with C's numbers, measured at 320 px with no overflow |
 | What's next | The category closest to done; the next one takes over at 100 %; Wildlife when nothing is found | One clear goal instead of a wall of items |
 | What's next length | 3 rows. When the closest category has fewer than 3 left, the next-closest fills the rest. Each category's rows sit under a title saying how many are left | Short at 320 px with no empty slots; the tracker holds the full list |
-| Ticking on the hub | Row slides out, next fills in, Undo toast that leaves 5 s after focus leaves What's next | Fast to use, a mis-tap is cheap to fix, and screen-reader users can reach Undo (WCAG 2.2.1) |
+| Ticking on the hub | Row slides out, next fills in, Undo toast that leaves 5 s after focus leaves What's next or the player taps outside it | Fast to use, a mis-tap is cheap to fix, and screen-reader users can reach Undo (WCAG 2.2.1) |
 | Latest | 3 newest rumours by a new required `added` date | Needs a date to sort by; News uses the same order |
 | Buying info after launch | Dropped from the hub; the guide's "Buying in Norway" already holds it | The dashboard is for players who own the game |
 | Newcomer line | "New to GTA VI? Before you start" only while the active profile has 0 found, in the strip's first half | Helps on day one, then gets out of the way; same slot, so no layout shift |
@@ -72,7 +72,7 @@ Long item and category names, emoji included, wrap and are never cut off. Norweg
 
 **`UndoToast`.**
 - Opens after a tick. Holds one item id; a new tick replaces it.
-- Its 5 s timer runs only while focus is outside What's next and the toast, and the pointer isn't over the toast. A tick puts focus on a What's next row, so Undo stays one Tab away until the player moves on.
+- Its 5 s timer runs only while focus is outside What's next and the toast, and the pointer isn't over the toast. A tick puts focus on a What's next row, so Undo stays one Tab away until the player moves on. Moving on means focus leaves What's next, or the player taps or clicks outside it (touch never moves focus). A window or tab switch alone doesn't start the timer.
 - Rendered in the DOM straight after the What's next list, so Tab from the last row reaches Undo. Visually it sits fixed above the bottom tab bar; while it is open, `scroll-padding-bottom` equals its height so it never covers the focused element.
 - Undo calls `tracker.untick(id)`, then focus moves to the restored item's checkbox. Escape closes the toast and focus stays in What's next.
 
@@ -96,7 +96,7 @@ Today `init()` always opens the first active profile (`ensureActiveProfile`, `pr
 
 1. A What's next checkbox calls `tracker.tick(id)`. While a tick is in flight, and for 400 ms after it lands, What's next ignores further ticks. A double tap would otherwise tick the item that just slid in under the finger.
 2. The model writes the record, then notifies subscribers. On a failed write nothing changes (section 7).
-3. `Dashboard` recomputes in one `useMemo` over `items`, `records` and the local day key: overall count, `perCategory`, `closestCategory`, `whatsNext`, `foundToday` and `recentFinds`. The day key comes from the hub's clock and changes at local midnight, so "found today", "Day N" and the relative dates in Latest roll over on an open page.
+3. `Dashboard` recomputes in one `useMemo` over `items`, `records` and the local day key: overall count, `perCategory`, `closestCategory`, `nextGroups`, `foundToday` and `recentFinds`. The day key comes from the hub's clock and changes at local midnight, so "found today", "Day N" and the relative dates in Latest roll over on an open page.
 4. The ticked row slides out and the next unfound item fills the third slot, from the next-closest category when needed. When the ticked item was the last of its category, that title goes and the next category's title loses its "Then:". Focus moves to the checkbox in the filled-in row, or to the What's next heading when no row is left.
 5. `UndoToast` opens and the status region says "{item} marked as found." Undo calls `tracker.untick(id)`; the item returns to the list and the status region says "{item} marked as not found."
 6. Switching profile closes the toast, so Undo never acts on another profile, and the status region says "Showing {name}."
@@ -165,7 +165,7 @@ New keys go into both `src/locales/en.json` and `nb.json`; `copy.test.ts` checks
 - **Headings.** A visually hidden `h2` ("Your progress") over the tiles and strip; visible `h2`s for What's next, Progress, Recent finds and Latest. Each What's next group title is an `h3`, and its list is labelled by it.
 - **One status region** (section 3), in the DOM from load and outside both views, so the flip at midnight is announced once and no re-render wipes it. It is written in one go and cleared between messages. The visible days line and found-today count are not live, so nothing is announced twice. Errors keep using the existing `role="alert"` paragraphs.
 - **Every press is heard.** Tick, Undo and profile switch each write one status line (section 6.1). "Manage profiles" and "All news" are links.
-- **Toast.** Undo is a real button, one Tab after the last What's next row. The timer only runs once focus has left What's next and the toast (section 4), which meets WCAG 2.2.1 without a setting. Escape closes it. It never covers the focused element (2.4.12).
+- **Toast.** Undo is a real button, one Tab after the last What's next row. The timer only runs once focus has left What's next and the toast, or the player taps or clicks outside it (section 4), which meets WCAG 2.2.1 without a setting. Escape closes it. It never covers the focused element (2.4.12).
 - **Focus** after a tick goes to the filled-in row's checkbox, after Undo to the restored item's checkbox, and after the midnight flip to the dashboard heading. Never to `body`.
 - **Reduced motion.** No slide; the row is replaced in place.
 - **Targets.** Checkbox rows, Undo and links are at least 44 px tall. Controls on one row share one height and bottom edge.
@@ -202,7 +202,7 @@ New keys go into both `src/locales/en.json` and `nb.json`; `copy.test.ts` checks
 - **Components** (fake-indexeddb, fake timers).
   - Skeleton first, then data. A rejected `import()` shows `hub.loadFailed`.
   - Tick slides the row out and opens the toast; Undo restores the item and focuses its checkbox.
-  - The toast timer doesn't run while focus is in What's next or the toast, and closes 5 s after focus leaves. Escape closes it.
+  - The toast timer doesn't run while focus is in What's next or the toast, and closes 5 s after focus leaves or a tap lands outside. A window blur alone doesn't start it. Escape closes it.
   - A second tick within 400 ms, or while the first is in flight, is ignored.
   - Focus moves to the filled-in row. No slide under reduced motion.
   - Switching profile closes the toast and writes "Showing {name}." to the status region; tick and Undo write theirs.
