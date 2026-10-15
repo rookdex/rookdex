@@ -68,6 +68,37 @@ describe("Undo toast (dashboard spec §4, §9)", () => {
 		expect(onClose).toHaveBeenCalledTimes(1)
 	})
 
+	it("keeps waiting when the window loses focus but focus stays in What's next", () => {
+		const onClose = vi.fn()
+		render(<Page onClose={onClose} />)
+		focus("Row")
+		const row = screen.getByRole("button", { name: "Row" })
+		// Alt+Tab or a screen-reader dialog: focusout with no target, activeElement unchanged.
+		fireEvent.focusOut(row, { relatedTarget: null })
+		wait(60_000)
+		expect(onClose).not.toHaveBeenCalled()
+		// A real blur (click on blank space) does start the timer.
+		act(() => row.blur())
+		wait(0)
+		wait(TOAST_MS - 1)
+		expect(onClose).not.toHaveBeenCalled()
+		wait(1)
+		expect(onClose).toHaveBeenCalledTimes(1)
+	})
+
+	it("starts the timer when the player taps or clicks outside What's next", () => {
+		const onClose = vi.fn()
+		render(<Page onClose={onClose} />)
+		focus("Row")
+		// Touch: the tap does not move focus.
+		fireEvent.pointerDown(screen.getByRole("button", { name: "Row" }))
+		wait(60_000)
+		expect(onClose).not.toHaveBeenCalled()
+		fireEvent.pointerDown(screen.getByRole("button", { name: "Elsewhere" }))
+		wait(TOAST_MS)
+		expect(onClose).toHaveBeenCalledTimes(1)
+	})
+
 	it("waits while the pointer is over it", () => {
 		const onClose = vi.fn()
 		render(<Page onClose={onClose} />)

@@ -220,6 +220,30 @@ describe("Hub at the flip (dashboard spec §3, §6.4)", () => {
 		expect(screen.getByRole("heading", { name: "Your progress" })).toHaveFocus()
 	})
 
+	it("leaves focus alone when the player clicked blank space after being in the hub", async () => {
+		vi.setSystemTime(new Date(eve))
+		hub()
+		const link = screen.getByRole("link", { name: "Read this before you start" })
+		act(() => link.focus())
+		act(() => link.blur())
+		await advance(2_000)
+		expect(screen.getByRole("heading", { name: "Your progress" })).not.toHaveFocus()
+		expect(document.body).toHaveFocus()
+	})
+
+	it("still moves focus when the window lost focus but focus stayed in the hub", async () => {
+		vi.setSystemTime(new Date(eve))
+		hub()
+		const link = screen.getByRole("link", { name: "Read this before you start" })
+		act(() => link.focus())
+		// A window blur: focusout with no target while the link stays the active element.
+		act(() => {
+			link.dispatchEvent(new FocusEvent("focusout", { bubbles: true, relatedTarget: null }))
+		})
+		await advance(2_000)
+		expect(screen.getByRole("heading", { name: "Your progress" })).toHaveFocus()
+	})
+
 	it("leaves focus alone when it was outside the hub", async () => {
 		vi.setSystemTime(new Date(eve))
 		hub()

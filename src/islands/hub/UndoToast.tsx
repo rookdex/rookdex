@@ -31,14 +31,35 @@ export function UndoToast({ item, error, onUndo, onClose, zoneRef, onEscapeFocus
 	useEffect(() => {
 		const inside = (target: EventTarget | null) =>
 			target instanceof Node && (zoneRef.current?.contains(target) ?? false)
-		const onIn = (event: FocusEvent) => setFocusInside(inside(event.target))
-		const onOut = (event: FocusEvent) => setFocusInside(inside(event.relatedTarget))
+		let pending: number | undefined
+		const settle = () => window.clearTimeout(pending)
+		const onIn = (event: FocusEvent) => {
+			settle()
+			setFocusInside(inside(event.target))
+		}
+		const onOut = (event: FocusEvent) => {
+			settle()
+			if (event.relatedTarget === null) {
+				// A window or tab blur also lands here, with focus still on the checkbox. Read
+				// where focus really is once the event has finished.
+				pending = window.setTimeout(() => setFocusInside(inside(document.activeElement)), 0)
+				return
+			}
+			setFocusInside(inside(event.relatedTarget))
+		}
+		// Touch players never move focus: a tap or click outside What's next counts as moving on.
+		const onPointerDown = (event: Event) => {
+			if (!inside(event.target)) setFocusInside(false)
+		}
 		setFocusInside(inside(document.activeElement))
 		document.addEventListener("focusin", onIn)
 		document.addEventListener("focusout", onOut)
+		document.addEventListener("pointerdown", onPointerDown)
 		return () => {
+			settle()
 			document.removeEventListener("focusin", onIn)
 			document.removeEventListener("focusout", onOut)
+			document.removeEventListener("pointerdown", onPointerDown)
 		}
 	}, [zoneRef])
 

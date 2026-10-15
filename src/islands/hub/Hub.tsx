@@ -103,16 +103,28 @@ export function Hub({
 	useEffect(() => {
 		const el = root.current
 		if (!el) return
+		let pending: number | undefined
 		const onIn = () => {
+			window.clearTimeout(pending)
 			hadFocus.current = true
 		}
 		const onOut = (event: FocusEvent) => {
+			window.clearTimeout(pending)
 			const next = event.relatedTarget
-			if (next instanceof Node && !el.contains(next)) hadFocus.current = false
+			if (next instanceof Node) {
+				if (!el.contains(next)) hadFocus.current = false
+				return
+			}
+			// No target: a click on blank space or a window blur. Only the first leaves focus
+			// outside the hub, so read where it really is once the event has finished.
+			pending = window.setTimeout(() => {
+				if (!el.contains(document.activeElement)) hadFocus.current = false
+			}, 0)
 		}
 		el.addEventListener("focusin", onIn)
 		el.addEventListener("focusout", onOut)
 		return () => {
+			window.clearTimeout(pending)
 			el.removeEventListener("focusin", onIn)
 			el.removeEventListener("focusout", onOut)
 		}
