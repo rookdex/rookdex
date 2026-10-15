@@ -60,9 +60,7 @@ jobs:
     # workflow_dispatch can target any branch; only main may reach production (SEO spec §4.6).
     # On the launch schedule a failed test is reported but doesn't stop the rebuild: the same
     # commit already passed on its push (dashboard spec §12).
-    if: >-
-      !cancelled() && github.ref == 'refs/heads/main' && needs.gate.outputs.go == 'true' &&
-      (needs.test.result == 'success' || github.event_name == 'schedule')
+    if: github.ref == 'refs/heads/main' && !cancelled() && needs.gate.outputs.go == 'true' && (needs.test.result == 'success' || github.event_name == 'schedule')
     runs-on: ubuntu-latest
     environment: production
     steps:
