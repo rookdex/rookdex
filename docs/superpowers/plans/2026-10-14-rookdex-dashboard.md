@@ -43,7 +43,7 @@
 | `src/model/schema.ts` | modify | `added` on rumours |
 | `src/seed/rumours.json` | modify | `added` dates |
 | `src/model/days.ts` | create | Seed-free calendar helpers |
-| `src/model/dashboard.ts` | create | `closestCategory`, `whatsNext`, `foundToday`, `latestRumours` |
+| `src/model/dashboard.ts` | create | `closestCategory`, `rankCategories`, `nextGroups`, `foundToday`, `latestRumours` |
 | `src/pages/[locale]/news.astro` | modify | Newest first |
 | `src/islands/seenFlag.ts` | modify | Active-profile key and storage wrapper |
 | `src/model/tracker.ts` | modify | Remember the active profile |
@@ -61,7 +61,7 @@
 | `src/islands/hub/StatStrip.tsx` | create | Found today or newcomer link, and Day N |
 | `src/islands/hub/DashboardSkeleton.tsx` | create | Same blocks at reserved heights |
 | `src/islands/hub/Dashboard.tsx` | create | Tracker state, blocks, ticking, Undo |
-| `src/islands/hub/WhatsNext.tsx` | create | Three rows, slide, lock, focus |
+| `src/islands/hub/WhatsNext.tsx` | create | Three rows in up to two titled groups, slide, lock, focus |
 | `src/islands/hub/UndoToast.tsx` | create | Undo with focus-aware timer |
 | `src/islands/hub/CountdownView.tsx` | create | Before-launch markup moved from `Countdown.tsx` |
 | `src/islands/hub/Latest.tsx` | create | Three newest rumours with relative dates |
@@ -3691,6 +3691,290 @@ grep -o 'import("\./[^"]*")' "dist$hub"
 git add src/styles/global.css
 git commit -m "Style the dashboard with reserved heights"
 ```
+
+---
+
+### Task 10b: What's next fills from the next-closest category
+
+Added 2026-10-15 after the Task 10 browser pass (spec amendment of the same date: §2, §4, §6.1, §6.2, §8, §9, §13, §14). With 1 item left in the closest category, What's next showed 1 row in space for 3. Now the next-closest category fills the rest, and each category's rows sit under a titled group.
+
+**Files:**
+- Modify: `src/model/dashboard.ts`, `src/model/dashboard.test.ts`
+- Modify: `src/locales/en.json`, `src/locales/nb.json`
+- Modify: `src/islands/hub/WhatsNext.tsx`, `src/islands/hub/WhatsNext.test.tsx`
+- Modify: `src/islands/hub/Dashboard.tsx`, `src/islands/hub/Dashboard.test.tsx`
+- Modify: `src/islands/hub/DashboardSkeleton.tsx`
+- Modify: `src/styles/global.css`
+
+**Interfaces:**
+- Produces: `rankCategories(items, records): string[]`, `nextGroups(items, records, limit): NextGroup[]`, `NextGroup`, `NEXT_GROUPS = 2` in `src/model/dashboard.ts`. `whatsNext` is removed (its only callers are `Dashboard.tsx` and its tests).
+- Produces: `WhatsNext` takes `groups: ShownGroup[]` (`{ category, title, items }`) instead of `items`.
+- Consumes: `perCategory`, `countable` from `stats.ts`; `groupItems` from `seed.ts`; `seedLabel` and `translator` from `i18n`.
+
+- [ ] **Step 1: Model tests first**
+
+In `src/model/dashboard.test.ts`, import `nextGroups` and `rankCategories` instead of `whatsNext`, and replace the `describe("whatsNext", ...)` block with:
+
+```ts
+describe("rankCategories", () => {
+	it("puts wildlife first, then category order, when nothing is found", () => {
+		expect(rankCategories(items, {})).toEqual(["wildlife", "collectibles", "vehicles"])
+	})
+	it("ranks by share found, ties in category order, and drops finished categories", () => {
+		const r = records({
+			"collectibles/a": "2026-11-20T10:00:00Z",
+			"collectibles/b": "2026-11-20T10:00:00Z",
+			"vehicles/c": "2026-11-20T10:00:00Z",
+		})
+		expect(rankCategories(items, r)).toEqual(["vehicles", "wildlife"])
+	})
+	it("agrees with closestCategory on its first entry", () => {
+		const cases: Records[] = [
+			{},
+			records({ "vehicles/c": "2026-11-20T10:00:00Z" }),
+			records({ "collectibles/a": "2026-11-20T10:00:00Z", "wildlife/e": "2026-11-20T10:00:00Z" }),
+		]
+		for (const r of cases) expect(rankCategories(items, r)[0]).toBe(closestCategory(items, r))
+	})
+})
+
+describe("nextGroups", () => {
+	const birds = [
+		item("wildlife/pelican", "birds"),
+		item("wildlife/egret", "birds"),
+		item("wildlife/alligator", "reptiles"),
+		item("wildlife/dodo", "birds", { retired: true }),
+		item("vehicles/bike", "bikes"),
+	]
+	const names = (groups: ReturnType<typeof nextGroups>) =>
+		groups.map((g) => [g.category, g.left, g.items.map((i) => i.name)])
+
+	it("lists unfound items of the closest category in tracker order, up to the limit", () => {
+		expect(names(nextGroups(birds, {}, 3))).toEqual([
+			["wildlife", 3, ["egret", "pelican", "alligator"]],
+		])
+	})
+	it("counts every unfound item in left, not only the ones shown", () => {
+		expect(names(nextGroups(birds, {}, 2))).toEqual([["wildlife", 3, ["egret", "pelican"]]])
+	})
+	it("skips found and retired items and fills from the next-closest category", () => {
+		const r = records({ "wildlife/egret": "2026-11-20T10:00:00Z" })
+		expect(names(nextGroups(birds, r, 3))).toEqual([
+			["wildlife", 2, ["pelican", "alligator"]],
+			["vehicles", 1, ["bike"]],
+		])
+	})
+	it("fills from the next category when the closest has one left", () => {
+		const r = records({ "collectibles/a": "2026-11-20T10:00:00Z" })
+		expect(names(nextGroups(items, r, 3))).toEqual([
+			["collectibles", 1, ["b"]],
+			["vehicles", 2, ["c", "d"]],
+		])
+	})
+	it("draws from at most two categories, even with room left", () => {
+		const r = records({
+			"collectibles/a": "2026-11-20T10:00:00Z",
+			"vehicles/c": "2026-11-20T10:00:00Z",
+		})
+		expect(names(nextGroups(items, r, 3))).toEqual([
+			["collectibles", 1, ["b"]],
+			["vehicles", 1, ["d"]],
+		])
+	})
+	it("is empty when everything is found", () => {
+		const all = Object.fromEntries(items.map((i) => [i.id, "2026-11-20T10:00:00Z"]))
+		expect(nextGroups(items, records(all), 3)).toEqual([])
+	})
+})
+```
+
+Run: `npx vitest run src/model/dashboard.test.ts`
+Expected: FAIL (`nextGroups` and `rankCategories` are not exported).
+
+- [ ] **Step 2: The model**
+
+In `src/model/dashboard.ts`, replace `closestCategory` and `whatsNext` with:
+
+```ts
+/** How many categories What's next draws from (dashboard spec §4). */
+export const NEXT_GROUPS = 2
+
+/** One category's rows in What's next. */
+export interface NextGroup {
+	category: string
+	/** Every unfound item of the category, not only the ones shown. */
+	left: number
+	items: SeedItem[]
+}
+
+/**
+ * Categories below 100 %, highest share found first, ties in category order. With nothing found,
+ * wildlife comes first and the rest follow in category order.
+ */
+export function rankCategories(items: SeedItem[], records: Records): string[] {
+	const counts = perCategory(countable(items), records)
+	if (counts.every((c) => c.done === 0)) {
+		const first = counts.find((c) => c.category === FIRST_GOAL) ?? counts[0]
+		return first ? [first, ...counts.filter((c) => c !== first)].map((c) => c.category) : []
+	}
+	// sort is stable, so equal shares keep category order.
+	return counts
+		.filter((c) => c.done < c.total)
+		.sort((a, b) => b.done / b.total - a.done / a.total)
+		.map((c) => c.category)
+}
+
+/**
+ * The category with the highest share found below 100 %. Ties go to category order. With nothing
+ * found it is wildlife; with everything found it is undefined.
+ */
+export function closestCategory(items: SeedItem[], records: Records): string | undefined {
+	return rankCategories(items, records)[0]
+}
+
+/** Unfound items of `category` in the tracker's order (group, then name). */
+function openItems(items: SeedItem[], records: Records, category: string): SeedItem[] {
+	const open = countable(items).filter(
+		(item) => item.category === category && !records[item.id]?.done
+	)
+	return [...groupItems(open).values()].flat()
+}
+
+/**
+ * What's next: up to `limit` unfound items, from the closest category first, then the next-closest,
+ * from at most NEXT_GROUPS categories. Empty when everything is found.
+ */
+export function nextGroups(items: SeedItem[], records: Records, limit: number): NextGroup[] {
+	const groups: NextGroup[] = []
+	let room = limit
+	for (const category of rankCategories(items, records)) {
+		if (room <= 0 || groups.length === NEXT_GROUPS) break
+		const open = openItems(items, records, category)
+		groups.push({ category, left: open.length, items: open.slice(0, room) })
+		room -= open.length
+	}
+	return groups
+}
+```
+
+Run: `npx vitest run src/model/dashboard.test.ts`
+Expected: PASS, including the existing `closestCategory` tests unchanged.
+
+- [ ] **Step 3: Copy**
+
+Add after `hub.whatsNext` in both locale files, text exactly as spec §8:
+
+- `src/locales/en.json`: `"hub.nextGroup": "{category} · {count} left"`, `"hub.nextGroupThen": "Then: {category} · {count} left"`
+- `src/locales/nb.json`: `"hub.nextGroup": "{category} · {count} igjen"`, `"hub.nextGroupThen": "Deretter: {category} · {count} igjen"`
+
+The `·` is U+00B7 with a normal space on each side, as in the strip.
+
+- [ ] **Step 4: WhatsNext renders groups**
+
+In `src/islands/hub/WhatsNext.tsx`:
+
+- Export `interface ShownGroup { category: string; title: string; items: SeedItem[] }`. The `items` prop becomes `groups: ShownGroup[]` (doc comment: up to three unfound items in at most two titled groups, fresh from the model).
+- `held` holds `ShownGroup[] | null`; `const shown = held ?? groups` and `const rows = shown.flatMap((g) => g.items)`. Everything that used the flat list (the `shown` ref of ids, the entering effect, `tick`'s `setHeld`) uses `rows` and `groups`. `tick` still receives the row's index in the flat list, so focus after a tick lands on the row now in the ticked one's place across groups.
+- Rendering: when `rows.length === 0`, the existing `next-done` paragraph. Otherwise:
+
+```tsx
+<div className="next-groups">
+	{shown.map((group) => (
+		<Fragment key={group.category}>
+			<h3 id={`next-group-${group.category}`} className="next-group">
+				{group.title}
+			</h3>
+			<ul className="next-list" aria-labelledby={`next-group-${group.category}`}>
+				{group.items.map((item) => /* the existing <li>, with its flat index */)}
+			</ul>
+		</Fragment>
+	))}
+</div>
+```
+
+Compute each row's flat index from the groups before it (a running offset), not with `indexOf`. The focus effect's `.next-list input` query already spans both lists; keep it. The `{children}` slot (the Undo toast) stays straight after the groups, so Tab from the last row reaches Undo.
+
+- [ ] **Step 5: Dashboard builds the groups**
+
+In `src/islands/hub/Dashboard.tsx`:
+
+- Import `nextGroups` instead of `whatsNext`. In the `useMemo`, `next: nextGroups(items, records, NEXT_LIMIT)`. `closest` stays from `closestCategory` (the tile).
+- Before the JSX:
+
+```ts
+const groups = view.next.map((g, index) => ({
+	category: g.category,
+	items: g.items,
+	title: t(index === 0 ? "hub.nextGroup" : "hub.nextGroupThen", {
+		category: label(g.category),
+		count: g.left,
+	}),
+}))
+```
+
+- Pass `groups={groups}` to `WhatsNext`.
+
+- [ ] **Step 6: Reserved height and styles**
+
+In `src/islands/hub/DashboardSkeleton.tsx`, wrap the skeleton's `next-list` in `<div className="next-groups">` so it reserves the same height as the loaded block. No title placeholders: the wrapper's `min-height` does the reserving.
+
+In `src/styles/global.css`, the reserved height moves from the list to the wrapper. Replace the `.next-list, .next-done` rule and drop nothing else:
+
+```css
+/* What's next reserves 3 rows and 2 group titles, loaded or not (dashboard spec §4). */
+.whats-next {
+	--next-title-h: 2rem;
+}
+
+.next-groups,
+.next-done {
+	min-height: calc(3 * var(--tap) + 2 * var(--space-1) + 2 * var(--next-title-h));
+	margin: 0;
+}
+
+.next-list {
+	margin: 0;
+}
+
+/* 1.25rem line + space-2 above + space-1 below = --next-title-h. A label, set apart from the rows. */
+.next-group {
+	margin: 0;
+	padding: var(--space-2) 0 var(--space-1);
+	font-size: 0.875rem;
+	font-weight: 600;
+	line-height: 1.25rem;
+	color: var(--text-muted);
+	overflow-wrap: anywhere;
+}
+```
+
+Keep the existing `.next-list` grid, gap, padding, list-style and overflow rules as they are.
+
+- [ ] **Step 7: Component tests**
+
+`src/islands/hub/WhatsNext.test.tsx`: the `Harness` takes `initial` as a list of categories with their items (`{ category: string; items: SeedItem[] }[]`, default one wildlife group of the four birds). It removes a saved item from its category, drops empty categories, and builds `groups` the way the model does: fill to 3 rows from at most 2 categories, titles `"<category> · <left> left"` for the first and `"Then: <category> · <left> left"` for the second. The five existing tests keep their assertions. Add:
+
+1. **"titles each group and labels its list by the title"**: wildlife `[Avocet]`, vehicles `[Bike, Car, Van]` (a second `item` helper or a category argument). Expect headings `wildlife · 1 left` and `Then: vehicles · 3 left` at level 3, `getByRole("list", { name: "wildlife · 1 left" })` holds Avocet, and the vehicles list holds Bike and Car.
+2. **"moves to the next group when its last item is ticked"**: same groups. Tick Avocet, `advance(LEAVE_MS)`. Expect one level-3 heading `vehicles · 3 left`, checkboxes Bike, Car, Van in that order, Van's row `data-entering`, and focus on Bike.
+
+`src/islands/hub/Dashboard.test.tsx`: update the tests whose What's next rows change now that the next category fills in. In "moves on when the closest category is done, and Undo brings it back", assert before the tick that the headings read `Wildlife · 1 left` and `Then: Vehicles · 1 left`; after the tick `Vehicles · 1 left` alone with focus on Bike; after Undo both titles again with focus on American alligator.
+
+Run: `npx vitest run src/model/dashboard.test.ts src/islands/hub`
+Expected: PASS.
+
+- [ ] **Step 8: Full checks and commit**
+
+Run: `npm test`, `npm run check`, then `npx biome check --write` on the changed files.
+Expected: all green.
+
+```bash
+git add src/model/dashboard.ts src/model/dashboard.test.ts src/locales/en.json src/locales/nb.json src/islands/hub/WhatsNext.tsx src/islands/hub/WhatsNext.test.tsx src/islands/hub/Dashboard.tsx src/islands/hub/Dashboard.test.tsx src/islands/hub/DashboardSkeleton.tsx src/styles/global.css
+git commit -m "Fill What's next from the next-closest category"
+```
+
+- [ ] **Step 9: Layout check (controller, browser pane)**
+
+Build with `ROOKDEX_NOW=2026-11-22T12:00:00Z`, serve with `wrangler dev`, unregister the service worker and clear caches. At 320 px and desktop, `en` and `nb`, with profiles of 0 finds, 1 item left in the closest category, and the two-categories-one-left-each case: What's next height equals the skeleton's (CLS 0 with a `PerformanceObserver`), titles stand apart from the rows, nothing overflows, Tab from the last row reaches Undo, and the toast doesn't cover the focused row. If `Deretter: Samleobjekter · N igjen` wraps at 320 px and pushes the block past its reservation, findings go back to the implementer.
 
 ---
 

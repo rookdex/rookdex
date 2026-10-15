@@ -31,7 +31,7 @@ GTA VI launches Thursday 19 November 2026 at 00:00 CET. This ships before the 1 
 | Where the dashboard lives | It takes over the hub after launch; no new route | One home for launch night and every day after |
 | Layout | Profile chip in the top bar, big pair Overall % + Closest %, slim strip, What's next, Progress, Recent finds, Latest | Mockup B with C's numbers, measured at 320 px with no overflow |
 | What's next | The category closest to done; the next one takes over at 100 %; Wildlife when nothing is found | One clear goal instead of a wall of items |
-| What's next length | 3 rows | Short at 320 px; the tracker holds the full list |
+| What's next length | 3 rows. When the closest category has fewer than 3 left, the next-closest fills the rest. Each category's rows sit under a title saying how many are left | Short at 320 px with no empty slots; the tracker holds the full list |
 | Ticking on the hub | Row slides out, next fills in, Undo toast that leaves 5 s after focus leaves What's next | Fast to use, a mis-tap is cheap to fix, and screen-reader users can reach Undo (WCAG 2.2.1) |
 | Latest | 3 newest rumours by a new required `added` date | Needs a date to sort by; News uses the same order |
 | Buying info after launch | Dropped from the hub; the guide's "Buying in Norway" already holds it | The dashboard is for players who own the game |
@@ -63,7 +63,7 @@ All new files go in `src/islands/hub/`. Top to bottom, the dashboard is:
 1. **Top bar.** `ProfileMenu` in switch mode. Its six action props become optional. A new optional `manageHref` adds one "Manage profiles" link item under the profile list. With no action props, no action items render.
 2. **`StatPair`.** Two big tiles: Overall % and Closest % with the category name under it. At 100 % everywhere, the Closest tile reads "All found".
 3. **`StatStrip`.** "N found today · Day N since launch". While the active profile has 0 found in total, the first half is the newcomer link instead: "New to GTA VI? Before you start", to the guide. Same slot, so it appearing or going causes no shift.
-4. **`WhatsNext`.** Up to 3 unfound items from the closest category, each a checkbox row that calls `tracker.tick`. When everything is found it shows "You've found everything tracked so far" instead. The block always reserves the height of 3 rows.
+4. **`WhatsNext`.** Up to 3 unfound items, each a checkbox row that calls `tracker.tick`. They come from the closest category first. When it has fewer than 3 left, the next-closest category fills the rest, at most two categories in all. Each category's rows sit under a small title: "Collectibles · 1 left" for the first, "Then: Places · 6 left" for the second. The count is every unfound item in that category, not only the ones shown. When everything is found it shows "You've found everything tracked so far" instead. The block always reserves the height of 3 rows and 2 titles.
 5. **Progress.** One `Bar` per category. Overall isn't repeated; the tile shows it.
 6. **Recent finds.** `recentFinds(items, records, 5)`, as on the tracker. Reserves the height of 5 rows, also when it shows `tracker.noRecent`.
 7. **`Latest`.** The 3 newest rumours, name and relative date, then an "All news" link. Hidden when there are no rumours (known at build time, so the skeleton matches).
@@ -97,14 +97,14 @@ Today `init()` always opens the first active profile (`ensureActiveProfile`, `pr
 1. A What's next checkbox calls `tracker.tick(id)`. While a tick is in flight, and for 400 ms after it lands, What's next ignores further ticks. A double tap would otherwise tick the item that just slid in under the finger.
 2. The model writes the record, then notifies subscribers. On a failed write nothing changes (section 7).
 3. `Dashboard` recomputes in one `useMemo` over `items`, `records` and the local day key: overall count, `perCategory`, `closestCategory`, `whatsNext`, `foundToday` and `recentFinds`. The day key comes from the hub's clock and changes at local midnight, so "found today", "Day N" and the relative dates in Latest roll over on an open page.
-4. The ticked row slides out and the next unfound item fills the third slot. Focus moves to the checkbox in the filled-in row, or to the What's next heading when no row is left.
+4. The ticked row slides out and the next unfound item fills the third slot, from the next-closest category when needed. When the ticked item was the last of its category, that title goes and the next category's title loses its "Then:". Focus moves to the checkbox in the filled-in row, or to the What's next heading when no row is left.
 5. `UndoToast` opens and the status region says "{item} marked as found." Undo calls `tracker.untick(id)`; the item returns to the list and the status region says "{item} marked as not found."
 6. Switching profile closes the toast, so Undo never acts on another profile, and the status region says "Showing {name}."
 
 ### 6.2 Model functions (`src/model/dashboard.ts`)
 
 - `closestCategory(items, records): string | undefined`. The category with the highest percentage below 100. Ties go to `categoryIds` order. With nothing found, `wildlife`. With every category at 100 %, `undefined`. Retired items don't count.
-- `whatsNext(items, records, category, limit): SeedItem[]`. Unfound, non-retired items in that category, in the tracker's order (`groupItems`: group, then name), at most `limit`. The hub and the tracker list items the same way.
+- `nextGroups(items, records, limit): { category, left, items }[]`. Categories below 100 % ranked as `closestCategory` ranks them (highest percentage first, ties by `categoryIds` order, `wildlife` first when nothing is found), so the first group is always the closest category. Each group holds its unfound, non-retired items in the tracker's order (`groupItems`: group, then name), and `left` counts all of them. Groups fill until `limit` items, at most two groups. Empty when every category is at 100 %. The hub and the tracker list items the same way.
 - `foundToday(records, now): number`. Records with `done: true` whose `updated_at` (stored in UTC) falls on `now`'s local calendar day.
 - `latestRumours(rumours, limit): Rumour[]`. Newest `added` first, ties by id, at most `limit`.
 
@@ -147,6 +147,8 @@ New keys go into both `src/locales/en.json` and `nb.json`; `copy.test.ts` checks
 | `hub.allFound` | All found | Alt funnet |
 | `hub.foundToday.one` / `.other` | {count} found today | {count} funnet i dag |
 | `hub.whatsNext` | What's next | Neste |
+| `hub.nextGroup` | {category} · {count} left | {category} · {count} igjen |
+| `hub.nextGroupThen` | Then: {category} · {count} left | Deretter: {category} · {count} igjen |
 | `hub.everythingFound` | You've found everything tracked so far. | Du har funnet alt vi følger så langt. |
 | `hub.latest` | Latest | Siste nytt |
 | `hub.allNews` | All news | Alle nyheter |
@@ -160,7 +162,7 @@ New keys go into both `src/locales/en.json` and `nb.json`; `copy.test.ts` checks
 
 ## 9. Accessibility
 
-- **Headings.** A visually hidden `h2` ("Your progress") over the tiles and strip; visible `h2`s for What's next, Progress, Recent finds and Latest.
+- **Headings.** A visually hidden `h2` ("Your progress") over the tiles and strip; visible `h2`s for What's next, Progress, Recent finds and Latest. Each What's next group title is an `h3`, and its list is labelled by it.
 - **One status region** (section 3), in the DOM from load and outside both views, so the flip at midnight is announced once and no re-render wipes it. It is written in one go and cleared between messages. The visible days line and found-today count are not live, so nothing is announced twice. Errors keep using the existing `role="alert"` paragraphs.
 - **Every press is heard.** Tick, Undo and profile switch each write one status line (section 6.1). "Manage profiles" and "All news" are links.
 - **Toast.** Undo is a real button, one Tab after the last What's next row. The timer only runs once focus has left What's next and the toast (section 4), which meets WCAG 2.2.1 without a setting. Escape closes it. It never covers the focused element (2.4.12).
@@ -193,7 +195,7 @@ New keys go into both `src/locales/en.json` and `nb.json`; `copy.test.ts` checks
 
 ## 13. Testing
 
-- **`dashboard.test.ts`.** `closestCategory`: ties, nothing found, all at 100 %, retired items ignored. `foundToday`: local-midnight boundary with an injected `now`, run with `TZ=Europe/Oslo` so a record at 23:30 UTC counts for the next local day. `latestRumours`: order, ties, limit. `whatsNext`: skips done and retired, tracker order, limit.
+- **`dashboard.test.ts`.** `closestCategory`: ties, nothing found, all at 100 %, retired items ignored. `foundToday`: local-midnight boundary with an injected `now`, run with `TZ=Europe/Oslo` so a record at 23:30 UTC counts for the next local day. `latestRumours`: order, ties, limit. `nextGroups`: skips done and retired, tracker order, limit, fills from the next-closest category, at most two groups, `left` counts unshown items, first group equals `closestCategory`.
 - **Tracker model.** Active profile restored; fallback when its profile is deleted or missing; written on switch, create, import as new and the delete fallback; blocked storage behaves as today.
 - **`delete-all`.** The new key is removed.
 - **`useHubPhase`.** Override honoured only on allowed hosts and only for `after`; the phase flips at zero.
@@ -220,6 +222,7 @@ New keys go into both `src/locales/en.json` and `nb.json`; `copy.test.ts` checks
 - **Announcing profile switches on the tracker page.** The tracker has the same silent switch today. Out of scope here; worth a small follow-up.
 - **A device clock set forward** shows the dashboard early. Accepted: prod follows the device clock by design, and nothing is lost.
 - **An installed app serving the old "before" HTML after launch.** The client flips by clock anyway; the cost is one layout shift until the service worker updates.
+- **A third What's next group.** When the two closest categories have one item left each, What's next shows 2 rows. A third title would need its height reserved on every visit for a case that lasts one tick.
 - **Removing the schedule trigger after launch.** The year guard already stops a 2027 run; removing the trigger can happen in any later chore.
 
 ## 15. After this spec
@@ -227,3 +230,5 @@ New keys go into both `src/locales/en.json` and `nb.json`; `copy.test.ts` checks
 The Android sub-project (TWA, closed test, Ko-fi link hidden inside the TWA) gets its own spec next. The phase 1c pipeline follows in December.
 
 > Stress-tested 2026-10-14 (skill 1b85fca): 14 applied, 2 adapted, 1 decided by me.
+>
+> Amended 2026-10-15: What's next fills to 3 rows from the next-closest category, each category under a titled group (§2, §4, §6.1, §6.2, §8, §9, §13, §14). Decided after the Task 10 browser pass showed 1 row in space for 3.
