@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { type Locale, seedLabel, translator } from "../../i18n"
-import { closestCategory, foundToday, whatsNext } from "../../model/dashboard"
+import { closestCategory, foundToday, nextGroups } from "../../model/dashboard"
 import { dayFromKey } from "../../model/days"
 import { activeProfiles } from "../../model/profiles"
 import { type Count, countable, countItems, perCategory, recentFinds } from "../../model/stats"
@@ -77,11 +77,24 @@ export function Dashboard({
 			overall: countItems(items, records),
 			categories: perCategory(countable(items), records),
 			closest,
-			next: closest ? whatsNext(items, records, closest, NEXT_LIMIT) : [],
+			next: nextGroups(items, records, NEXT_LIMIT),
 			foundToday: foundToday(items, records, dayFromKey(today)),
 			recent: recentFinds(items, records, RECENT_LIMIT),
 		}
 	}, [items, records, today])
+
+	// Titled groups for What's next. Stable between renders, so a row sliding in is detected once.
+	const groups = useMemo(() => {
+		const { t: translate } = translator(locale)
+		return view.next.map((g, index) => ({
+			category: g.category,
+			items: g.items,
+			title: translate(index === 0 ? "hub.nextGroup" : "hub.nextGroupThen", {
+				category: seedLabel(translate, "category", g.category),
+				count: g.left,
+			}),
+		}))
+	}, [view.next, locale])
 
 	if (state.status === "error") {
 		return (
@@ -172,7 +185,7 @@ export function Dashboard({
 				{toast ? "" : error}
 			</p>
 			<WhatsNext
-				items={view.next}
+				groups={groups}
 				disabled={state.error === "closed"}
 				onTick={tick}
 				t={t}

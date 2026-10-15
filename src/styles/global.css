@@ -934,13 +934,30 @@ p {
 	flex: none;
 }
 
-.next-list,
+/* What's next reserves 3 rows and 2 group titles, loaded or not (dashboard spec §4). */
+.whats-next {
+	--next-title-h: 2rem;
+}
+
+.next-groups,
 .next-done {
-	min-height: calc(3 * var(--tap) + 2 * var(--space-1));
+	min-height: calc(3 * var(--tap) + 2 * var(--space-1) + 2 * var(--next-title-h));
 	margin: 0;
 }
 
+/* 1.25rem line + space-2 above + space-1 below = --next-title-h. A label, set apart from the rows. */
+.next-group {
+	margin: 0;
+	padding: var(--space-2) 0 var(--space-1);
+	font-size: 0.875rem;
+	font-weight: 600;
+	line-height: 1.25rem;
+	color: var(--text-muted);
+	overflow-wrap: anywhere;
+}
+
 .next-list {
+	margin: 0;
 	display: grid;
 	align-content: start;
 	gap: var(--space-1);

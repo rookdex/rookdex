@@ -33,6 +33,8 @@
 	"hub.foundToday.one": "{count} funnet i dag",
 	"hub.foundToday.other": "{count} funnet i dag",
 	"hub.whatsNext": "Neste",
+	"hub.nextGroup": "{category} · {count} igjen",
+	"hub.nextGroupThen": "Deretter: {category} · {count} igjen",
 	"hub.everythingFound": "Du har funnet alt vi følger så langt.",
 	"hub.latest": "Siste nytt",
 	"hub.allNews": "Alle nyheter",

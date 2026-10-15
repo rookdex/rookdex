@@ -176,20 +176,21 @@ describe("ticking on the hub (dashboard spec §6.1, §7)", () => {
 
 	it("ticks from What's next, announces it, and Undo puts it back with focus on it", async () => {
 		await ready()
-		// Tracker order: the birds group before reptiles.
+		// Tracker order: the birds group before reptiles, then Vehicles fills the third row.
 		expect(
 			within(next())
 				.getAllByRole("checkbox")
 				.map((b) => b.getAttribute("id"))
-		).toEqual(["next-wildlife/pelican", "next-wildlife/american-alligator"])
+		).toEqual(["next-wildlife/pelican", "next-wildlife/american-alligator", "next-vehicles/bike"])
 		fireEvent.click(within(next()).getByRole("checkbox", { name: "American alligator" }))
 		const undo = await screen.findByRole("button", { name: "Undo" })
 		expect(announce).toHaveBeenCalledWith("American alligator marked as found.")
 		await waitFor(() =>
 			expect(within(next()).queryByRole("checkbox", { name: "American alligator" })).toBeNull()
 		)
+		// Focus lands on the row now in the ticked row's place, here the first of the next group.
 		await waitFor(() =>
-			expect(within(next()).getByRole("checkbox", { name: "Pelican" })).toHaveFocus()
+			expect(within(next()).getByRole("checkbox", { name: "Bike" })).toHaveFocus()
 		)
 		fireEvent.click(undo)
 		await waitFor(() =>
@@ -202,14 +203,21 @@ describe("ticking on the hub (dashboard spec §6.1, §7)", () => {
 	it("moves on when the closest category is done, and Undo brings it back", async () => {
 		await seed(["Player 1"], { "wildlife/pelican": NOV_20 })
 		await ready()
+		const titles = () =>
+			within(next())
+				.getAllByRole("heading", { level: 3 })
+				.map((h) => h.textContent)
+		expect(titles()).toEqual(["Wildlife · 1 left", "Then: Vehicles · 1 left"])
 		fireEvent.click(within(next()).getByRole("checkbox", { name: "American alligator" }))
 		const bike = await within(next()).findByRole("checkbox", { name: "Bike" })
 		await waitFor(() => expect(bike).toHaveFocus())
+		await waitFor(() => expect(titles()).toEqual(["Vehicles · 1 left"]))
 		expect(screen.getByText("Closest: Vehicles")).toBeInTheDocument()
 		fireEvent.click(screen.getByRole("button", { name: "Undo" }))
 		await waitFor(() =>
 			expect(within(next()).getByRole("checkbox", { name: "American alligator" })).toHaveFocus()
 		)
+		expect(titles()).toEqual(["Wildlife · 1 left", "Then: Vehicles · 1 left"])
 		expect(screen.getByText("Closest: Wildlife")).toBeInTheDocument()
 	})
 

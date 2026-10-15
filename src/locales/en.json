@@ -33,6 +33,8 @@
 	"hub.foundToday.one": "{count} found today",
 	"hub.foundToday.other": "{count} found today",
 	"hub.whatsNext": "What's next",
+	"hub.nextGroup": "{category} · {count} left",
+	"hub.nextGroupThen": "Then: {category} · {count} left",
 	"hub.everythingFound": "You've found everything tracked so far.",
 	"hub.latest": "Latest",
 	"hub.allNews": "All news",

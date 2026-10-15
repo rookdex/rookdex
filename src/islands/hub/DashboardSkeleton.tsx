@@ -36,11 +36,13 @@ export function DashboardSkeleton({ categoryCount, t }: Props) {
 			<p className="tracker-alert" />
 			<section className="whats-next" aria-hidden="true">
 				<h2>{t("hub.whatsNext")}</h2>
-				<ul className="next-list">
-					{keys("row", NEXT_LIMIT).map((key) => (
-						<li key={key} className="next-row skeleton" />
-					))}
-				</ul>
+				<div className="next-groups">
+					<ul className="next-list">
+						{keys("row", NEXT_LIMIT).map((key) => (
+							<li key={key} className="next-row skeleton" />
+						))}
+					</ul>
+				</div>
 			</section>
 			<section className="dash-progress" aria-hidden="true">
 				<h2>{t("tracker.progress")}</h2>

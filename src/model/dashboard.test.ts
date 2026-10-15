@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { closestCategory, foundToday, latestRumours, whatsNext } from "./dashboard"
+import { closestCategory, foundToday, latestRumours, nextGroups, rankCategories } from "./dashboard"
 import type { ProgressRecord, Rumour, SeedItem } from "./schema"
 import type { Records } from "./stats"
 
@@ -70,7 +70,29 @@ describe("closestCategory", () => {
 	})
 })
 
-describe("whatsNext", () => {
+describe("rankCategories", () => {
+	it("puts wildlife first, then category order, when nothing is found", () => {
+		expect(rankCategories(items, {})).toEqual(["wildlife", "collectibles", "vehicles"])
+	})
+	it("ranks by share found, ties in category order, and drops finished categories", () => {
+		const r = records({
+			"collectibles/a": "2026-11-20T10:00:00Z",
+			"collectibles/b": "2026-11-20T10:00:00Z",
+			"vehicles/c": "2026-11-20T10:00:00Z",
+		})
+		expect(rankCategories(items, r)).toEqual(["vehicles", "wildlife"])
+	})
+	it("agrees with closestCategory on its first entry", () => {
+		const cases: Records[] = [
+			{},
+			records({ "vehicles/c": "2026-11-20T10:00:00Z" }),
+			records({ "collectibles/a": "2026-11-20T10:00:00Z", "wildlife/e": "2026-11-20T10:00:00Z" }),
+		]
+		for (const r of cases) expect(rankCategories(items, r)[0]).toBe(closestCategory(items, r))
+	})
+})
+
+describe("nextGroups", () => {
 	const birds = [
 		item("wildlife/pelican", "birds"),
 		item("wildlife/egret", "birds"),
@@ -78,17 +100,44 @@ describe("whatsNext", () => {
 		item("wildlife/dodo", "birds", { retired: true }),
 		item("vehicles/bike", "bikes"),
 	]
-	it("lists unfound items of the category in tracker order, up to the limit", () => {
-		expect(whatsNext(birds, {}, "wildlife", 3).map((i) => i.name)).toEqual([
-			"egret",
-			"pelican",
-			"alligator",
+	const names = (groups: ReturnType<typeof nextGroups>) =>
+		groups.map((g) => [g.category, g.left, g.items.map((i) => i.name)])
+
+	it("lists unfound items of the closest category in tracker order, up to the limit", () => {
+		expect(names(nextGroups(birds, {}, 3))).toEqual([
+			["wildlife", 3, ["egret", "pelican", "alligator"]],
 		])
-		expect(whatsNext(birds, {}, "wildlife", 2)).toHaveLength(2)
 	})
-	it("skips found and retired items", () => {
+	it("counts every unfound item in left, not only the ones shown", () => {
+		expect(names(nextGroups(birds, {}, 2))).toEqual([["wildlife", 3, ["egret", "pelican"]]])
+	})
+	it("skips found and retired items and fills from the next-closest category", () => {
 		const r = records({ "wildlife/egret": "2026-11-20T10:00:00Z" })
-		expect(whatsNext(birds, r, "wildlife", 3).map((i) => i.name)).toEqual(["pelican", "alligator"])
+		expect(names(nextGroups(birds, r, 3))).toEqual([
+			["wildlife", 2, ["pelican", "alligator"]],
+			["vehicles", 1, ["bike"]],
+		])
+	})
+	it("fills from the next category when the closest has one left", () => {
+		const r = records({ "collectibles/a": "2026-11-20T10:00:00Z" })
+		expect(names(nextGroups(items, r, 3))).toEqual([
+			["collectibles", 1, ["b"]],
+			["vehicles", 2, ["c", "d"]],
+		])
+	})
+	it("draws from at most two categories, even with room left", () => {
+		const r = records({
+			"collectibles/a": "2026-11-20T10:00:00Z",
+			"vehicles/c": "2026-11-20T10:00:00Z",
+		})
+		expect(names(nextGroups(items, r, 3))).toEqual([
+			["collectibles", 1, ["b"]],
+			["vehicles", 1, ["d"]],
+		])
+	})
+	it("is empty when everything is found", () => {
+		const all = Object.fromEntries(items.map((i) => [i.id, "2026-11-20T10:00:00Z"]))
+		expect(nextGroups(items, records(all), 3)).toEqual([])
 	})
 })
 

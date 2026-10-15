@@ -1,4 +1,4 @@
-import { type ReactNode, type RefObject, useEffect, useRef, useState } from "react"
+import { Fragment, type ReactNode, type RefObject, useEffect, useRef, useState } from "react"
 import type { Translate } from "../../i18n"
 import type { SeedItem } from "../../model/schema"
 
@@ -9,9 +9,16 @@ export const LOCK_MS = 400
 
 export const nextBoxId = (itemId: string) => `next-${itemId}`
 
-interface Props {
-	/** Up to three unfound items of the closest category, fresh from the model. */
+/** One titled group of rows. */
+export interface ShownGroup {
+	category: string
+	title: string
 	items: SeedItem[]
+}
+
+interface Props {
+	/** Up to three unfound items in at most two titled groups, fresh from the model. */
+	groups: ShownGroup[]
 	disabled: boolean
 	/** Resolves true when the tick was saved. */
 	onTick: (id: string) => Promise<boolean>
@@ -26,21 +33,23 @@ interface Props {
 const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms))
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
-export function WhatsNext({ items, disabled, onTick, t, zoneRef, headingRef, children }: Props) {
-	// While a tick is saving and sliding out, the rows on screen stay as they were.
-	const [held, setHeld] = useState<SeedItem[] | null>(null)
+export function WhatsNext({ groups, disabled, onTick, t, zoneRef, headingRef, children }: Props) {
+	// While a tick is saving and sliding out, the groups on screen stay as they were.
+	const [held, setHeld] = useState<ShownGroup[] | null>(null)
 	const [pending, setPending] = useState<string | null>(null)
 	const [leaving, setLeaving] = useState<string | null>(null)
 	const [entering, setEntering] = useState<string | null>(null)
 	const busy = useRef(false)
 	const focusAt = useRef<number | null>(null)
-	const shown = useRef(items.map((item) => item.id))
-	const rows = held ?? items
+	const live = groups.flatMap((g) => g.items)
+	const shown = useRef(live.map((item) => item.id))
+	const showing = held ?? groups
+	const rows = showing.flatMap((g) => g.items)
 
 	async function tick(id: string, index: number) {
 		if (busy.current) return
 		busy.current = true
-		setHeld(items)
+		setHeld(groups)
 		setPending(id)
 		const saved = await onTick(id)
 		setPending(null)
@@ -66,11 +75,11 @@ export function WhatsNext({ items, disabled, onTick, t, zoneRef, headingRef, chi
 	// slides.
 	useEffect(() => {
 		if (held) return
-		const ids = items.map((item) => item.id)
+		const ids = groups.flatMap((g) => g.items.map((item) => item.id))
 		const fresh = ids.filter((id) => !shown.current.includes(id))
 		shown.current = ids
 		if (fresh.length === 1 && !reducedMotion()) setEntering(fresh[0])
-	}, [items, held])
+	}, [groups, held])
 
 	// After a tick: the row now in the ticked one's place, else the last row, else the heading.
 	useEffect(() => {
@@ -91,26 +100,41 @@ export function WhatsNext({ items, disabled, onTick, t, zoneRef, headingRef, chi
 			{rows.length === 0 ? (
 				<p className="next-done">{t("hub.everythingFound")}</p>
 			) : (
-				<ul className="next-list" aria-labelledby="next-heading">
-					{rows.map((item, index) => (
-						<li
-							key={item.id}
-							className="next-row"
-							data-leaving={item.id === leaving || undefined}
-							data-entering={item.id === entering || undefined}
-							onAnimationEnd={() => setEntering(null)}
-						>
-							<input
-								id={nextBoxId(item.id)}
-								type="checkbox"
-								checked={item.id === pending || item.id === leaving}
-								disabled={disabled}
-								onChange={() => tick(item.id, index)}
-							/>
-							<label htmlFor={nextBoxId(item.id)}>{item.name}</label>
-						</li>
-					))}
-				</ul>
+				<div className="next-groups">
+					{showing.map((group, groupIndex) => {
+						// Each row's place in the flat list, so focus after a tick can cross groups.
+						const offset = showing
+							.slice(0, groupIndex)
+							.reduce((sum, earlier) => sum + earlier.items.length, 0)
+						return (
+							<Fragment key={group.category}>
+								<h3 id={`next-group-${group.category}`} className="next-group">
+									{group.title}
+								</h3>
+								<ul className="next-list" aria-labelledby={`next-group-${group.category}`}>
+									{group.items.map((item, index) => (
+										<li
+											key={item.id}
+											className="next-row"
+											data-leaving={item.id === leaving || undefined}
+											data-entering={item.id === entering || undefined}
+											onAnimationEnd={() => setEntering(null)}
+										>
+											<input
+												id={nextBoxId(item.id)}
+												type="checkbox"
+												checked={item.id === pending || item.id === leaving}
+												disabled={disabled}
+												onChange={() => tick(item.id, offset + index)}
+											/>
+											<label htmlFor={nextBoxId(item.id)}>{item.name}</label>
+										</li>
+									))}
+								</ul>
+							</Fragment>
+						)
+					})}
+				</div>
 			)}
 			{children}
 		</section>
