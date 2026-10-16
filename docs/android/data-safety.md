@@ -6,7 +6,7 @@ Play Console, Policy, App content, Data safety. The answers rest on the privacy 
 
 | Question | Answer | Why |
 |---|---|---|
-| Does your app collect or share any of the required user data types? | **No** | Everything Rookdex stores stays on the device: profiles and ticks in IndexedDB, the active profile, language and three "already seen" flags in localStorage, and the service worker cache. Nothing is sent anywhere. No account, no cookies, no analytics, no ads, no SDKs. |
+| Does your app collect or share any of the required user data types? | **No** | Everything Rookdex stores stays on the device: profiles and ticks in IndexedDB, the active profile, language and two "already seen" flags in localStorage, an "update later" choice in sessionStorage, and the service worker cache. Nothing is sent anywhere. No account, no cookies, no analytics, no ads, no SDKs. |
 
 Answering No skips the encryption, deletion and per-data-type questions. Play then shows "No data collected" and "No data shared with third parties".
 

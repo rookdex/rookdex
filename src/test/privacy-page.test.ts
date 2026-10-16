@@ -91,7 +91,7 @@ describe("Privacy page (Android spec §3)", () => {
 		const items = [...doc.querySelectorAll('section[aria-labelledby="privacy-stored"] li')]
 		expect(items.map((li) => li.textContent)).toEqual([
 			"Your profiles and what you have ticked off (IndexedDB).",
-			'Which profile is active, the language you picked, and three notes that a message was already shown: the install prompt, the storage hint and "update later" (localStorage).',
+			'Which profile is active, the language you picked, and two notes that a message was already shown: the install prompt and the storage hint (localStorage). If you choose "update later", that is kept only until you close the tab (sessionStorage).',
 			"An offline copy of the site, so it works without a network (the service worker cache).",
 		])
 	})
@@ -105,6 +105,19 @@ describe("Privacy page (Android spec §3)", () => {
 			expect(section?.textContent).toContain(t("settings.deleteAll"))
 			expect(section?.querySelector("a")?.getAttribute("href")).toBe(
 				`/${locale}/settings/#settings-data`
+			)
+		}
+	)
+
+	it.each(["en", "nb"] as const)(
+		"says uninstalling the app keeps the data in %s",
+		async (locale) => {
+			const doc = await page(locale)
+			const section = doc.querySelector('section[aria-labelledby="privacy-delete"]')
+			expect(section?.textContent).toContain(
+				locale === "en"
+					? "Uninstalling the Android app does not do this"
+					: "Å avinstallere Android-appen gjør ikke dette"
 			)
 		}
 	)

@@ -40,12 +40,12 @@ GTA VI launches Thursday 19 November 2026. A new personal Play account needs a c
 
 Content, in this order (checked against the code on 2026-10-16):
 
-1. **What Rookdex stores, on your device only.** Profiles and progress (IndexedDB). The active profile, the language choice and three "already seen" flags: the install prompt, the storage hint and "update later" (`localStorage`). An offline copy of the site (the service worker cache).
+1. **What Rookdex stores, on your device only.** Profiles and progress (IndexedDB). The active profile, the language choice and two "already seen" flags: the install prompt and the storage hint (`localStorage`). "Update later" lasts until the tab closes (`sessionStorage`). An offline copy of the site (the service worker cache).
 2. **What leaves your device: nothing.** No account, no cookies, no analytics, no ads, no trackers. Fonts are self-hosted.
 3. **Hosting.** Cloudflare serves the site. Like any web host, it sees your IP address to deliver the pages. Rookdex runs no server code and keeps no logs (`wrangler.jsonc` serves static assets only). Production was checked on 2026-10-16: no cookies, and no Cloudflare analytics beacon injected. Link to Cloudflare's privacy policy through `ExternalLink`; the Norwegian copy notes that the page is in English.
 4. **Links to other sites.** Sources and the GitHub link go to other sites; their own policies apply there.
 5. **The Android app.** It is this website opened through Chrome, so everything above applies, plus Chrome's own policy.
-6. **Delete your data.** Settings, then "Delete all data on this device". Uninstalling the app or clearing the site's data does the same.
+6. **Delete your data.** Settings, then "Delete all data on this device", which keeps the install and storage-hint notes. Clearing the site's data removes everything. Uninstalling the app does not, because the data lives in the browser.
 7. **Who runs Rookdex, contact and changes.** "Rookdex is run by Malin Fossum in Norway." Contact `legal@rookdex.app`. No postal address. If Rookdex ever stores anything off your device (phase 2 accounts), this page changes before that ships.
 
 Play wants the policy to name the developer on the listing ("Rookdex") and give a privacy contact. GDPR Art. 13 also wants the controller named, because Cloudflare processes visitor IP addresses on my behalf. My name is already public on the Play developer profile, so naming it here costs nothing new.
