@@ -2,6 +2,7 @@
 import ExternalLink from "../../components/ExternalLink.astro"
 import { isLocale, type Locale, locales, translator } from "../../i18n"
 import Base from "../../layouts/Base.astro"
+import { latestRumours } from "../../model/dashboard"
 import { outletOf } from "../../model/outlet"
 import { rumours } from "../../model/seed"
 
@@ -13,6 +14,8 @@ export function getStaticPaths() {
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const { t } = translator(locale as Locale)
+// Newest first, the same order as Latest on the hub (dashboard spec §6.3).
+const ordered = latestRumours(rumours, rumours.length)
 ---
 
 <Base locale={locale} title={t("seo.titles.news")} description={t("news.description")} path="news">
@@ -22,11 +25,11 @@ const { t } = translator(locale as Locale)
 		<section aria-labelledby="rumours">
 			<h2 id="rumours">{t("rumours.title")}</h2>
 			{
-				rumours.length === 0 ? (
+				ordered.length === 0 ? (
 					<p>{t("rumours.empty")}</p>
 				) : (
 					<ul class="rumour-list">
-						{rumours.map((rumour) => {
+						{ordered.map((rumour) => {
 							const press =
 								rumour.sources.find((source) => source.tier === "press") ?? rumour.sources[0]
 							return (

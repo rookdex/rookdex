@@ -2,9 +2,14 @@
 import { getRelativeLocaleUrl } from "astro:i18n"
 import Mark from "../../components/Mark.astro"
 import { isLocale, type Locale, locales, translator } from "../../i18n"
-import { Countdown } from "../../islands/Countdown"
+import { Hub } from "../../islands/hub/Hub"
+import { LATEST_LIMIT } from "../../islands/hub/limits"
 import { InstallPrompt } from "../../islands/InstallPrompt"
 import Base from "../../layouts/Base.astro"
+import { buildNow } from "../../model/build-now"
+import { latestRumours } from "../../model/dashboard"
+import { categoryIds, rumours, seedItems } from "../../model/seed"
+import { countable } from "../../model/stats"
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale } }))
@@ -13,6 +18,14 @@ export function getStaticPaths() {
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const { t } = translator(locale as Locale)
+// Read at build time only; production never sets ROOKDEX_NOW (dashboard spec §6.4, §11).
+const initialNow = buildNow(process.env.ROOKDEX_NOW).toISOString()
+const latest = latestRumours(rumours, LATEST_LIMIT).map(({ id, name, added }) => ({
+	id,
+	name,
+	added,
+}))
+const categoryCount = categoryIds(countable(seedItems)).length
 ---
 
 <Base locale={locale} title={t("seo.titles.home")} description={t("seo.homeDescription")} path="">
@@ -29,12 +42,15 @@ const { t } = translator(locale as Locale)
 		</header>
 		{/* The server-rendered time changes every build; the version hash skips it (precache.mjs). */}
 		<div class="build-stamp" data-build-stamp>
-			<Countdown
+			<Hub
 				client:load
 				locale={locale}
-				initialNow={new Date().toISOString()}
+				initialNow={initialNow}
 				guideHref={getRelativeLocaleUrl(locale, "guides/before-you-start")}
 				trackerHref={getRelativeLocaleUrl(locale, "tracker")}
+				newsHref={getRelativeLocaleUrl(locale, "news")}
+				latest={latest}
+				categoryCount={categoryCount}
 			/>
 		</div>
 	</div>

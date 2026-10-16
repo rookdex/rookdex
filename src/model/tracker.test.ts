@@ -282,3 +282,103 @@ describe("closed (spec §7.2)", () => {
 		expect(tracker.getState().records["wildlife/a"]).toBeUndefined()
 	})
 })
+
+describe("active profile (dashboard spec §5)", () => {
+	/** An in-memory stand-in for the localStorage wrapper. */
+	function memory(initial: string | null = null) {
+		const box = { value: initial }
+		const store = {
+			read: () => box.value,
+			write: vi.fn((id: string) => {
+				box.value = id
+			}),
+		}
+		return { box, store }
+	}
+	/** One database for two trackers, as two page loads would share it. */
+	function shared() {
+		const factory = new IDBFactory()
+		return () => openStore(factory)
+	}
+	/** A clock that moves a second per call, so profiles sort by creation and not by id. */
+	function clock() {
+		let second = 0
+		return () => new Date(Date.UTC(2026, 8, 16, 10, 0, second++))
+	}
+
+	it("reopens the remembered profile", async () => {
+		const open = shared()
+		const { box, store } = memory()
+		const first = make({ openStore: open, activeProfile: store, now: clock() }).tracker
+		await first.init()
+		await first.createProfile("Dad")
+		const dad = first.getState().profileId
+		expect(box.value).toBe(dad)
+
+		const second = make({ openStore: open, activeProfile: store, now: clock() }).tracker
+		await second.init()
+		expect(second.getState().profileId).toBe(dad)
+	})
+
+	it("falls back to the first active profile when the saved id is unknown, and rewrites it", async () => {
+		const { box, store } = memory("gone")
+		const { tracker } = make({ activeProfile: store })
+		await tracker.init()
+		const first = tracker.getState().profiles[0].id
+		expect(tracker.getState().profileId).toBe(first)
+		expect(box.value).toBe(first)
+	})
+
+	it("falls back when the saved profile was deleted, and writes the delete fallback", async () => {
+		const open = shared()
+		const { box, store } = memory()
+		const first = make({ openStore: open, activeProfile: store, now: clock() }).tracker
+		await first.init()
+		const player1 = first.getState().profileId
+		await first.createProfile("Dad")
+		const dad = first.getState().profileId
+		await first.deleteProfile(dad)
+		expect(box.value).toBe(player1)
+
+		box.value = dad // as if another tab had saved Dad before the delete
+		const second = make({ openStore: open, activeProfile: store, now: clock() }).tracker
+		await second.init()
+		expect(second.getState().profileId).toBe(player1)
+		expect(box.value).toBe(player1)
+	})
+
+	it("is written on switch and on import into a new profile", async () => {
+		const { box, store } = memory()
+		const { tracker } = make({ activeProfile: store, now: clock() })
+		await tracker.init()
+		const player1 = tracker.getState().profileId
+		await tracker.createProfile("Dad")
+		await tracker.switchProfile(player1)
+		expect(box.value).toBe(player1)
+
+		const { file } = buildExport(
+			{ id: "x", name: "Imported", created_at: "2026-09-16T10:00:00.000Z" },
+			[],
+			now()
+		)
+		const json = JSON.stringify(file)
+		await tracker.readImport({ size: json.length, text: async () => json })
+		await tracker.confirmImport("new")
+		const imported = tracker.getState().profiles.find((p) => p.name === "Imported")
+		expect(tracker.getState().profileId).toBe(imported?.id)
+		expect(box.value).toBe(imported?.id)
+	})
+
+	it("opens the first profile, as before, when storage reads nothing and writes nowhere", async () => {
+		const open = shared()
+		const blocked = { read: () => null, write: () => {} }
+		const first = make({ openStore: open, activeProfile: blocked, now: clock() }).tracker
+		await first.init()
+		const player1 = first.getState().profileId
+		await first.createProfile("Dad")
+
+		const second = make({ openStore: open, activeProfile: blocked, now: clock() }).tracker
+		await second.init()
+		expect(second.getState().profileId).toBe(player1)
+	})
+})

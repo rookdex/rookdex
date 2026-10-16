@@ -72,4 +72,45 @@ describe("ProfileMenu", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Profile: Player 1" }))
 		expect(await axe(container)).toHaveNoViolations()
 	})
+
+	it("in switch mode lists only the profiles and the manage link (dashboard spec §4)", async () => {
+		const onSwitch = vi.fn()
+		const { container } = render(
+			<ProfileMenu
+				profiles={profiles}
+				current={profiles[0]}
+				onSwitch={onSwitch}
+				manageHref="/en/tracker/"
+				t={translator("en").t}
+			/>
+		)
+		fireEvent.click(screen.getByRole("button", { name: "Profile: Player 1" }))
+		expect(screen.getAllByRole("menuitemradio").map((item) => item.textContent)).toEqual([
+			"Player 1",
+			"Dad",
+		])
+		const manage = screen.getByRole("menuitem", { name: "Manage profiles" })
+		expect(manage).toHaveAttribute("href", "/en/tracker/")
+		expect(screen.getAllByRole("menuitem")).toHaveLength(1)
+		// Arrow keys reach the link like any other item.
+		fireEvent.keyDown(screen.getByRole("menu"), { key: "ArrowUp" })
+		expect(manage).toHaveFocus()
+		fireEvent.click(screen.getByRole("menuitemradio", { name: "Dad" }))
+		expect(onSwitch).toHaveBeenCalledWith("p2")
+		fireEvent.click(screen.getByRole("button", { name: "Profile: Player 1" }))
+		expect(await axe(container)).toHaveNoViolations()
+	})
+
+	it("with no actions and no manage link, draws no separator", () => {
+		render(
+			<ProfileMenu
+				profiles={profiles}
+				current={profiles[0]}
+				onSwitch={vi.fn()}
+				t={translator("en").t}
+			/>
+		)
+		fireEvent.click(screen.getByRole("button", { name: "Profile: Player 1" }))
+		expect(screen.getByRole("menu").querySelector("hr")).toBeNull()
+	})
 })

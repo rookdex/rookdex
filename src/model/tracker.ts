@@ -32,6 +32,12 @@ export interface Announcement {
 	total: number
 }
 
+/** Where the active profile id is remembered between pages (dashboard spec §5). Must never throw. */
+export interface ActiveProfileStore {
+	read(): string | null
+	write(id: string): void
+}
+
 export interface TrackerState {
 	status: Status
 	error?: TrackerError
@@ -56,6 +62,8 @@ export interface TrackerDeps {
 	persist?: () => Promise<boolean>
 	installed?: boolean
 	hintSeen?: boolean
+	/** Remembers the active profile across pages and reloads. Leave undefined to always open the first. */
+	activeProfile?: ActiveProfileStore
 }
 
 export interface ImportFileLike {
@@ -173,6 +181,16 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		}
 	}
 
+	/** Shows `profile` and remembers it, so the next page or reload opens the same one. */
+	async function show(
+		db: Store,
+		profile: Profile,
+		extra: Partial<TrackerState> = {}
+	): Promise<void> {
+		set({ ...(await profilePatch(db, profile)), ...extra })
+		deps.activeProfile?.write(profile.id)
+	}
+
 	// Spec §5: persistence is always requested on the player's first write; the hint about it
 	// is shown only in the browser tab, and only once.
 	function requestPersist(): void {
@@ -213,7 +231,13 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			const db = await deps.openStore()
 			store = db
 			await purgeDeleted(db, now())
-			const profile = await ensureActiveProfile(db, deps.defaultProfileName, now(), deps.newId)
+			// The remembered profile when it still exists; otherwise the first active one, written back.
+			const saved = deps.activeProfile?.read() ?? null
+			const remembered = saved
+				? (await listProfiles(db)).find((p) => p.id === saved && !p.deleted_at)
+				: undefined
+			const profile =
+				remembered ?? (await ensureActiveProfile(db, deps.defaultProfileName, now(), deps.newId))
 			// Armed after the silent default-profile write: the persistence request (and Firefox's
 			// prompt for it) follows the first write the player makes.
 			db.onFirstWrite(requestPersist)
@@ -222,6 +246,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 				fail("closed")
 			})
 			set({ ...(await profilePatch(db, profile)), status: "ready" })
+			if (profile.id !== saved) deps.activeProfile?.write(profile.id)
 		} catch {
 			set({ status: "error" })
 		}
@@ -250,14 +275,14 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			guard(async () => {
 				const db = ready()
 				const profile = (await listProfiles(db)).find((p) => p.id === id && !p.deleted_at)
-				if (profile) set(await profilePatch(db, profile))
+				if (profile) await show(db, profile)
 			}),
 		createProfile: (name) =>
 			once(async () => {
 				if (!validName(name)) return fail("name")
 				const db = ready()
 				const profile = await createProfileRecord(db, name, now(), deps.newId)
-				set(await profilePatch(db, profile))
+				await show(db, profile)
 			}),
 		renameProfile: (id, name) =>
 			guard(async () => {
@@ -275,7 +300,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 					return
 				}
 				const next = await ensureActiveProfile(db, deps.defaultProfileName, now(), deps.newId)
-				set(await profilePatch(db, next))
+				await show(db, next)
 			}),
 		restoreProfile: (id) =>
 			guard(async () => {
@@ -312,7 +337,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 				if (target === "new") {
 					const profile = await createProfileRecord(db, file.profile_name, now(), deps.newId)
 					await importRecords(db, profile.id, file)
-					set({ ...(await profilePatch(db, profile)), pendingImport: undefined })
+					await show(db, profile, { pendingImport: undefined })
 					return
 				}
 				const profileId = state.profileId

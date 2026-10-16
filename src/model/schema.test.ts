@@ -81,6 +81,7 @@ describe("rumourInputSchema", () => {
 			name: "Stock market",
 			claim_key: "stock-market",
 			summary: "A returning stock market has been reported.",
+			added: "2026-09-18",
 			sources: [{ url: "https://www.ign.com/articles/x", title: "IGN report" }],
 		}
 		expect(rumourInputSchema.safeParse(rumour).success).toBe(true)

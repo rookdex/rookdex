@@ -1,5 +1,5 @@
 // Launch timing rules. Pure functions: no DOM, no timers, no Date.now().
-// The Countdown island's hook is the only caller.
+// The hub's clock hook, the tracker's Progress link and the footer countdown call these.
 
 const DAY_MS = 86_400_000
 

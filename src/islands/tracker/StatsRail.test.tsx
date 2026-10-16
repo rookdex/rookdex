@@ -17,6 +17,33 @@ const gator: SeedItem = {
 }
 
 describe("StatsRail", () => {
+	it("links the Progress heading to the hub when given hubHref (dashboard spec §4)", () => {
+		render(
+			<StatsRail
+				overall={{ done: 0, total: 0 }}
+				categories={[]}
+				recent={[]}
+				hubHref="/en/"
+				t={translator("en").t}
+			/>
+		)
+		const link = screen.getByRole("link", { name: "Progress" })
+		expect(link).toHaveAttribute("href", "/en/")
+		expect(screen.getByRole("heading", { name: "Progress" })).toContainElement(link)
+	})
+
+	it("keeps the Progress heading plain without hubHref", () => {
+		render(
+			<StatsRail
+				overall={{ done: 0, total: 0 }}
+				categories={[]}
+				recent={[]}
+				t={translator("en").t}
+			/>
+		)
+		expect(screen.queryByRole("link", { name: "Progress" })).toBeNull()
+	})
+
 	it("renders labelled progress bars with visible counts", () => {
 		render(
 			<StatsRail
