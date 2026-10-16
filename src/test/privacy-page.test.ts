@@ -23,7 +23,9 @@ async function axeViolations(html: string): Promise<string[]> {
 	})
 	window.eval(axeSource)
 	const axe = (window as unknown as { axe: Axe }).axe
-	const results = await axe.run(window.document, { rules: { "color-contrast": { enabled: false } } })
+	const results = await axe.run(window.document, {
+		rules: { "color-contrast": { enabled: false } },
+	})
 	return results.violations.map((v) => v.id)
 }
 
@@ -43,16 +45,19 @@ describe("Privacy page (Android spec §3)", () => {
 		expect(nb.querySelector("h1")?.textContent).toBe("Personvernerklæring")
 	})
 
-	it.each(["en", "nb"] as const)("names the legal basis, processor and right to complain in %s", async (locale) => {
-		const { t } = translator(locale)
-		const doc = await page(locale)
-		expect(doc.querySelector('section[aria-labelledby="privacy-hosting"]')?.textContent).toContain(
-			t("privacy.hostingBasis")
-		)
-		expect(doc.querySelector('section[aria-labelledby="privacy-who"]')?.textContent).toContain(
-			t("privacy.rights")
-		)
-	})
+	it.each(["en", "nb"] as const)(
+		"names the legal basis, processor and right to complain in %s",
+		async (locale) => {
+			const { t } = translator(locale)
+			const doc = await page(locale)
+			expect(
+				doc.querySelector('section[aria-labelledby="privacy-hosting"]')?.textContent
+			).toContain(t("privacy.hostingBasis"))
+			expect(doc.querySelector('section[aria-labelledby="privacy-who"]')?.textContent).toContain(
+				t("privacy.rights")
+			)
+		}
+	)
 
 	it.each(["en", "nb"] as const)("has the seven sections in order in %s", async (locale) => {
 		const { t } = translator(locale)
@@ -113,9 +118,9 @@ describe("Privacy page (Android spec §3)", () => {
 			"https://www.cloudflare.com/privacypolicy/",
 			"https://www.google.com/chrome/privacy/",
 		])
-		expect(text(doc.querySelector('a[href="https://www.cloudflare.com/privacypolicy/"]'))).toContain(
-			"(på engelsk)"
-		)
+		expect(
+			text(doc.querySelector('a[href="https://www.cloudflare.com/privacypolicy/"]'))
+		).toContain("(på engelsk)")
 	})
 
 	it("names who runs Rookdex and gives the contact address", async () => {
@@ -136,7 +141,9 @@ describe("Privacy page (Android spec §3)", () => {
 
 	it("uses an axe harness that can go red", async () => {
 		expect(
-			await axeViolations('<!doctype html><html lang="en"><title>x</title><main><img src="a.png"></main></html>')
+			await axeViolations(
+				'<!doctype html><html lang="en"><title>x</title><main><img src="a.png"></main></html>'
+			)
 		).toContain("image-alt")
 	})
 })

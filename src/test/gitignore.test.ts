@@ -15,12 +15,17 @@ function ignored(path: string): boolean {
 }
 
 describe("signing key guard (Android spec §6 step 3)", () => {
-	it.each(["x.keystore", "x.jks", "signing-key-info.txt", "x.aab", "x.apk", "x.idsig", "nested/app/x.aab"])(
-		"refuses %s",
-		(path) => {
-			expect(ignored(path)).toBe(true)
-		}
-	)
+	it.each([
+		"x.keystore",
+		"x.jks",
+		"signing-key-info.txt",
+		"x.aab",
+		"x.apk",
+		"x.idsig",
+		"nested/app/x.aab",
+	])("refuses %s", (path) => {
+		expect(ignored(path)).toBe(true)
+	})
 
 	it("still tracks an ordinary file, so the guard can go red", () => {
 		expect(ignored("x.json")).toBe(false)
