@@ -277,7 +277,10 @@ describe("ticking on the hub (dashboard spec §6.1, §7)", () => {
 			await screen.findByText("Saving failed. Your browser may be blocking storage.")
 		).toBeInTheDocument()
 		expect(screen.queryByRole("button", { name: "Undo" })).toBeNull()
-		expect(within(next()).getByRole("checkbox", { name: "Pelican" })).not.toBeChecked()
+		// The error renders before What's next lets go of the checkbox, one render later.
+		await waitFor(() =>
+			expect(within(next()).getByRole("checkbox", { name: "Pelican" })).not.toBeChecked()
+		)
 	})
 
 	it("leaves the item ticked and shows the error in the toast when Undo fails", async () => {
