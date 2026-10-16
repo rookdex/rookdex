@@ -233,7 +233,7 @@ Budget: 8 hours a week, roughly 55 hours before the freeze. Fallback if 1c runs 
 
 ## 13. Open questions
 
-1. ~~Brand name~~ Decided 2026-09-09: Rookdex. Remaining: trademark screen (nearby marks: Hasbro ROOK card game, rook.io storage project) before the Play Store listing in phase 2.
+1. ~~Brand name~~ Decided 2026-09-09: Rookdex. ~~Trademark screen~~ Done 2026-10-16: clear, see `2026-10-16-rookdex-android-design.md` §9.
 2. Which YouTube channels and forums make the initial allowlist.
 3. Whether the phase 2 sync API is a Cloudflare Worker or an ASP.NET Core service on Azure (career value versus cost). Decided in January.
 4. Whether to add ads at all. Pro plus Ko-fi may be enough; the decision waits for real traffic numbers.
