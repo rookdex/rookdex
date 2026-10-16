@@ -162,6 +162,8 @@
 	"settings.no": "No",
 	"settings.transfer": "Export or import",
 	"settings.transferLink": "Profile menu in Tracker",
+	"settings.privacy": "Privacy",
+	"settings.privacyLink": "Privacy policy",
 	"settings.dangerBody": "Removes every profile, all progress and your language choice on this device. It can't be undone. Export first if you want a copy.",
 	"settings.deleteAll": "Delete all data on this device",
 	"settings.dialogTitle": "Delete all data on this device?",

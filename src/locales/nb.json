@@ -162,6 +162,8 @@
 	"settings.no": "Nei",
 	"settings.transfer": "Eksport eller import",
 	"settings.transferLink": "Profilmenyen i Oversikt",
+	"settings.privacy": "Personvern",
+	"settings.privacyLink": "Personvernerklæring",
 	"settings.dangerBody": "Fjerner alle profiler, all fremgang og språkvalget ditt på denne enheten. Det kan ikke angres. Eksporter først hvis du vil ha en kopi.",
 	"settings.deleteAll": "Slett alle data på denne enheten",
 	"settings.dialogTitle": "Slette alle data på denne enheten?",
