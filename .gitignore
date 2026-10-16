@@ -16,3 +16,12 @@ dist/
 # Lighthouse CI output (lighthouserc.json)
 .lighthouseci/
 lighthouse-report/
+
+# Android signing key and app bundles (Android spec §6 step 3). The key lives in my password
+# manager and one offline copy, never in the repo.
+*.keystore
+*.jks
+signing-key-info.txt
+*.aab
+*.apk
+*.idsig
