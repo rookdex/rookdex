@@ -26,14 +26,20 @@ describe("copy rules (spec §9)", () => {
 })
 
 describe("soft hyphens (spec §5, §11)", () => {
-	it("appear only in the Norwegian Settings tab label", () => {
+	it("appear only in the Norwegian Settings tab label and the privacy heading", () => {
 		const withShy = all.filter(([, text]) => text.includes("\u00ad")).map(([path]) => path)
-		expect(withShy).toEqual(["nb.nav.settings"])
+		expect(withShy).toEqual(["nb.nav.settings", "nb.privacy.title"])
 	})
 
 	it("leave the page title whole", () => {
 		expect(nb["settings.title"]).toBe("Innstillinger")
 		expect(nb["nav.settings"].replace("\u00ad", "")).toBe(nb["settings.title"])
+	})
+
+	it("break the Norwegian privacy heading at its joint, never the search title", () => {
+		// "Personvernerklæring" is wider than a 320 px phone at h1 size (Android spec §3).
+		expect(nb["privacy.title"]).toBe("Personvern\u00aderklæring")
+		expect(nb["seo.titles.privacy"]).toBe("Personvernerklæring · Rookdex")
 	})
 })
 

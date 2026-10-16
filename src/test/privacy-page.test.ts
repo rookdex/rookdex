@@ -42,7 +42,7 @@ describe("Privacy page (Android spec §3)", () => {
 		expect((await page("en")).title).toBe("Privacy policy · Rookdex")
 		const nb = await page("nb")
 		expect(nb.title).toBe("Personvernerklæring · Rookdex")
-		expect(nb.querySelector("h1")?.textContent).toBe("Personvernerklæring")
+		expect(nb.querySelector("h1")?.textContent).toBe("Personvern\u00aderklæring")
 	})
 
 	it.each(["en", "nb"] as const)(
