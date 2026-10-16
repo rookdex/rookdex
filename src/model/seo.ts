@@ -27,6 +27,7 @@ export function indexablePaths(guideSlugs: string[]): string[] {
 		"tracker",
 		"tracker/sources",
 		"news",
+		"privacy",
 		...validSlugs(guideSlugs).map((slug) => `guides/${slug}`),
 	]
 }

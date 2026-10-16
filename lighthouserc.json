@@ -6,7 +6,8 @@
 				"http://localhost/en/",
 				"http://localhost/nb/",
 				"http://localhost/en/tracker/",
-				"http://localhost/en/guides/before-you-start/"
+				"http://localhost/en/guides/before-you-start/",
+				"http://localhost/en/privacy/"
 			],
 			"numberOfRuns": 3
 		},
