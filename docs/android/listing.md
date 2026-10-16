@@ -73,7 +73,7 @@ Appen er nettstedet rookdex.app i en app. Koden er åpen på GitHub under MIT-li
 
 | Asset | File | Play's rule |
 |---|---|---|
-| App icon | `public/pwa-512x512.png` | 512 × 512, 32-bit PNG |
+| App icon | `docs/android/icon-512.png` | 512 × 512, 32-bit PNG, full square (Play rounds it) |
 | Feature graphic | `docs/android/feature-graphic.jpg` | 1024 × 500, JPEG or 24-bit PNG |
 | Phone screenshots, English | `docs/android/screenshots/en-*.png` | 2 to 8, 1080 × 1920 |
 | Phone screenshots, Norwegian | `docs/android/screenshots/nb-*.png` | 2 to 8, 1080 × 1920 |
