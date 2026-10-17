@@ -59,6 +59,29 @@ describe("Privacy page (Android spec §3)", () => {
 		}
 	)
 
+	it.each(["en", "nb"] as const)(
+		"states the right to object in its own paragraph under Hosting in %s (GDPR Art. 21(4))",
+		async (locale) => {
+			const { t } = translator(locale)
+			const doc = await page(locale)
+			const paragraphs = [
+				...doc.querySelectorAll('section[aria-labelledby="privacy-hosting"] p'),
+			].map((p) => text(p))
+			expect(paragraphs).toContain(t("privacy.object"))
+		}
+	)
+
+	it.each(["en", "nb"] as const)(
+		"does not claim the Android app always opens in Chrome in %s",
+		async (locale) => {
+			const { t } = translator(locale)
+			const doc = await page(locale)
+			const body = text(doc.querySelector('section[aria-labelledby="privacy-android"] p'))
+			expect(body).toBe(t("privacy.androidBody"))
+			expect(body).not.toMatch(/(through|gjennom) Chrome/)
+		}
+	)
+
 	it.each(["en", "nb"] as const)("has the seven sections in order in %s", async (locale) => {
 		const { t } = translator(locale)
 		const doc = await page(locale)
