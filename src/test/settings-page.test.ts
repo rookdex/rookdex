@@ -50,6 +50,21 @@ describe("Settings page (spec §7)", () => {
 		expect(link?.getAttribute("href")).toBe("/en/tracker/")
 	})
 
+	it.each(["en", "nb"] as const)(
+		"ends Your data with a link to the privacy page in %s",
+		async (locale) => {
+			const doc = await settings(locale)
+			const rows = [...doc.querySelectorAll('section[aria-labelledby="settings-data"] dl > .row')]
+			const last = rows.at(-1)
+			expect(last?.querySelector("dt")?.textContent).toBe(
+				locale === "en" ? "Privacy" : "Personvern"
+			)
+			const link = last?.querySelector("dd a")
+			expect(link?.textContent).toBe(locale === "en" ? "Privacy policy" : "Personvernerklæring")
+			expect(link?.getAttribute("href")).toBe(`/${locale}/privacy/`)
+		}
+	)
+
 	it("puts Cancel first in the delete dialog, with an alert for its messages", async () => {
 		const doc = await settings("en")
 		const buttons = [...doc.querySelectorAll("dialog button")].map((b) => b.textContent?.trim())

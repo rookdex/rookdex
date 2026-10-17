@@ -1,5 +1,7 @@
 # Rookdex Android (Play Store) Implementation Plan
 
+> **As built (2026-10-17):** PR 1 shipped as #60. The files in the repo are the source of truth: where a code block below differs from them (the privacy copy, which also gained `privacy.object`, and `docs/android/screenshots.mjs`, which now frames each shot and waits on page state), follow the files.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Ship what the repo needs for Rookdex to go on Google Play as a Trusted Web Activity: a privacy page (EN and NB) linked from the footer and Settings, the `docs/android/` pack I paste into Play Console, a signing-key guard in `.gitignore`, and later `assetlinks.json`.
@@ -15,7 +17,7 @@
 - Package name `app.rookdex`. Developer name "Rookdex". Public email `legal@rookdex.app`. Website `https://rookdex.app`.
 - Privacy URLs: `/en/privacy/` and `/nb/privacy/`. One shared slug: no translated slug. Norwegian title and link text say "Personvern".
 - Store category Entertainment. Target audience 18 and over only.
-- No "GTA", "Rockstar" or game art in the app name, icon or graphics. The full description may name the game once, as plain text.
+- No "GTA", "Rockstar" or game art in the app name, icon or feature graphic. The full description may name the game once, as plain text, and screenshots may show the name where the app's own text does.
 - No Ko-fi link, donation link or Pro sale anywhere in this work.
 - The signing key, its passwords and `signing-key-info.txt` are never read, pasted into a chat or shown to an AI tool. Fingerprints come from Play Console only.
 - Copy rules (`src/i18n/copy.test.ts`): no `!`, no "leak"/"lekk*", no "ROOKDEX" in strings, search titles at most 65 characters and containing "Rookdex". `en.json` and `nb.json` keep identical key sets (`src/i18n/bundles.test.ts`).
@@ -319,7 +321,7 @@ Add this block to `src/locales/en.json`, after the last `settings.*` key (keep v
 	"privacy.linksTitle": "Links to other sites",
 	"privacy.linksBody": "Sources, news reports and the GitHub link take you to other sites. Their own privacy policies apply there.",
 	"privacy.androidTitle": "The Android app",
-	"privacy.androidBody": "The Rookdex app on Google Play is this website opened through Chrome. Everything on this page applies to the app, and Chrome's own privacy notice applies to Chrome.",
+	"privacy.androidBody": "The Rookdex app on Google Play is this website, opened in a browser on your phone. That is usually Chrome, but it can be another browser you have set as your default. Everything on this page applies to the app, and the browser's own privacy policy applies to the browser.",
 	"privacy.androidLink": "Chrome's privacy notice",
 	"privacy.deleteTitle": "Delete your data",
 	"privacy.deleteBody": "Go to Settings and choose \"{button}\". Uninstalling the app or clearing this site's data in your browser does the same.",
@@ -352,7 +354,7 @@ And to `src/locales/nb.json`, in the same position:
 	"privacy.linksTitle": "Lenker til andre nettsteder",
 	"privacy.linksBody": "Kilder, nyhetssaker og GitHub-lenken tar deg til andre nettsteder. Der gjelder deres egne personvernerklæringer.",
 	"privacy.androidTitle": "Android-appen",
-	"privacy.androidBody": "Rookdex-appen på Google Play er dette nettstedet åpnet gjennom Chrome. Alt på denne siden gjelder for appen, og Chromes egen personvernerklæring gjelder for Chrome.",
+	"privacy.androidBody": "Rookdex-appen på Google Play er dette nettstedet, åpnet i en nettleser på telefonen. Som regel er det Chrome, men det kan være en annen nettleser du har valgt som standard. Alt på denne siden gjelder for appen, og nettleserens egen personvernerklæring gjelder for nettleseren.",
 	"privacy.androidLink": "Chromes personvernerklæring",
 	"privacy.deleteTitle": "Slett dataene dine",
 	"privacy.deleteBody": "Gå til Innstillinger og velg «{button}». Å avinstallere appen eller slette nettstedets data i nettleseren gjør det samme.",
@@ -940,7 +942,7 @@ Appen er nettstedet rookdex.app i en app. Koden er åpen på GitHub under MIT-li
 
 Upload the screenshots in this order: hub, tracker, news, settings.
 
-The name, icon and graphics carry no "GTA", "Rockstar" or game art. The full description names the game once, to say what Rookdex is for.
+The name, icon and feature graphic carry no "GTA", "Rockstar" or game art. The full description names the game once, to say what Rookdex is for. The screenshots show the app as it is, so the hub names GTA VI and the news headlines say "GTA 6". That is plain text describing the content, with no logo or game art.
 ````
 
 - [ ] **Step 2: Check the description lengths**
@@ -974,7 +976,9 @@ Answering No skips the encryption, deletion and per-data-type questions. Play th
 
 ## If Play asks about the IP address
 
-Cloudflare sees the visitor's IP address to deliver the pages, like any web host. Rookdex runs no server code and keeps no logs (`wrangler.jsonc` serves static assets only). Play's data safety guidance does not count data processed only ephemerally to serve a request as collection, so the answer stays No. If a reviewer disagrees, the fallback is to declare "Approximate location: IP address", collected, not shared, processed ephemerally, required, for app functionality.
+Cloudflare sees the visitor's IP address to deliver the pages, like any web host. Rookdex runs no server code and keeps no logs (`wrangler.jsonc` serves static assets only), so the IP address never reaches me and is used for nothing beyond routing the request. Play asks developers to disclose IP addresses "based on their particular usage and practices", and Rookdex has none, so the answer stays No.
+
+Ephemeral processing is not the reason. Play's guidance says ephemerally processed data still has to be declared in the form; it is only left out of the public listing. If a reviewer disagrees with No, the fallback is to declare "Approximate location: IP address", collected, not shared, processed ephemerally, required, for app functionality. Play then still shows nothing for it on the listing.
 
 ## Account deletion
 

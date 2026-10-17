@@ -15,17 +15,19 @@ describe.each(["en", "nb"] as const)("footer in %s (feedback spec §6)", (locale
 		expect(doc.querySelector(".footer-disclaimer")?.textContent).toBe(t("footer.disclaimer"))
 	})
 
-	it("has three icon links named by hidden text, with hidden tooltips", async () => {
+	it("has four icon links named by hidden text, with hidden tooltips", async () => {
 		const doc = await renderDoc(Footer, { props: { locale } })
 		const icons = [...doc.querySelectorAll(".footer-icons a")]
 		expect(icons.map((a) => a.getAttribute("href"))).toEqual([
 			"https://github.com/rookdex/rookdex",
 			"mailto:legal@rookdex.app",
+			`/${locale}/privacy/`,
 			`/${locale}/settings/#about`,
 		])
 		expect(icons.map(hiddenName)).toEqual([
 			t("footer.github"),
 			t("footer.legal"),
+			t("footer.privacy"),
 			t("footer.about"),
 		])
 		for (const a of icons) {
@@ -39,6 +41,9 @@ describe.each(["en", "nb"] as const)("footer in %s (feedback spec §6)", (locale
 		expect(icons[0].querySelector(".new-tab-note")).not.toBeNull()
 		expect(icons[0].querySelector(".ext-icon")).toBeNull()
 		expect(icons[0].querySelector(".tip")?.textContent).toBe(`${t("footer.github")} ↗`)
+		// Privacy stays on the site.
+		expect(icons[2].hasAttribute("target")).toBe(false)
+		expect(icons[2].querySelector(".tip")?.textContent).toBe(t("footer.privacy"))
 	})
 
 	it("ships the launch date in the status chip, with the live templates beside it", async () => {

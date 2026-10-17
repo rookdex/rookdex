@@ -21,12 +21,13 @@ describe("validSlugs (SEO spec §4.1)", () => {
 })
 
 describe("indexablePaths (SEO spec §4.1)", () => {
-	it("lists home, tracker, its sources, news, then each guide once under guides/", () => {
+	it("lists home, tracker, its sources, news, privacy, then each guide once under guides/", () => {
 		expect(indexablePaths(["before-you-start", "before-you-start"])).toEqual([
 			"",
 			"tracker",
 			"tracker/sources",
 			"news",
+			"privacy",
 			"guides/before-you-start",
 		])
 	})

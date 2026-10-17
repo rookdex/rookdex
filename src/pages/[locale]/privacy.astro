@@ -1,0 +1,105 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n"
+import ExternalLink from "../../components/ExternalLink.astro"
+import { isLocale, type Locale, locales, translator } from "../../i18n"
+import Base from "../../layouts/Base.astro"
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale }, props: {} }))
+}
+
+// The privacy page (Android spec §3), a sub-page of Settings. Any new storage, network call or
+// third party updates this page in the same PR (spec §8).
+const { locale } = Astro.params
+if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
+const { t } = translator(locale as Locale)
+// The day this text last changed. Move it with every change to the privacy copy.
+const UPDATED = new Date("2026-10-17T00:00:00Z")
+const dateLocale = locale === "nb" ? "nb-NO" : "en-GB"
+const updated = new Intl.DateTimeFormat(dateLocale, { dateStyle: "long", timeZone: "UTC" }).format(
+	UPDATED
+)
+---
+
+<Base
+	locale={locale}
+	title={t("seo.titles.privacy")}
+	description={t("privacy.description")}
+	path="privacy"
+	tab="settings"
+>
+	<article class="privacy">
+		<h1>{t("privacy.title")}</h1>
+		<p class="tagline">{t("privacy.intro")}</p>
+		<p class="meta">{t("privacy.updated", { date: updated })}</p>
+
+		<section aria-labelledby="privacy-stored">
+			<h2 id="privacy-stored">{t("privacy.storedTitle")}</h2>
+			<p>{t("privacy.storedBody")}</p>
+			<ul>
+				<li>{t("privacy.storedProfiles")}</li>
+				<li>{t("privacy.storedChoices")}</li>
+				<li>{t("privacy.storedOffline")}</li>
+			</ul>
+		</section>
+
+		<section aria-labelledby="privacy-leaves">
+			<h2 id="privacy-leaves">{t("privacy.leavesTitle")}</h2>
+			<p>{t("privacy.leavesBody")}</p>
+		</section>
+
+		<section aria-labelledby="privacy-hosting">
+			<h2 id="privacy-hosting">{t("privacy.hostingTitle")}</h2>
+			<p>{t("privacy.hostingBody")}</p>
+			<p>{t("privacy.hostingBasis")}</p>
+			<p>{t("privacy.object")}</p>
+			<p>
+				<ExternalLink href="https://www.cloudflare.com/privacypolicy/" locale={locale as Locale}>
+					{t("privacy.hostingLink")}
+				</ExternalLink>
+			</p>
+		</section>
+
+		<section aria-labelledby="privacy-links">
+			<h2 id="privacy-links">{t("privacy.linksTitle")}</h2>
+			<p>{t("privacy.linksBody")}</p>
+		</section>
+
+		<section aria-labelledby="privacy-android">
+			<h2 id="privacy-android">{t("privacy.androidTitle")}</h2>
+			<p>{t("privacy.androidBody")}</p>
+			<p>
+				<ExternalLink href="https://www.google.com/chrome/privacy/" locale={locale as Locale}>
+					{t("privacy.androidLink")}
+				</ExternalLink>
+			</p>
+		</section>
+
+		<section aria-labelledby="privacy-delete">
+			<h2 id="privacy-delete">{t("privacy.deleteTitle")}</h2>
+			<p>{t("privacy.deleteBody", { button: t("settings.deleteAll") })}</p>
+			<p>
+				<a href={`${getRelativeLocaleUrl(locale, "settings")}#settings-data`}>
+					{t("privacy.deleteLink")}
+				</a>
+			</p>
+		</section>
+
+		<section aria-labelledby="privacy-who">
+			<h2 id="privacy-who">{t("privacy.whoTitle")}</h2>
+			<p>{t("privacy.whoBody")}</p>
+			<p>
+				{t("privacy.contact")} <a href="mailto:legal@rookdex.app">legal@rookdex.app</a>
+			</p>
+			<p>{t("privacy.rights")}</p>
+			<p>{t("privacy.changes")}</p>
+		</section>
+	</article>
+</Base>
+
+<style>
+	.meta {
+		color: var(--text-muted);
+		font-size: 0.875rem;
+	}
+</style>

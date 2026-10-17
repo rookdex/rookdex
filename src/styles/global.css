@@ -306,10 +306,10 @@ p {
 	font-size: 1.125rem;
 }
 
-/* The footer "HUD strip" (feedback spec §6). Phone: icons and © share the first row, the chip
-   takes the second. The gaps are tightened so the English footer is 169 px at 320 (the Norwegian
-   one is 151 px); copy, type size and the 44 px controls are unchanged. From 768 px the gaps are
-   restored and everything sits on one centre line. */
+/* The footer "HUD strip" (feedback spec §6, Android spec §4). Phone: the four icons, the chip and
+   the © each take a row, because four icons and the © overflow 320 px by 35 px on one row. The
+   English footer is 189 px at 320 (the Norwegian one is 171 px). From 768 px everything sits on one
+   centre line. */
 .site-footer {
 	padding: var(--space-2) min(var(--space-3), 5vw) 10px;
 	border-top: 1px solid var(--border);
@@ -325,12 +325,13 @@ p {
 
 .footer-strip {
 	display: grid;
-	grid-template-columns: 1fr auto;
+	grid-template-columns: 1fr;
 	grid-template-areas:
-		"icons copy"
-		"chip chip";
+		"icons"
+		"chip"
+		"copy";
 	align-items: center;
-	gap: var(--space-1) min(var(--space-3), 5vw);
+	gap: var(--space-1);
 }
 
 /* The icons sit at the left edge on a phone, so their tips open to the right. They may run to
@@ -347,6 +348,10 @@ p {
 
 .footer-icons li:nth-child(3) {
 	--tip-inset: calc(2 * (var(--tap) + var(--space-1)));
+}
+
+.footer-icons li:nth-child(4) {
+	--tip-inset: calc(3 * (var(--tap) + var(--space-1)));
 }
 
 .footer-icons {
@@ -1840,6 +1845,7 @@ p {
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: center;
+		column-gap: var(--space-3);
 		row-gap: var(--space-2);
 	}
 
