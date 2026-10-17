@@ -80,4 +80,4 @@ Appen er nettstedet rookdex.app i en app. Koden er åpen på GitHub under MIT-li
 
 Upload the screenshots in this order: hub, tracker, news, settings.
 
-The name, icon and graphics carry no "GTA", "Rockstar" or game art. The full description names the game once, to say what Rookdex is for.
+The name, icon and feature graphic carry no "GTA", "Rockstar" or game art. The full description names the game once, to say what Rookdex is for. The screenshots show the app as it is, so the hub names GTA VI and the news headlines say "GTA 6". That is plain text describing the content, with no logo or game art.

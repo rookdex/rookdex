@@ -25,3 +25,5 @@ signing-key-info.txt
 *.aab
 *.apk
 *.idsig
+# The PWABuilder download (Android spec §6) holds the signing key, so it never lands either.
+*.zip

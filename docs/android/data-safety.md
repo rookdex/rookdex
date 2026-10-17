@@ -12,7 +12,9 @@ Answering No skips the encryption, deletion and per-data-type questions. Play th
 
 ## If Play asks about the IP address
 
-Cloudflare sees the visitor's IP address to deliver the pages, like any web host. Rookdex runs no server code and keeps no logs (`wrangler.jsonc` serves static assets only). Play's data safety guidance does not count data processed only ephemerally to serve a request as collection, so the answer stays No. If a reviewer disagrees, the fallback is to declare "Approximate location: IP address", collected, not shared, processed ephemerally, required, for app functionality.
+Cloudflare sees the visitor's IP address to deliver the pages, like any web host. Rookdex runs no server code and keeps no logs (`wrangler.jsonc` serves static assets only), so the IP address never reaches me and is used for nothing beyond routing the request. Play asks developers to disclose IP addresses "based on their particular usage and practices", and Rookdex has none, so the answer stays No.
+
+Ephemeral processing is not the reason. Play's guidance says ephemerally processed data still has to be declared in the form; it is only left out of the public listing. If a reviewer disagrees with No, the fallback is to declare "Approximate location: IP address", collected, not shared, processed ephemerally, required, for app functionality. Play then still shows nothing for it on the listing.
 
 ## Account deletion
 
