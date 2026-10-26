@@ -56,12 +56,52 @@ svg {
 	display: none !important;
 }
 
+/* Cyan, no underline. A link outside running text stands on its own line or row, where its
+   position and colour mark it (Settings redesign). */
 a {
 	color: var(--link);
+	text-decoration: none;
+}
+
+/* Links inside running text keep an underline: there colour alone would not set them apart from
+   the words around them (WCAG 1.4.1). :where() keeps this as light as the rule above. */
+:where(.news, .privacy p, .guide > :is(p, ul, ol)) a {
 	text-decoration: underline;
 	text-underline-offset: 0.15em;
 	text-decoration-thickness: 1px;
 	text-decoration-color: color-mix(in srgb, var(--link) 50%, transparent);
+}
+
+/* A link on its own line: a 44 px target that lifts on hover and press. The negative margin keeps
+   its text on the line's edge. Links that stay on the site end in a chevron; external links keep
+   their ↗ instead. */
+.go-link {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-1);
+	min-height: var(--tap);
+	padding-inline: var(--space-2);
+	margin-inline: calc(-1 * var(--space-2));
+	border-radius: var(--radius);
+}
+
+.go-link:not([target])::after {
+	content: "";
+	flex: none;
+	width: 1rem;
+	height: 1rem;
+	background: currentColor;
+	mask:
+		url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E")
+		center / contain no-repeat;
+}
+
+/* Forced colours replace backgrounds, which would blank the masked chevron. */
+@media (forced-colors: active) {
+	.go-link:not([target])::after {
+		forced-color-adjust: none;
+		background: LinkText;
+	}
 }
 
 /* The ↗ on external text links (feedback spec §3.1). */
@@ -249,7 +289,7 @@ p {
 	color: var(--text-muted);
 }
 
-.lang .picker-list {
+.picker-list {
 	position: absolute;
 	top: calc(100% + var(--space-1));
 	right: 0;
@@ -268,7 +308,7 @@ p {
 	box-shadow: 0 8px 24px color-mix(in srgb, var(--bg) 60%, transparent);
 }
 
-.lang .picker-row {
+.picker-row {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -281,7 +321,7 @@ p {
 	text-decoration: none;
 }
 
-.lang .picker-row[aria-current="page"] {
+.picker-row[aria-current] {
 	background: var(--bg-hover);
 }
 
@@ -293,7 +333,7 @@ p {
 /* Forced colours (standard §6.4): the active row uses the system selection colours. The extra class
    outranks the later :hover and :focus-visible rules, so Highlight wins in every state. */
 @media (forced-colors: active) {
-	.lang .picker-list .picker-row[aria-current] {
+	.picker-list .picker-row[aria-current] {
 		forced-color-adjust: none;
 		background: Highlight;
 		color: HighlightText;
@@ -556,7 +596,7 @@ p {
 .chips a,
 .history button,
 .lang summary,
-.lang .picker-row,
+.picker-row,
 .menu button,
 .menu a,
 .actions button,
@@ -565,6 +605,7 @@ p {
 .hint button,
 .deleted-list button,
 .icon-link,
+.go-link,
 .item,
 .item-icon {
 	transition:
@@ -576,15 +617,20 @@ p {
 }
 
 @media (hover: hover) {
-	a:hover {
+	:where(.news, .privacy p, .guide > :is(p, ul, ol)) a:hover {
 		text-decoration-color: var(--link);
 		text-decoration-thickness: 2px;
+	}
+
+	/* Keeps its cyan, like the Sources chip. */
+	.go-link:hover {
+		background: var(--bg-hover);
 	}
 
 	.tabbar a:hover,
 	.history button:hover:not(:disabled),
 	.lang summary:hover,
-	.lang .picker-row:hover,
+	.picker-row:hover,
 	.menu button:hover,
 	.menu a:hover,
 	.actions button:not(.primary):hover,
@@ -645,7 +691,7 @@ p {
 @media (hover: none) {
 	.tabbar a:active,
 	.history button:active:not(:disabled),
-	.lang .picker-row:active,
+	.picker-row:active,
 	.menu button:active,
 	.menu a:active,
 	.actions button:not(.primary):active,
@@ -655,7 +701,8 @@ p {
 	.deleted-list button:active,
 	.icon-link:active,
 	.chips button:not([aria-pressed="true"]):active,
-	.chips a:active {
+	.chips a:active,
+	.go-link:active {
 		background: var(--bg-hover);
 	}
 }
@@ -664,7 +711,7 @@ p {
 .tabbar a:focus-visible,
 .history button:focus-visible,
 .lang summary:focus-visible,
-.lang .picker-row:focus-visible,
+.picker-row:focus-visible,
 .menu button:focus-visible,
 .menu a:focus-visible,
 .actions button:not(.primary):focus-visible,
@@ -678,8 +725,9 @@ p {
 	color: var(--text);
 }
 
-/* The Sources chip keeps its cyan text: focus is the lift plus the outline. */
-.chips a:focus-visible {
+/* The Sources chip and links on their own line keep their cyan: focus is the lift plus the outline. */
+.chips a:focus-visible,
+.go-link:focus-visible {
 	background: var(--bg-hover);
 }
 
@@ -1274,7 +1322,7 @@ p {
 	font-size: 1rem;
 }
 
-/* From launch on, the heading links to the hub: same ink as the heading, still underlined. */
+/* From launch on, the heading links to the hub: same ink as the heading, with the chevron. */
 .stats h2 a {
 	color: inherit;
 }

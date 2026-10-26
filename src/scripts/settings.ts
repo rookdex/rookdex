@@ -78,6 +78,27 @@ export function wireInstallRow(row: HTMLElement, win: InstallWindow): void {
 }
 
 /**
+ * Share row: the system share sheet with the site's address. Left out where the browser has no
+ * share sheet. Closing the sheet rejects with AbortError, which is not an error to report.
+ */
+export function wireShareRow(
+	row: HTMLElement,
+	nav: { share?: (data: ShareData) => Promise<void> }
+) {
+	const button = row.querySelector<HTMLButtonElement>("[data-share-button]")
+	const share = nav.share
+	if (!button || typeof share !== "function") {
+		row.remove()
+		return
+	}
+	row.hidden = false
+	const { url, title, text } = row.dataset
+	button.addEventListener("click", () => {
+		share.call(nav, { title, text, url }).catch(() => {})
+	})
+}
+
+/**
  * "Delete all data on this device" (spec §7.2). Native <dialog> with Cancel first, so showModal()
  * focuses it and a stray Enter cancels. The confirm button stays disabled until the request
  * settles, including while other tabs block it. Success closes the dialog and speaks through the

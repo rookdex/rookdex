@@ -41,7 +41,9 @@ export function Latest({ latest, today, locale, newsHref, t }: Props) {
 					</li>
 				))}
 			</ul>
-			<a href={newsHref}>{t("hub.allNews")}</a>
+			<a className="go-link" href={newsHref}>
+				{t("hub.allNews")}
+			</a>
 		</section>
 	)
 }

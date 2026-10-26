@@ -27,19 +27,97 @@ describe("Settings page (spec §7)", () => {
 		expect(doc.title).toBe("Innstillinger · Rookdex")
 	})
 
-	it("marks the current language and links the other to its own Settings page", async () => {
+	const languageGroup = (doc: Document) =>
+		doc.querySelector('section[aria-labelledby="settings-language"]')
+
+	it("shows the language as one row that opens the header's picker", async () => {
 		const doc = await settings("nb")
-		const group = doc.querySelector('section[aria-labelledby="settings-language"]')
-		expect(group?.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe("Norsk bokmål")
-		expect(
-			group?.querySelector('a[data-picker-row]:not([data-picker-row=""])')?.getAttribute("href")
-		).toBe("/en/settings/")
+		const group = languageGroup(doc)
+		const pickers = group?.querySelectorAll("details[data-picker]")
+		expect(pickers).toHaveLength(1)
+		const summary = pickers?.[0].querySelector(":scope > summary")
+		expect(summary?.querySelector(".row-label")?.textContent).toBe("Språk")
+		expect(summary?.querySelector("[data-choice-value]")?.textContent).toBe("Norsk bokmål")
+		expect(summary?.querySelector("svg.row-chevron")?.getAttribute("aria-hidden")).toBe("true")
+		expect(group?.querySelector('[role="menu"], [role="menuitem"], select')).toBeNull()
+	})
+
+	it("lists System, English and Norsk bokmål, with this page's language current", async () => {
+		const doc = await settings("nb")
+		const list = languageGroup(doc)?.querySelector("details[data-picker] > ul.picker-list")
+		expect(list?.getAttribute("aria-label")).toBe("Språk")
+		const rows = [...(list?.querySelectorAll("a[data-picker-row]") ?? [])]
+		expect(rows.map((a) => [a.getAttribute("data-picker-row"), a.getAttribute("href")])).toEqual([
+			["", "/en/settings/"],
+			["en", "/en/settings/"],
+			["nb", "/nb/settings/"],
+		])
+		const current = list?.querySelectorAll('[aria-current="page"]')
+		expect(current).toHaveLength(1)
+		expect(current?.[0].textContent?.trim()).toBe("Norsk bokmål")
+		expect(current?.[0].querySelector(".lang-check")).not.toBeNull()
 	})
 
 	it("ships the browser-dependent rows hidden until the script decides", async () => {
 		const doc = await settings("en")
 		expect(doc.querySelector("[data-storage-row]")?.hasAttribute("hidden")).toBe(true)
 		expect(doc.querySelector("[data-install-row]")?.hasAttribute("hidden")).toBe(true)
+		expect(doc.querySelector("[data-update-check]")?.hasAttribute("hidden")).toBe(true)
+		expect(doc.querySelector("[data-share-row]")?.hasAttribute("hidden")).toBe(true)
+	})
+
+	it("gives the update check a button and an empty status line with its messages", async () => {
+		const doc = await settings("nb")
+		const row = doc.querySelector<HTMLElement>("[data-update-check]")
+		expect(row?.querySelector("button[data-update-check-button]")?.textContent?.trim()).toBe(
+			"Se etter oppdateringer"
+		)
+		expect(row?.querySelector('[role="status"]')?.textContent).toBe("")
+		expect(row?.dataset.checking).toBe("Sjekker …")
+		expect(row?.dataset.current).toBe("Du har nyeste versjon")
+		expect(row?.dataset.ready).toBe("Ny versjon er klar")
+		expect(row?.dataset.failed).toBe("Kunne ikke sjekke. Prøv igjen når du er på nett.")
+	})
+
+	it("shares the site's address, with the tagline as the text", async () => {
+		const doc = await settings("en")
+		const row = doc.querySelector<HTMLElement>("[data-share-row]")
+		expect(row?.querySelector("button")?.textContent?.trim()).toBe("Share Rookdex")
+		expect(row?.dataset.url).toBe("https://rookdex.app")
+		expect(row?.dataset.title).toBe("Rookdex")
+		expect(row?.dataset.text).toBe(
+			"A launch-night companion for GTA VI. Track what you find, see what is confirmed."
+		)
+	})
+
+	it("ends the page with the delete box, after About and the trademark note", async () => {
+		const doc = await settings("en")
+		const last = doc.querySelector("main")?.lastElementChild
+		expect(last?.id).toBe("delete-data")
+		expect(last?.hasAttribute("data-delete")).toBe(true)
+		expect(last?.previousElementSibling?.id).toBe("about")
+		expect(doc.querySelector('section[aria-labelledby="settings-data"] [data-delete]')).toBeNull()
+	})
+
+	it("lets each row's one link fill the row", async () => {
+		const doc = await settings("en")
+		const linked = [...doc.querySelectorAll("main dl > .row")].filter((row) =>
+			row.querySelector("dd a")
+		)
+		expect(linked.length).toBeGreaterThan(0)
+		for (const row of linked) {
+			expect(row.classList.contains("row-linked")).toBe(true)
+			expect(row.querySelectorAll("dd a")).toHaveLength(1)
+		}
+	})
+
+	it("ends internal and mail links with a chevron and keeps the ↗ on external ones", async () => {
+		const doc = await settings("en")
+		for (const link of doc.querySelectorAll("main dl > .row dd a")) {
+			const external = link.getAttribute("target") === "_blank"
+			expect(link.querySelector(".ext-icon") !== null).toBe(external)
+			expect(link.querySelector(".row-chevron") !== null).toBe(!external)
+		}
 	})
 
 	it("points export and import at the Tracker's profile menu", async () => {
@@ -92,6 +170,9 @@ describe("Settings page (spec §7)", () => {
 		expect(rowsOf(doc).map(label)).toEqual([
 			"Install",
 			"Version",
+			"Updates",
+			"Share",
+			"Feedback",
 			"Source code",
 			"Code licence",
 			"Guide licence",
@@ -107,11 +188,15 @@ describe("Settings page (spec §7)", () => {
 		const doc = await settings("nb")
 		const rows = rowsOf(doc)
 		const href = (i: number) => rows[i].querySelector("dd a")?.getAttribute("href")
-		expect(href(2)).toBe("https://github.com/rookdex/rookdex")
-		expect(rows[3].querySelector("dd")?.textContent?.trim()).toBe("MIT")
-		expect(href(4)).toBe("https://creativecommons.org/licenses/by-sa/4.0/")
-		expect(href(5)).toBe("mailto:legal@rookdex.app")
+		expect(href(4)).toBe("mailto:feedback@rookdex.app")
+		expect(href(5)).toBe("https://github.com/rookdex/rookdex")
+		expect(rows[6].querySelector("dd")?.textContent?.trim()).toBe("MIT")
+		expect(href(7)).toBe("https://creativecommons.org/licenses/by-sa/4.0/")
+		expect(href(8)).toBe("mailto:legal@rookdex.app")
 		expect(rows.map(label).slice(2)).toEqual([
+			"Oppdateringer",
+			"Del",
+			"Tilbakemelding",
 			"Kildekode",
 			"Kodelisens",
 			"Guidelisens",
@@ -140,34 +225,15 @@ describe("Settings page (spec §7)", () => {
 		expect(dd?.querySelector("a")).toBeNull()
 	})
 
-	it("lets the other language's link fill its row", async () => {
+	it("ships the System row first and hidden, with each language's Settings URL", async () => {
 		const doc = await settings("en")
-		const link = doc.querySelector(
-			'section[aria-labelledby="settings-language"] a[data-picker-row]:not([data-picker-row=""])'
-		)
-		expect(link?.classList.contains("row-link")).toBe(true)
-		expect(link?.closest("li")?.classList.contains("row-has-link")).toBe(true)
-	})
-
-	it("puts a hidden System row first and hooks the other language's link", async () => {
-		const doc = await settings("en")
-		const rows = doc.querySelectorAll('section[aria-labelledby="settings-language"] li')
-		expect(rows[0].hasAttribute("data-system-item")).toBe(true)
-		expect(rows[0].hasAttribute("hidden")).toBe(true)
-		const system = rows[0].querySelector("a")
-		expect(system?.getAttribute("data-picker-row")).toBe("")
-		expect(JSON.parse(system?.getAttribute("data-hrefs") ?? "")).toEqual({
+		const first = languageGroup(doc)?.querySelector(".picker-list > li")
+		expect(first?.hasAttribute("data-system-item")).toBe(true)
+		expect(first?.hasAttribute("hidden")).toBe(true)
+		expect(JSON.parse(first?.querySelector("a")?.getAttribute("data-hrefs") ?? "")).toEqual({
 			en: "/en/settings/",
 			nb: "/nb/settings/",
 		})
-		expect(
-			doc
-				.querySelector('section[aria-labelledby="settings-language"] a[data-picker-row="nb"]')
-				?.getAttribute("href")
-		).toBe("/nb/settings/")
-		// One wrapping span, so the flex link holds one sentence, not three flex items (reflow at 200 %).
-		expect(system?.children).toHaveLength(1)
-		expect(system?.firstElementChild?.tagName).toBe("SPAN")
 	})
 
 	it("names the language choice among what this browser keeps", async () => {

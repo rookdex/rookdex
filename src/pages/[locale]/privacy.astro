@@ -79,7 +79,7 @@ const updated = new Intl.DateTimeFormat(dateLocale, { dateStyle: "long", timeZon
 			<h2 id="privacy-delete">{t("privacy.deleteTitle")}</h2>
 			<p>{t("privacy.deleteBody", { button: t("settings.deleteAll") })}</p>
 			<p>
-				<a href={`${getRelativeLocaleUrl(locale, "settings")}#settings-data`}>
+				<a href={`${getRelativeLocaleUrl(locale, "settings")}#delete-data`}>
 					{t("privacy.deleteLink")}
 				</a>
 			</p>

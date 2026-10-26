@@ -1,0 +1,56 @@
+---
+import { defaultLocale, type Locale, locales, translator } from "../i18n"
+import { systemRow } from "../i18n/system-row"
+
+interface Props {
+	locale: Locale
+	path: string
+}
+
+// The list inside a language picker, shared by the header globe and Settings so the two cannot
+// drift. The System row ships hidden: only the browser knows navigator.languages, so
+// src/scripts/language-choice.ts fills it in and src/scripts/current-choice.ts may tick it.
+const { locale, path } = Astro.props
+const { t, displayName } = translator(locale)
+const { hrefs, before: systemBefore, after: systemAfter } = systemRow(t, path)
+---
+
+<ul class="picker-list" aria-label={t("picker.language")}>
+	<li data-system-item hidden>
+		<a href={hrefs[defaultLocale]} data-picker-row="" data-hrefs={JSON.stringify(hrefs)}>
+			<span>{systemBefore}<span data-system-name></span>{systemAfter}</span>
+		</a>
+	</li>
+	{
+		locales.map((l) => (
+			<li>
+				<a
+					class="picker-row"
+					data-picker-row={l}
+					href={hrefs[l]}
+					hreflang={l}
+					lang={l}
+					aria-current={l === locale ? "page" : undefined}
+				>
+					<span>{displayName(l)}</span>
+					{l === locale && (
+						<svg
+							class="lang-check"
+							viewBox="0 0 24 24"
+							width="16"
+							height="16"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<path d="M5 12.5l4.5 4.5L19 7.5" />
+						</svg>
+					)}
+				</a>
+			</li>
+		))
+	}
+</ul>

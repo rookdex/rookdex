@@ -1,10 +1,12 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n"
 import pkg from "../../../package.json"
+import Chevron from "../../components/Chevron.astro"
 import ExternalLink from "../../components/ExternalLink.astro"
-import { defaultLocale, isLocale, type Locale, locales, translator } from "../../i18n"
-import { systemRow } from "../../i18n/system-row"
+import LanguageList from "../../components/LanguageList.astro"
+import { isLocale, type Locale, locales, translator } from "../../i18n"
 import Base from "../../layouts/Base.astro"
+import { SITE } from "../../model/seo"
 import { appVersion, commitUrl } from "../../model/version"
 
 export function getStaticPaths() {
@@ -16,7 +18,6 @@ export function getStaticPaths() {
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const { t, displayName } = translator(locale as Locale)
-const { hrefs, before: systemBefore, after: systemAfter } = systemRow(t, "settings")
 // Read at render, so tests can stub it. A local build has no sha and shows "dev".
 const sha = process.env.GITHUB_SHA
 ---
@@ -26,50 +27,17 @@ const sha = process.env.GITHUB_SHA
 
 	<section class="settings-group" aria-labelledby="settings-language">
 		<h2 id="settings-language">{t("settings.language")}</h2>
-		<ul class="rows">
-			<li class="row row-has-link" data-system-item hidden>
-				<a href={hrefs[defaultLocale]} class="row-link" data-picker-row="" data-hrefs={JSON.stringify(hrefs)}>
-					<span>{systemBefore}<span data-system-name></span>{systemAfter}</span>
-				</a>
-			</li>
-			{
-				locales.map((l) => (
-					<li class={l === locale ? "row" : "row row-has-link"}>
-						{l === locale ? (
-							<span aria-current="page" lang={l}>
-								{displayName(l)}
-							</span>
-						) : (
-							<a
-								href={hrefs[l]}
-								hreflang={l}
-								lang={l}
-								class="row-link"
-								data-picker-row={l}
-							>
-								{displayName(l)}
-							</a>
-						)}
-						{l === locale && (
-							<svg
-								class="check"
-								viewBox="0 0 24 24"
-								width="16"
-								height="16"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								aria-hidden="true"
-							>
-								<path d="M5 12.5l4.5 4.5L19 7.5" />
-							</svg>
-						)}
-					</li>
-				))
-			}
-		</ul>
+		{/* The header's picker as a row: choosing a language is a link, so nothing moves on its own
+		    (WCAG 3.2.2). current-choice.ts swaps the value to System when no language is stored. */}
+		<div class="rows">
+			<details class="row-picker" data-picker="settings-lang">
+				<summary class="row row-summary">
+					<span class="row-label">{t("settings.language")}</span>
+					<span class="row-value"><span data-choice-value>{displayName(locale as Locale)}</span><Chevron down /></span>
+				</summary>
+				<LanguageList locale={locale as Locale} path="settings" />
+			</details>
+		</div>
 	</section>
 
 	<section class="settings-group" aria-labelledby="settings-data">
@@ -87,36 +55,15 @@ const sha = process.env.GITHUB_SHA
 				<dt>{t("settings.persisted")}</dt>
 				<dd data-value></dd>
 			</div>
-			<div class="row">
+			<div class="row row-linked">
 				<dt>{t("settings.transfer")}</dt>
-				<dd><a href={getRelativeLocaleUrl(locale, "tracker")}>{t("settings.transferLink")}</a></dd>
+				<dd><a href={getRelativeLocaleUrl(locale, "tracker")}>{t("settings.transferLink")}<Chevron /></a></dd>
 			</div>
-			<div class="row">
+			<div class="row row-linked">
 				<dt>{t("settings.privacy")}</dt>
-				<dd><a href={getRelativeLocaleUrl(locale, "privacy")}>{t("settings.privacyLink")}</a></dd>
+				<dd><a href={getRelativeLocaleUrl(locale, "privacy")}>{t("settings.privacyLink")}<Chevron /></a></dd>
 			</div>
 		</dl>
-		<div class="danger" data-delete>
-			<p>{t("settings.dangerBody")}</p>
-			<button type="button" class="danger-button" data-delete-open>{t("settings.deleteAll")}</button>
-			<p class="delete-status" role="status" data-delete-status></p>
-			<dialog
-				class="modal"
-				aria-labelledby="delete-all-title"
-				data-blocked={t("settings.blocked")}
-				data-failed={t("settings.failed")}
-				data-done={t("settings.done")}
-			>
-				<h2 id="delete-all-title" tabindex="-1">{t("settings.dialogTitle")}</h2>
-				<p>{t("settings.dangerBody")}</p>
-				<p>{t("settings.keepsChoices")}</p>
-				<p class="tracker-alert" role="alert" data-delete-alert></p>
-				<div class="actions">
-					<button type="button" data-delete-cancel>{t("settings.cancel")}</button>
-					<button type="button" class="danger-button" data-delete-confirm>{t("settings.confirm")}</button>
-				</div>
-			</dialog>
-		</div>
 	</section>
 
 	<section id="about" class="settings-group" aria-labelledby="settings-about">
@@ -132,7 +79,7 @@ const sha = process.env.GITHUB_SHA
 					<span data-install-ios hidden>{t("settings.iosHowTo")}</span>
 				</dd>
 			</div>
-			<div class="row">
+			<div class={sha ? "row row-linked" : "row"}>
 				<dt>{t("settings.version")}</dt>
 				<dd>
 					{
@@ -151,7 +98,42 @@ const sha = process.env.GITHUB_SHA
 					}
 				</dd>
 			</div>
-			<div class="row">
+			{/* Shown and wired by update-notice.ts once the service worker is registered. */}
+			<div
+				class="row"
+				data-update-check
+				data-checking={t("settings.checking")}
+				data-current={t("settings.upToDate")}
+				data-ready={t("settings.updateReady")}
+				data-failed={t("settings.updateFailed")}
+				hidden
+			>
+				<dt>{t("settings.updates")}</dt>
+				<dd class="row-actions">
+					<span class="row-status" role="status" data-update-check-status></span>
+					<button type="button" class="row-button" data-update-check-button>
+						{t("settings.checkUpdates")}
+					</button>
+				</dd>
+			</div>
+			<div
+				class="row"
+				data-share-row
+				data-url={SITE}
+				data-title={t("siteName")}
+				data-text={t("tagline")}
+				hidden
+			>
+				<dt>{t("settings.share")}</dt>
+				<dd>
+					<button type="button" class="row-button" data-share-button>{t("settings.shareButton")}</button>
+				</dd>
+			</div>
+			<div class="row row-linked">
+				<dt>{t("settings.feedback")}</dt>
+				<dd><a href="mailto:feedback@rookdex.app"><span>feedback@<wbr />rookdex.app</span><Chevron /></a></dd>
+			</div>
+			<div class="row row-linked">
 				<dt>{t("settings.source")}</dt>
 				<dd>
 					<ExternalLink href="https://github.com/rookdex/rookdex" locale={locale as Locale}>
@@ -163,7 +145,7 @@ const sha = process.env.GITHUB_SHA
 				<dt>{t("settings.codeLicence")}</dt>
 				<dd>MIT</dd>
 			</div>
-			<div class="row">
+			<div class="row row-linked">
 				<dt>{t("settings.guideLicence")}</dt>
 				<dd>
 					<ExternalLink
@@ -174,18 +156,40 @@ const sha = process.env.GITHUB_SHA
 					</ExternalLink>
 				</dd>
 			</div>
-			<div class="row">
+			<div class="row row-linked">
 				<dt>{t("settings.legal")}</dt>
-				<dd><a href="mailto:legal@rookdex.app">legal@rookdex.app</a></dd>
+				<dd><a href="mailto:legal@rookdex.app"><span>legal@<wbr />rookdex.app</span><Chevron /></a></dd>
 			</div>
 		</dl>
 		<p class="note">{t("settings.trademarks")}</p>
 	</section>
+
+	<div id="delete-data" class="danger" data-delete>
+		<p>{t("settings.dangerBody")}</p>
+		<button type="button" class="danger-button" data-delete-open>{t("settings.deleteAll")}</button>
+		<p class="delete-status" role="status" data-delete-status></p>
+		<dialog
+			class="modal"
+			aria-labelledby="delete-all-title"
+			data-blocked={t("settings.blocked")}
+			data-failed={t("settings.failed")}
+			data-done={t("settings.done")}
+		>
+			<h2 id="delete-all-title" tabindex="-1">{t("settings.dialogTitle")}</h2>
+			<p>{t("settings.dangerBody")}</p>
+			<p>{t("settings.keepsChoices")}</p>
+			<p class="tracker-alert" role="alert" data-delete-alert></p>
+			<div class="actions">
+				<button type="button" data-delete-cancel>{t("settings.cancel")}</button>
+				<button type="button" class="danger-button" data-delete-confirm>{t("settings.confirm")}</button>
+			</div>
+		</dialog>
+	</div>
 </Base>
 
 <script>
 	import { deleteAllData } from "../../scripts/delete-all"
-	import { wireDeleteDialog, wireInstallRow, wireStorageRow } from "../../scripts/settings"
+	import { wireDeleteDialog, wireInstallRow, wireShareRow, wireStorageRow } from "../../scripts/settings"
 
 	// Either store can be missing or throw on access (private modes, blocked site data).
 	function database(): IDBFactory | undefined {
@@ -201,6 +205,9 @@ const sha = process.env.GITHUB_SHA
 
 	const installRow = document.querySelector<HTMLElement>("[data-install-row]")
 	if (installRow) wireInstallRow(installRow, window)
+
+	const shareRow = document.querySelector<HTMLElement>("[data-share-row]")
+	if (shareRow) wireShareRow(shareRow, navigator)
 
 	const danger = document.querySelector<HTMLElement>("[data-delete]")
 	if (danger) {
@@ -231,6 +238,12 @@ const sha = process.env.GITHUB_SHA
 		border-radius: var(--radius);
 	}
 
+	/* Clips a row's hover fill to the list's rounded corners, so the separators stay straight. The
+	   language list opens out of its card, so only the label and value lists clip. */
+	dl.rows {
+		overflow: hidden;
+	}
+
 	/* Muted label left, value or action right, the pattern phone settings screens use. */
 	.row {
 		display: flex;
@@ -254,7 +267,8 @@ const sha = process.env.GITHUB_SHA
 		grid-template-columns: minmax(min-content, 1fr) auto;
 	}
 
-	.row dt {
+	.row dt,
+	.row-label {
 		color: var(--text-muted);
 	}
 
@@ -272,7 +286,13 @@ const sha = process.env.GITHUB_SHA
 		min-height: var(--tap);
 	}
 
+	.row :global(a) {
+		gap: var(--space-1);
+	}
+
+	/* The margin keeps the 44 px button off the row lines above and below it. */
 	.row-button {
+		margin-block: var(--space-1);
 		padding: 0 var(--space-3);
 		border: 1px solid var(--border);
 		border-radius: var(--radius);
@@ -282,9 +302,92 @@ const sha = process.env.GITHUB_SHA
 		cursor: pointer;
 	}
 
-	.check {
+	/* The status sits before its button and wraps above it when the row runs out of room. */
+	.row-actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: flex-end;
+		column-gap: var(--space-3);
+	}
+
+	/* Even padding, so the button stays centred on the label whether the status wraps or not. */
+	.row-actions:has(.row-status:not(:empty)) {
+		padding-block: var(--space-1);
+	}
+
+	.row-status {
+		color: var(--text-muted);
+	}
+
+	.row-status:empty {
+		display: none;
+	}
+
+	/* A row with one link: the link's box grows over the whole row, so the whole row is the
+	   target, and the label stays outside the link's name. */
+	.row-linked {
+		position: relative;
+		transition: background-color 120ms;
+	}
+
+	.row-linked :global(a::after) {
+		content: "";
+		position: absolute;
+		inset: 0;
+	}
+
+	.row-linked :global(a:focus-visible) {
+		outline: none;
+	}
+
+	.row-linked :global(a:focus-visible::after) {
+		outline: 2px solid var(--accent);
+		outline-offset: -2px;
+	}
+
+	.row-linked:has(:global(a:focus-visible)) {
+		background: var(--bg-hover);
+	}
+
+	.row :global(.row-chevron) {
 		flex: none;
-		color: var(--accent);
+		width: 1rem;
+		height: 1rem;
+	}
+
+	/* The language row: the header's picker list under a settings row. */
+	.row-picker {
+		position: relative;
+	}
+
+	.row-summary {
+		list-style: none;
+		cursor: pointer;
+		border-radius: calc(var(--radius) - 1px);
+		outline-offset: -2px;
+		transition: background-color 120ms;
+	}
+
+	.row-summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.row-value {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-1);
+		color: var(--link);
+		text-align: right;
+	}
+
+	.row-picker[open] :global(.row-chevron) {
+		rotate: 180deg;
+	}
+
+	.row-picker[open] > .row-summary,
+	.row-summary:focus-visible {
+		background: var(--bg-hover);
 	}
 
 	.danger {
@@ -333,56 +436,24 @@ const sha = process.env.GITHUB_SHA
 
 	@media (hover: hover) {
 		.row-button:hover,
-		.danger-button:not(:disabled):hover {
+		.danger-button:not(:disabled):hover,
+		.row-linked:hover,
+		.row-summary:hover {
 			background: var(--bg-hover);
 		}
 	}
 
 	@media (hover: none) {
 		.row-button:active,
-		.danger-button:not(:disabled):active {
+		.danger-button:not(:disabled):active,
+		.row-linked:active,
+		.row-summary:active {
 			background: var(--bg-hover);
 		}
 	}
 
 	.row-button:focus-visible,
 	.danger-button:not(:disabled):focus-visible {
-		background: var(--bg-hover);
-	}
-
-	/* The other language's link fills its row, so the whole row switches (feedback spec §7.2). */
-	.row-has-link {
-		padding: 0;
-	}
-
-	/* Clips the link's fill to the list's rounded corners, so the separator stays straight. */
-	.rows:has(.row-link) {
-		overflow: hidden;
-	}
-
-	.row-link {
-		flex: 1;
-		align-self: stretch;
-		display: flex;
-		align-items: center;
-		padding: 0 14px;
-		outline-offset: -2px;
-		transition: background-color 120ms;
-	}
-
-	@media (hover: hover) {
-		.row-link:hover {
-			background: var(--bg-hover);
-		}
-	}
-
-	@media (hover: none) {
-		.row-link:active {
-			background: var(--bg-hover);
-		}
-	}
-
-	.row-link:focus-visible {
 		background: var(--bg-hover);
 	}
 

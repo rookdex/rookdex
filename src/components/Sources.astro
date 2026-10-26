@@ -22,7 +22,7 @@ const { urls, label, locale } = Astro.props
 			<ul>
 				{urls.map((url) => (
 					<li>
-						<ExternalLink href={url} locale={locale}>
+						<ExternalLink href={url} locale={locale} class="go-link">
 							{outletOf(url)}
 						</ExternalLink>
 					</li>

@@ -21,7 +21,7 @@ const { t, displayName } = translator("en")
 		{
 			locales.map((l) => (
 				<li>
-					<a href={getRelativeLocaleUrl(l, "")} hreflang={l} lang={l}>
+					<a class="go-link" href={getRelativeLocaleUrl(l, "")} hreflang={l} lang={l}>
 						{displayName(l)}
 					</a>
 				</li>

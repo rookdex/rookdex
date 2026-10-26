@@ -18,5 +18,8 @@ describe("404 page", () => {
 		expect(
 			[...doc.querySelectorAll("main a[hreflang]")].map((a) => a.getAttribute("hreflang"))
 		).toEqual(["en", "nb"])
+		for (const link of doc.querySelectorAll("main a[hreflang]")) {
+			expect(link.classList.contains("go-link")).toBe(true)
+		}
 	})
 })

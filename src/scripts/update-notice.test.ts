@@ -15,6 +15,7 @@ class FakeRegistration extends EventTarget {
 	waiting: FakeWorker | null = null
 	installing: FakeWorker | null = null
 	active: object | null = null
+	update = vi.fn((): Promise<unknown> => Promise.resolve())
 }
 
 class FakeContainer extends EventTarget {
@@ -37,6 +38,8 @@ function setup(options: {
 	installing?: boolean
 	active?: boolean
 	storage?: UpdateEnv["storage"]
+	/** Adds Settings' "Check for updates" row to the page. */
+	check?: boolean
 	/** Runs after the markup exists and before the script wires, for state the page already had. */
 	beforeWire?: () => void
 }) {
@@ -47,7 +50,15 @@ function setup(options: {
 			<button type="button" data-update-reload>Reload</button>
 			<button type="button" data-update-later>Later</button>
 		</div>
-		<p role="status" data-update-status></p>`
+		<p role="status" data-update-status></p>
+		${
+			options.check
+				? `<div data-update-check data-checking="Checking…" data-current="Up to date" data-ready="New version ready" data-failed="Couldn't check" hidden>
+					<span role="status" data-update-check-status></span>
+					<button type="button" data-update-check-button>Check for updates</button>
+				</div>`
+				: ""
+		}`
 	document.documentElement.style.removeProperty("--notice-h")
 	const container = new FakeContainer()
 	container.controller = options.controller === false ? null : {}
@@ -207,5 +218,75 @@ describe("update notice (feedback spec §10.3)", () => {
 		expect(root.style.getPropertyValue("--notice-h")).toMatch(/^\d+px$/)
 		click("[data-update-later]")
 		expect(root.style.getPropertyValue("--notice-h")).toBe("")
+	})
+})
+
+describe("Check for updates in Settings", () => {
+	const row = () => document.querySelector<HTMLElement>("[data-update-check]") as HTMLElement
+	const status = () => row().querySelector("[data-update-check-status]")?.textContent
+	const check = () => row().querySelector<HTMLButtonElement>("[data-update-check-button]")?.click()
+	/** Lets the awaited update() and the steps after it run. */
+	const settle = () => new Promise((resolve) => setTimeout(resolve, 0))
+
+	it("shows the row once the service worker is registered", () => {
+		setup({ check: true })
+		expect(row().hidden).toBe(false)
+	})
+
+	it("says it is checking, then that this is the newest version", async () => {
+		const { registration, card } = setup({ check: true })
+		check()
+		expect(status()).toBe("Checking…")
+		await settle()
+		expect(registration.update).toHaveBeenCalledTimes(1)
+		expect(status()).toBe("Up to date")
+		expect(card.hidden).toBe(true)
+	})
+
+	it("shows the notice for a new version, even after Later, and speaks once", async () => {
+		const { registration, card, live, flush, store } = setup({ check: true })
+		store.setItem(LATER_KEY, "1")
+		const worker = new FakeWorker()
+		registration.update.mockImplementation(() => {
+			registration.installing = worker
+			registration.dispatchEvent(new Event("updatefound"))
+			return Promise.resolve()
+		})
+		check()
+		await settle()
+		expect(status()).toBe("Checking…")
+		registration.installing = null
+		registration.waiting = worker
+		worker.become("installed")
+		await settle()
+		flush()
+		expect(status()).toBe("New version ready")
+		expect(card.hidden).toBe(false)
+		// The row's status speaks; the notice's own region stays quiet, so it is said once.
+		expect(live.textContent).toBe("")
+	})
+
+	it("reports a worker that was already waiting as ready", async () => {
+		const { card } = setup({ check: true, waiting: true })
+		check()
+		await settle()
+		expect(status()).toBe("New version ready")
+		expect(card.hidden).toBe(false)
+	})
+
+	it("says it could not check when update() fails, offline for one", async () => {
+		const { registration } = setup({ check: true })
+		registration.update.mockImplementation(() => Promise.reject(new TypeError("offline")))
+		check()
+		await settle()
+		expect(status()).toBe("Couldn't check")
+	})
+
+	it("ignores clicks while a check runs", async () => {
+		const { registration } = setup({ check: true })
+		check()
+		check()
+		await settle()
+		expect(registration.update).toHaveBeenCalledTimes(1)
 	})
 })

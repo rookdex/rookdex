@@ -1,6 +1,7 @@
 // The "new version is ready" notice (feedback spec §10.3). The new service worker waits; this
 // shows the notice, sends SKIP_WAITING on Reload and reloads every open tab once when the new
-// version takes over. Everything the browser owns comes in through `env`, so it is testable.
+// version takes over. It also wires Settings' "Check for updates" row when the page has one.
+// Everything the browser owns comes in through `env`, so it is testable.
 
 export const LATER_KEY = "rookdex.update-later"
 /** The card's gap to the tab bar or the screen edge, added to its height for scroll padding. */
@@ -17,6 +18,7 @@ export interface UpdateEnv {
 		readonly waiting: WorkerLike | null
 		readonly installing: WorkerLike | null
 		readonly active: unknown
+		update(): Promise<unknown>
 	}
 	storage: () => Pick<Storage, "getItem" | "setItem"> | undefined
 	reload: () => void
@@ -60,10 +62,16 @@ export function wireUpdateNotice(doc: Document, env: UpdateEnv): void {
 	// Re-measured on resize: a rotated phone can wrap the card taller than it first was.
 	const measure = () => root.style.setProperty("--notice-h", `${card.offsetHeight + GAP}px`)
 
-	const show = () => {
-		if (!env.container.controller || laterChosen() || !card.hidden) return
+	// True while a check from Settings runs: its own status line speaks, so the notice stays quiet.
+	let checking = false
+
+	/** `asked`: the visitor pressed Check for updates, which outranks an earlier Later. */
+	const show = (asked = false) => {
+		if (!card.hidden) return
+		if (!asked && (!env.container.controller || laterChosen())) return
 		card.hidden = false
 		measure()
+		if (checking) return
 		// Filled on the next task, once the region is known to be in the tree, so it is announced
 		// once. Showing never moves focus.
 		env.defer(() => {
@@ -110,6 +118,14 @@ export function wireUpdateNotice(doc: Document, env: UpdateEnv): void {
 		if (!card.contains(target)) returnTo = target
 	})
 
+	wireUpdateCheck(doc, env, {
+		show: () => show(true),
+		setChecking: (value) => {
+			checking = value
+		},
+		isChecking: () => checking,
+	})
+
 	laterButton.addEventListener("click", () => {
 		const hadFocus = card.contains(doc.activeElement)
 		hide()
@@ -119,5 +135,49 @@ export function wireUpdateNotice(doc: Document, env: UpdateEnv): void {
 		} catch {
 			// Blocked storage: the notice can come back on the next page.
 		}
+	})
+}
+
+/** Resolves once a worker that is still installing has installed or failed. */
+function settled(worker: WorkerLike | null): Promise<void> {
+	if (worker?.state !== "installing") return Promise.resolve()
+	return new Promise((resolve) => {
+		worker.addEventListener("statechange", () => {
+			if (worker.state !== "installing") resolve()
+		})
+	})
+}
+
+/**
+ * Settings' "Check for updates" row. Shown only once a service worker is registered, since this
+ * runs from that registration. update() asks the server for a newer worker; a new version shows
+ * the notice above, and the row's status line says which way it went.
+ */
+function wireUpdateCheck(
+	doc: Document,
+	env: UpdateEnv,
+	notice: { show(): void; setChecking(value: boolean): void; isChecking(): boolean }
+): void {
+	const row = doc.querySelector<HTMLElement>("[data-update-check]")
+	const status = row?.querySelector<HTMLElement>("[data-update-check-status]")
+	const button = row?.querySelector<HTMLButtonElement>("[data-update-check-button]")
+	if (!row || !status || !button) return
+	row.hidden = false
+
+	button.addEventListener("click", async () => {
+		if (notice.isChecking()) return
+		notice.setChecking(true)
+		status.textContent = row.dataset.checking ?? ""
+		let result: "current" | "ready" | "failed"
+		try {
+			await env.registration.update()
+			await settled(env.registration.installing)
+			result = env.registration.waiting ? "ready" : "current"
+		} catch {
+			result = "failed"
+		}
+		if (result === "ready") notice.show()
+		notice.setChecking(false)
+		status.textContent = row.dataset[result] ?? ""
 	})
 }

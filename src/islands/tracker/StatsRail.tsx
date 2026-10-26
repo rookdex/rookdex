@@ -46,7 +46,13 @@ export function StatsRail({ overall, categories, recent, hubHref, t }: Props) {
 	return (
 		<section className="stats" aria-labelledby="stats-heading">
 			<h2 id="stats-heading">
-				{hubHref ? <a href={hubHref}>{t("tracker.progress")}</a> : t("tracker.progress")}
+				{hubHref ? (
+					<a className="go-link" href={hubHref}>
+						{t("tracker.progress")}
+					</a>
+				) : (
+					t("tracker.progress")
+				)}
 			</h2>
 			<div className="stats-grid">
 				<Bar

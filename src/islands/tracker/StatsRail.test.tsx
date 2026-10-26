@@ -29,6 +29,7 @@ describe("StatsRail", () => {
 		)
 		const link = screen.getByRole("link", { name: "Progress" })
 		expect(link).toHaveAttribute("href", "/en/")
+		expect(link).toHaveClass("go-link")
 		expect(screen.getByRole("heading", { name: "Progress" })).toContainElement(link)
 	})
 

@@ -127,7 +127,7 @@ describe("Privacy page (Android spec §3)", () => {
 			const section = doc.querySelector('section[aria-labelledby="privacy-delete"]')
 			expect(section?.textContent).toContain(t("settings.deleteAll"))
 			expect(section?.querySelector("a")?.getAttribute("href")).toBe(
-				`/${locale}/settings/#settings-data`
+				`/${locale}/settings/#delete-data`
 			)
 		}
 	)

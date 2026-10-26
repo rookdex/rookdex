@@ -37,7 +37,7 @@ const categoryCount = categoryIds(countable(seedItems)).length
 			</h1>
 			<p class="tagline">{t("tagline")}</p>
 			<p class="tap-links">
-				<a href={getRelativeLocaleUrl(locale, "tracker")}>{t("hub.openTracker")}</a>
+				<a class="go-link" href={getRelativeLocaleUrl(locale, "tracker")}>{t("hub.openTracker")}</a>
 			</p>
 		</header>
 		{/* The server-rendered time changes every build; the version hash skips it (precache.mjs). */}
