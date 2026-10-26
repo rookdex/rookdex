@@ -1,5 +1,22 @@
 [
 	{
+		"id": "rumours/performance-mode-later",
+		"name": "A Performance Mode After Launch",
+		"claim_key": "performance-mode-later",
+		"summary": "Rockstar North's Rob Nelson has said GTA 6 runs at 30 fps on PS5 and Xbox Series X at launch and that more options may come later; a 60 fps mode is not confirmed, and Digital Foundry calls one extremely unlikely on console.",
+		"added": "2026-08-28",
+		"sources": [
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-will-run-at-30fps-across-ps5-and-xbox-series-x-and-rockstar-is-reportedly-undecided-about-adding-a-performance-mode-to-better-that/",
+				"title": "GTA 6 will run at 30fps across PS5 and Xbox Series X"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-at-60fps-is-unlikely-on-console-and-will-be-genuinely-challenging-on-pc-tech-analysts-say/",
+				"title": "GTA 6 at 60fps is \"unlikely\" on console and will be \"genuinely challenging\" on PC, tech analysts say"
+			}
+		]
+	},
+	{
 		"id": "rumours/online-2027-launch",
 		"name": "GTA 6 Multiplayer in 2027",
 		"claim_key": "online-2027-launch",
@@ -14,11 +31,19 @@
 	},
 	{
 		"id": "rumours/pc-release-timing",
-		"name": "GTA 6 PC Release Timing",
-		"claim_key": "pc-release-late-2027",
-		"summary": "PC Gamer estimates the PC version likely will not arrive before late 2027, based on the gaps between console and PC launches for past Rockstar titles; Rockstar has given no PC release window.",
-		"added": "2026-09-18",
+		"name": "GTA 6 on PC by March 2027",
+		"claim_key": "pc-release-q1-2027",
+		"summary": "GamesBeat, citing four unnamed industry sources, reports that the PC version will launch in the first three months of 2027, sooner than PC Gamer's own estimate of late 2027; Rockstar has not announced a PC version or commented on the report.",
+		"added": "2026-10-13",
 		"sources": [
+			{
+				"url": "https://www.pcgamer.com/games/grand-theft-auto/report-claims-grand-theft-auto-6-will-launch-on-pc-sooner-than-anyone-expected/",
+				"title": "Grand Theft Auto 6 rumored to be launching on PC sooner than anyone expected"
+			},
+			{
+				"url": "https://rockstarintel.com/gta-6-coming-to-pc-by-march-2027-says-report/",
+				"title": "GTA 6 Coming To PC By March 2027 Says Report"
+			},
 			{
 				"url": "https://www.pcgamer.com/games/grand-theft-auto/gta-6-pc-release-date/",
 				"title": "When might the GTA 6 PC release date be?"
@@ -26,15 +51,28 @@
 		]
 	},
 	{
-		"id": "rumours/post-launch-map-expansion",
-		"name": "Post-Launch Map Expansion",
-		"claim_key": "map-expansion",
-		"summary": "Insider reporting cited by GTABase suggests Rockstar intends to keep growing Leonida after launch by adding new missions and cities over time rather than shipping the full world on day one; this plan is not officially confirmed.",
-		"added": "2026-09-18",
+		"id": "rumours/review-copies-october",
+		"name": "Review Copies Before November",
+		"claim_key": "review-copies-october",
+		"summary": "Insider NateTheHate claims review copies go out before the end of October, and Insider Gaming reports that reviews go live before the 19 November launch; Rockstar has not announced a review date.",
+		"added": "2026-10-15",
 		"sources": [
 			{
-				"url": "https://www.gtabase.com/gta-6/map/",
-				"title": "GTA 6 Map: Full Leonida Map, Vice City & All Locations"
+				"url": "https://rockstarintel.com/gta-6-will-be-sent-out-very-soon-to-reviewers-its-claimed/",
+				"title": "GTA 6 Will Be Sent Out Very Soon To Reviewers It's Claimed"
+			}
+		]
+	},
+	{
+		"id": "rumours/preorder-estimate",
+		"name": "Record Pre-Order Estimates",
+		"claim_key": "preorder-estimate-us-digital",
+		"summary": "Analytics firm Sensor Tower estimates 6.45 million digital pre-orders in the US alone, 148% ahead of Call of Duty: Modern Warfare 2 at the same point before launch; these are outside estimates, and Rockstar and Take-Two have not shared sales figures.",
+		"added": "2026-10-21",
+		"sources": [
+			{
+				"url": "https://rockstarintel.com/gta-6-pre-order-numbers-are-146-more-than-any-other-game/",
+				"title": "GTA 6 Pre-Orders Are 148% More Than Any Other Game"
 			}
 		]
 	}
