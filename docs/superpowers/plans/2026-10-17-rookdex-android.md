@@ -855,7 +855,7 @@ git commit -m "Refuse Android signing keys and app bundles in git"
 
 **Interfaces:**
 - Consumes: privacy URL from Task 1; graphics paths from Tasks 6 and 7.
-- Produces: the files I paste from on 23 to 27 October.
+- Produces: the files I paste from on 26 to 28 October.
 
 - [ ] **Step 1: Write `docs/android/listing.md`**
 
