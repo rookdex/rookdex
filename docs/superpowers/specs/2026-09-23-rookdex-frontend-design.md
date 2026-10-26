@@ -15,7 +15,7 @@ Written 2026-09-23 from the frontend brainstorm (sessions 9–12). It adds app-s
 ### Non-goals
 
 - No light theme and no theme setting. Dark-only is locked (brand spec §10).
-- No facts feed on News. Phase 1c adds it; this spec ships no placeholder for it.
+- No facts feed on News. Phase 1c adds it; this spec ships no placeholder for it. (As built, October 2026: a hand-curated Confirmed section now sits above Rumours, see section 8.)
 - No display names for outlets. Sources show the domain (section 9).
 - No client-side router (`ClientRouter`, view transitions). Deferred until the nav is measured in use.
 - No change to the Tracker island's data model, profile menu or delete flow. The one exception: a new "closed" state when another tab deletes all data (section 7.2).
@@ -151,6 +151,7 @@ Legal lines stay in the footer on every page; Settings repeats only the source l
 - Lead: the existing `rumours.intro` ("Reported by press, not confirmed by Rockstar. Rumours move to the tracker when confirmed." / "Meldt av pressen, ikke bekreftet av Rockstar. Rykter flyttes til oversikten når de bekreftes."). Page description: a new `news.description`, since the tab will hold more than rumours in 1c.
 - `<h2>` "Rumours" / "Rykter" (the existing `rumours.title`), then the rumour list: name as `<h3>` (17 px, DM Sans 700), summary (14 px muted), "Reported by {outlet}" link (14 px cyan), each item under a hairline with 12 px vertical padding. The empty state keeps `rumours.empty`.
 - The old "back to tracker" link is dropped; the tab bar does that job.
+- As built, October 2026: a hand-curated **Confirmed** section ("Bekreftet") sits above Rumours, filled from `src/seed/facts.json`. Each fact carries an en and nb name and summary, an `announced` date (newest first) and the same source rule as a confirmed tracker item: an official source, plus press next to an official video. It links its official source as "Announced on {outlet}". Each section now opens with its own intro line, so `rumours.intro` moved under the Rumours `<h2>` and no longer sits under the `<h1>`. The phase 1c feed replaces the file, not the section. Below Rumours, an **Official channels** section ("Offisielle kanaler") lists Rockstar Newswire, YouTube, X and Instagram as plain-text external links, with no logos.
 
 ## 9. Guide sources
 
@@ -233,7 +234,7 @@ Rendering `.astro` files needs Astro's Container API (`experimental_AstroContain
 
 - Promote the tab bar, history buttons and language dropdown into the Workbench design system once they have run in production.
 - Outlet display names (`{ domain, name }` in `allowlist.json`) when a guide gets three or more sources.
-- Phase 1c: the facts feed on News, and the `preview` job posting its URL as a PR comment.
+- Phase 1c: the automated facts feed on News (replacing the hand-curated `facts.json`), and the `preview` job posting its URL as a PR comment.
 
 ## 16. Stress test: considered and rejected
 

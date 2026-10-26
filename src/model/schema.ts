@@ -69,6 +69,23 @@ export const rumourInputSchema = z.strictObject({
 })
 export const rumourSchema = rumourInputSchema.extend({ sources: z.array(sourceSchema).min(1) })
 
+/** One string per shipped locale: a fact is written in every language, unlike a rumour. */
+function localized(max: number) {
+	return z.strictObject({ en: text(max), nb: text(max) })
+}
+
+/** A confirmed fact on News, hand-curated until the phase 1c facts feed takes over. */
+export const factInputSchema = z.strictObject({
+	id: idSchema,
+	claim_key: z.string().regex(/^[a-z0-9-]{1,80}$/),
+	name: localized(TEXT.name),
+	summary: localized(TEXT.summary),
+	/** The day Rockstar or Take-Two announced it, `YYYY-MM-DD`. News sorts by it, newest first. */
+	announced: z.iso.date(),
+	sources: z.array(sourceInputSchema).min(1),
+})
+export const factSchema = factInputSchema.extend({ sources: z.array(sourceSchema).min(1) })
+
 export const progressRecordSchema = z.strictObject({
 	item_id: idSchema,
 	done: z.boolean(),
@@ -104,6 +121,8 @@ export type SeedItemInput = z.infer<typeof seedItemInputSchema>
 export type SeedItem = z.infer<typeof seedItemSchema>
 export type RumourInput = z.infer<typeof rumourInputSchema>
 export type Rumour = z.infer<typeof rumourSchema>
+export type FactInput = z.infer<typeof factInputSchema>
+export type Fact = z.infer<typeof factSchema>
 export type ProgressRecord = z.infer<typeof progressRecordSchema>
 export type Profile = z.infer<typeof profileSchema>
 export type ExportFile = z.infer<typeof exportFileSchema>

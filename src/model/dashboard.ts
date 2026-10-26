@@ -1,7 +1,7 @@
 // The dashboard's numbers (dashboard spec §6.2). Pure: no DOM, no clock; the caller passes `now`.
 // Retired items and records without a seed item never count, as in stats.ts.
 import { localDayKey } from "./days"
-import type { Rumour, SeedItem } from "./schema"
+import type { Fact, Rumour, SeedItem } from "./schema"
 import { groupItems } from "./seed"
 import { countable, perCategory, type Records } from "./stats"
 
@@ -82,4 +82,11 @@ export function latestRumours(rumours: Rumour[], limit: number): Rumour[] {
 	return [...rumours]
 		.sort((a, b) => b.added.localeCompare(a.added) || a.id.localeCompare(b.id))
 		.slice(0, limit)
+}
+
+/** Newest `announced` first, ties by id: the Confirmed list on News. */
+export function newestFacts(facts: Fact[]): Fact[] {
+	return [...facts].sort(
+		(a, b) => b.announced.localeCompare(a.announced) || a.id.localeCompare(b.id)
+	)
 }

@@ -7,6 +7,8 @@ import { normalizeHost } from "./outlet"
 import {
 	type Allowlist,
 	allowlistSchema,
+	type Fact,
+	factInputSchema,
 	type Rumour,
 	rumourInputSchema,
 	type SeedItem,
@@ -71,19 +73,19 @@ function attachTiers(
 	return { sources: tiered, errors }
 }
 
+/** Spec §4: confirmed needs an official source, and an official video alone needs press too. */
+function confirmedErrors(id: string, sources: Source[]): string[] {
+	const official = sources.filter((s) => s.tier === "official")
+	if (official.length === 0) return [`${id}: confirmed needs an official source`]
+	if (official.every((s) => isVideo(s.url)) && !sources.some((s) => s.tier === "press"))
+		return [`${id}: video-only official source needs a press source naming the item`]
+	return []
+}
+
 /** Spec §4: what each status needs from its sources. */
 export function tierErrors(item: SeedItem): string[] {
-	const errors: string[] = []
-	const official = item.sources.filter((s) => s.tier === "official")
-	const press = item.sources.filter((s) => s.tier === "press")
-	if (item.status === "confirmed") {
-		if (official.length === 0) errors.push(`${item.id}: confirmed needs an official source`)
-		else if (official.every((s) => isVideo(s.url)) && press.length === 0)
-			errors.push(`${item.id}: video-only official source needs a press source naming the item`)
-	} else if (!item.precedent) {
-		errors.push(`${item.id}: expected needs a precedent`)
-	}
-	return errors
+	if (item.status === "confirmed") return confirmedErrors(item.id, item.sources)
+	return item.precedent ? [] : [`${item.id}: expected needs a precedent`]
 }
 
 function issueMessages(prefix: string, error: z.ZodError): string[] {
@@ -146,6 +148,23 @@ export function validateRumours(
 	return { rumours, errors }
 }
 
+/** Facts follow the same source rule as a confirmed seed item. */
+export function validateFacts(data: unknown, list: Allowlist): { facts: Fact[]; errors: string[] } {
+	const parsed = z.array(factInputSchema).safeParse(data)
+	if (!parsed.success) return { facts: [], errors: issueMessages("facts", parsed.error) }
+	const facts: Fact[] = []
+	const errors: string[] = []
+	for (const input of parsed.data) {
+		const tiered = attachTiers(input.id, input.sources, list)
+		errors.push(...tiered.errors)
+		if (tiered.errors.length > 0) continue
+		const ruleErrors = confirmedErrors(input.id, tiered.sources)
+		errors.push(...ruleErrors)
+		if (ruleErrors.length === 0) facts.push({ ...input, sources: tiered.sources })
+	}
+	return { facts, errors }
+}
+
 function categoryOf(path: string): string {
 	return (path.split("/").pop() ?? "").replace(/\.json$/, "")
 }
@@ -168,9 +187,10 @@ function idsIn(data: unknown): string[] {
 export function loadAll(
 	files: Record<string, unknown>,
 	list: Allowlist
-): { items: SeedItem[]; rumours: Rumour[]; errors: string[] } {
+): { items: SeedItem[]; rumours: Rumour[]; facts: Fact[]; errors: string[] } {
 	const items: SeedItem[] = []
 	let rumours: Rumour[] = []
+	let facts: Fact[] = []
 	const errors: string[] = []
 	const allIds: string[] = []
 	const categories = Object.entries(files)
@@ -184,6 +204,12 @@ export function loadAll(
 			errors.push(...result.errors)
 			continue
 		}
+		if (category === "facts") {
+			const result = validateFacts(data, list)
+			facts = result.facts
+			errors.push(...result.errors)
+			continue
+		}
 		const result = validateSeedFile(category, data, list)
 		items.push(...result.items)
 		errors.push(...result.errors)
@@ -193,7 +219,7 @@ export function loadAll(
 		if (seen.has(id)) errors.push(`duplicate id ${id}`)
 		seen.add(id)
 	}
-	return { items, rumours, errors }
+	return { items, rumours, facts, errors }
 }
 
 /** Category ids in the order items appear (alphabetical by file name). */
@@ -221,3 +247,4 @@ if (loaded.errors.length > 0) throw new Error(`Seed invalid:\n${loaded.errors.jo
 
 export const seedItems: SeedItem[] = loaded.items
 export const rumours: Rumour[] = loaded.rumours
+export const facts: Fact[] = loaded.facts
