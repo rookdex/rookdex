@@ -1,17 +1,27 @@
-# Play session runbook (23 to 27 October)
+# Play session runbook (26 to 28 October)
 
-Android spec §6. Latest safe closed-test go-live: Thursday 29 October.
+Android spec §6. Latest safe closed-test go-live: Thursday 29 October. That leaves 14 days of testing to 12 November and up to 7 days of production review before launch on 19 November.
 
-## Before 23 October
+If Play slips past 29 October, the site still launches on 19 November as a PWA. The Play listing can follow later.
 
-- [ ] Collect at least 14 testers' Google account emails, the ones they use in Play on an Android phone. iPhone users can't count.
+| Day | Steps |
+|---|---|
+| Monday 26 | Testers, 1, 2, 3 |
+| Tuesday 27 | 4, 5 |
+| Wednesday 28 | 6 (send for review) |
+
+## Testers (Monday 26 October)
+
+- [ ] Send the tester message and collect at least 14 testers' Google account emails, the ones they use in Play on an Android phone. iPhone users can't count.
 - [ ] Keep that list private: in my password manager or my own notes, then in Play Console's tester list. Never in this repo, a doc, an issue or an AI chat. It is other people's personal data.
+- [ ] Late replies are fine: testers can be added to the list after the track goes live. The clock only counts days with 12 or more opted in.
 
 ## 1. Account checks
 
 - [ ] Identity verification approved.
 - [ ] Device check (Play Console app on an Android phone with Google services), if Play still asks.
 - [ ] Phone verification (unlocks after identity).
+- [ ] Identity still in review? Steps 2 and 3 don't need it. Then try Create app (step 4): if Play Console allows it, the forms in step 5 can be filled in while I wait.
 
 ## 2. Build the bundle in PWABuilder
 

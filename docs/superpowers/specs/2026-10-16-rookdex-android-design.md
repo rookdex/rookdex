@@ -2,7 +2,7 @@
 
 Written 2026-10-16 from the Android brainstorm (sessions 54, 56, 64 and 65). It puts Rookdex on Google Play as a Trusted Web Activity (TWA): a thin Android shell that opens the live site in Chrome without browser chrome. The site stays the product. This spec covers what the repo needs for that, and the Play forms I fill in by hand.
 
-GTA VI launches Thursday 19 November 2026. A new personal Play account needs a closed test with at least 12 testers opted in for 14 days in a row, then a production review of up to 7 days. The latest safe go-live for the closed test is therefore **Thursday 29 October**. I'm away 18 to 22 October with only a phone, so my Play session runs 23 to 27 October.
+GTA VI launches Thursday 19 November 2026. A new personal Play account needs a closed test with at least 12 testers opted in for 14 days in a row, then a production review of up to 7 days. The latest safe go-live for the closed test is therefore **Thursday 29 October**. I'm away 18 to 22 October with only a phone, so my Play session runs 26 to 28 October (moved from 23 to 27 October, deadline unchanged).
 
 ## 1. What this spec covers
 
@@ -70,14 +70,14 @@ All text is written in my voice and pasted into Play Console by hand.
   - Feature graphic, 1024×500, required: `docs/brand/feature.html`, a variant of `og.html` with the same tokens and mark, rendered to `docs/android/feature-graphic.png` the way the OG banner was.
   - Phone screenshots: hub, tracker, news and settings, in English and Norwegian, 1080×1920 PNG (a 360×640 viewport at device scale 3) into `docs/android/screenshots/`. Captured from a production build so the service worker and fonts are real, with a fresh profile named "Main" and demo ticks, never my own profiles or names.
 
-## 6. My Play session (runbook, 23 to 27 October)
+## 6. My Play session (runbook, 26 to 28 October)
 
 1. **Finish account checks** if any are still open: identity, device (Play Console app on an Android phone with Google services), then phone (it unlocks after identity).
 2. **Build:** PWABuilder with `https://rookdex.app`, Android, Google Play. Package `app.rookdex`, app and launcher name "Rookdex", display standalone, status bar and splash colour `#000000`, notification and location delegation off, Play Billing off, fallback Custom Tabs. Signing key: create new.
 3. **Keep the key safe:** the downloaded zip holds the keystore and its passwords. Both go into my password manager plus one offline copy. Unzip it outside the repo. `.gitignore` still refuses `*.keystore`, `*.jks`, `signing-key-info.txt`, `*.aab`, `*.apk` and `*.idsig` in case it lands there. The key, its passwords and `signing-key-info.txt` are never pasted into a chat or an AI tool. If the key is lost, Play App Signing lets me reset the upload key, so loss is recoverable but slow.
 4. **Create the app** in Play Console: default language English, app (not game), free. Play App Signing on (the default).
 5. **Fill in** the listing, graphics, privacy URL and App content forms from `docs/android/`.
-6. **Closed testing:** upload the bundle, add at least 12 testers by email list (family, classmates, the GET cohort), send for review, share the opt-in link. Every tester needs an Android phone and the Google account email they use in Play; iPhone users can't count. Collect the emails before 23 October. The 14-day clock counts days with at least 12 testers opted in, so aim for 14 or 15 in case one drops out.
+6. **Closed testing:** upload the bundle, add at least 12 testers by email list (family, classmates, the GET cohort), send for review, share the opt-in link. Every tester needs an Android phone and the Google account email they use in Play; iPhone users can't count. Collect the emails from 26 October. The 14-day clock counts days with at least 12 testers opted in, so aim for 14 or 15 in case one drops out.
 7. **Copy both SHA-256 fingerprints** from Play Console, Test and release, App integrity: the app signing key and the upload key. Both are public values and go into PR 2. Take them from Play Console, not from `signing-key-info.txt`, which also holds the passwords.
 8. **Device check on a tester phone:** the app opens without a URL bar (after PR 2 deploys), the install prompt stays hidden, and the in-app back and forward buttons behave next to Android's own back gesture.
 
@@ -110,7 +110,7 @@ Done 2026-10-16. TMview, covering EUIPO, USPTO, UKIPO, WIPO and Norway's Patents
 | 16 Oct | Play account registered; identity, device and phone checks started | me |
 | 16 to 17 Oct | This spec, the plan, PR 1 (privacy page, links, `docs/android/`, graphics, `.gitignore`) merged and deployed | me |
 | 18 to 22 Oct | Away. Identity check runs. | |
-| 23 to 27 Oct | Runbook steps 1 to 7 | me |
+| 26 to 28 Oct | Runbook steps 1 to 7 | me |
 | By 29 Oct | Closed test live with 12+ testers opted in | me |
 | After first upload | PR 2 (`assetlinks.json`) | me |
 | ~12 Nov | Apply for production access, review up to 7 days | me |
