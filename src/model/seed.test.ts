@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest"
+import { locales } from "../i18n/locales"
 import en from "../locales/en.json"
 import nb from "../locales/nb.json"
 import type { Allowlist } from "./schema"
 import {
 	allowlist,
 	categoryIds,
+	facts,
 	groupItems,
 	isVideo,
 	loadAll,
@@ -13,6 +15,7 @@ import {
 	rumours,
 	seedItems,
 	tierErrors,
+	validateFacts,
 	validateRumours,
 	validateSeedFile,
 } from "./seed"
@@ -155,12 +158,40 @@ describe("validateRumours", () => {
 	})
 })
 
+describe("validateFacts", () => {
+	const fact = {
+		id: "facts/stock-market",
+		claim_key: "stock-market",
+		name: { en: "Stock market", nb: "Aksjemarked" },
+		summary: { en: "Rockstar confirmed a stock market.", nb: "Rockstar bekreftet et aksjemarked." },
+		announced: "2026-10-15",
+		sources: [official],
+	}
+	it("needs an official source, like a confirmed item (spec §4)", () => {
+		expect(validateFacts([fact], list).errors).toEqual([])
+		expect(validateFacts([{ ...fact, sources: [press] }], list).errors).toEqual([
+			"facts/stock-market: confirmed needs an official source",
+		])
+	})
+	it("needs a press source next to an official video", () => {
+		expect(validateFacts([{ ...fact, sources: [trailer] }], list).errors).toEqual([
+			"facts/stock-market: video-only official source needs a press source naming the item",
+		])
+		expect(validateFacts([{ ...fact, sources: [trailer, press] }], list).errors).toEqual([])
+	})
+	it("needs both languages and an announced date as YYYY-MM-DD", () => {
+		expect(validateFacts([{ ...fact, name: { en: "Stock market" } }], list).errors).not.toEqual([])
+		expect(validateFacts([{ ...fact, announced: "15.10.2026" }], list).errors).not.toEqual([])
+	})
+})
+
 describe("loadAll", () => {
 	it("maps file names to categories, skips rumours, and rejects duplicate ids", () => {
 		const files = {
 			"../seed/wildlife.json": [item({})],
 			"../seed/vehicles.json": [item({ id: "wildlife/american-alligator", category: "vehicles" })],
 			"../seed/rumours.json": [],
+			"../seed/facts.json": [],
 		}
 		const result = loadAll(files, list)
 		expect(result.errors).toContain("duplicate id wildlife/american-alligator")
@@ -184,6 +215,7 @@ describe("shipped seed", () => {
 	it("validates against the shipped allowlist (this is the CI gate)", () => {
 		expect(Array.isArray(seedItems)).toBe(true)
 		expect(Array.isArray(rumours)).toBe(true)
+		expect(facts.length).toBeGreaterThan(0)
 		expect(allowlist.blocklist).toBeDefined()
 	})
 	it("has an English name and a label in both languages for every category and group", () => {
@@ -199,9 +231,15 @@ describe("shipped seed", () => {
 			}
 		}
 	})
-	it("keeps brand tokens out of item and rumour ids (whole segment only)", () => {
+	it("writes every fact in every shipped language", () => {
+		for (const fact of facts) {
+			expect(Object.keys(fact.name).sort(), fact.id).toEqual([...locales].sort())
+			expect(Object.keys(fact.summary).sort(), fact.id).toEqual([...locales].sort())
+		}
+	})
+	it("keeps brand tokens out of item, rumour and fact ids (whole segment only)", () => {
 		const banned = ["gta", "gta6", "gtavi", "rockstar", "leonida", "vice"]
-		for (const { id } of [...seedItems, ...rumours]) {
+		for (const { id } of [...seedItems, ...rumours, ...facts]) {
 			for (const segment of id.split(/[/-]/)) {
 				expect(banned, id).not.toContain(segment)
 			}

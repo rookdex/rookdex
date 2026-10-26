@@ -2,28 +2,56 @@
 import ExternalLink from "../../components/ExternalLink.astro"
 import { isLocale, type Locale, locales, translator } from "../../i18n"
 import Base from "../../layouts/Base.astro"
-import { latestRumours } from "../../model/dashboard"
+import { latestRumours, newestFacts } from "../../model/dashboard"
 import { outletOf } from "../../model/outlet"
-import { rumours } from "../../model/seed"
+import { facts, rumours } from "../../model/seed"
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale }, props: {} }))
 }
 
-// The News tab (spec §8). Rumours are its first section; phase 1c adds the facts feed above them.
+// The News tab (spec §8). Confirmed facts sit above the rumours. Both are hand-curated until the
+// phase 1c facts feed takes over.
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const { t } = translator(locale as Locale)
 // Newest first, the same order as Latest on the hub (dashboard spec §6.3).
 const ordered = latestRumours(rumours, rumours.length)
+const confirmed = newestFacts(facts)
+const lang = locale as Locale
 ---
 
 <Base locale={locale} title={t("seo.titles.news")} description={t("news.description")} path="news">
 	<article class="news">
 		<h1>{t("news.title")}</h1>
-		<p class="tagline">{t("rumours.intro")}</p>
+		{
+			confirmed.length > 0 && (
+				<section aria-labelledby="confirmed">
+					<h2 id="confirmed">{t("facts.title")}</h2>
+					<p class="section-intro">{t("facts.intro")}</p>
+					<ul class="rumour-list fact-list">
+						{confirmed.map((fact) => {
+							const official =
+								fact.sources.find((source) => source.tier === "official") ?? fact.sources[0]
+							return (
+								<li>
+									<h3>{fact.name[lang]}</h3>
+									<p class="summary">{fact.summary[lang]}</p>
+									<p class="meta">
+										<ExternalLink href={official.url} locale={lang}>
+											{t("facts.announcedOn", { outlet: outletOf(official.url) })}
+										</ExternalLink>
+									</p>
+								</li>
+							)
+						})}
+					</ul>
+				</section>
+			)
+		}
 		<section aria-labelledby="rumours">
 			<h2 id="rumours">{t("rumours.title")}</h2>
+			<p class="section-intro">{t("rumours.intro")}</p>
 			{
 				ordered.length === 0 ? (
 					<p>{t("rumours.empty")}</p>
@@ -50,3 +78,15 @@ const ordered = latestRumours(rumours, rumours.length)
 		</section>
 	</article>
 </Base>
+
+<style>
+	/* Each section says where its items come from, so a confirmed fact never sits under the
+	   "not confirmed" line. Muted like the summaries, at body size. */
+	.section-intro {
+		color: var(--text-muted);
+	}
+
+	section + section {
+		margin-top: var(--space-4);
+	}
+</style>

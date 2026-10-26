@@ -1,0 +1,90 @@
+[
+	{
+		"id": "facts/editions-and-prices",
+		"claim_key": "editions-prices",
+		"name": {
+			"en": "Two Editions, from $79.99",
+			"nb": "To utgaver, fra 79,99 dollar"
+		},
+		"summary": {
+			"en": "Pre-orders opened on 25 June. The Standard Edition costs $79.99 and the digital-only Ultimate Edition $99.99, and Standard owners can buy the upgrade later. Purchases before 20 November include the Vintage Vice City Pack.",
+			"nb": "Forhåndsbestillingen åpnet 25. juni. Standardutgaven koster 79,99 dollar og Ultimate Edition, som bare finnes digitalt, 99,99 dollar. Standard kan oppgraderes senere. Kjøp før 20. november får med Vintage Vice City Pack."
+		},
+		"announced": "2026-06-24",
+		"sources": [
+			{
+				"url": "https://www.take2games.com/ir/news/rockstar-games-announces-pre-orders-grand-theft-auto-vi",
+				"title": "Rockstar Games Announces Pre-Orders for Grand Theft Auto VI"
+			},
+			{
+				"url": "https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions",
+				"title": "Grand Theft Auto VI Platforms, Editions, and Versions"
+			}
+		]
+	},
+	{
+		"id": "facts/preload",
+		"claim_key": "preload-date",
+		"name": {
+			"en": "Preload Opens 12 November",
+			"nb": "Forhåndsnedlasting fra 12. november"
+		},
+		"summary": {
+			"en": "Preload starts at local midnight on 12 November, a week before launch. Boxed copies hold a download code instead of a disc, and they reach shops from 12 November so they can preload too.",
+			"nb": "Forhåndsnedlastingen starter ved midnatt lokal tid 12. november, en uke før lansering. Fysiske eksemplarer har en nedlastingskode i stedet for en plate, og de kommer i butikk fra 12. november så også de kan lastes ned på forhånd."
+		},
+		"announced": "2026-06-24",
+		"sources": [
+			{
+				"url": "https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions",
+				"title": "Grand Theft Auto VI Platforms, Editions, and Versions"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-pre-loads-open-exactly-1-week-before-rockstars-long-awaited-sequel-comes-out-take-two-finally-confirms/",
+				"title": "GTA 6 pre-loads open exactly 1 week before Rockstar's long-awaited sequel comes out"
+			}
+		]
+	},
+	{
+		"id": "facts/radio-stations",
+		"claim_key": "radio-stations",
+		"name": {
+			"en": "Six Radio Stations and Podcasts",
+			"nb": "Seks radiokanaler og podkaster"
+		},
+		"summary": {
+			"en": "Rockstar detailed six in-game radio stations, from Latin and country to metal and pop, plus on-demand podcasts. For the first time, Jason and Lucia can listen on foot through earbuds connected to their phones.",
+			"nb": "Rockstar viste fram seks radiokanaler i spillet, fra latinamerikansk musikk og country til metal og pop, og podkaster du kan høre når du vil. For første gang kan Jason og Lucia lytte til fots, med ørepropper koblet til mobilen."
+		},
+		"announced": "2026-10-08",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/o3982oa93a23k4/the-music-of-grand-theft-auto-vi-in-game-radio-stations",
+				"title": "The Music of Grand Theft Auto VI: In-Game Radio Stations"
+			}
+		]
+	},
+	{
+		"id": "facts/launch-trailer",
+		"claim_key": "launch-trailer",
+		"name": {
+			"en": "Launch Trailer Out, Date Holds",
+			"nb": "Lanseringstraileren er ute"
+		},
+		"summary": {
+			"en": "Rockstar released the Launch Trailer on 15 October and restated the release date: 19 November on PlayStation 5 and Xbox Series X|S.",
+			"nb": "Rockstar slapp lanseringstraileren 15. oktober og gjentok utgivelsesdatoen: 19. november på PlayStation 5 og Xbox Series X|S."
+		},
+		"announced": "2026-10-15",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/517572321a549a/watch-the-grand-theft-auto-vi-launch-trailer",
+				"title": "Watch the Grand Theft Auto VI Launch Trailer"
+			},
+			{
+				"url": "https://rockstarintel.com/gta-6-launch-trailer-released/",
+				"title": "GTA 6 Launch Trailer Released"
+			}
+		]
+	}
+]
