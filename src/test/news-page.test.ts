@@ -51,6 +51,7 @@ describe("News page (spec §8)", () => {
 		expect([...doc.querySelectorAll("main h2")].map((h) => h.textContent)).toEqual([
 			"Confirmed",
 			"Rumours",
+			"Official channels",
 		])
 		expect(
 			doc.querySelector('nav[aria-label="Main"] [aria-current="page"]')?.textContent?.trim()
@@ -89,6 +90,22 @@ describe("News page (spec §8)", () => {
 			expect(a.getAttribute("href")).toBe("https://www.rockstargames.com/newswire/article/1")
 			expect(a.getAttribute("target")).toBe("_blank")
 			expect(a.textContent).toContain("Announced on rockstargames.com")
+		}
+	})
+
+	it("lists Rockstar's official channels as plain text links in a new tab", async () => {
+		const doc = await renderDoc(News, { params: { locale: "nb" } })
+		expect(doc.querySelector("#channels")?.textContent).toBe("Offisielle kanaler")
+		const links = [...doc.querySelectorAll(".channel-list a")]
+		expect(links.map((a) => a.getAttribute("href"))).toEqual([
+			"https://www.rockstargames.com/newswire",
+			"https://www.youtube.com/@RockstarGames",
+			"https://x.com/rockstargames",
+			"https://instagram.com/rockstargames",
+		])
+		for (const a of links) {
+			expect(a.getAttribute("target")).toBe("_blank")
+			expect(a.querySelector("img")).toBeNull()
 		}
 	})
 

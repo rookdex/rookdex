@@ -19,6 +19,13 @@ const { t } = translator(locale as Locale)
 const ordered = latestRumours(rumours, rumours.length)
 const confirmed = newestFacts(facts)
 const lang = locale as Locale
+// Rockstar's own channels, as its site footer links them. Plain text on purpose: no logos.
+const channels = [
+	{ name: "Rockstar Newswire", href: "https://www.rockstargames.com/newswire" },
+	{ name: "YouTube", href: "https://www.youtube.com/@RockstarGames" },
+	{ name: "X", href: "https://x.com/rockstargames" },
+	{ name: "Instagram", href: "https://instagram.com/rockstargames" },
+]
 ---
 
 <Base locale={locale} title={t("seo.titles.news")} description={t("news.description")} path="news">
@@ -76,6 +83,21 @@ const lang = locale as Locale
 				)
 			}
 		</section>
+		<section aria-labelledby="channels">
+			<h2 id="channels">{t("channels.title")}</h2>
+			<p class="section-intro">{t("channels.intro")}</p>
+			<ul class="rumour-list channel-list">
+				{
+					channels.map((channel) => (
+						<li>
+							<ExternalLink href={channel.href} locale={lang}>
+								{channel.name}
+							</ExternalLink>
+						</li>
+					))
+				}
+			</ul>
+		</section>
 	</article>
 </Base>
 
@@ -84,6 +106,17 @@ const lang = locale as Locale
 	   "not confirmed" line. Muted like the summaries, at body size. */
 	.section-intro {
 		color: var(--text-muted);
+	}
+
+	/* One link per row, each a full tap target. */
+	.channel-list li {
+		padding: 0;
+	}
+
+	.channel-list :global(a) {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tap);
 	}
 
 	section + section {

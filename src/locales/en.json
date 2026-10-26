@@ -146,6 +146,8 @@
 	"facts.title": "Confirmed",
 	"facts.intro": "Announced by Rockstar or Take-Two themselves.",
 	"facts.announcedOn": "Announced on {outlet}",
+	"channels.title": "Official channels",
+	"channels.intro": "Rockstar's own news, straight from the source.",
 	"news.title": "News",
 	"news.description": "News about GTA VI, including what the press reports that Rockstar has not confirmed.",
 	"sources.title": "Sources",
