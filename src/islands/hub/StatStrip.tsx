@@ -16,7 +16,9 @@ export function StatStrip({ newcomer, foundToday, daysSince, guideHref, t, plura
 		<p className="stat-strip">
 			<span className="stat-strip-first">
 				{newcomer ? (
-					<a href={guideHref}>{t("hub.newHere")}</a>
+					<a className="go-link" href={guideHref}>
+						{t("hub.newHere")}
+					</a>
 				) : (
 					plural("hub.foundToday", foundToday)
 				)}

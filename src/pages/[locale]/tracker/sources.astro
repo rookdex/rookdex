@@ -51,14 +51,14 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 						<ul class="tap-links">
 							{item.sources.map((source) => (
 								<li>
-									<ExternalLink href={source.url} locale={locale as Locale}>
+									<ExternalLink href={source.url} locale={locale as Locale} class="go-link">
 										{source.title}
 									</ExternalLink>
 									<span class="outlet">{outletOf(source.url)}</span>
 								</li>
 							))}
 						</ul>
-						<a class="back" href={`${tracker}#item-${item.id}`}>
+						<a class="back go-link" href={`${tracker}#item-${item.id}`}>
 							{t("sources.back")}<span class="visually-hidden">: {item.name}</span>
 						</a>
 					</article>
@@ -180,10 +180,12 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 	}
 
 	.back {
-		display: inline-flex;
-		align-items: center;
-		min-height: var(--tap);
 		color: var(--text-muted);
 		font-size: 0.8125rem;
+	}
+
+	/* A chevron would point away from where Back goes. */
+	.back::after {
+		content: none;
 	}
 </style>

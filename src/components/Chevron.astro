@@ -1,0 +1,24 @@
+---
+interface Props {
+	/** Points down, for a row that opens a list in place instead of going somewhere. */
+	down?: boolean
+}
+
+// The chevron that ends a link row in Settings. Decorative: the row's text names it.
+const { down = false } = Astro.props
+---
+
+<svg
+	class="row-chevron"
+	viewBox="0 0 24 24"
+	width="16"
+	height="16"
+	fill="none"
+	stroke="currentColor"
+	stroke-width="2"
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	aria-hidden="true"
+>
+	<path d={down ? "m6 9 6 6 6-6" : "m9 6 6 6-6 6"} />
+</svg>

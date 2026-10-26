@@ -58,7 +58,9 @@ export function CountdownView({ locale, state, guideHref }: Props) {
 			<h2>{t("hub.buyHeading")}</h2>
 			<p>{t("hub.buyBody", { standard: money(prices.standard) })}</p>
 			<p>
-				<a href={guideHref}>{t("hub.beforeYouStart")}</a>
+				<a className="go-link" href={guideHref}>
+					{t("hub.beforeYouStart")}
+				</a>
 			</p>
 		</section>
 	)

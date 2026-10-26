@@ -67,6 +67,7 @@ describe("Hub before launch", () => {
 			"href",
 			"/en/guides/before-you-start/"
 		)
+		expect(screen.getByRole("link", { name: "Read this before you start" })).toHaveClass("go-link")
 		// The status region exists from the start and says nothing on load.
 		expect(screen.getByRole("status")).toBeEmptyDOMElement()
 	})
@@ -140,6 +141,7 @@ describe("Hub after launch", () => {
 		expect(screen.queryByTestId("countdown-digits")).toBeNull()
 		expect(screen.getByRole("heading", { name: "Latest" })).toBeInTheDocument()
 		expect(screen.getByRole("link", { name: "All news" })).toHaveAttribute("href", "/en/news/")
+		expect(screen.getByRole("link", { name: "All news" })).toHaveClass("go-link")
 		const dates = [...document.querySelectorAll(".latest time")].map((el) => el.textContent)
 		expect(dates).toEqual(["today", "65 days ago"])
 	})

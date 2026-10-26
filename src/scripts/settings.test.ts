@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from "vitest"
 import type { DeleteResult } from "./delete-all"
-import { type InstallWindow, wireDeleteDialog, wireInstallRow, wireStorageRow } from "./settings"
+import {
+	type InstallWindow,
+	wireDeleteDialog,
+	wireInstallRow,
+	wireShareRow,
+	wireStorageRow,
+} from "./settings"
 
 function storageRow(): HTMLElement {
 	document.body.innerHTML = `
@@ -273,5 +279,47 @@ describe("wireDeleteDialog (spec §7.2)", () => {
 		await vi.waitFor(() =>
 			expect(box.status.textContent).toBe("All data on this device is deleted.")
 		)
+	})
+})
+
+function shareRow(): HTMLElement {
+	document.body.innerHTML = `
+		<dl>
+			<div data-share-row data-url="https://rookdex.app" data-title="Rookdex" data-text="Tagline" hidden>
+				<dt>Share</dt><dd><button type="button" data-share-button>Share Rookdex</button></dd>
+			</div>
+		</dl>`
+	return document.querySelector("[data-share-row]") as HTMLElement
+}
+
+describe("wireShareRow", () => {
+	it("leaves the row out when the browser has no share sheet", () => {
+		const row = shareRow()
+		wireShareRow(row, {})
+		expect(row.isConnected).toBe(false)
+	})
+
+	it("shows the row and shares the site's address, title and text", async () => {
+		const row = shareRow()
+		const share = vi.fn(() => Promise.resolve())
+		wireShareRow(row, { share })
+		expect(row.hidden).toBe(false)
+		row.querySelector<HTMLButtonElement>("[data-share-button]")?.click()
+		expect(share).toHaveBeenCalledWith({
+			title: "Rookdex",
+			text: "Tagline",
+			url: "https://rookdex.app",
+		})
+	})
+
+	it("treats a closed share sheet as nothing to report", async () => {
+		const row = shareRow()
+		const rejection = Promise.reject(new DOMException("Share canceled", "AbortError"))
+		const share = vi.fn(() => rejection)
+		wireShareRow(row, { share })
+		row.querySelector<HTMLButtonElement>("[data-share-button]")?.click()
+		await expect(rejection).rejects.toThrow()
+		await Promise.resolve()
+		expect(row.hidden).toBe(false)
 	})
 })
