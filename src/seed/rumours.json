@@ -1,9 +1,9 @@
 [
 	{
-		"id": "rumours/performance-mode-later",
-		"name": "A Performance Mode After Launch",
-		"claim_key": "performance-mode-later",
-		"summary": "Rockstar North's Rob Nelson has said GTA 6 runs at 30 fps on PS5 and Xbox Series X at launch and that more options may come later; a 60 fps mode is not confirmed, and Digital Foundry calls one extremely unlikely on console.",
+		"id": "rumours/console-frame-rate",
+		"name": "30 fps on Console at Launch",
+		"claim_key": "console-frame-rate-launch",
+		"summary": "Rockstar North's Rob Nelson told Flow Games that GTA 6 runs at 30 fps on PS5 and Xbox Series X for now and that more options may be added later; Rockstar has not published a launch frame rate, and Digital Foundry calls 60 fps on console extremely unlikely.",
 		"added": "2026-08-28",
 		"sources": [
 			{
