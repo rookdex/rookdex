@@ -5,6 +5,7 @@ import { CountdownView } from "./CountdownView"
 import type { DashboardProps } from "./Dashboard"
 import { DashboardSkeleton } from "./DashboardSkeleton"
 import { Latest, type LatestItem } from "./Latest"
+import { daysSinceText } from "./StatStrip"
 import { useHubPhase } from "./useHubPhase"
 
 type DashboardModule = { Dashboard: ComponentType<DashboardProps> }
@@ -63,7 +64,7 @@ export function Hub({
 	// The days line is news only when it changes on the device clock: not on load, and not when
 	// the first tick swaps the build clock for the device clock.
 	const daysText = after
-		? t("hub.daySince", { n: state.daysSince })
+		? daysSinceText(t, state.daysSince)
 		: plural("hub.daysToGo", state.daysToGo)
 	const synced = state.now !== start
 	const heard = useRef<string | null>(null)

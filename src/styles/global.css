@@ -971,12 +971,13 @@ p {
 	font-variant-numeric: tabular-nums;
 }
 
-/* Both text halves shrink and wrap, two lines at most at 14 px (42 px, inside the tap height),
-   so the newcomer link and the count swap without a shift. Only the dot keeps its size. */
+/* Phone: the two halves stack, so the link and the day label each keep one line at 320 px in nb.
+   The first half always holds the tap height, so the newcomer link and the count swap without a
+   shift. The dot only shows once both share a row. */
 .stat-strip {
 	display: flex;
-	align-items: center;
-	gap: var(--space-2);
+	flex-direction: column;
+	align-items: flex-start;
 	min-height: var(--tap);
 	margin: 0;
 	max-width: none;
@@ -985,12 +986,17 @@ p {
 }
 
 .stat-strip > span {
-	flex: 0 1 auto;
 	min-width: 0;
 }
 
+.stat-strip-first {
+	display: flex;
+	align-items: center;
+	min-height: var(--tap);
+}
+
 .stat-strip > [aria-hidden="true"] {
-	flex: none;
+	display: none;
 }
 
 /* What's next reserves 3 rows and 2 group titles, loaded or not (dashboard spec §4). */
@@ -1799,6 +1805,16 @@ p {
 @media (min-width: 768px) {
 	.hub-dashboard {
 		padding: var(--space-4) min(var(--space-4), 7.5vw);
+	}
+
+	.stat-strip {
+		flex-direction: row;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.stat-strip > [aria-hidden="true"] {
+		display: inline;
 	}
 
 	.stat-tile {
