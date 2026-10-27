@@ -82,7 +82,7 @@ describe("Privacy page (Android spec §3)", () => {
 		}
 	)
 
-	it.each(["en", "nb"] as const)("has the seven sections in order in %s", async (locale) => {
+	it.each(["en", "nb"] as const)("has the eight sections in order in %s", async (locale) => {
 		const { t } = translator(locale)
 		const doc = await page(locale)
 		expect([...doc.querySelectorAll("main section > h2")].map((h) => h.textContent)).toEqual([
@@ -90,6 +90,7 @@ describe("Privacy page (Android spec §3)", () => {
 			t("privacy.leavesTitle"),
 			t("privacy.hostingTitle"),
 			t("privacy.linksTitle"),
+			t("privacy.emailTitle"),
 			t("privacy.androidTitle"),
 			t("privacy.deleteTitle"),
 			t("privacy.whoTitle"),
@@ -167,6 +168,19 @@ describe("Privacy page (Android spec §3)", () => {
 			"legal@rookdex.app"
 		)
 	})
+
+	it.each(["en", "nb"] as const)(
+		"says what happens to an email in %s, with both addresses",
+		async (locale) => {
+			const { t } = translator(locale)
+			const doc = await page(locale)
+			const section = doc.querySelector('section[aria-labelledby="privacy-email"]')
+			expect(text(section?.querySelector("p"))).toBe(t("privacy.emailBody"))
+			for (const address of ["feedback@rookdex.app", "legal@rookdex.app"]) {
+				expect(t("privacy.emailBody")).toContain(address)
+			}
+		}
+	)
 
 	it("has no axe violations in either language", async () => {
 		for (const locale of ["en", "nb"] as const) {
