@@ -15,7 +15,7 @@ describe("Settings page (spec §7)", () => {
 			doc.querySelector('nav[aria-label="Main"] [aria-current="page"]')?.textContent?.trim()
 		).toBe("Settings")
 		expect([...doc.querySelectorAll("main section > h2")].map((h) => h.textContent)).toEqual([
-			"Language",
+			"General",
 			"Your data",
 			"About",
 		])
@@ -28,7 +28,7 @@ describe("Settings page (spec §7)", () => {
 	})
 
 	const languageGroup = (doc: Document) =>
-		doc.querySelector('section[aria-labelledby="settings-language"]')
+		doc.querySelector('section[aria-labelledby="settings-general"]')
 
 	it("shows the language as one row that opens the header's picker", async () => {
 		const doc = await settings("nb")

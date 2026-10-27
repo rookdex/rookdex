@@ -14,7 +14,7 @@ const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const { t } = translator(locale as Locale)
 // The day this text last changed. Move it with every change to the privacy copy.
-const UPDATED = new Date("2026-10-17T00:00:00Z")
+const UPDATED = new Date("2026-10-27T00:00:00Z")
 const dateLocale = locale === "nb" ? "nb-NO" : "en-GB"
 const updated = new Intl.DateTimeFormat(dateLocale, { dateStyle: "long", timeZone: "UTC" }).format(
 	UPDATED
@@ -63,6 +63,11 @@ const updated = new Intl.DateTimeFormat(dateLocale, { dateStyle: "long", timeZon
 		<section aria-labelledby="privacy-links">
 			<h2 id="privacy-links">{t("privacy.linksTitle")}</h2>
 			<p>{t("privacy.linksBody")}</p>
+		</section>
+
+		<section aria-labelledby="privacy-email">
+			<h2 id="privacy-email">{t("privacy.emailTitle")}</h2>
+			<p>{t("privacy.emailBody")}</p>
 		</section>
 
 		<section aria-labelledby="privacy-android">

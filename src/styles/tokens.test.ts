@@ -101,14 +101,15 @@ describe("no raw hex outside tokens.css (spec §13.1)", () => {
 		}
 	})
 
-	// The banner is serialised to a standalone SVG before it is rasterised, so it cannot read the
-	// custom properties and has to spell the colours out. Each one must still be a token value.
-	it("keeps the OG banner source on token values", () => {
-		const ogHtml = readFileSync(join(srcDir, "../docs/brand/og.html"), "utf8")
+	// The OG banner and the Play feature graphic are serialised to standalone SVGs before they are
+	// rasterised, so they cannot read the custom properties and have to spell the colours out. Each
+	// one must still be a token value.
+	it.each(["og.html", "feature.html"])("keeps docs/brand/%s on token values", (file) => {
+		const html = readFileSync(join(srcDir, "../docs/brand", file), "utf8")
 		const tokenHexes = new Set([...tokensCss.matchAll(/#[0-9a-f]{6}\b/g)].map((m) => m[0]))
-		const bannerHexes = [...ogHtml.matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map((m) => m[0])
-		expect(bannerHexes.length).toBeGreaterThan(5)
-		for (const hex of bannerHexes) expect(tokenHexes, hex).toContain(hex)
+		const hexes = [...html.matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map((m) => m[0])
+		expect(hexes.length).toBeGreaterThan(5)
+		for (const hex of hexes) expect(tokenHexes, hex).toContain(hex)
 	})
 })
 
