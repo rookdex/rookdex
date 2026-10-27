@@ -23,7 +23,7 @@ Check the service status page on support.rockstargames.com first. Busy servers o
 
 - **Ultimate Edition items** unlock chapter by chapter as you play the story. There is nothing to hunt for in the first hour.
 - **The Vintage Vice City Pack** (a '55 Vapid Stanier with a garage, outfits, hairstyles and a weapon pattern) comes with every purchase before 20 November. Rockstar hasn't said where it shows up in the game.
-- **The GTA+ month** that comes with a digital purchase covers GTA Online, not the story. You claim it in the PlayStation Store (by 31 March 2027) or the Xbox Store (within 180 days), and it renews at full price until you cancel. With no GTA Online at launch, there's no hurry.
+- **The GTA+ month** comes with a digital copy bought before 20 November, so launch day still counts. It covers GTA Online, not the story. You claim it in the PlayStation Store (by 31 March 2027) or under Offers & Credits in the Microsoft Store (within 180 days), and it renews at full price until you cancel. With no GTA Online at launch, there's no hurry.
 
 ## Playing as two
 
