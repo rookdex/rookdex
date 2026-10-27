@@ -22,11 +22,24 @@ const tickIndexes = [0, 1, 3, 4, 6, 8, 10, 12, 15]
 const pages = [
 	["1-hub", "", [{ start: "section.hub-state" }]],
 	["2-tracker", "tracker/", [{ start: "top" }, { start: "section.stats" }]],
-	["3-news", "news/", [{ start: "top" }, { start: "#rumours" }, { start: ".rumour-list" }]],
+	[
+		"3-news",
+		"news/",
+		[
+			{ start: "top" },
+			{ start: "#confirmed" },
+			{ start: '[aria-labelledby="rumours"] .rumour-list' },
+		],
+	],
 	[
 		"4-settings",
 		"settings/",
-		[{ start: "top" }, { start: '[aria-labelledby="settings-data"]' }, { end: ".danger" }],
+		[
+			{ start: "top" },
+			{ start: '[aria-labelledby="settings-data"]' },
+			{ start: "#about" },
+			{ end: "#delete-data" },
+		],
 	],
 ]
 const viewport = { width: 360, height: 640, deviceScaleFactor: 3 }

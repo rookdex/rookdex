@@ -32,7 +32,7 @@ What you get:
 • A countdown to launch, then a dashboard of what to do next
 • A tracker for collectibles, places, vehicles and wildlife, with progress per category
 • Several profiles on one device, with export and import
-• News: press reports that are not confirmed yet, each with its source
+• News: what Rockstar has confirmed and press reports that are not confirmed yet, each with its source
 • A guide to what to sort out before launch night
 • English and Norwegian
 
@@ -60,7 +60,7 @@ Dette får du:
 • Nedtelling til lansering, deretter en oversikt over hva du kan gjøre nå
 • Sjekkliste for samleobjekter, steder, kjøretøy og dyreliv, med fremdrift per kategori
 • Flere profiler på én enhet, med eksport og import
-• Nyheter: det pressen melder som ikke er bekreftet ennå, hver sak med kilde
+• Nyheter: det Rockstar har bekreftet og det pressen melder som ikke er bekreftet ennå, hver sak med kilde
 • En guide til hva du bør ordne før lanseringskvelden
 • Engelsk og norsk
 
