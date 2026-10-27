@@ -35,4 +35,4 @@ The standard digital edition is {price:standard} on the PlayStation Store and th
 
 ## What Rookdex does on launch night
 
-[The home page](/en/) turns into your dashboard at midnight. [Install the site](/en/settings/#about) on your phone before then, so it works even when the wifi is busy.
+[The home page](/en/) turns into your dashboard at midnight. [Install the site](/en/settings/#about) on your phone before then, so it works even when the wifi is busy. Once the game unlocks, [your first hour](/en/guides/first-hour/) covers what to check and what you can skip.
