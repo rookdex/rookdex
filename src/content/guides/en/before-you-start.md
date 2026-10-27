@@ -1,16 +1,17 @@
 ---
 title: Before you start
 searchTitle: "Before you start: GTA 6 launch checklist · Rookdex"
-summary: What to sort out before launch night so you can play at midnight.
-updated: 2026-10-01
+summary: What to sort out before launch night so you can play the moment it unlocks.
+updated: 2026-10-27
 sources:
+  - https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions
   - https://www.rockstargames.com/newswire/article/5171972o3ak5oa/pre-order-grand-theft-auto-vi-on-june-25
   - https://store.playstation.com/no-no/concept/10000730
 ---
 
 ## The date
 
-The game releases on **19 November 2026** on PlayStation 5 and Xbox Series X|S. Digital editions unlock at midnight CET. There is no PC version at launch, and it is single-player at launch.
+The game releases on **19 November 2026** on PlayStation 5 and Xbox Series X|S. Rockstar hasn't confirmed the unlock time yet. Preload starts at local midnight on 12 November, so midnight on launch day is likely. There is no PC version at launch, and it is single-player at launch.
 
 ## Editions
 

@@ -1,16 +1,17 @@
 ---
 title: Før du begynner
 searchTitle: "Før du begynner: GTA 6-sjekkliste for lanseringen · Rookdex"
-summary: Det du bør ordne før lanseringskvelden, så du kan spille ved midnatt.
-updated: 2026-10-01
+summary: Det du bør ordne før lanseringskvelden, så du kan spille med en gang det låses opp.
+updated: 2026-10-27
 sources:
+  - https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions
   - https://www.rockstargames.com/newswire/article/5171972o3ak5oa/pre-order-grand-theft-auto-vi-on-june-25
   - https://store.playstation.com/no-no/concept/10000730
 ---
 
 ## Datoen
 
-Spillet slippes **19. november 2026** på PlayStation 5 og Xbox Series X|S. Digitale utgaver låses opp ved midnatt norsk tid. Det kommer ingen PC-versjon ved lansering, og spillet er enspiller ved lansering.
+Spillet slippes **19. november 2026** på PlayStation 5 og Xbox Series X|S. Rockstar har ikke bekreftet når spillet låses opp ennå. Forhåndsnedlastingen starter ved midnatt lokal tid 12. november, så midnatt på lanseringsdagen er sannsynlig. Det kommer ingen PC-versjon ved lansering, og spillet er enspiller ved lansering.
 
 ## Utgaver
 
