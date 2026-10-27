@@ -10,6 +10,11 @@ interface Props {
 	plural: Translator["plural"]
 }
 
+/** "Launch day" on day 0, "Day N since launch" after it. The strip and the status region share it. */
+export function daysSinceText(t: Translate, daysSince: number): string {
+	return daysSince === 0 ? t("hub.launchDay") : t("hub.daySince", { n: daysSince })
+}
+
 /** "N found today · Day N since launch". The newcomer link takes the same slot, so it never shifts. */
 export function StatStrip({ newcomer, foundToday, daysSince, guideHref, t, plural }: Props) {
 	return (
@@ -24,7 +29,7 @@ export function StatStrip({ newcomer, foundToday, daysSince, guideHref, t, plura
 				)}
 			</span>
 			<span aria-hidden="true">·</span>
-			<span>{t("hub.daySince", { n: daysSince })}</span>
+			<span>{daysSinceText(t, daysSince)}</span>
 		</p>
 	)
 }

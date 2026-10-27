@@ -32,6 +32,7 @@ export function DashboardSkeleton({ categoryCount, t }: Props) {
 			</dl>
 			<p className="stat-strip" aria-hidden="true">
 				<span className="stat-strip-first">&nbsp;</span>
+				<span>&nbsp;</span>
 			</p>
 			<p className="tracker-alert" />
 			<section className="whats-next" aria-hidden="true">

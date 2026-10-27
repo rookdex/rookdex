@@ -211,7 +211,7 @@ describe("Hub at the flip (dashboard spec §3, §6.4)", () => {
 		// act renders the flip only when it ends, so the gap timer starts after the 2 s.
 		await advance(ANNOUNCE_GAP_MS)
 		expect(screen.getByRole("status")).toBe(region)
-		expect(region).toHaveTextContent("Day 0 since launch")
+		expect(region).toHaveTextContent("Launch day")
 	})
 
 	it("moves focus to the dashboard heading when focus was inside the hub", async () => {
