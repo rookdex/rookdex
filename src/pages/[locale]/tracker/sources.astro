@@ -51,9 +51,10 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 						<ul class="tap-links">
 							{item.sources.map((source) => (
 								<li>
-									<ExternalLink href={source.url} locale={locale as Locale} class="go-link">
-										{source.title}
-									</ExternalLink>
+									{/* No whitespace around the title: a space before the ↗ would let it wrap alone. */}
+									<ExternalLink href={source.url} locale={locale as Locale} class="go-link"
+										>{source.title}</ExternalLink
+									>
 									<span class="outlet">{outletOf(source.url)}</span>
 								</li>
 							))}
@@ -172,6 +173,14 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 	.source-entry li {
 		display: flex;
 		flex-direction: column;
+	}
+
+	/* In a flex link a wrapped title and its ↗ are separate items, which pushes the ↗ out to the
+	   right edge. Plain block flow keeps it after the last word; the padding centres one line in
+	   the 44 px target. ExternalLink renders the <a>, outside this page's scope. */
+	.source-entry li :global(a) {
+		display: block;
+		padding-block: calc((var(--tap) - 1lh) / 2);
 	}
 
 	.outlet {
