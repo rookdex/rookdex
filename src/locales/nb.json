@@ -155,6 +155,7 @@
 	"sources.back": "Tilbake til elementet i oversikten",
 	"settings.title": "Innstillinger",
 	"settings.description": "Språk, dataene Rookdex lagrer på denne enheten, og appdetaljer.",
+	"settings.general": "Generelt",
 	"settings.language": "Språk",
 	"settings.data": "Dine data",
 	"settings.about": "Om",

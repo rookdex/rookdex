@@ -155,6 +155,7 @@
 	"sources.back": "Back to the item in the tracker",
 	"settings.title": "Settings",
 	"settings.description": "Language, the data Rookdex keeps on this device, and app details.",
+	"settings.general": "General",
 	"settings.language": "Language",
 	"settings.data": "Your data",
 	"settings.about": "About",

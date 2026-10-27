@@ -25,8 +25,8 @@ const sha = process.env.GITHUB_SHA
 <Base locale={locale} title={t("seo.titles.settings")} description={t("settings.description")} path="settings">
 	<h1>{t("settings.title")}</h1>
 
-	<section class="settings-group" aria-labelledby="settings-language">
-		<h2 id="settings-language">{t("settings.language")}</h2>
+	<section class="settings-group" aria-labelledby="settings-general">
+		<h2 id="settings-general">{t("settings.general")}</h2>
 		{/* The header's picker as a row: choosing a language is a link, so nothing moves on its own
 		    (WCAG 3.2.2). current-choice.ts swaps the value to System when no language is stored. */}
 		<div class="rows">
