@@ -1,6 +1,6 @@
 # Data safety
 
-Play Console, Policy, App content, Data safety. The answers rest on the privacy page (`/en/privacy/`, Android spec §3), checked against the code on 2026-10-16.
+Play Console, Policy, App content, Data safety. The answers rest on the privacy page (`/en/privacy/`, Android spec §3), checked against the code on 2026-10-16 and again on 2026-10-27, after the Settings redesign.
 
 ## Data collection and security
 
@@ -15,6 +15,14 @@ Answering No skips the encryption, deletion and per-data-type questions. Play th
 Cloudflare sees the visitor's IP address to deliver the pages, like any web host. Rookdex runs no server code and keeps no logs (`wrangler.jsonc` serves static assets only), so the IP address never reaches me and is used for nothing beyond routing the request. Play asks developers to disclose IP addresses "based on their particular usage and practices", and Rookdex has none, so the answer stays No.
 
 Ephemeral processing is not the reason. Play's guidance says ephemerally processed data still has to be declared in the form; it is only left out of the public listing. If a reviewer disagrees with No, the fallback is to declare "Approximate location: IP address", collected, not shared, processed ephemerally, required, for app functionality. Play then still shows nothing for it on the listing.
+
+## Share, Send feedback and Check for updates
+
+Settings gained these three rows on 2026-10-26. None of them changes the answer:
+
+- **Share Rookdex** opens the phone's own share sheet with the site's address. The user picks where it goes; Rookdex sends nothing.
+- **Send feedback** is a `mailto:` link to feedback@rookdex.app. The user's own email app writes and sends the message, so the app never handles it.
+- **Check for updates** asks the service worker to fetch the newest version of the site from rookdex.app. That is the same request as loading a page.
 
 ## Account deletion
 

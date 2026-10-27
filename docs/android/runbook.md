@@ -1,16 +1,16 @@
-# Play session runbook (26 to 28 October)
+# Play session runbook
 
-Android spec §6. Latest safe closed-test go-live: Thursday 29 October. That leaves 14 days of testing to 12 November and up to 7 days of production review before launch on 19 November.
+Android spec §6. The plan was 26 to 28 October, with the closed test live by Thursday 29 October. That leaves 14 days of testing to 12 November and up to 7 days of production review before launch on 19 November.
 
-If Play slips past 29 October, the site still launches on 19 November as a PWA. The Play listing can follow later.
+**Status 27 October:** identity verification is on its third attempt, and Create app stays blocked until it passes. The bundle (step 2) is built and the forms for step 5 are ready. Steps 4 to 6 run on the day Google approves. Every day past 29 October pushes production access past launch day. If that happens, the site still launches on 19 November as a PWA and the Play listing follows later.
 
 | Day | Steps |
 |---|---|
 | Monday 26 | Testers, 1, 2, 3 |
-| Tuesday 27 | 4, 5 |
-| Wednesday 28 | 6 (send for review) |
+| Day Google approves | 4, 5 |
+| The day after | 6 (send for review) |
 
-## Testers (Monday 26 October)
+## Testers (from Monday 26 October)
 
 - [ ] Send the tester message and collect at least 14 testers' Google account emails, the ones they use in Play on an Android phone. iPhone users can't count.
 - [ ] Keep that list private: in my password manager or my own notes, then in Play Console's tester list. Never in this repo, a doc, an issue or an AI chat. It is other people's personal data.
@@ -82,5 +82,5 @@ Open https://www.pwabuilder.com, enter `https://rookdex.app`, choose Android, Go
 
 ## Later
 
-- [ ] About 12 November: apply for production access (review takes up to 7 days).
+- [ ] 14 days after 12 or more testers opted in (12 November at the earliest): apply for production access (review takes up to 7 days).
 - [ ] After launch (19 November): the hub screenshots show the countdown, which is gone by then. Re-run `docs/android/screenshots.mjs` against a local `npm run preview` with the hub path set to `?phase=after` (works on localhost only) and replace the hub shots in Play Console.
