@@ -21,3 +21,11 @@ export function daysAgo(added: string, today: string): number {
 	const ms = Date.parse(`${today}T00:00:00Z`) - Date.parse(`${added}T00:00:00Z`)
 	return Math.max(0, Math.round(ms / DAY_MS))
 }
+
+/** The key `n` calendar days after `key` (negative goes back). Steps by date, never by 24 hours,
+ *  so a daylight-saving change can't skip or repeat a day (desktop dashboard spec §6.2). */
+export function addDays(key: string, n: number): string {
+	const date = dayFromKey(key)
+	date.setDate(date.getDate() + n)
+	return localDayKey(date)
+}

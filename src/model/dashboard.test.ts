@@ -1,6 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { closestCategory, foundToday, latestRumours, nextGroups, rankCategories } from "./dashboard"
-import type { ProgressRecord, Rumour, SeedItem } from "./schema"
+import {
+	categoryRows,
+	closestCategory,
+	findsByDay,
+	foundToday,
+	latestNews,
+	latestRumours,
+	nextGroups,
+	rankCategories,
+} from "./dashboard"
+import type { Fact, ProgressRecord, Rumour, SeedItem } from "./schema"
 import type { Records } from "./stats"
 
 const src = { url: "https://www.rockstargames.com/VI", title: "Site", tier: "official" as const }
@@ -191,5 +200,131 @@ describe("latestRumours", () => {
 		const list = [rumour("b", "2026-09-18"), rumour("c", "2026-10-01")]
 		latestRumours(list, 2)
 		expect(list.map((r) => r.name)).toEqual(["b", "c"])
+	})
+})
+
+function fact(id: string, announced: string): Fact {
+	return {
+		id,
+		claim_key: id.split("/")[1],
+		name: { en: `${id} en`, nb: `${id} nb` },
+		summary: { en: "s", nb: "s" },
+		announced,
+		sources: [src],
+	}
+}
+function rumour(id: string, added: string): Rumour {
+	return { id, name: id, claim_key: id.split("/")[1], summary: "s", added, sources: [src] }
+}
+
+describe("latestNews", () => {
+	it("merges facts and rumours newest first", () => {
+		const news = latestNews(
+			[fact("facts/a", "2026-10-01"), fact("facts/b", "2026-10-20")],
+			[rumour("rumours/c", "2026-10-10"), rumour("rumours/d", "2026-10-25")],
+			5
+		)
+		expect(news.map((n) => n.id)).toEqual(["rumours/d", "facts/b", "rumours/c", "facts/a"])
+		expect(news[1]).toEqual({
+			id: "facts/b",
+			kind: "confirmed",
+			date: "2026-10-20",
+			name: { en: "facts/b en", nb: "facts/b nb" },
+		})
+		expect(news[0]).toEqual({
+			id: "rumours/d",
+			kind: "rumour",
+			date: "2026-10-25",
+			name: "rumours/d",
+		})
+	})
+
+	it("puts Confirmed first on the same day, then orders by id", () => {
+		const news = latestNews(
+			[fact("facts/z", "2026-10-20")],
+			[rumour("rumours/b", "2026-10-20"), rumour("rumours/a", "2026-10-20")],
+			5
+		)
+		expect(news.map((n) => n.id)).toEqual(["facts/z", "rumours/a", "rumours/b"])
+	})
+
+	it("returns at most limit items, and nothing from nothing", () => {
+		const many = Array.from({ length: 8 }, (_, n) => rumour(`rumours/r${n}`, `2026-10-1${n}`))
+		expect(latestNews([], many, 5)).toHaveLength(5)
+		expect(latestNews([], [], 5)).toEqual([])
+	})
+})
+
+describe("findsByDay", () => {
+	beforeEach(() => {
+		vi.stubEnv("TZ", "Europe/Oslo")
+	})
+	afterEach(() => {
+		vi.unstubAllEnvs()
+	})
+
+	it("returns the last `days` local days ending today, oldest first, zero days kept", () => {
+		const r = records({
+			"wildlife/e": "2026-11-20T10:00:00Z",
+			"wildlife/f": "2026-11-22T10:00:00Z",
+			"vehicles/c": "2026-11-22T11:00:00Z",
+		})
+		expect(findsByDay(items, r, "2026-11-22", 7)).toEqual([
+			{ day: "2026-11-16", count: 0 },
+			{ day: "2026-11-17", count: 0 },
+			{ day: "2026-11-18", count: 0 },
+			{ day: "2026-11-19", count: 0 },
+			{ day: "2026-11-20", count: 1 },
+			{ day: "2026-11-21", count: 0 },
+			{ day: "2026-11-22", count: 2 },
+		])
+	})
+
+	it("counts a tick by its local calendar day, not its UTC day", () => {
+		const r = records({ "wildlife/e": "2026-11-21T23:30:00Z" }) // 00:30 on 22 Nov in Oslo
+		const days = findsByDay(items, r, "2026-11-22", 2)
+		expect(days).toEqual([
+			{ day: "2026-11-21", count: 0 },
+			{ day: "2026-11-22", count: 1 },
+		])
+	})
+
+	it("skips unticked records, retired items and records with no seed item", () => {
+		const withRetired = [...items, item("wildlife/old", "g", { retired: true })]
+		const r: Records = {
+			...records({ "wildlife/old": "2026-11-22T10:00:00Z", "ghost/x": "2026-11-22T10:00:00Z" }),
+			"wildlife/e": { ...found("2026-11-22T10:00:00Z"), item_id: "wildlife/e", done: false },
+		}
+		expect(findsByDay(withRetired, r, "2026-11-22", 1)).toEqual([{ day: "2026-11-22", count: 0 }])
+	})
+
+	it("returns 7 distinct days across the 25 October 2026 daylight-saving change", () => {
+		const days = findsByDay(items, {}, "2026-10-28", 7).map((d) => d.day)
+		expect(days).toEqual([
+			"2026-10-22",
+			"2026-10-23",
+			"2026-10-24",
+			"2026-10-25",
+			"2026-10-26",
+			"2026-10-27",
+			"2026-10-28",
+		])
+	})
+})
+
+describe("categoryRows", () => {
+	it("gives each category its total, found count and group ids in tracker order", () => {
+		const grouped = [
+			item("vehicles/c", "bikes"),
+			item("wildlife/e", "reptiles"),
+			item("wildlife/f", "birds"),
+			item("wildlife/g", "reptiles"),
+			item("wildlife/old", "fish", { retired: true }),
+		]
+		const r = records({ "wildlife/e": "2026-11-20T10:00:00Z" })
+		expect(categoryRows(grouped, r)).toEqual([
+			{ id: "vehicles", done: 0, total: 1, groups: ["bikes"] },
+			{ id: "wildlife", done: 1, total: 3, groups: ["birds", "reptiles"] },
+		])
 	})
 })

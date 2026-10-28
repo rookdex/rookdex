@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { dayFromKey, daysAgo, localDayKey } from "./days"
+import { addDays, dayFromKey, daysAgo, localDayKey } from "./days"
 
 beforeEach(() => {
 	vi.stubEnv("TZ", "Europe/Oslo")
@@ -23,5 +23,18 @@ describe("calendar days (dashboard spec §6.2)", () => {
 		expect(daysAgo("2026-09-18", "2026-11-22")).toBe(65)
 		expect(daysAgo("2026-11-22", "2026-11-22")).toBe(0)
 		expect(daysAgo("2026-11-25", "2026-11-22")).toBe(0)
+	})
+})
+
+describe("addDays", () => {
+	it("steps by calendar day across the October daylight-saving change", () => {
+		expect(addDays("2026-10-25", -1)).toBe("2026-10-24")
+		expect(addDays("2026-10-24", 1)).toBe("2026-10-25")
+		expect(addDays("2026-10-26", -1)).toBe("2026-10-25")
+	})
+
+	it("crosses month and year ends", () => {
+		expect(addDays("2026-11-01", -1)).toBe("2026-10-31")
+		expect(addDays("2026-12-31", 1)).toBe("2027-01-01")
 	})
 })
