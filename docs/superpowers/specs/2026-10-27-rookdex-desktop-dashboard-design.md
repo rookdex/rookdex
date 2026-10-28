@@ -276,3 +276,20 @@ New keys go into both `src/locales/en.json` and `nb.json`. `nav.home` is renamed
 The page title and description still say "countdown" after launch. The SEO follow-up for launch night picks that up, together with the `og:image` handoff.
 
 > Stress-tested 2026-10-27 (skill 1b85fca): 10 applied, 3 adapted, 0 decided by me.
+
+## As built (2026-10-28)
+
+The build follows this spec with these settled gaps and deviations:
+
+- **News chips.** The News page has no Confirmed/Rumour chips, so the news tile reuses `facts.title` ("Confirmed" / "Bekreftet") and adds `hub.chipRumour` ("Rumour" / "Rykte") with a small `.news-chip` style. Its rows link to `/news/#confirmed` and `/news/#rumours`.
+- **Tile labels.** The guide tile uses a new key, `hub.guideLabel` ("Guide"). The settings tile reuses `nav.settings`.
+- **No `hub.countdownLabel`.** It would repeat `hub.countdownHeading`, which the hero reuses as its label.
+- **No `hub.nothingYet` keys.** The before-launch grid (§4.1) has no Recent finds area to show them.
+- **Guide titles as props.** "Before you start" and "Your first hour" come from the guides' frontmatter, so `index.astro` passes them to the hub.
+- **Hero markup.** "17 / 43 found" is a paragraph; the three label-value pairs are the `dl` (§9).
+- **Blocked storage (§5).** The checklist read returns `null` when storage is blocked, and the note swaps to `hub.checklistNoStorage`.
+- **Live sync between tabs is in.** §14 lists the `storage`-event sync as rejected; the plan's stress test added it back (about ten lines and one test).
+- **News and link tiles live in `Hub`,** so they render even when the dashboard chunk fails (§3 put them in Dashboard).
+- **From 1024 px** the countdown's buying block and its days unit are hidden; the hero shows the days line instead.
+
+The measurement pass (Task 11) fixed, in CSS only: the link tiles and category rows losing their layout to `.hub-state a` after launch (page overflow at 1265 px, a 30 px skeleton shift), the tagline's `65ch` cap rewrapping on font swap (22 px shift at 1024 px), the countdown units moving when reduced motion drops the seconds, the hero date's contrast on the sun (3.9:1, now full text colour), the Rockstar card's `nb` text under the sun, and three overflows at 200 % text. The bottom-row reserve is `26rem`. One open point: muted text over a full category fill measures 6.0:1 (5.5:1 on hover), below the 7:1 in §4.3; `--text` over it is 13.5:1.

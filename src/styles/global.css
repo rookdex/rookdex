@@ -1837,16 +1837,21 @@ p {
 	color: var(--text-muted);
 }
 
+/* minmax(0, 1fr) and overflow-wrap keep a long word (the nb label INNSTILLINGER at 200 % text)
+   from widening the column past its grid area. */
 .link-tiles {
 	display: grid;
+	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-3);
 	align-content: start;
+	container-type: inline-size;
 }
 
 .link-tile {
 	min-height: 6.5rem;
 	color: var(--text);
 	text-decoration: none;
+	overflow-wrap: anywhere;
 	isolation: isolate;
 }
 
@@ -1868,6 +1873,24 @@ p {
 .link-tile .tile-body {
 	font-size: 0.875rem;
 	color: var(--text-muted);
+}
+
+/* The sun shows 4.5rem into the tile; the text stops a gap short of it, so the art is never under
+   the title (desktop spec §4.7). The longer nb copy ran into it at 1265 px. */
+.map-tile {
+	padding-inline-end: 5.5rem;
+}
+
+/* With large text the column is too narrow for text and art side by side (12rem is about 190 px at
+   the default size, against 260 px at 1265 px). The art goes and the text takes the width. */
+@container (width < 12rem) {
+	.map-tile {
+		padding-inline-end: var(--space-4);
+	}
+
+	.map-tile .tile-art {
+		display: none;
+	}
 }
 
 /* Our own art, never Rockstar's: behind the text, clipped to its own layer. */
@@ -1928,21 +1951,25 @@ p {
 	list-style: none;
 }
 
+/* A wrapping row, not a grid: at 200 % text the title's grid column shrank to 60 px and its words
+   ran under the date. Now the date drops to its own line, still on the right. */
 .news-tile-list li {
-	display: grid;
-	grid-template-columns: auto minmax(0, 1fr) auto;
+	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	gap: var(--space-2);
+	column-gap: var(--space-2);
 	min-height: var(--tap);
 }
 
 .news-tile-list a {
 	display: flex;
+	flex: 1 1 10rem;
 	align-items: center;
 	min-height: var(--tap);
 }
 
 .news-tile-list time {
+	margin-inline-start: auto;
 	font-size: 0.8125rem;
 	color: var(--text-muted);
 	white-space: nowrap;
@@ -2116,10 +2143,13 @@ p {
 	min-width: 0;
 }
 
+/* Wraps so the Closest tag drops under a long name at 200 % text instead of running under "N left". */
 .ledger-name h3 {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	gap: var(--space-2);
+	overflow-wrap: anywhere;
 	margin: 0;
 	font-size: 1rem;
 }
@@ -2262,8 +2292,11 @@ p {
 	list-style: none;
 }
 
+/* Wraps when the label is at its narrowest and the Open link still doesn't fit (200 % text in the
+   five-column tile overflowed by 16 px); the link then sits on its own line at the right. */
 .check-row {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: stretch;
 	gap: var(--space-2);
 	border-top: 1px solid var(--border);
@@ -2307,6 +2340,7 @@ p {
 	display: inline-flex;
 	flex: none;
 	align-items: center;
+	margin-inline-start: auto;
 	gap: var(--space-1);
 	min-height: var(--tap);
 	padding-inline: var(--space-2);
@@ -2507,7 +2541,10 @@ p {
 		border: 0;
 	}
 
+	/* No 65ch cap: ch follows the font, so the fallback face wrapped the line and the web font
+	   unwrapped it again, a 22 px shift at 1024 px. */
 	.hub-intro .tagline {
+		max-width: none;
 		margin: 0;
 		font-size: 0.9375rem;
 		color: var(--text-muted);
@@ -2531,6 +2568,18 @@ p {
 		display: contents;
 	}
 
+	/* The after-launch hub carries .hub-state, and `.hub-state a` (inline-flex, 44 px) outranks these
+	   links' own classes. Without this the link tiles laid out in a row and overflowed their column,
+	   and the category rows lost 15 px against their skeleton, which shifted the bottom row. */
+	.hub-dashboard .link-tile,
+	.hub-dashboard .ledger-row {
+		display: grid;
+	}
+
+	.hub-dashboard .ledger-row {
+		min-height: 4.5rem;
+	}
+
 	/* The page alert gets its own first row, so a message pushes the grid down, as on phones, instead
 	   of covering the hero. The grid is pulled up by one gap, so the empty row costs nothing. Child
 	   combinators keep the Undo toast's own alert out of this. --bottom-row-min is one reserved
@@ -2538,7 +2587,7 @@ p {
 	   Recent finds holds it from 1024 px; at 1200 px news and the tiles share the row. The areas are
 	   for 1024 to 1199 px (desktop spec §4.1). */
 	.hub-dashboard {
-		--bottom-row-min: 24rem;
+		--bottom-row-min: 26rem;
 		margin-block-start: calc(var(--space-3) * -1);
 		grid-template-areas:
 			"alert alert alert alert alert alert alert alert alert alert alert alert"
@@ -2623,6 +2672,7 @@ p {
 		display: flex;
 	}
 
+	/* Full text colour: the date sits on the sun, where the muted grey measured 3.9:1. */
 	.hero-date {
 		display: block;
 		position: absolute;
@@ -2630,7 +2680,7 @@ p {
 		right: var(--space-4);
 		margin: 0;
 		font-size: 0.875rem;
-		color: var(--text-muted);
+		color: var(--text);
 	}
 
 	/* The countdown sits inside the hero tile: no second border, its h2 styled as the tile label. */
@@ -2642,7 +2692,9 @@ p {
 
 	/* The label look of the shared list above. It cannot join that list: the list applies at every
 	   width, and this h2 keeps its heading size on phones. */
+	/* max-width: the sun reaches 7.5rem into the content box; the muted label wraps before it. */
 	.hero-before > .hub-state > h2 {
+		max-width: calc(100% - 8.5rem);
 		margin: 0;
 		font-size: 0.75rem;
 		font-weight: 600;
@@ -2659,6 +2711,14 @@ p {
 		display: none;
 	}
 
+	/* A row of content-sized units: with reduced motion the seconds unit drops out after hydration,
+	   and auto-fit columns then moved hours and minutes sideways. It wraps at 200 % text. */
+	.hero-before .countdown {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2) var(--space-5);
+	}
+
 	/* The chip sits in the hero's top-right corner, with the day line beside it. */
 	.hub-dashboard .dash-top {
 		grid-area: hero;
@@ -2670,9 +2730,10 @@ p {
 		padding: var(--space-3) var(--space-4) 0 0;
 	}
 
+	/* Full text colour for the same reason as .hero-date: from 1200 px the line can sit on the sun. */
 	.dash-day {
 		font-size: 0.875rem;
-		color: var(--text-muted);
+		color: var(--text);
 	}
 
 	.hub-prelaunch {
