@@ -2533,9 +2533,19 @@ p {
 
 	/* The page alert gets its own first row, so a message pushes the grid down, as on phones, instead
 	   of covering the hero. The grid is pulled up by one gap, so the empty row costs nothing. Child
-	   combinators keep the Undo toast's own alert out of this. */
+	   combinators keep the Undo toast's own alert out of this. --bottom-row-min is one reserved
+	   minimum height for the blocks of the bottom row, so the chart showing or not shifts nothing.
+	   Recent finds holds it from 1024 px; at 1200 px news and the tiles share the row. The areas are
+	   for 1024 to 1199 px (desktop spec §4.1). */
 	.hub-dashboard {
+		--bottom-row-min: 24rem;
 		margin-block-start: calc(var(--space-3) * -1);
+		grid-template-areas:
+			"alert alert alert alert alert alert alert alert alert alert alert alert"
+			"hero hero hero hero hero hero hero hero hero hero hero hero"
+			"next next next next next next recent recent recent recent recent recent"
+			"bars bars bars bars bars bars bars bars bars bars bars bars"
+			"news news news news news news tiles tiles tiles tiles tiles tiles";
 	}
 
 	.hub-dashboard > .tracker-alert,
@@ -2543,14 +2553,35 @@ p {
 		grid-area: alert;
 	}
 
-	/* One reserved minimum height for the blocks of the bottom row, so the chart showing or not
-	   shifts nothing. Recent finds holds it from 1024 px; at 1200 px news and the tiles share the row. */
-	.hub-dashboard {
-		--bottom-row-min: 24rem;
+	/* Placement comes before the show and hide rules below, which are more specific. */
+	.hub-dashboard .hero,
+	.hero-before {
+		grid-area: hero;
+	}
+
+	.hub-dashboard .whats-next {
+		grid-area: next;
 	}
 
 	.hub-dashboard .dash-recent {
+		grid-area: recent;
 		min-height: var(--bottom-row-min);
+	}
+
+	.cat-bars {
+		grid-area: bars;
+	}
+
+	.news-tile {
+		grid-area: news;
+	}
+
+	.link-tiles {
+		grid-area: tiles;
+	}
+
+	.checklist {
+		grid-area: checklist;
 	}
 
 	/* Phone blocks give way to their desktop versions. */
@@ -2580,10 +2611,10 @@ p {
 		display: grid;
 	}
 
+	/* .recent-meta is left out: only the Latest highlight shows the category line. */
 	.hero-art,
 	.recent-label,
 	.recent-when,
-	.recent-meta,
 	.dash-day {
 		display: block;
 	}
@@ -2644,51 +2675,12 @@ p {
 		color: var(--text-muted);
 	}
 
-	/* Areas, 1024 to 1199 px (desktop spec §4.1). */
-	.hub-dashboard {
-		grid-template-areas:
-			"alert alert alert alert alert alert alert alert alert alert alert alert"
-			"hero hero hero hero hero hero hero hero hero hero hero hero"
-			"next next next next next next recent recent recent recent recent recent"
-			"bars bars bars bars bars bars bars bars bars bars bars bars"
-			"news news news news news news tiles tiles tiles tiles tiles tiles";
-	}
-
 	.hub-prelaunch {
 		grid-template-areas:
 			"hero hero hero hero hero hero hero hero hero hero hero hero"
 			"checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist"
 			"bars bars bars bars bars bars bars bars bars bars bars bars"
 			"news news news news news news tiles tiles tiles tiles tiles tiles";
-	}
-
-	.hub-dashboard .hero,
-	.hero-before {
-		grid-area: hero;
-	}
-
-	.hub-dashboard .whats-next {
-		grid-area: next;
-	}
-
-	.hub-dashboard .dash-recent {
-		grid-area: recent;
-	}
-
-	.cat-bars {
-		grid-area: bars;
-	}
-
-	.news-tile {
-		grid-area: news;
-	}
-
-	.link-tiles {
-		grid-area: tiles;
-	}
-
-	.checklist {
-		grid-area: checklist;
 	}
 
 	/* No news at all: the tiles take its columns (desktop spec §7). */
@@ -2706,12 +2698,38 @@ p {
 		background: var(--bg-raised);
 	}
 
-	/* Recent finds: the first row is the Latest highlight, then up to 4 rows, or 2 with the chart. */
+	.recent-label,
+	.recent-when,
+	.recent-meta {
+		font-size: 0.8125rem;
+		color: var(--text-muted);
+	}
+
+	/* Recent finds: the first row is the Latest highlight, then up to 4 rows, or 2 with the chart.
+	   The rows under it are one line each: the name, with the relative day pushed to the right. The
+	   day comes first in the DOM and moves with CSS order, so the reading order is unchanged. */
+	.dash-recent .recent li {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		min-height: var(--tap);
+	}
+
+	.dash-recent .recent li:not(:first-child) .recent-when {
+		order: 1;
+		margin-inline-start: auto;
+		white-space: nowrap;
+	}
+
 	.dash-recent .recent li:first-child {
 		display: grid;
 		gap: var(--space-1);
 		padding-bottom: var(--space-3);
 		border-bottom: 1px solid var(--border);
+	}
+
+	.dash-recent .recent li:first-child .recent-meta {
+		display: block;
 	}
 
 	.dash-recent .recent li:first-child .recent-name {
@@ -2722,13 +2740,6 @@ p {
 
 	.dash-recent.has-chart .recent li:nth-child(n + 4) {
 		display: none;
-	}
-
-	.recent-label,
-	.recent-when,
-	.recent-meta {
-		font-size: 0.8125rem;
-		color: var(--text-muted);
 	}
 
 	.recent-empty-title {
@@ -2793,6 +2804,14 @@ p {
 			"news news news news news news news news tiles tiles tiles tiles";
 	}
 
+	/* The bottom row's reserve (--bottom-row-min, set from 1024 px) now covers all three blocks. Text
+	   at 200 % grows the row instead of being clipped. */
+	.hub-dashboard .dash-recent,
+	.hub-dashboard .news-tile,
+	.hub-dashboard .link-tiles {
+		min-height: var(--bottom-row-min);
+	}
+
 	/* No news: the tiles keep their own columns beside Recent finds instead of covering it. */
 	.hub-dashboard:not(:has(.news-tile)) .link-tiles {
 		grid-column: 5 / -1;
@@ -2800,14 +2819,6 @@ p {
 
 	.ledger {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	/* The bottom row's reserve (--bottom-row-min, set from 1024 px) now covers all three blocks. Text
-	   at 200 % grows the row instead of being clipped. */
-	.hub-dashboard .dash-recent,
-	.hub-dashboard .news-tile,
-	.hub-dashboard .link-tiles {
-		min-height: var(--bottom-row-min);
 	}
 }
 
