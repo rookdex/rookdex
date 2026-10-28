@@ -1826,7 +1826,9 @@ p {
 /* The small uppercase muted label look, declared once. Later tiles extend this selector list; they
    never repeat the declarations. */
 .tile-head h2,
-.tile-label {
+.tile-label,
+.hero-meta dt,
+.cat-bars .deco h2 {
 	margin: 0;
 	font-size: 0.75rem;
 	font-weight: 600;
@@ -1959,6 +1961,218 @@ p {
 	border-color: var(--accent);
 	background: var(--accent);
 	color: var(--accent-text);
+}
+
+/* Hero (spec §4.2). The label, the count and the segmented bar are three grid items; space-between
+   keeps the bar on the hero's bottom edge whatever the height. */
+.hero {
+	align-content: space-between;
+	min-height: 18.75rem;
+	isolation: isolate;
+}
+
+.hero-art {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	overflow: hidden;
+	border-radius: inherit;
+	pointer-events: none;
+}
+
+.hero-art .art-sun {
+	right: -2rem;
+	top: -2rem;
+	bottom: auto;
+	width: 11rem;
+	height: 11rem;
+	opacity: 0.35;
+}
+
+.hero-art .art-stripes {
+	right: -2rem;
+	top: 4.5rem;
+	bottom: auto;
+	width: 11rem;
+	height: 4.5rem;
+}
+
+.hero-count {
+	display: flex;
+	align-items: baseline;
+	gap: var(--space-2);
+	margin: 0;
+}
+
+.hero-big {
+	font-family: var(--font-display);
+	font-size: 6rem;
+	line-height: 1;
+	color: var(--text);
+	text-shadow: var(--glow);
+}
+
+.hero-of {
+	font-family: var(--font-display);
+	font-size: 1.75rem;
+	color: var(--text-muted);
+}
+
+.hero-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2) var(--space-5);
+	margin: var(--space-2) 0 0;
+}
+
+.hero-meta dd {
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: var(--text);
+}
+
+.seg {
+	display: flex;
+	gap: 2px;
+	height: 0.5rem;
+	border-radius: 999px;
+	background: var(--border);
+	overflow: hidden;
+}
+
+.seg-part {
+	flex: 0 1 0;
+	min-width: 0;
+	background: var(--bg-hover);
+}
+
+.seg-fill {
+	display: block;
+	height: 100%;
+	background: var(--gradient);
+	box-shadow: var(--glow);
+}
+
+/* Category bars (spec §4.3). The shared label look comes from the .tile-label list above. */
+.cat-bars .deco {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	margin-bottom: var(--space-3);
+}
+
+.cat-bars .deco::before,
+.cat-bars .deco::after {
+	content: "";
+	flex: 1;
+	height: 0;
+	border-top: 3px double var(--border);
+}
+
+.cat-bars .deco h2 {
+	letter-spacing: 0.12em;
+}
+
+.ledger {
+	display: grid;
+	gap: var(--space-2) var(--space-3);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ledger-row {
+	position: relative;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto auto auto;
+	align-items: center;
+	gap: var(--space-3);
+	min-height: 4.5rem;
+	padding: var(--space-2) var(--space-3);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
+	color: var(--text);
+	text-decoration: none;
+	isolation: isolate;
+}
+
+.ledger-fill {
+	position: absolute;
+	inset: 0 auto 0 0;
+	z-index: -1;
+	width: 0;
+	border-radius: inherit;
+	background: linear-gradient(
+		90deg,
+		color-mix(in srgb, var(--accent) 22%, transparent),
+		color-mix(in srgb, var(--accent-2) 16%, transparent)
+	);
+}
+
+.ledger-name {
+	display: grid;
+	min-width: 0;
+}
+
+.ledger-name h3 {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	margin: 0;
+	font-size: 1rem;
+}
+
+/* The one allowed text clip: the full group list is in the link's text for screen readers, and the
+   line has no fixed height. */
+.ledger-groups {
+	overflow: hidden;
+	font-size: 0.8125rem;
+	color: var(--text-muted);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ledger-left {
+	font-size: 0.875rem;
+	color: var(--text-muted);
+	white-space: nowrap;
+}
+
+.ledger-frac {
+	font-family: var(--font-display);
+	font-size: 1.75rem;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.ledger-frac em {
+	font-style: normal;
+	font-size: 1.125rem;
+	color: var(--text-muted);
+}
+
+.ledger-row .row-chevron {
+	color: var(--link);
+}
+
+.tag {
+	padding: 0 var(--space-2);
+	border: 1px solid var(--accent);
+	border-radius: 999px;
+	background: var(--accent);
+	color: var(--accent-text);
+	font-size: 0.6875rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+@media (hover: hover) {
+	.ledger-row:hover {
+		background: var(--bg-hover);
+	}
 }
 
 @media (min-width: 768px) {
