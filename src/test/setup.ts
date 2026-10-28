@@ -15,8 +15,11 @@ expect.extend(axeMatchers)
 // jsdom has no matchMedia and no <dialog> methods; stub the parts the islands call.
 if (typeof window !== "undefined") {
 	// Testing Library only auto-cleans with `globals: true`, which this project does not use.
-	const { cleanup } = await import("@testing-library/react")
+	const { cleanup, configure } = await import("@testing-library/react")
 	afterEach(cleanup)
+	// findBy and waitFor give up after 1 s by default, and a full parallel run can take longer to
+	// render the tracker. testTimeout (15 s) still caps each test.
+	configure({ asyncUtilTimeout: 5000 })
 
 	window.matchMedia ??= vi.fn().mockImplementation((query: string) => ({
 		matches: false,
