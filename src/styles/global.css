@@ -2175,6 +2175,52 @@ p {
 	}
 }
 
+/* Phones keep names only (phone dashboard spec); the extras show from 1024 px (Task 10). */
+.recent-label,
+.recent-when,
+.recent-meta,
+.recent-empty,
+.finds-by-day,
+.dash-day {
+	display: none;
+}
+
+.fbd-list {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	gap: var(--space-2);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.fbd-item {
+	display: grid;
+	justify-items: center;
+	gap: var(--space-1);
+	font-size: 0.75rem;
+	color: var(--text-muted);
+}
+
+.fbd-track {
+	display: flex;
+	align-items: flex-end;
+	width: 100%;
+	height: 4rem;
+}
+
+.fbd-bar {
+	width: 100%;
+	min-height: 2px;
+	border-radius: 2px 2px 0 0;
+	background: var(--gradient);
+}
+
+.fbd-item.is-today {
+	color: var(--text);
+	font-weight: 600;
+}
+
 /* Before-launch checklist (desktop dashboard spec §4.8). */
 
 .checklist-count,

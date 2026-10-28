@@ -1,7 +1,7 @@
 import { type ComponentType, useCallback, useEffect, useRef, useState } from "react"
 import { type Locale, translator } from "../../i18n"
 import type { CategoryRow } from "../../model/dashboard"
-import { localDayKey } from "../../model/days"
+import { dateLocale, localDayKey } from "../../model/days"
 import { LAUNCH_AT } from "../../model/launch"
 import type { ChecklistId } from "../seenFlag"
 import { CategoryBars } from "./CategoryBars"
@@ -84,7 +84,7 @@ export function Hub({
 	}
 	// The launch date only, never a time: Rockstar hasn't confirmed the unlock time (#73).
 	// Day first, as the privacy page does: plain `en` would give "Thu, Nov 19".
-	const launchDate = new Intl.DateTimeFormat(locale === "nb" ? "nb-NO" : "en-GB", {
+	const launchDate = new Intl.DateTimeFormat(dateLocale(locale), {
 		weekday: "short",
 		day: "numeric",
 		month: "short",

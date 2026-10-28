@@ -1,5 +1,11 @@
 // Calendar-day helpers for the hub. No seed import: the hub's before-launch bundle uses these and
 // must not pull in the tracker model (dashboard spec §10).
+import type { Locale } from "../i18n"
+
+/** The `Intl` locale for dates: day first in both languages (plain `en` would give "Nov 26"). */
+export function dateLocale(locale: Locale): string {
+	return locale === "nb" ? "nb-NO" : "en-GB"
+}
 
 const DAY_MS = 86_400_000
 

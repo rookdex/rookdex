@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { type Locale, seedLabel, translator } from "../../i18n"
-import { closestCategory, foundToday, nextGroups } from "../../model/dashboard"
+import {
+	categoryRows,
+	closestCategory,
+	findsByDay,
+	foundToday,
+	nextGroups,
+} from "../../model/dashboard"
 import { dayFromKey } from "../../model/days"
 import { activeProfiles } from "../../model/profiles"
 import { type Count, countable, countItems, perCategory, recentFinds } from "../../model/stats"
@@ -8,10 +14,13 @@ import { buildTracker } from "../buildTracker"
 import { ProfileMenu } from "../tracker/ProfileMenu"
 import { Bar } from "../tracker/StatsRail"
 import { useTrackerState } from "../useTracker"
+import { CategoryBars } from "./CategoryBars"
 import { DashboardSkeleton } from "./DashboardSkeleton"
-import { NEXT_LIMIT, RECENT_LIMIT } from "./limits"
+import { Hero } from "./Hero"
+import { FINDS_DAYS, NEXT_LIMIT, RECENT_LIMIT } from "./limits"
+import { RecentFinds } from "./RecentFinds"
 import { StatPair } from "./StatPair"
-import { StatStrip } from "./StatStrip"
+import { daysSinceText, StatStrip } from "./StatStrip"
 import { UndoToast } from "./UndoToast"
 import { nextBoxId, WhatsNext } from "./WhatsNext"
 
@@ -80,6 +89,8 @@ export function Dashboard({
 			next: nextGroups(items, records, NEXT_LIMIT),
 			foundToday: foundToday(items, records, dayFromKey(today)),
 			recent: recentFinds(items, records, RECENT_LIMIT),
+			rows: categoryRows(items, records),
+			days: findsByDay(items, records, today, FINDS_DAYS),
 		}
 	}, [items, records, today])
 
@@ -158,6 +169,7 @@ export function Dashboard({
 	return (
 		<div className="dashboard">
 			<div className="dash-top">
+				<span className="dash-day">{daysSinceText(t, daysSince)}</span>
 				<ProfileMenu
 					profiles={activeProfiles(state.profiles)}
 					current={current}
@@ -166,6 +178,14 @@ export function Dashboard({
 					t={t}
 				/>
 			</div>
+			<Hero
+				locale={locale}
+				overall={view.overall}
+				foundToday={view.foundToday}
+				closestLabel={closest && view.overall.done > 0 ? label(closest.category) : undefined}
+				rows={view.rows}
+				t={t}
+			/>
 			<StatPair
 				locale={locale}
 				overall={view.overall}
@@ -217,18 +237,14 @@ export function Dashboard({
 					/>
 				))}
 			</section>
-			<section className="dash-recent" aria-labelledby="dash-recent-heading">
-				<h2 id="dash-recent-heading">{t("tracker.recent")}</h2>
-				{view.recent.length === 0 ? (
-					<p className="stats-empty">{t("tracker.noRecent")}</p>
-				) : (
-					<ul className="recent" aria-labelledby="dash-recent-heading">
-						{view.recent.map((find) => (
-							<li key={find.item.id}>{find.item.name}</li>
-						))}
-					</ul>
-				)}
-			</section>
+			<CategoryBars
+				rows={view.rows}
+				phase="after"
+				closest={view.overall.done > 0 ? view.closest : undefined}
+				trackerHref={trackerHref}
+				t={t}
+			/>
+			<RecentFinds recent={view.recent} days={view.days} today={today} locale={locale} t={t} />
 		</div>
 	)
 }
