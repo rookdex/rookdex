@@ -246,7 +246,7 @@
 	"privacy.storedTitle": "What Rookdex stores, on your device only",
 	"privacy.storedBody": "Rookdex keeps a few things in your browser's storage on this device:",
 	"privacy.storedProfiles": "Your profiles and what you have ticked off (IndexedDB).",
-	"privacy.storedChoices": "Which profile is active, the language you picked, and two notes that a message was already shown: the install prompt and the storage hint (localStorage). If you choose \"update later\", that is kept only until you close the tab (sessionStorage).",
+	"privacy.storedChoices": "Which profile is active, the language you picked, which items you ticked on the before-launch list, and two notes that a message was already shown: the install prompt and the storage hint (localStorage). If you choose \"update later\", that is kept only until you close the tab (sessionStorage).",
 	"privacy.storedOffline": "An offline copy of the site, so it works without a network (the service worker cache).",
 	"privacy.leavesTitle": "What leaves your device: nothing",
 	"privacy.leavesBody": "There is no account, no cookies, no analytics, no ads and no trackers. The fonts come from Rookdex itself, not from a font service.",

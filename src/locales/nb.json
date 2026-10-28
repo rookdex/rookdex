@@ -246,7 +246,7 @@
 	"privacy.storedTitle": "Hva Rookdex lagrer, bare på enheten din",
 	"privacy.storedBody": "Rookdex lagrer noen få ting i nettleserens lagring på denne enheten:",
 	"privacy.storedProfiles": "Profilene dine og det du har krysset av (IndexedDB).",
-	"privacy.storedChoices": "Hvilken profil som er aktiv, språket du valgte, og to merknader om at en melding allerede er vist: installeringsforslaget og lagringstipset (localStorage). Velger du «oppdater senere», huskes det bare til du lukker fanen (sessionStorage).",
+	"privacy.storedChoices": "Hvilken profil som er aktiv, språket du valgte, hvilke punkter du krysset av på listen før lansering, og to merknader om at en melding allerede er vist: installeringsforslaget og lagringstipset (localStorage). Velger du «oppdater senere», huskes det bare til du lukker fanen (sessionStorage).",
 	"privacy.storedOffline": "En kopi av nettstedet som virker uten nett (service worker-bufferen).",
 	"privacy.leavesTitle": "Hva som forlater enheten din: ingenting",
 	"privacy.leavesBody": "Det finnes ingen konto, ingen informasjonskapsler, ingen analyse, ingen reklame og ingen sporing. Skriftene kommer fra Rookdex selv, ikke fra en skrifttjeneste.",
