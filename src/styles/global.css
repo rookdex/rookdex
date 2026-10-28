@@ -2175,6 +2175,31 @@ p {
 	}
 }
 
+/* Below 1024 px the desktop-only blocks stay out of the phone layout (desktop spec §1). The
+   checklist is the one new block phones keep, so it appears in none of these rules. */
+.hub-prelaunch {
+	display: grid;
+	gap: var(--space-4);
+}
+
+.hub-prelaunch .cat-bars,
+.hub-prelaunch .news-tile,
+.hub-prelaunch .link-tiles,
+.hub-dashboard .hero,
+.hub-dashboard .cat-bars,
+.hub-dashboard .news-tile,
+.hub-dashboard .link-tiles,
+.hero-art,
+.hero-date,
+.hero .seg {
+	display: none;
+}
+
+/* The before-launch hero is a plain wrapper on phones: the countdown keeps its own tile. */
+.hero-before {
+	display: contents;
+}
+
 /* Phones keep names only (phone dashboard spec); the extras show from 1024 px (Task 10). */
 .recent-label,
 .recent-when,
@@ -2454,8 +2479,7 @@ p {
 }
 
 @media (min-width: 1024px) {
-	.update-notice,
-	.undo-toast {
+	.update-notice {
 		left: auto;
 		width: 22rem;
 	}
@@ -2465,8 +2489,261 @@ p {
 	}
 
 	.hub {
-		grid-template-columns: 1fr 1fr;
-		align-items: start;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--space-3);
+	}
+
+	/* The h1 stays for search engines and screen readers; the header shows the wordmark. This repeats
+	   the .visually-hidden declarations because the markup carries the .lockup class, not that one. */
+	.hub-intro .lockup {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.hub-intro .tagline {
+		margin: 0;
+		font-size: 0.9375rem;
+		color: var(--text-muted);
+	}
+
+	.hub-intro .tap-links {
+		display: none;
+	}
+
+	.hub-prelaunch,
+	.hub-dashboard {
+		display: grid;
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		gap: var(--space-3);
+		padding: 0;
+		border: 0;
+		background: none;
+	}
+
+	.hub-dashboard .dashboard {
+		display: contents;
+	}
+
+	/* The page alert gets its own first row, so a message pushes the grid down, as on phones, instead
+	   of covering the hero. The grid is pulled up by one gap, so the empty row costs nothing. Child
+	   combinators keep the Undo toast's own alert out of this. */
+	.hub-dashboard {
+		margin-block-start: calc(var(--space-3) * -1);
+	}
+
+	.hub-dashboard > .tracker-alert,
+	.hub-dashboard > .dashboard > .tracker-alert {
+		grid-area: alert;
+	}
+
+	/* One reserved minimum height for the blocks of the bottom row, so the chart showing or not
+	   shifts nothing. Recent finds holds it from 1024 px; at 1200 px news and the tiles share the row. */
+	.hub-dashboard {
+		--bottom-row-min: 24rem;
+	}
+
+	.hub-dashboard .dash-recent {
+		min-height: var(--bottom-row-min);
+	}
+
+	/* Phone blocks give way to their desktop versions. */
+	.hub-dashboard .stat-pair,
+	.hub-dashboard .stat-strip,
+	.hub-dashboard .dash-progress,
+	.hub-dashboard .latest,
+	.hub-dashboard .stats-empty,
+	.hero-before .countdown-more {
+		display: none;
+	}
+
+	.hub-prelaunch .cat-bars,
+	.hub-dashboard .cat-bars {
+		display: block;
+	}
+
+	/* The news tile is a tile (a grid), so its head and list keep the gap between them. */
+	.hub-prelaunch .news-tile,
+	.hub-dashboard .news-tile,
+	.hub-prelaunch .link-tiles,
+	.hub-dashboard .link-tiles,
+	.hub-dashboard .hero,
+	.hero-before,
+	.recent-empty,
+	.finds-by-day {
+		display: grid;
+	}
+
+	.hero-art,
+	.recent-label,
+	.recent-when,
+	.recent-meta,
+	.dash-day {
+		display: block;
+	}
+
+	.hero .seg {
+		display: flex;
+	}
+
+	.hero-date {
+		display: block;
+		position: absolute;
+		top: var(--space-4);
+		right: var(--space-4);
+		margin: 0;
+		font-size: 0.875rem;
+		color: var(--text-muted);
+	}
+
+	/* The countdown sits inside the hero tile: no second border, its h2 styled as the tile label. */
+	.hero-before > .hub-state {
+		padding: 0;
+		border: 0;
+		background: none;
+	}
+
+	/* The label look of the shared list above. It cannot join that list: the list applies at every
+	   width, and this h2 keeps its heading size on phones. */
+	.hero-before > .hub-state > h2 {
+		margin: 0;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+	}
+
+	.hero-before .days-number {
+		font-size: 7rem;
+	}
+
+	.hero-before .countdown .unit:first-child {
+		display: none;
+	}
+
+	/* The chip sits in the hero's top-right corner, with the day line beside it. */
+	.hub-dashboard .dash-top {
+		grid-area: hero;
+		z-index: 1;
+		align-self: start;
+		justify-self: end;
+		align-items: center;
+		gap: var(--space-3);
+		padding: var(--space-3) var(--space-4) 0 0;
+	}
+
+	.dash-day {
+		font-size: 0.875rem;
+		color: var(--text-muted);
+	}
+
+	/* Areas, 1024 to 1199 px (desktop spec §4.1). */
+	.hub-dashboard {
+		grid-template-areas:
+			"alert alert alert alert alert alert alert alert alert alert alert alert"
+			"hero hero hero hero hero hero hero hero hero hero hero hero"
+			"next next next next next next recent recent recent recent recent recent"
+			"bars bars bars bars bars bars bars bars bars bars bars bars"
+			"news news news news news news tiles tiles tiles tiles tiles tiles";
+	}
+
+	.hub-prelaunch {
+		grid-template-areas:
+			"hero hero hero hero hero hero hero hero hero hero hero hero"
+			"checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist"
+			"bars bars bars bars bars bars bars bars bars bars bars bars"
+			"news news news news news news tiles tiles tiles tiles tiles tiles";
+	}
+
+	.hub-dashboard .hero,
+	.hero-before {
+		grid-area: hero;
+	}
+
+	.hub-dashboard .whats-next {
+		grid-area: next;
+	}
+
+	.hub-dashboard .dash-recent {
+		grid-area: recent;
+	}
+
+	.cat-bars {
+		grid-area: bars;
+	}
+
+	.news-tile {
+		grid-area: news;
+	}
+
+	.link-tiles {
+		grid-area: tiles;
+	}
+
+	.checklist {
+		grid-area: checklist;
+	}
+
+	/* No news at all: the tiles take its columns (desktop spec §7). */
+	.hub-prelaunch:not(:has(.news-tile)) .link-tiles,
+	.hub-dashboard:not(:has(.news-tile)) .link-tiles {
+		grid-column: 1 / -1;
+	}
+
+	/* What's next and Recent finds are tiles too. */
+	.hub-dashboard .whats-next,
+	.hub-dashboard .dash-recent {
+		padding: var(--space-4);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg-raised);
+	}
+
+	/* Recent finds: the first row is the Latest highlight, then up to 4 rows, or 2 with the chart. */
+	.dash-recent .recent li:first-child {
+		display: grid;
+		gap: var(--space-1);
+		padding-bottom: var(--space-3);
+		border-bottom: 1px solid var(--border);
+	}
+
+	.dash-recent .recent li:first-child .recent-name {
+		font-family: var(--font-display);
+		font-size: 2.25rem;
+		line-height: 1.05;
+	}
+
+	.dash-recent.has-chart .recent li:nth-child(n + 4) {
+		display: none;
+	}
+
+	.recent-label,
+	.recent-when,
+	.recent-meta {
+		font-size: 0.8125rem;
+		color: var(--text-muted);
+	}
+
+	.recent-empty-title {
+		font-weight: 600;
+		color: var(--text);
+	}
+
+	/* Desktop has no bottom tab bar: the toast sits at the bottom centre. @keyframes notice-in
+	   animates opacity only, so this translateX holds during the animation. */
+	.undo-toast {
+		left: 50%;
+		right: auto;
+		width: 22rem;
+		bottom: calc(var(--notice-h, 0px) + var(--space-3));
+		transform: translateX(-50%);
 	}
 
 	.tracker {
@@ -2497,5 +2774,45 @@ p {
 
 	.footer-strip {
 		flex-wrap: nowrap;
+	}
+}
+
+@media (min-width: 1200px) {
+	.hub-dashboard {
+		grid-template-areas:
+			"alert alert alert alert alert alert alert alert alert alert alert alert"
+			"hero hero hero hero hero hero hero hero next next next next"
+			"bars bars bars bars bars bars bars bars bars bars bars bars"
+			"recent recent recent recent news news news news news tiles tiles tiles";
+	}
+
+	.hub-prelaunch {
+		grid-template-areas:
+			"hero hero hero hero hero hero hero checklist checklist checklist checklist checklist"
+			"bars bars bars bars bars bars bars bars bars bars bars bars"
+			"news news news news news news news news tiles tiles tiles tiles";
+	}
+
+	/* No news: the tiles keep their own columns beside Recent finds instead of covering it. */
+	.hub-dashboard:not(:has(.news-tile)) .link-tiles {
+		grid-column: 5 / -1;
+	}
+
+	.ledger {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	/* The bottom row's reserve (--bottom-row-min, set from 1024 px) now covers all three blocks. Text
+	   at 200 % grows the row instead of being clipped. */
+	.hub-dashboard .dash-recent,
+	.hub-dashboard .news-tile,
+	.hub-dashboard .link-tiles {
+		min-height: var(--bottom-row-min);
+	}
+}
+
+@media (min-width: 1600px) {
+	.wrap.wide {
+		max-width: 85rem;
 	}
 }
