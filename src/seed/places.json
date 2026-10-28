@@ -134,5 +134,389 @@
 				"title": "Grand Theft Auto VI - Vice City - Rockstar Games"
 			}
 		]
+	},
+	{
+		"id": "places/ocean-beach",
+		"category": "places",
+		"group": "neighborhoods",
+		"name": "Ocean Beach",
+		"status": "confirmed",
+		"description": "A Vice City neighborhood of pastel art deco hotels and bright white sands. Rockstar calls it world-famous in the Vintage Vice City Pack text.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/little-cuba",
+		"category": "places",
+		"group": "neighborhoods",
+		"name": "Little Cuba",
+		"status": "confirmed",
+		"description": "A Vice City neighborhood known for its bustling bakeries, named by Rockstar on its Vice City postcard.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+				"title": "Every GTA 6 location revealed"
+			}
+		]
+	},
+	{
+		"id": "places/stockyard",
+		"category": "places",
+		"group": "neighborhoods",
+		"name": "Stockyard",
+		"status": "confirmed",
+		"description": "A district signposted in the first trailer. Rockstar places the Stock 305 clothing store and the Electric Fang tattoo parlor here.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-trailer-1-breakdown-things-you-missed/",
+				"title": "GTA 6 trailer breakdown - 12 things you might have missed"
+			}
+		]
+	},
+	{
+		"id": "places/washington-beach",
+		"category": "places",
+		"group": "neighborhoods",
+		"name": "Washington Beach",
+		"status": "confirmed",
+		"description": "A beach area where the Ultimate Edition's Shitzu Squalo boat is docked, named by Rockstar.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/southside",
+		"category": "places",
+		"group": "neighborhoods",
+		"name": "Southside Vice City",
+		"status": "confirmed",
+		"description": "Part of Vice City named by Rockstar as home turf of the PTT Youngin$, one of its loudest gangs.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/watson-bay",
+		"category": "places",
+		"group": "neighborhoods",
+		"name": "Watson Bay",
+		"status": "confirmed",
+		"description": "An area of Leonida named by Rockstar as the location of the Paradise Garage, an Ultimate Edition garage.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/kelly-county",
+		"category": "places",
+		"group": "regions",
+		"name": "Kelly County",
+		"status": "confirmed",
+		"description": "A county of Leonida named on a highway road sign in the first trailer.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-trailer-1-breakdown-things-you-missed/",
+				"title": "GTA 6 trailer breakdown - 12 things you might have missed"
+			}
+		]
+	},
+	{
+		"id": "places/goose-key",
+		"category": "places",
+		"group": "keys",
+		"name": "Goose Key",
+		"status": "confirmed",
+		"description": "A key named on a road sign behind a sign for The Keys at the start of the launch trailer. The name nods to Top Gun.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/517572321a549a/watch-the-grand-theft-auto-vi-launch-trailer",
+				"title": "Watch the Grand Theft Auto VI Launch Trailer - Rockstar Games"
+			},
+			{
+				"url": "https://www.gamespot.com/articles/things-we-noticed-in-the-gta-6-launch-trailer/",
+				"title": "10 Things We Noticed In The GTA 6 Launch Trailer - GameSpot"
+			}
+		]
+	},
+	{
+		"id": "places/vc-port",
+		"category": "places",
+		"group": "landmarks",
+		"name": "VC Port",
+		"status": "confirmed",
+		"description": "The Vice City port, billed by Rockstar as the cruise ship capital of the world.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+				"title": "Every GTA 6 location revealed"
+			}
+		]
+	},
+	{
+		"id": "places/the-city-airport",
+		"category": "places",
+		"group": "landmarks",
+		"name": "Vice City International Airport",
+		"status": "confirmed",
+		"description": "The city's airport, signposted as VCI on a highway road sign in the first trailer.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-trailer-1-breakdown-things-you-missed/",
+				"title": "GTA 6 trailer breakdown - 12 things you might have missed"
+			},
+			{
+				"url": "https://rockstarintel.com/gta-6-all-confirmed-locations-so-far/",
+				"title": "GTA 6 - All confirmed locations so far - RockstarINTEL"
+			}
+		]
+	},
+	{
+		"id": "places/tisha-wocka-flea-market",
+		"category": "places",
+		"group": "landmarks",
+		"name": "Tisha-Wocka Flea Market",
+		"status": "confirmed",
+		"description": "A Vice City flea market known for its bootleg brands, named by Rockstar on its Vice City postcard.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/the-lake",
+		"category": "places",
+		"group": "landmarks",
+		"name": "Lake Leonida",
+		"status": "confirmed",
+		"description": "A lake area named by Rockstar as the home of One-Eyed Willie's Mod Shop.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/gambit-bay",
+		"category": "places",
+		"group": "landmarks",
+		"name": "Gambit Bay",
+		"status": "confirmed",
+		"description": "A bay Rockstar names as a fishing spot in its Ultimate Edition text for the Shitzu Squalo boat.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/paradise-garage",
+		"category": "places",
+		"group": "landmarks",
+		"name": "Paradise Garage",
+		"status": "confirmed",
+		"description": "An Ultimate Edition garage in Watson Bay with a weapon locker and a secure drop for stolen goods to be fenced.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/allied-crystal-sugar-refinery",
+		"category": "places",
+		"group": "businesses",
+		"name": "Allied Crystal Sugar Refinery",
+		"status": "confirmed",
+		"description": "The sugar refinery that provides the jobs in Ambrosia, named on Rockstar's Ambrosia postcard.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+				"title": "Every GTA 6 location revealed"
+			}
+		]
+	},
+	{
+		"id": "places/the-rusty-anchor",
+		"category": "places",
+		"group": "businesses",
+		"name": "The Rusty Anchor",
+		"status": "confirmed",
+		"description": "A dive bar in the Leonida Keys, shown with its sign in an official Leonida Keys screenshot.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+				"title": "Every GTA 6 location revealed"
+			}
+		]
+	},
+	{
+		"id": "places/starlet-motel",
+		"category": "places",
+		"group": "businesses",
+		"name": "Starlet Motel",
+		"status": "confirmed",
+		"description": "A roadside motel in Port Gellhorn, shown with its neon sign in an official Port Gellhorn screenshot.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+				"title": "Every GTA 6 location revealed"
+			}
+		]
+	},
+	{
+		"id": "places/delights-cabaret",
+		"category": "places",
+		"group": "businesses",
+		"name": "Delights Cabaret",
+		"status": "confirmed",
+		"description": "A roadside cabaret club in Port Gellhorn, shown with its neon sign in an official Port Gellhorn screenshot.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/only-in-leonida",
+				"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+				"title": "Every GTA 6 location revealed"
+			}
+		]
+	},
+	{
+		"id": "places/ptt-youngins-illegal-goods-store",
+		"category": "places",
+		"group": "businesses",
+		"name": "PTT Youngin$ Illegal Goods Store",
+		"status": "confirmed",
+		"description": "An Ultimate Edition raid on the compound of a Southside Vice City gang. Escape safely to score special items and contraband.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/rideout-customs-mod-shop",
+		"category": "places",
+		"group": "businesses",
+		"name": "Rideout Customs Mod Shop",
+		"status": "confirmed",
+		"description": "An Ultimate Edition mod shop for detailed interiors, exquisite rims and donk stylings.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/saras-unisex-salon",
+		"category": "places",
+		"group": "businesses",
+		"name": "Sara's Unisex Salon",
+		"status": "confirmed",
+		"description": "A salon with signature styles for Jason and Lucia, including facial hair, makeup and nails. Only open with the Ultimate Edition.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/stock-305-clothing-store",
+		"category": "places",
+		"group": "businesses",
+		"name": "Stock 305 Clothing Store",
+		"status": "confirmed",
+		"description": "Stockyard's premier streetwear store, with exclusive looks for Jason and Lucia. Only open with the Ultimate Edition.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/electric-fang-tattoo-parlor",
+		"category": "places",
+		"group": "businesses",
+		"name": "Electric Fang Tattoo Parlor",
+		"status": "confirmed",
+		"description": "Stockyard's best-known ink bar, with over 50 tattoos designed by the artist collective FAILE. Only open with the Ultimate Edition.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
+	},
+	{
+		"id": "places/one-eyed-willies-mod-shop",
+		"category": "places",
+		"group": "businesses",
+		"name": "One-Eyed Willie's Mod Shop",
+		"status": "confirmed",
+		"description": "A mod shop in Lake Leonida for off-road modifications and hand-painted automotive art. Only open with the Ultimate Edition.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			}
+		]
 	}
 ]

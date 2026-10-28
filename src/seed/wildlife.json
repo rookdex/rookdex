@@ -460,5 +460,31 @@
 				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
 			}
 		]
+	},
+	{
+		"id": "wildlife/ray",
+		"category": "wildlife",
+		"group": "marine",
+		"name": "Ray",
+		"status": "confirmed",
+		"description": "Rays swim past a diver in a wetsuit in the Extended Look. Press coverage names them as manta rays and stingrays. Rays are also on the wildlife list Rockstar gave Game Informer.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look, Now Playing (Rockstar Newswire)"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-side-activities/",
+				"title": "All of the GTA 6 side activities confirmed so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-extended-look-breakdown-7-things-you-might-have-missed/",
+				"title": "GTA 6 extended look breakdown: 7 things you might have missed - GamesRadar+"
+			},
+			{
+				"url": "https://rockstarintel.com/gta-6-has-hurricanes-170-animals-fun-activities-weather-system-detailed/",
+				"title": "GTA 6 Has Hurricanes, 170 Animals, Fun Activities, Weather System Detailed - RockstarINTEL"
+			}
+		]
 	}
 ]
