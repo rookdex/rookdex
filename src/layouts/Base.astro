@@ -21,7 +21,7 @@ interface Props {
 	description: string
 	/** Route without the locale prefix: "" for the hub, "guides/before-you-start" for a guide. */
 	path: string
-	/** Overrides the tab `path` implies; `null` marks none (the 404 passes "" but is not Home). */
+	/** Overrides the tab `path` implies; `null` marks none (the 404 passes "" but is not Dashboard). */
 	tab?: Tab | null
 	/** false drops the canonical, hreflang links, og:url and JSON-LD: the 404 has no address of
 	 *  its own and is served with a real 404 status, so it needs no noindex (SEO spec §4.4). */

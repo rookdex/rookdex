@@ -31,7 +31,7 @@ describe("main navigation (spec §5, §12)", () => {
 	})
 
 	it.each([
-		["", "Home"],
+		["", "Dashboard"],
 		["tracker", "Tracker"],
 		["news", "News"],
 		["settings", "Settings"],
