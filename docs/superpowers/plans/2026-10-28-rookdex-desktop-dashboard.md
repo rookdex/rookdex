@@ -42,6 +42,7 @@
 3. **A tick in a second tab is lost** when the first tab writes its own tick from stale state. Read-before-write keeps both. Pinned in Task 3 (storage) and Task 7 (component).
 4. **Finds by day across the 25 October daylight-saving change** skips or repeats a day if it steps by 24 hours. Pinned in Task 2.
 5. **The installed app** shows the install row as ticked and disabled, and never stores that tick. Pinned in Task 7.
+6. **A filled page alert covers the hero** if it shares the hero's grid row. It gets its own `alert` row (Task 10); Task 11 measures it with a forced message.
 
 ---
 
@@ -147,6 +148,7 @@ In both bundles rename `nav.home` to `nav.dashboard`: `"Dashboard"` (en), `"Dash
 	"hub.beforeLaunch": "Before launch",
 	"hub.checklistDone": "{done} of {total} done",
 	"hub.checklistNote": "Ticks stay on this device. The list goes away at launch, when the tracker takes over.",
+	"hub.checklistNoStorage": "Your browser blocks storage here, so ticks last until you close the page.",
 	"hub.check.edition": "Pick your edition",
 	"hub.check.editionSub": "The guide compares them",
 	"hub.check.preload": "Preload on 12 November",
@@ -190,6 +192,7 @@ In both bundles rename `nav.home` to `nav.dashboard`: `"Dashboard"` (en), `"Dash
 	"hub.beforeLaunch": "Før lansering",
 	"hub.checklistDone": "{done} av {total} ferdig",
 	"hub.checklistNote": "Avkrysningene blir på denne enheten. Listen forsvinner ved lansering, når Oversikt tar over.",
+	"hub.checklistNoStorage": "Nettleseren blokkerer lagring her, så avkrysningene varer til du lukker siden.",
 	"hub.check.edition": "Velg utgave",
 	"hub.check.editionSub": "Guiden sammenligner dem",
 	"hub.check.preload": "Forhåndslast 12. november",
@@ -514,8 +517,8 @@ git commit -m "Add latestNews, findsByDay and categoryRows for the desktop dashb
   - `CHECKLIST_KEY = "rookdex.prelaunch-checklist"`
   - `CHECKLIST_IDS = ["edition", "preload", "space", "first-hour", "install"] as const`
   - `type ChecklistId = (typeof CHECKLIST_IDS)[number]`
-  - `readChecklist(): ChecklistId[]`
-  - `writeChecklistItem(id: ChecklistId, ticked: boolean, current: ChecklistId[]): ChecklistId[]` returns the new list, in `CHECKLIST_IDS` order. `current` is what the island shows; it is used only when storage is blocked.
+  - `readChecklist(): ChecklistId[] | null`, `null` when storage is blocked.
+  - `writeChecklistItem(id: ChecklistId, ticked: boolean, current: ChecklistId[]): { list: ChecklistId[]; saved: boolean }`. `list` is the new list, in `CHECKLIST_IDS` order; `saved` is false when storage refused the write. `current` is what the island shows; it is used only when storage is blocked.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -546,25 +549,25 @@ describe("readChecklist (desktop dashboard spec §5)", () => {
 		expect(readChecklist()).toEqual(["edition", "space"])
 	})
 
-	it("reads blocked storage as empty", () => {
+	it("reads blocked storage as null, so the island can say so", () => {
 		vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
 			throw new Error("SecurityError")
 		})
-		expect(readChecklist()).toEqual([])
+		expect(readChecklist()).toBeNull()
 	})
 })
 
 describe("writeChecklistItem", () => {
 	it("round-trips a tick and an untick", () => {
-		expect(writeChecklistItem("preload", true, [])).toEqual(["preload"])
+		expect(writeChecklistItem("preload", true, [])).toEqual({ list: ["preload"], saved: true })
 		expect(readChecklist()).toEqual(["preload"])
-		expect(writeChecklistItem("preload", false, ["preload"])).toEqual([])
+		expect(writeChecklistItem("preload", false, ["preload"])).toEqual({ list: [], saved: true })
 		expect(readChecklist()).toEqual([])
 	})
 
 	it("reads storage again first, so a tick from another tab is kept", () => {
 		localStorage.setItem(CHECKLIST_KEY, '["edition"]') // written by another tab
-		expect(writeChecklistItem("space", true, [])).toEqual(["edition", "space"])
+		expect(writeChecklistItem("space", true, []).list).toEqual(["edition", "space"])
 		expect(JSON.parse(localStorage.getItem(CHECKLIST_KEY) ?? "")).toEqual(["edition", "space"])
 	})
 
@@ -575,7 +578,10 @@ describe("writeChecklistItem", () => {
 		vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
 			throw new Error("SecurityError")
 		})
-		expect(writeChecklistItem("space", true, ["edition"])).toEqual(["edition", "space"])
+		expect(writeChecklistItem("space", true, ["edition"])).toEqual({
+			list: ["edition", "space"],
+			saved: false,
+		})
 	})
 })
 ```
@@ -598,7 +604,7 @@ export const CHECKLIST_IDS = ["edition", "preload", "space", "first-hour", "inst
 export type ChecklistId = (typeof CHECKLIST_IDS)[number]
 
 /** The stored ids in list order, or null when storage is blocked. Garbage reads as empty. */
-function loadChecklist(): ChecklistId[] | null {
+export function readChecklist(): ChecklistId[] | null {
 	let raw: string | null
 	try {
 		raw = localStorage.getItem(CHECKLIST_KEY)
@@ -614,27 +620,24 @@ function loadChecklist(): ChecklistId[] | null {
 	}
 }
 
-export function readChecklist(): ChecklistId[] {
-	return loadChecklist() ?? []
-}
-
 /**
  * Ticks or unticks one id. Reads storage again first, so a tick made in another open tab is kept.
- * Blocked storage falls back to `current`, so ticks last until the page closes. Never throws.
+ * Blocked storage falls back to `current`, so ticks last until the page closes, and `saved` comes
+ * back false so the island can say so. Never throws.
  */
 export function writeChecklistItem(
 	id: ChecklistId,
 	ticked: boolean,
 	current: ChecklistId[]
-): ChecklistId[] {
-	const base = loadChecklist() ?? current
-	const next = CHECKLIST_IDS.filter((known) => (known === id ? ticked : base.includes(known)))
+): { list: ChecklistId[]; saved: boolean } {
+	const base = readChecklist() ?? current
+	const list = CHECKLIST_IDS.filter((known) => (known === id ? ticked : base.includes(known)))
 	try {
-		localStorage.setItem(CHECKLIST_KEY, JSON.stringify(next))
+		localStorage.setItem(CHECKLIST_KEY, JSON.stringify(list))
+		return { list, saved: true }
 	} catch {
-		// Blocked storage: the island keeps the ticks in memory until the page closes.
+		return { list, saved: false }
 	}
-	return next
 }
 ```
 
@@ -863,7 +866,7 @@ const tile = (items = news) =>
 	render(<NewsTile news={items} today="2026-11-22" locale="en" newsHref="/en/news/" t={t} />)
 
 describe("NewsTile (desktop dashboard spec §4.6)", () => {
-	it("lists the items in the order given, each with its chip and a link to News", () => {
+	it("lists the items in the order given, each with its chip and a link to its News section", () => {
 		tile()
 		const section = screen.getByRole("region", { name: "Latest news" })
 		const rows = within(section).getAllByRole("listitem")
@@ -873,7 +876,11 @@ describe("NewsTile (desktop dashboard spec §4.6)", () => {
 		])
 		expect(within(rows[0]).getByRole("link", { name: "Online in 2027" })).toHaveAttribute(
 			"href",
-			"/en/news/"
+			"/en/news/#rumours"
+		)
+		expect(within(rows[1]).getByRole("link", { name: "Preload on 12 November" })).toHaveAttribute(
+			"href",
+			"/en/news/#confirmed"
 		)
 		expect(within(section).getByRole("link", { name: "All news" })).toHaveAttribute(
 			"href",
@@ -1089,7 +1096,10 @@ export function NewsTile({ news, today, locale, newsHref, t }: Props) {
 						<span className={`news-chip is-${entry.kind}`}>
 							{t(entry.kind === "confirmed" ? "facts.title" : "hub.chipRumour")}
 						</span>
-						<a href={newsHref}>{entry.name}</a>
+						{/* News has no anchor per item, so a row goes to its section (news.astro ids). */}
+						<a href={`${newsHref}#${entry.kind === "confirmed" ? "confirmed" : "rumours"}`}>
+							{entry.name}
+						</a>
 						<time dateTime={entry.date}>
 							{mounted ? relative.format(-daysAgo(entry.date, today), "day") : ""}
 						</time>
@@ -1939,6 +1949,31 @@ describe("PrelaunchChecklist (desktop dashboard spec §4.8)", () => {
 		expect(box("Free up console space")).toBeChecked()
 	})
 
+	it("shows what another tab stored without a click here", () => {
+		list()
+		localStorage.setItem(CHECKLIST_KEY, '["space"]')
+		fireEvent(window, new StorageEvent("storage", { key: CHECKLIST_KEY }))
+		expect(box("Free up console space")).toBeChecked()
+		localStorage.removeItem(CHECKLIST_KEY) // Delete all in Settings, in another tab
+		fireEvent(window, new StorageEvent("storage", { key: CHECKLIST_KEY }))
+		expect(box("Free up console space")).not.toBeChecked()
+	})
+
+	it("says so when storage is blocked, and still ticks for this visit", () => {
+		vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+			throw new Error("SecurityError")
+		})
+		vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+			throw new Error("SecurityError")
+		})
+		list()
+		expect(screen.getByText(/blocks storage here/)).toBeInTheDocument()
+		expect(screen.queryByText(/Ticks stay on this device/)).toBeNull()
+		fireEvent.click(box("Pick your edition"))
+		expect(box("Pick your edition")).toBeChecked()
+		expect(screen.getByText("1 of 5 done")).toBeInTheDocument()
+	})
+
 	it("puts each Open link outside the label, named after its page", () => {
 		list()
 		const open = screen.getByRole("link", { name: "Open: Before you start" })
@@ -1981,7 +2016,13 @@ Expected: FAIL, module not found.
 import { useEffect, useState } from "react"
 import type { Translate } from "../../i18n"
 import { isStandalone } from "../../scripts/standalone"
-import { CHECKLIST_IDS, type ChecklistId, readChecklist, writeChecklistItem } from "../seenFlag"
+import {
+	CHECKLIST_IDS,
+	CHECKLIST_KEY,
+	type ChecklistId,
+	readChecklist,
+	writeChecklistItem,
+} from "../seenFlag"
 import { Chev } from "./Chev"
 
 /** Where a row's Open link goes, and the page name its hidden text reads out. */
@@ -2012,10 +2053,29 @@ const COPY: Record<ChecklistId, string> = {
 export function PrelaunchChecklist({ links, t }: Props) {
 	const [ticked, setTicked] = useState<ChecklistId[]>([])
 	const [installed, setInstalled] = useState(false)
+	const [blocked, setBlocked] = useState(false)
 	useEffect(() => {
-		setTicked(readChecklist())
+		const load = () => {
+			const saved = readChecklist()
+			setBlocked(saved === null)
+			if (saved) setTicked(saved)
+		}
+		load()
 		setInstalled(isStandalone(window))
+		// Another tab ticked something, or Delete all ran in Settings: show what is stored now.
+		const onStorage = (event: StorageEvent) => {
+			if (event.key === CHECKLIST_KEY || event.key === null) load()
+		}
+		window.addEventListener("storage", onStorage)
+		return () => window.removeEventListener("storage", onStorage)
 	}, [])
+
+	// Outside the state updater, which React may run twice: the write is a side effect.
+	const toggle = (id: ChecklistId, on: boolean) => {
+		const { list, saved } = writeChecklistItem(id, on, ticked)
+		setTicked(list)
+		setBlocked(!saved)
+	}
 
 	const isDone = (id: ChecklistId) => (id === "install" && installed) || ticked.includes(id)
 	const done = CHECKLIST_IDS.filter(isDone).length
@@ -2039,9 +2099,7 @@ export function PrelaunchChecklist({ links, t }: Props) {
 									type="checkbox"
 									checked={isDone(id)}
 									disabled={locked}
-									onChange={(event) =>
-										setTicked((now) => writeChecklistItem(id, event.target.checked, now))
-									}
+									onChange={(event) => toggle(id, event.target.checked)}
 								/>
 								<span className="check-text">
 									<span className="check-item">{t(`hub.check.${key}`)}</span>
@@ -2057,7 +2115,9 @@ export function PrelaunchChecklist({ links, t }: Props) {
 					)
 				})}
 			</ul>
-			<p className="checklist-note">{t("hub.checklistNote")}</p>
+			<p className="checklist-note">
+				{t(blocked ? "hub.checklistNoStorage" : "hub.checklistNote")}
+			</p>
 		</section>
 	)
 }
@@ -2204,11 +2264,24 @@ const BEFORE_VIEW = [
 ]
 const HEAVY = /from "\.\.\/\.\.\/model\/(seed|stats|dashboard|tracker)"/
 
+/** Lines that pull the tracker model in at runtime. A multi-line import counts by its `from` line. */
+function runtimeModelImports(source: string): string[] {
+	return source
+		.split("\n")
+		.filter((line) => HEAVY.test(line) && !/^import type /.test(line))
+}
+
 describe("before-view imports", () => {
+	it("catches a runtime import, so the guard can go red", () => {
+		expect(runtimeModelImports('import { seedItems } from "../../model/seed"')).toHaveLength(1)
+		expect(runtimeModelImports('import { type Count } from "../../model/stats"')).toHaveLength(1)
+		expect(runtimeModelImports('} from "../../model/dashboard"')).toHaveLength(1)
+		expect(runtimeModelImports('import type { Count } from "../../model/stats"')).toEqual([])
+	})
+
 	it.each(BEFORE_VIEW)("%s imports the tracker model as types only", (file) => {
 		const source = readFileSync(new URL(`./${file}`, import.meta.url), "utf8")
-		const heavy = source.split("\n").filter((line) => HEAVY.test(line))
-		for (const line of heavy) expect(line).toMatch(/^import type /)
+		expect(runtimeModelImports(source)).toEqual([])
 	})
 })
 ```
@@ -2963,14 +3036,16 @@ Inside the existing `@media (min-width: 1024px)` block, replace the `.hub { grid
 		display: contents;
 	}
 
-	/* An empty alert row must not add a gap; a filled one pushes the grid down, as on phones. */
-	.hub-dashboard .tracker-alert {
-		grid-column: 1 / -1;
-		grid-row: 1;
+	/* The page alert gets its own first row, so a message pushes the grid down, as on phones, instead
+	   of covering the hero. The grid is pulled up by one gap, so the empty row costs nothing. Child
+	   combinators keep the Undo toast's own alert out of this. */
+	.hub-dashboard {
+		margin-block-start: calc(var(--space-3) * -1);
 	}
 
-	.hub-dashboard .tracker-alert:empty {
-		margin-block-end: calc(var(--space-3) * -1);
+	.hub-dashboard > .tracker-alert,
+	.hub-dashboard > .dashboard > .tracker-alert {
+		grid-area: alert;
 	}
 
 	/* Phone blocks give way to their desktop versions. */
@@ -3064,6 +3139,7 @@ Inside the existing `@media (min-width: 1024px)` block, replace the `.hub { grid
 	/* Areas, 1024 to 1199 px (desktop spec §4.1). */
 	.hub-dashboard {
 		grid-template-areas:
+			"alert alert alert alert alert alert alert alert alert alert alert alert"
 			"hero hero hero hero hero hero hero hero hero hero hero hero"
 			"next next next next next next recent recent recent recent recent recent"
 			"bars bars bars bars bars bars bars bars bars bars bars bars"
@@ -3153,7 +3229,7 @@ Inside the existing `@media (min-width: 1024px)` block, replace the `.hub { grid
 	}
 ```
 
-Check `@keyframes notice-in`: if it animates `transform`, the centring `translateX(-50%)` is overwritten during the 160 ms animation. In that case centre with `left: 0; right: 0; margin-inline: auto;` instead of `left: 50%` plus `transform`.
+`@keyframes notice-in` animates `opacity` only (checked 2026-10-28), so the centring `translateX(-50%)` holds during the animation. If someone later adds `transform` to it, centre with `left: 0; right: 0; margin-inline: auto;` instead.
 
 The `dash-top` and `hero` share one grid area. The hero's own `.tile-label` stays on the left, and the chip and day line sit on the right of the same top row. The hero's top padding must leave room for the chip's 44 px height, so add `.hub-dashboard .hero { padding-top: calc(var(--space-3) + var(--tap)); }` if the label and the big number collide with the chip at 1024 px (measure in Task 11).
 
@@ -3165,6 +3241,7 @@ Add new blocks after the 1024 block:
 @media (min-width: 1200px) {
 	.hub-dashboard {
 		grid-template-areas:
+			"alert alert alert alert alert alert alert alert alert alert alert alert"
 			"hero hero hero hero hero hero hero hero next next next next"
 			"bars bars bars bars bars bars bars bars bars bars bars bars"
 			"recent recent recent recent news news news news news tiles tiles tiles";
@@ -3262,6 +3339,8 @@ At 1024, 1265, 1440 and 1640 px, `en` and `nb`:
 - A `PerformanceObserver({ type: "layout-shift", buffered: true })` reports a total of 0 for each load.
 - Contrast: text over `.ledger-fill` at 100 % fill is at least 7:1; the struck-through checklist item at least 4.5:1; the `.tag` uses `--accent-text` on `--accent`.
 - Edge cases: a 3-digit found count in the hero (temporarily set `overall.done` through React devtools or a test build), and the longest `nb` category as Closest at 1024 px.
+- Overlays: the `.dash-top` chip and day line never intersect the hero's `.tile-label` or `.hero-count`, and `.hero-date` never intersects the countdown's `h2` or `.days` (compare `getBoundingClientRect()` of each pair), at every width and at 200 % text.
+- Alert row: after launch, note the hero's `top`, then write text into the page alert from the console (`document.querySelector(".dashboard > .tracker-alert").textContent = "Test"`). The alert's `bottom` sits above the hero's `top`, and nothing overlaps. With the alert empty again, the hero's `top` is back to the noted value.
 - Chrome font size at 200 % at 1265 px: nothing clipped.
 - 320 px `nb` before launch: the checklist sits straight after the countdown, no overflow, rows at least 44 px.
 - Below 1024 px after launch: the phone dashboard looks exactly as on `main` (compare one screenshot each at 390 px).
@@ -3287,3 +3366,5 @@ git commit -m "Fix desktop dashboard spacing from the measurement pass and note 
 - [ ] **Step 7: Push and open the PR**
 
 Push the branch and open a PR titled "Desktop dashboard and before-launch checklist". Body: what changed (grid from 1024, Dashboard tab, checklist, Rockstar site card), the six settled spec gaps, the measured numbers (CLS per width and state, the bottom-row reserve), screenshots at 1265 px before and after launch and at 320 px before launch, and the manual NVDA notes. No AI attribution.
+
+> Stress-tested 2026-10-28 (skill 1b85fca): 6 applied, 1 adapted, 0 decided by me.
