@@ -19,8 +19,10 @@ export function DashboardSkeleton({ categoryCount, t }: Props) {
 		<div className="dashboard is-skeleton">
 			<p className="visually-hidden">{t("tracker.loading")}</p>
 			<div className="dash-top" aria-hidden="true">
+				<span className="dash-day">&nbsp;</span>
 				<span className="skeleton skeleton-chip" />
 			</div>
+			<div className="tile hero hero-after skeleton" aria-hidden="true" />
 			{/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: a dl is not focusable; the rule misreads it. */}
 			<dl className="stat-pair" aria-hidden="true">
 				{keys("tile", 2).map((key) => (
@@ -55,6 +57,18 @@ export function DashboardSkeleton({ categoryCount, t }: Props) {
 						<div className="bar" />
 					</div>
 				))}
+			</section>
+			<section className="cat-bars" aria-hidden="true">
+				<div className="deco">
+					<h2>{t("hub.categories")}</h2>
+				</div>
+				<ul className="ledger">
+					{keys("cat", categoryCount).map((key) => (
+						<li key={key}>
+							<span className="ledger-row skeleton" />
+						</li>
+					))}
+				</ul>
 			</section>
 			<section className="dash-recent" aria-hidden="true">
 				<h2>{t("tracker.recent")}</h2>

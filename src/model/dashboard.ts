@@ -1,8 +1,8 @@
 // The dashboard's numbers (dashboard spec §6.2). Pure: no DOM, no clock; the caller passes `now`.
 // Retired items and records without a seed item never count, as in stats.ts.
-import { localDayKey } from "./days"
+import { addDays, localDayKey } from "./days"
 import type { Fact, Rumour, SeedItem } from "./schema"
-import { groupItems } from "./seed"
+import { categoryIds, groupItems } from "./seed"
 import { countable, perCategory, type Records } from "./stats"
 
 /** Where a player with nothing found starts. */
@@ -89,4 +89,79 @@ export function newestFacts(facts: Fact[]): Fact[] {
 	return [...facts].sort(
 		(a, b) => b.announced.localeCompare(a.announced) || a.id.localeCompare(b.id)
 	)
+}
+
+/** One row of the Latest news tile (desktop dashboard spec §4.6). A fact's name is per locale. */
+export interface NewsEntry {
+	id: string
+	kind: "confirmed" | "rumour"
+	date: string
+	name: string | Fact["name"]
+}
+
+/** Facts by `announced` and rumours by `added`, newest first. Same day: Confirmed first, then id. */
+export function latestNews(facts: Fact[], rumours: Rumour[], limit: number): NewsEntry[] {
+	const entries: NewsEntry[] = [
+		...facts.map((f) => ({
+			id: f.id,
+			kind: "confirmed" as const,
+			date: f.announced,
+			name: f.name,
+		})),
+		...rumours.map((r) => ({ id: r.id, kind: "rumour" as const, date: r.added, name: r.name })),
+	]
+	const rank = (kind: NewsEntry["kind"]) => (kind === "confirmed" ? 0 : 1)
+	return entries
+		.sort(
+			(a, b) =>
+				b.date.localeCompare(a.date) || rank(a.kind) - rank(b.kind) || a.id.localeCompare(b.id)
+		)
+		.slice(0, limit)
+}
+
+/** Finds on one local calendar day. */
+export interface DayCount {
+	day: string
+	count: number
+}
+
+/**
+ * Finds per local day for the `days` days ending on `today` (`YYYY-MM-DD`), oldest first, zero
+ * days kept (desktop dashboard spec §6.2). Retired items and records with no seed item never count.
+ */
+export function findsByDay(
+	items: SeedItem[],
+	records: Records,
+	today: string,
+	days: number
+): DayCount[] {
+	const counts = new Map<string, number>()
+	for (let n = days - 1; n >= 0; n--) counts.set(addDays(today, -n), 0)
+	for (const item of countable(items)) {
+		const record = records[item.id]
+		if (record?.done !== true) continue
+		const day = localDayKey(new Date(record.updated_at))
+		const count = counts.get(day)
+		if (count !== undefined) counts.set(day, count + 1)
+	}
+	return [...counts].map(([day, count]) => ({ day, count }))
+}
+
+/** One category bar: its counts and its group ids in tracker order (desktop dashboard spec §6.1). */
+export interface CategoryRow {
+	id: string
+	done: number
+	total: number
+	groups: string[]
+}
+
+/** Every category, in the order its first item appears in the tracker. Retired items are skipped. */
+export function categoryRows(items: SeedItem[], records: Records): CategoryRow[] {
+	const live = countable(items)
+	const counts = perCategory(live, records)
+	return categoryIds(live).map((id) => {
+		const count = counts.find((c) => c.category === id) ?? { done: 0, total: 0 }
+		const groups = [...groupItems(live.filter((item) => item.category === id)).keys()]
+		return { id, done: count.done, total: count.total, groups }
+	})
 }

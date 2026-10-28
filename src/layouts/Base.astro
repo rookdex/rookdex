@@ -21,14 +21,16 @@ interface Props {
 	description: string
 	/** Route without the locale prefix: "" for the hub, "guides/before-you-start" for a guide. */
 	path: string
-	/** Overrides the tab `path` implies; `null` marks none (the 404 passes "" but is not Home). */
+	/** Overrides the tab `path` implies; `null` marks none (the 404 passes "" but is not Dashboard). */
 	tab?: Tab | null
 	/** false drops the canonical, hreflang links, og:url and JSON-LD: the 404 has no address of
 	 *  its own and is served with a real 404 status, so it needs no noindex (SEO spec §4.4). */
 	indexable?: boolean
+	/** The hub's wider page: caps at 85rem from 1600 px instead of 72rem (desktop spec §3). */
+	wide?: boolean
 }
 
-const { locale, title, description, path, tab, indexable = true } = Astro.props
+const { locale, title, description, path, tab, indexable = true, wide = false } = Astro.props
 const { t } = translator(locale)
 const current = currentTab(path, tab)
 const sub = current !== null && path !== TAB_PATHS[current]
@@ -119,7 +121,7 @@ const ogLocale: Record<Locale, string> = { en: "en_US", nb: "nb_NO" }
 			</div>
 		</div>
 		<p class="visually-hidden" role="status" data-update-status></p>
-		<main id="main" class="wrap">
+		<main id="main" class:list={["wrap", { wide }]}>
 			<slot />
 		</main>
 		<p

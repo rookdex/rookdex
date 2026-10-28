@@ -14,7 +14,7 @@ const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const { t } = translator(locale as Locale)
 // The day this text last changed. Move it with every change to the privacy copy.
-const UPDATED = new Date("2026-10-27T00:00:00Z")
+const UPDATED = new Date("2026-10-28T00:00:00Z")
 const dateLocale = locale === "nb" ? "nb-NO" : "en-GB"
 const updated = new Intl.DateTimeFormat(dateLocale, { dateStyle: "long", timeZone: "UTC" }).format(
 	UPDATED

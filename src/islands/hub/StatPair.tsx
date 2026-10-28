@@ -10,7 +10,7 @@ interface Props {
 }
 
 /** Whole percent rounded down, so a tile never says 100 % before the last find. */
-function share(count: Count): number {
+export function share(count: Count): number {
 	return count.total === 0 ? 0 : Math.floor((count.done * 100) / count.total) / 100
 }
 

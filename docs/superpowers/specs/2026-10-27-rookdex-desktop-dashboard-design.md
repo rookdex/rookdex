@@ -76,7 +76,7 @@ The tagline line sits above the grid. An art-deco divider labelled "Categories" 
 - One link per category to `tracker/?show=<category>`. The whole row is the target.
 - Left: the category name (`h3`), and under it the group names joined by " · " (`seedLabel(t, "group", id)`), one line, cut with an ellipsis only if it would wrap.
 - Right: "N left" (or "N to find" before launch, "All found" at 100 %), the fraction in Bebas, and a chevron in `--link`.
-- The fill sits behind the text: the brand gradient at 22 % and 16 % strength, no edge line. Text over it keeps at least 7:1, checked during the build.
+- The fill sits behind the text: the brand gradient at 22 % and 16 % strength, no edge line. The name and fraction over it keep at least 7:1; the muted secondary lines (groups, "N left") keep at least 4.5:1 (WCAG AA). Checked during the build.
 - The closest category gets the "Closest" tag after its name, after launch only. The tag has a 1 px border in its own background colour, so it stays outlined in forced-colours mode.
 - Rows are 72 px tall.
 
@@ -276,3 +276,20 @@ New keys go into both `src/locales/en.json` and `nb.json`. `nav.home` is renamed
 The page title and description still say "countdown" after launch. The SEO follow-up for launch night picks that up, together with the `og:image` handoff.
 
 > Stress-tested 2026-10-27 (skill 1b85fca): 10 applied, 3 adapted, 0 decided by me.
+
+## As built (2026-10-28)
+
+The build follows this spec with these settled gaps and deviations:
+
+- **News chips.** The News page has no Confirmed/Rumour chips, so the news tile reuses `facts.title` ("Confirmed" / "Bekreftet") and adds `hub.chipRumour` ("Rumour" / "Rykte") with a small `.news-chip` style. Its rows link to `/news/#confirmed` and `/news/#rumours`.
+- **Tile labels.** The guide tile uses a new key, `hub.guideLabel` ("Guide"). The settings tile reuses `nav.settings`.
+- **No `hub.countdownLabel`.** It would repeat `hub.countdownHeading`, which the hero reuses as its label.
+- **No `hub.nothingYet` keys.** The before-launch grid (§4.1) has no Recent finds area to show them.
+- **Guide titles as props.** "Before you start" and "Your first hour" come from the guides' frontmatter, so `index.astro` passes them to the hub.
+- **Hero markup.** "17 / 43 found" is a paragraph; the three label-value pairs are the `dl` (§9).
+- **Blocked storage (§5).** The checklist read returns `null` when storage is blocked, and the note swaps to `hub.checklistNoStorage`.
+- **Live sync between tabs is in.** §14 lists the `storage`-event sync as rejected; the plan's stress test added it back (about ten lines and one test).
+- **News and link tiles live in `Hub`,** so they render even when the dashboard chunk fails (§3 put them in Dashboard).
+- **From 1024 px** the countdown's buying block and its days unit are hidden; the hero shows the days line instead.
+
+The measurement pass (Task 11) fixed, in CSS only: the link tiles and category rows losing their layout to `.hub-state a` after launch (page overflow at 1265 px, a 30 px skeleton shift), the tagline's `65ch` cap rewrapping on font swap (22 px shift at 1024 px), the countdown units moving when reduced motion drops the seconds, the hero date's contrast on the sun (3.9:1, now full text colour), the Rockstar card's `nb` text under the sun, and three overflows at 200 % text. The bottom-row reserve is `26rem`. Over a full category fill, `--text` measures 13.5:1 and the muted lines 6.0:1 (5.5:1 on hover); §4.3 now asks AA (4.5:1) for those muted lines instead of 7:1.

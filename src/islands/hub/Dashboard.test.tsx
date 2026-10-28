@@ -72,9 +72,11 @@ async function ready(today?: string) {
 	return view
 }
 
-/** A tile's value: the dd after its dt. */
+/** A phone tile's value: the dd after its dt. Scoped to the phone pair; the hero repeats the labels. */
 function tile(label: string) {
-	return screen.getByText(label).nextElementSibling
+	const pair = document.querySelector<HTMLElement>(".stat-pair")
+	if (!pair) throw new Error("no .stat-pair")
+	return within(pair).getByText(label).nextElementSibling
 }
 
 // Midday UTC, so the local day matches in any time zone from UTC-12 to UTC+11.
@@ -98,7 +100,9 @@ describe("Dashboard blocks (dashboard spec §4)", () => {
 			"href",
 			"/en/guides/before-you-start/"
 		)
-		expect(screen.getByText("Day 1 since launch")).toBeInTheDocument()
+		const strip = document.querySelector<HTMLElement>(".stat-strip")
+		expect(strip).not.toBeNull()
+		expect(within(strip as HTMLElement).getByText("Day 1 since launch")).toBeInTheDocument()
 		expect(screen.getByText("Nothing ticked yet.")).toBeInTheDocument()
 	})
 
@@ -168,6 +172,63 @@ describe("Dashboard blocks (dashboard spec §4)", () => {
 		expect(await axe(container)).toHaveNoViolations()
 		await screen.findByRole("button", { name: "Profile: Player 1" })
 		expect(await axe(container)).toHaveNoViolations()
+	})
+})
+
+describe("desktop blocks (desktop spec §3)", () => {
+	it("renders What's next and the profile chip once", async () => {
+		await seed(["Player 1"])
+		await ready()
+		expect(screen.getAllByRole("heading", { name: "What's next" })).toHaveLength(1)
+		expect(screen.getAllByRole("button", { name: /^Profile: / })).toHaveLength(1)
+	})
+
+	it("shows the hero, the category bars and the day line next to the chip", async () => {
+		await seed(["Player 1"], { "wildlife/american-alligator": "2026-11-20T10:00:00Z" })
+		await ready()
+		expect(document.querySelector(".hero-big")).toHaveTextContent("1")
+		expect(screen.getByRole("heading", { level: 2, name: "Categories" })).toBeInTheDocument()
+		expect(screen.getByRole("link", { name: /^Wildlife/ })).toHaveAttribute(
+			"href",
+			"/en/tracker/?show=wildlife"
+		)
+		expect(document.querySelector(".dash-top .dash-day")).toHaveTextContent("Day 1 since launch")
+	})
+
+	it("keeps the hero's visible label out of the reading order", async () => {
+		await ready()
+		// The hub owns the one visually hidden h2 with this text (Hub.test.tsx); the hero repeats it
+		// as an aria-hidden label, so the Dashboard alone never exposes it as a second heading.
+		expect(screen.queryByRole("heading", { name: "Your progress" })).toBeNull()
+		expect(document.querySelector(".hero .tile-label")).toHaveAttribute("aria-hidden", "true")
+		expect(document.querySelector(".hero .tile-label")).toHaveTextContent("Your progress")
+	})
+
+	it("tags no category and shows a dash for Closest with nothing found", async () => {
+		await seed(["Player 1"])
+		await ready()
+		expect(document.querySelector(".tag")).toBeNull()
+		const closest = screen.getByText("Closest", { selector: "dt" }).nextElementSibling
+		expect(closest).toHaveTextContent("–")
+	})
+
+	it("gives Recent finds a Latest highlight with its day and category", async () => {
+		await seed(["Player 1"], { "wildlife/american-alligator": "2026-11-20T10:00:00Z" })
+		await ready()
+		const first = document.querySelector(".dash-recent .recent li")
+		expect(first?.querySelector(".recent-label")).toHaveTextContent("Latest")
+		expect(first?.querySelector(".recent-when")).toHaveTextContent("today")
+		expect(first?.querySelector(".recent-meta")).toHaveTextContent(/Wildlife · /)
+	})
+
+	it("shows the chart only with finds on 2 days", async () => {
+		await seed(["Player 1"], {
+			"wildlife/american-alligator": "2026-11-19T10:00:00Z",
+			"wildlife/pelican": "2026-11-20T10:00:00Z",
+		})
+		await ready()
+		expect(screen.getByRole("list", { name: "Finds by day" })).toBeInTheDocument()
+		expect(document.querySelector(".dash-recent")).toHaveClass("has-chart")
 	})
 })
 

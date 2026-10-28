@@ -3,7 +3,7 @@ import { currentTab } from "./tabs"
 
 describe("currentTab (spec §5)", () => {
 	it.each([
-		["", "home"],
+		["", "dashboard"],
 		["tracker", "tracker"],
 		["news", "news"],
 		["settings", "settings"],
