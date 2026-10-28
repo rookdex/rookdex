@@ -1,17 +1,27 @@
 // @vitest-environment jsdom
-import { act, render, screen } from "@testing-library/react"
+import { act, render, screen, within } from "@testing-library/react"
 import type { ComponentProps } from "react"
 import { renderToString } from "react-dom/server"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
+import type { CategoryRow } from "../../model/dashboard"
 import { ANNOUNCE_GAP_MS, Hub } from "./Hub"
 import type { LatestItem } from "./Latest"
+import type { NewsItem } from "./NewsTile"
 
 const before = "2026-09-10T10:00:00Z" // 70 days to go
 const after = "2026-11-22T10:00:00Z" // day 3
 const latest: LatestItem[] = [
 	{ id: "rumours/online", name: "Online in 2027", added: "2026-11-22" },
 	{ id: "rumours/pc", name: "PC timing", added: "2026-09-18" },
+]
+
+const categories: CategoryRow[] = [
+	{ id: "vehicles", done: 0, total: 8, groups: ["bikes"] },
+	{ id: "wildlife", done: 0, total: 23, groups: ["reptiles"] },
+]
+const news: NewsItem[] = [
+	{ id: "facts/preload", kind: "confirmed", name: "Preload on 12 November", date: "2026-09-01" },
 ]
 
 function StubDashboard() {
@@ -27,7 +37,13 @@ function props(overrides: Partial<ComponentProps<typeof Hub>> = {}): ComponentPr
 		trackerHref: "/en/tracker/",
 		newsHref: "/en/news/",
 		latest,
-		categoryCount: 4,
+		categories,
+		news,
+		mapLink: "https://www.rockstargames.com/VI",
+		settingsHref: "/en/settings/",
+		firstHourHref: "/en/guides/first-hour/",
+		guideTitle: "Before you start",
+		firstHourTitle: "Your first hour",
 		loadDashboard: loaded,
 		...overrides,
 	}
@@ -131,6 +147,71 @@ describe("Hub before launch", () => {
 	})
 })
 
+describe("desktop dashboard before launch (desktop spec §4)", () => {
+	it("renders the checklist, the bars, the news and the tiles before launch", () => {
+		vi.setSystemTime(new Date(before))
+		hub()
+		expect(screen.getByRole("list", { name: "Before launch" })).toBeInTheDocument()
+		expect(screen.getByRole("heading", { level: 2, name: "Categories" })).toBeInTheDocument()
+		expect(screen.getByRole("link", { name: /^Vehicles/ })).toHaveTextContent("8 to find")
+		expect(screen.getByRole("region", { name: "Latest news" })).toBeInTheDocument()
+		expect(screen.getByRole("link", { name: /^Leonida on Rockstar's site/ })).toBeInTheDocument()
+		expect(screen.getByRole("link", { name: "Open: Your first hour" })).toHaveAttribute(
+			"href",
+			"/en/guides/first-hour/"
+		)
+	})
+
+	it("puts the countdown and the launch date, with no time, in the before hero", () => {
+		vi.setSystemTime(new Date(before))
+		hub()
+		const hero = document.querySelector<HTMLElement>(".hero-before")
+		expect(hero).not.toBeNull()
+		expect(within(hero as HTMLElement).getByTestId("countdown-digits")).toBeInTheDocument()
+		const date = hero?.querySelector(".hero-date")
+		expect(date).toHaveTextContent("Thu 19 Nov")
+		expect(date?.textContent).not.toMatch(/\d:\d/)
+	})
+
+	it("writes the launch date day first in Norwegian too", () => {
+		vi.setSystemTime(new Date(before))
+		hub({ locale: "nb" })
+		expect(document.querySelector(".hero-date")?.textContent).toMatch(/19\. nov/)
+	})
+
+	it("emits no style attribute in the server HTML, before or after launch", () => {
+		expect(renderToString(<Hub {...props()} />)).not.toContain("style=")
+		expect(renderToString(<Hub {...props({ initialNow: after })} />)).not.toContain("style=")
+	})
+
+	it("hides news and keeps the tiles when there is no news", () => {
+		vi.setSystemTime(new Date(before))
+		hub({ news: [] })
+		expect(screen.queryByRole("region", { name: "Latest news" })).toBeNull()
+		expect(screen.getByRole("link", { name: /^Before you start/ })).toBeInTheDocument()
+	})
+
+	it("renders the news tile and the link tiles after launch too, even if the chunk fails", async () => {
+		vi.setSystemTime(new Date(after))
+		hub({ initialNow: after, loadDashboard: () => Promise.reject(new Error("offline")) })
+		await advance(0)
+		expect(screen.getByRole("alert")).toBeInTheDocument()
+		expect(screen.getByRole("region", { name: "Latest news" })).toBeInTheDocument()
+		expect(screen.getByRole("link", { name: /^Leonida on Rockstar's site/ })).toBeInTheDocument()
+	})
+
+	it("moves focus to the dashboard heading when the hub flips with focus in the checklist", async () => {
+		// One second before launch, in the device's own clock.
+		vi.setSystemTime(new Date("2026-11-18T22:59:59Z"))
+		hub()
+		const box = screen.getByRole("checkbox", { name: /^Pick your edition/ })
+		act(() => box.focus())
+		expect(box).toHaveFocus()
+		await advance(2_000)
+		expect(screen.getByRole("heading", { name: "Your progress" })).toHaveFocus()
+	})
+})
+
 describe("Hub after launch", () => {
 	it("loads the dashboard and shows Latest with relative dates", async () => {
 		vi.setSystemTime(new Date(after))
@@ -140,8 +221,10 @@ describe("Hub after launch", () => {
 		expect(screen.getByText("Dashboard loaded")).toBeInTheDocument()
 		expect(screen.queryByTestId("countdown-digits")).toBeNull()
 		expect(screen.getByRole("heading", { name: "Latest" })).toBeInTheDocument()
-		expect(screen.getByRole("link", { name: "All news" })).toHaveAttribute("href", "/en/news/")
-		expect(screen.getByRole("link", { name: "All news" })).toHaveClass("go-link")
+		// After launch the news tile adds a second "All news" link, so scope to the Latest block.
+		const latestBlock = within(screen.getByRole("region", { name: "Latest" }))
+		expect(latestBlock.getByRole("link", { name: "All news" })).toHaveAttribute("href", "/en/news/")
+		expect(latestBlock.getByRole("link", { name: "All news" })).toHaveClass("go-link")
 		const dates = [...document.querySelectorAll(".latest time")].map((el) => el.textContent)
 		expect(dates).toEqual(["today", "65 days ago"])
 	})

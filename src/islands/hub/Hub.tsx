@@ -1,10 +1,18 @@
 import { type ComponentType, useCallback, useEffect, useRef, useState } from "react"
 import { type Locale, translator } from "../../i18n"
+import type { CategoryRow } from "../../model/dashboard"
 import { localDayKey } from "../../model/days"
+import { LAUNCH_AT } from "../../model/launch"
+import type { ChecklistId } from "../seenFlag"
+import { CategoryBars } from "./CategoryBars"
 import { CountdownView } from "./CountdownView"
 import type { DashboardProps } from "./Dashboard"
 import { DashboardSkeleton } from "./DashboardSkeleton"
+import { HeroArt, SegmentBar } from "./Hero"
 import { Latest, type LatestItem } from "./Latest"
+import { LinkTiles } from "./LinkTiles"
+import { type NewsItem, NewsTile } from "./NewsTile"
+import { type ChecklistLink, PrelaunchChecklist } from "./PrelaunchChecklist"
 import { daysSinceText } from "./StatStrip"
 import { useHubPhase } from "./useHubPhase"
 
@@ -25,8 +33,17 @@ interface Props {
 	newsHref: string
 	/** The newest rumours, built into the page. */
 	latest: LatestItem[]
-	/** How many progress bars the skeleton reserves. */
-	categoryCount: number
+	/** Every category at 0 found, from the seed at build time (desktop spec §6.1). */
+	categories: CategoryRow[]
+	/** The newest facts and rumours, mixed, names in the page's language. */
+	news: NewsItem[]
+	/** MAP_LINK.url. */
+	mapLink: string
+	settingsHref: string
+	firstHourHref: string
+	/** Guide titles from their frontmatter, for the tiles and the checklist's hidden link names. */
+	guideTitle: string
+	firstHourTitle: string
 	/** Test seam for the dashboard chunk. The page never passes it. */
 	loadDashboard?: () => Promise<DashboardModule>
 }
@@ -43,7 +60,13 @@ export function Hub({
 	trackerHref,
 	newsHref,
 	latest,
-	categoryCount,
+	categories,
+	news,
+	mapLink,
+	settingsHref,
+	firstHourHref,
+	guideTitle,
+	firstHourTitle,
 	loadDashboard = loadDefault,
 }: Props) {
 	const { t, plural } = translator(locale)
@@ -51,6 +74,32 @@ export function Hub({
 	const state = useHubPhase(start)
 	const after = state.phase === "after"
 	const today = localDayKey(state.now)
+
+	const checklistLinks: Record<ChecklistId, ChecklistLink> = {
+		edition: { href: guideHref, page: guideTitle },
+		preload: { href: newsHref, page: t("nav.news") },
+		space: { href: newsHref, page: t("nav.news") },
+		"first-hour": { href: firstHourHref, page: firstHourTitle },
+		install: { href: settingsHref, page: t("nav.settings") },
+	}
+	// The launch date only, never a time: Rockstar hasn't confirmed the unlock time (#73).
+	// Day first, as the privacy page does: plain `en` would give "Thu, Nov 19".
+	const launchDate = new Intl.DateTimeFormat(locale === "nb" ? "nb-NO" : "en-GB", {
+		weekday: "short",
+		day: "numeric",
+		month: "short",
+		timeZone: "Europe/Oslo",
+	}).format(LAUNCH_AT)
+	const newsTile = <NewsTile news={news} today={today} locale={locale} newsHref={newsHref} t={t} />
+	const tiles = (
+		<LinkTiles
+			mapLink={mapLink}
+			guideHref={guideHref}
+			guideTitle={guideTitle}
+			settingsHref={settingsHref}
+			t={t}
+		/>
+	)
 
 	const [message, setMessage] = useState("")
 	const gap = useRef<number | undefined>(undefined)
@@ -166,14 +215,27 @@ export function Hub({
 							announce={announce}
 						/>
 					) : (
-						<DashboardSkeleton categoryCount={categoryCount} t={t} />
+						<DashboardSkeleton categoryCount={categories.length} t={t} />
 					)}
 					{latest.length > 0 && (
 						<Latest latest={latest} today={today} locale={locale} newsHref={newsHref} t={t} />
 					)}
+					{newsTile}
+					{tiles}
 				</section>
 			) : (
-				<CountdownView locale={locale} state={state} guideHref={guideHref} />
+				<div className="hub-prelaunch">
+					<div className="tile hero hero-before">
+						<HeroArt />
+						<CountdownView locale={locale} state={state} guideHref={guideHref} />
+						<p className="hero-date">{launchDate}</p>
+						<SegmentBar rows={categories} />
+					</div>
+					<PrelaunchChecklist links={checklistLinks} t={t} />
+					<CategoryBars rows={categories} phase="before" trackerHref={trackerHref} t={t} />
+					{newsTile}
+					{tiles}
+				</div>
 			)}
 			<p className="visually-hidden" role="status">
 				{message}

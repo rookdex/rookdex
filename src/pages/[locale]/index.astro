@@ -1,14 +1,17 @@
 ---
+import { getCollection } from "astro:content"
 import { getRelativeLocaleUrl } from "astro:i18n"
 import Mark from "../../components/Mark.astro"
-import { isLocale, type Locale, locales, translator } from "../../i18n"
+import { MAP_LINK } from "../../config/map-link"
+import { defaultLocale, isLocale, type Locale, locales, translator } from "../../i18n"
 import { Hub } from "../../islands/hub/Hub"
-import { LATEST_LIMIT } from "../../islands/hub/limits"
+import { LATEST_LIMIT, NEWS_LIMIT } from "../../islands/hub/limits"
 import { InstallPrompt } from "../../islands/InstallPrompt"
 import Base from "../../layouts/Base.astro"
 import { buildNow } from "../../model/build-now"
-import { latestRumours } from "../../model/dashboard"
-import { categoryIds, rumours, seedItems } from "../../model/seed"
+import { categoryRows, latestNews, latestRumours } from "../../model/dashboard"
+import { resolveGuide } from "../../model/guides"
+import { facts, rumours, seedItems } from "../../model/seed"
 import { countable } from "../../model/stats"
 
 export function getStaticPaths() {
@@ -25,10 +28,22 @@ const latest = latestRumours(rumours, LATEST_LIMIT).map(({ id, name, added }) =>
 	name,
 	added,
 }))
-const categoryCount = categoryIds(countable(seedItems)).length
+const guides = await getCollection("guides")
+const guideTitle = (slug: string) => {
+	const found = resolveGuide(guides, locale, slug, defaultLocale)
+	if (!found) throw new Error(`Missing guide: ${slug}`)
+	return found.entry.data.title
+}
+const categories = categoryRows(countable(seedItems), {})
+const news = latestNews(facts, rumours, NEWS_LIMIT).map(({ id, kind, date, name }) => ({
+	id,
+	kind,
+	date,
+	name: typeof name === "string" ? name : name[locale as Locale],
+}))
 ---
 
-<Base locale={locale} title={t("seo.titles.home")} description={t("seo.homeDescription")} path="">
+<Base locale={locale} title={t("seo.titles.home")} description={t("seo.homeDescription")} path="" wide>
 	<div class="hub">
 		<header class="hub-intro">
 			<h1 class="lockup" aria-label={t("siteName")}>
@@ -50,7 +65,13 @@ const categoryCount = categoryIds(countable(seedItems)).length
 				trackerHref={getRelativeLocaleUrl(locale, "tracker")}
 				newsHref={getRelativeLocaleUrl(locale, "news")}
 				latest={latest}
-				categoryCount={categoryCount}
+				categories={categories}
+				news={news}
+				mapLink={MAP_LINK.url}
+				settingsHref={getRelativeLocaleUrl(locale, "settings")}
+				firstHourHref={getRelativeLocaleUrl(locale, "guides/first-hour")}
+				guideTitle={guideTitle("before-you-start")}
+				firstHourTitle={guideTitle("first-hour")}
 			/>
 		</div>
 	</div>

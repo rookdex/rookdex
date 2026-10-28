@@ -55,13 +55,15 @@ export function CountdownView({ locale, state, guideHref }: Props) {
 				))}
 			</div>
 			<p>{t("hub.preload")}</p>
-			<h2>{t("hub.buyHeading")}</h2>
-			<p>{t("hub.buyBody", { standard: money(prices.standard) })}</p>
-			<p>
-				<a className="go-link" href={guideHref}>
-					{t("hub.beforeYouStart")}
-				</a>
-			</p>
+			<div className="countdown-more">
+				<h2>{t("hub.buyHeading")}</h2>
+				<p>{t("hub.buyBody", { standard: money(prices.standard) })}</p>
+				<p>
+					<a className="go-link" href={guideHref}>
+						{t("hub.beforeYouStart")}
+					</a>
+				</p>
+			</div>
 		</section>
 	)
 }
