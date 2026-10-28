@@ -130,5 +130,2820 @@
 				"title": "Los Santos Customs (Blaine County) - GTA 5 Story Property - GTABase"
 			}
 		]
+	},
+	{
+		"id": "vehicles/grotti-cheetah-95",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "1995 Grotti Cheetah",
+		"status": "confirmed",
+		"description": "A mid-1990s Grotti sports car styled after the Ferrari Testarossa, with a minimalist retro-futuristic livery. An Ultimate Edition bonus vehicle.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/cheetah-classic",
+				"title": "Grotti Cheetah '95 - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-ganado",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Ganado",
+		"status": "confirmed",
+		"description": "Jason's well-worn low-riding pickup, styled after the 1970 Ford Ranchero. Seen in Trailer 2 and the key art. The Ultimate Edition adds an exclusive Retro Build.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/ganado",
+				"title": "Vapid Ganado '70 - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-dominator-67-buggy",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "1967 Vapid Dominator Buggy",
+		"status": "confirmed",
+		"description": "A Mud Club off-roader styled after a lifted first-generation Ford Mustang, made for the backwoods of Mount Kalaga. An Ultimate Edition bonus stored at the Paradise Garage in Watson Bay.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/dominator-buggy-67",
+				"title": "Vapid Dominator '67 Buggy - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/dinka-enduro",
+		"category": "vehicles",
+		"group": "motorcycles",
+		"name": "Dinka Enduro",
+		"status": "confirmed",
+		"description": "An off-road motorcycle in an Army fatigue livery, kept at Jason's safehouse. An Ultimate Edition bonus vehicle.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/enduro",
+				"title": "Dinka Enduro - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/crest-kayak",
+		"category": "vehicles",
+		"group": "boats",
+		"name": "Crest Kayak",
+		"status": "confirmed",
+		"description": "A kayak for paddling Leonida's rivers, kept at Jason's safehouse. An Ultimate Edition bonus vehicle.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/kayak",
+				"title": "Crest Kayak - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/shitzu-squalo",
+		"category": "vehicles",
+		"group": "boats",
+		"name": "Shitzu Squalo",
+		"status": "confirmed",
+		"description": "A speedboat built for fishing trips. The Ultimate Edition version is pink and blue, docked at Washington Beach and carries a crate of explosives. Also seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/squalo",
+				"title": "Shitzu Squalo - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/rideout-customs",
+		"category": "vehicles",
+		"group": "service",
+		"name": "Rideout Customs",
+		"status": "confirmed",
+		"description": "An Ultimate Edition mod shop that turns stock vehicles into show cars with detailed interiors, custom rims and donk styling.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/one-eyed-willies-mod-shop",
+		"category": "vehicles",
+		"group": "service",
+		"name": "One-Eyed Willie's Mod Shop",
+		"status": "confirmed",
+		"description": "An Ultimate Edition mod shop in Lake Leonida that specializes in off-road modifications and hand-painted paint jobs.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/VI/editions",
+				"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/buckingham-windsor-drop",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Buckingham Windsor Drop",
+		"status": "confirmed",
+		"description": "A luxury convertible styled after the Rolls-Royce Dawn. Seen in the Launch Trailer.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/517572321a549a/watch-the-grand-theft-auto-vi-launch-trailer",
+				"title": "Watch the Grand Theft Auto VI Launch Trailer - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/windsor-drop",
+				"title": "Buckingham Windsor Drop - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/declasse-granger-police",
+		"category": "vehicles",
+		"group": "emergency",
+		"name": "Declasse Granger Police",
+		"status": "confirmed",
+		"description": "A police SUV styled after the Chevrolet Suburban. Seen in the Launch Trailer.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/517572321a549a/watch-the-grand-theft-auto-vi-launch-trailer",
+				"title": "Watch the Grand Theft Auto VI Launch Trailer - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/granger-police",
+				"title": "Granger Police - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/ubermacht-sentinel-classic",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Ubermacht Sentinel Classic",
+		"status": "confirmed",
+		"description": "A classic sports coupe styled after the BMW E30 M3. Jason and Lucia drive it from outside their apartment in An Extended Look, with a working retractable soft top.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/sentinel-classic",
+				"title": "Übermacht Sentinel Classic - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/maibatsu-penumbra-ff",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Maibatsu Penumbra FF",
+		"status": "confirmed",
+		"description": "A sports coupe styled after the second-generation Mitsubishi Eclipse. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/penumbra-ff",
+				"title": "Maibatsu Penumbra FF - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/progen-emerus",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Progen Emerus",
+		"status": "confirmed",
+		"description": "A supercar styled after the McLaren Senna. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/emerus",
+				"title": "Progen Emerus - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/karin-feroci",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Karin Feroci",
+		"status": "confirmed",
+		"description": "A sedan styled after the first-generation Lexus GS 300. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/feroci",
+				"title": "Karin Feroci - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/fathom-fr36",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Fathom FR36",
+		"status": "confirmed",
+		"description": "A sports coupe styled after the Infiniti G35. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/fr36",
+				"title": "Fathom FR36 - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/pegassi-infernus-classic",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Pegassi Infernus Classic",
+		"status": "confirmed",
+		"description": "A classic supercar styled after the Lamborghini Diablo. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/infernus-classic",
+				"title": "Pegassi Infernus Classic - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/grotti-itali-rsx",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Grotti Itali RSX",
+		"status": "confirmed",
+		"description": "A sports car styled after the Ferrari SF90 Stradale. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/itali-rsx",
+				"title": "Grotti Itali RSX - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-lowline",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Lowline",
+		"status": "confirmed",
+		"description": "A sedan styled after the Ford Taurus. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/ford-taurus",
+				"title": "Vapid Lowline - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/pfister-neon",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Pfister Neon",
+		"status": "confirmed",
+		"description": "An electric sports car styled after the Porsche Taycan. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/neon",
+				"title": "Pfister Neon - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/mammoth-patriot-mil-spec",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Mammoth Patriot Mil-Spec",
+		"status": "confirmed",
+		"description": "A military-style SUV styled after the Hummer H1. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/patriot-mil-spec",
+				"title": "Mammoth Patriot Mil-Spec - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/ubermacht-rebla-gts",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Ubermacht Rebla GTS",
+		"status": "confirmed",
+		"description": "A SUV styled after the BMW X5. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/rebla-gts",
+				"title": "Übermacht Rebla GTS - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/canis-terminus",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Canis Terminus",
+		"status": "confirmed",
+		"description": "An off-road SUV styled after the Jeep Wrangler Rubicon. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/terminus",
+				"title": "Canis Terminus - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/karin-vivanite",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Karin Vivanite",
+		"status": "confirmed",
+		"description": "A minivan styled after the Toyota Sienna. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/vivanite",
+				"title": "Karin Vivanite - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/benefactor-xls",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Benefactor XLS",
+		"status": "confirmed",
+		"description": "A SUV styled after the Mercedes-Benz GL-Class. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/xls",
+				"title": "Benefactor XLS - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/ubermacht-zion-cabrio",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Ubermacht Zion Cabrio",
+		"status": "confirmed",
+		"description": "A convertible styled after the BMW 6 Series. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/zion-cabrio",
+				"title": "Übermacht Zion Cabrio - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/principe-lectro",
+		"category": "vehicles",
+		"group": "motorcycles",
+		"name": "Principe Lectro",
+		"status": "confirmed",
+		"description": "A naked sport bike styled after the Ducati Streetfighter. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/lectro",
+				"title": "Principe Lectro - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/pegassi-faggio",
+		"category": "vehicles",
+		"group": "motorcycles",
+		"name": "Pegassi Faggio",
+		"status": "confirmed",
+		"description": "A scooter styled after the Vespa. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/faggio",
+				"title": "Pegassi Faggio - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/buckingham-luxor",
+		"category": "vehicles",
+		"group": "aircraft",
+		"name": "Buckingham Luxor",
+		"status": "confirmed",
+		"description": "A private jet styled after the Learjet 45. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/luxor",
+				"title": "Buckingham Luxor - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/buckingham-valkyrie",
+		"category": "vehicles",
+		"group": "aircraft",
+		"name": "Buckingham Valkyrie",
+		"status": "confirmed",
+		"description": "A military helicopter styled after the Bell UH-1 Huey. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/valkyrie",
+				"title": "Buckingham Valkyrie - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/dundreary-landstalker-xl-police",
+		"category": "vehicles",
+		"group": "emergency",
+		"name": "Dundreary Landstalker XL Police",
+		"status": "confirmed",
+		"description": "A police SUV styled after the Lincoln Navigator. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/police-landstalker-xl",
+				"title": "Police Landstalker XL - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/brute-ambulance",
+		"category": "vehicles",
+		"group": "emergency",
+		"name": "Brute Ambulance",
+		"status": "confirmed",
+		"description": "An ambulance styled after the Chevrolet Express cutaway ambulance. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/ambulance",
+				"title": "Ambulance - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/brute-stockade",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Brute Stockade",
+		"status": "confirmed",
+		"description": "A Gruppe Sechs armored cash truck styled after the International 4700. A biker gang robs one in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/stockade",
+				"title": "Brute Stockade - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/hvy-airtug",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "HVY Airtug",
+		"status": "confirmed",
+		"description": "An airport tug styled after the Clark CT30. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/airtug",
+				"title": "Airtug - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-benson",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Vapid Benson",
+		"status": "confirmed",
+		"description": "A box truck styled after the International 4700. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/benson",
+				"title": "Vapid Benson - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/hvy-biff",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "HVY Biff",
+		"status": "confirmed",
+		"description": "A dump truck styled after the Kenworth T800. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/biff",
+				"title": "HVY Biff - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/jobuilt-flatbed",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "JoBuilt Flatbed",
+		"status": "confirmed",
+		"description": "A flatbed truck styled after the Freightliner Century Class. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/flatbed",
+				"title": "JoBuilt Flatbed - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/declasse-granger-taxi",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Declasse Granger Taxi",
+		"status": "confirmed",
+		"description": "A taxi styled after the Chevrolet Suburban. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/granger-taxi",
+				"title": "Granger Taxi - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/brute-tipper",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Brute Tipper",
+		"status": "confirmed",
+		"description": "A six-wheel dump truck styled after the Chevrolet Kodiak. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/tipper-6-wheels",
+				"title": "Brute Tipper (6 wheels) - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/brute-utility-truck",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Brute Utility Truck",
+		"status": "confirmed",
+		"description": "An utility truck styled after the International 4700. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/utility-truck-van",
+				"title": "Utility Truck - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/nagasaki-caddy",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Nagasaki Caddy",
+		"status": "confirmed",
+		"description": "A golf cart. Seen in An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/caddy",
+				"title": "Caddy - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-bison-900-95",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Bravado Bison 900 '95",
+		"status": "confirmed",
+		"description": "A pickup truck styled after the second-generation Dodge Ram. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/bison-900-1995",
+				"title": "Bravado Bison 900 '95 - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/nagasaki-blazer",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Nagasaki Blazer",
+		"status": "confirmed",
+		"description": "A quad bike styled after the Yamaha YFZ450. A gang rides several through a neighborhood in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/blazer",
+				"title": "Nagasaki Blazer - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/albany-buccaneer",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Albany Buccaneer",
+		"status": "confirmed",
+		"description": "A muscle car styled after the Buick Riviera. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/buccaneer",
+				"title": "Albany Buccaneer - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/albany-buccaneer-custom",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Albany Buccaneer Custom",
+		"status": "confirmed",
+		"description": "A low-riding custom muscle car styled after the Buick Riviera. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/buccaneer-custom",
+				"title": "Albany Buccaneer Custom - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-buffalo",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Bravado Buffalo",
+		"status": "confirmed",
+		"description": "A sports sedan styled after the Dodge Charger. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/buffalo",
+				"title": "Bravado Buffalo - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-buffalo-stx",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Bravado Buffalo STX",
+		"status": "confirmed",
+		"description": "A muscle sedan styled after the 2015 Dodge Charger. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/buffalo-stx",
+				"title": "Bravado Buffalo STX - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-caracara",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Caracara",
+		"status": "confirmed",
+		"description": "A six-wheeled pickup styled after the Hennessey VelociRaptor 6x6. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/caracara",
+				"title": "Vapid Caracara - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/grotti-carbonizzare",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Grotti Carbonizzare",
+		"status": "confirmed",
+		"description": "A sports car styled after the Ferrari 458 Italia. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/carbonizzare",
+				"title": "Grotti Carbonizzare - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-chino",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Chino",
+		"status": "confirmed",
+		"description": "A lowrider styled after the 1965 Lincoln Continental. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/chino",
+				"title": "Vapid Chino - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/pfister-comet-retro-custom",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Pfister Comet Retro Custom",
+		"status": "confirmed",
+		"description": "A widebody sports car styled after the Porsche 911 (930). Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/comet-retro-custom",
+				"title": "Pfister Comet Retro Custom - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/pfister-comet-s2-cabrio",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Pfister Comet S2 Cabrio",
+		"status": "confirmed",
+		"description": "A convertible sports car styled after the Porsche 911 Turbo S Cabriolet. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/comet-s2-cabrio",
+				"title": "Pfister Comet S2 Cabrio - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/invetero-coquette-d10",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Invetero Coquette D10",
+		"status": "confirmed",
+		"description": "A sports car styled after the Chevrolet Corvette C8. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/coquette-d10",
+				"title": "Invetero Coquette D10 - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/grotti-furia",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Grotti Furia",
+		"status": "confirmed",
+		"description": "A supercar styled after modern Ferraris such as the SF90 Stradale. Seen racing down a highway in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/furia",
+				"title": "Grotti Furia - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/karin-futo",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Karin Futo",
+		"status": "confirmed",
+		"description": "A compact sports coupe styled after the Toyota AE86. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/futo",
+				"title": "Karin Futo - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-gauntlet-hellfire",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Bravado Gauntlet Hellfire",
+		"status": "confirmed",
+		"description": "A muscle car styled after the Dodge Challenger Demon. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/gauntlet-hellfire",
+				"title": "Bravado Gauntlet Hellfire - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/declasse-granger-3600lx",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Declasse Granger 3600LX",
+		"status": "confirmed",
+		"description": "A full-size SUV styled after the Chevrolet Suburban. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/granger-3600lx",
+				"title": "Declasse Granger 3600LX - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/annis-hellion",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Annis Hellion",
+		"status": "confirmed",
+		"description": "An off-road SUV styled after the Nissan Patrol. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/hellion",
+				"title": "Annis Hellion - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/karin-intruder",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Karin Intruder",
+		"status": "confirmed",
+		"description": "A sedan styled after the Infiniti Q45. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/intruder",
+				"title": "Karin Intruder - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-liberator",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Liberator",
+		"status": "confirmed",
+		"description": "A monster truck styled after Bigfoot-style show trucks. Seen in the Thrillbilly Mud Club clip in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/liberator",
+				"title": "Vapid Liberator - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/nagasaki-outlaw",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Nagasaki Outlaw",
+		"status": "confirmed",
+		"description": "A side-by-side off-roader styled after the Can-Am Maverick X3. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/outlaw",
+				"title": "Nagasaki Outlaw - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/schyster-pmp-700",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Schyster PMP 700",
+		"status": "confirmed",
+		"description": "A sedan styled after the Chrysler 300. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/pmp-700",
+				"title": "Schyster PMP 700 - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/albany-primo",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Albany Primo",
+		"status": "confirmed",
+		"description": "A sedan styled after the late-1980s Pontiac Bonneville. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/primo",
+				"title": "Albany Primo - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/imponte-ruiner",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Imponte Ruiner",
+		"status": "confirmed",
+		"description": "A muscle car styled after the Pontiac Trans Am. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/ruiner",
+				"title": "Imponte Ruiner - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-sandking-xl",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Sandking XL",
+		"status": "confirmed",
+		"description": "A lifted pickup styled after the Ford Super Duty. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/sandking-xl",
+				"title": "Vapid Sandking XL - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/benefactor-schafter-v12",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Benefactor Schafter V12",
+		"status": "confirmed",
+		"description": "A luxury sedan styled after the Brabus E V12. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/schafter-v12",
+				"title": "Benefactor Schafter V12 - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/obey-tailgater",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Obey Tailgater",
+		"status": "confirmed",
+		"description": "A sedan styled after the Audi A6. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/tailgater",
+				"title": "Obey Tailgater - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/declasse-tulip-m-100",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Declasse Tulip M-100",
+		"status": "confirmed",
+		"description": "A muscle car styled after a late-1970s Chevrolet Malibu, seen in bright magenta paint in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/tulip-m-100",
+				"title": "Declasse Tulip M-100 - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/pegassi-zorrusso",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Pegassi Zorrusso",
+		"status": "confirmed",
+		"description": "A supercar styled after the Italdesign Zerouno. Seen racing down a highway with a passenger standing through the roof in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/zorrusso",
+				"title": "Pegassi Zorrusso - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/declasse-bobcat-xl",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Declasse Bobcat XL",
+		"status": "confirmed",
+		"description": "A pickup truck styled after the fourth-generation Chevrolet C/K. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/bobcat-xl",
+				"title": "Declasse Bobcat XL - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/ubermacht-cypher",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Ubermacht Cypher",
+		"status": "confirmed",
+		"description": "A sports coupe styled after the BMW M2. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/cypher",
+				"title": "Übermacht Cypher - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-dominator",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Dominator",
+		"status": "confirmed",
+		"description": "A muscle car styled after the Ford Mustang. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/dominator",
+				"title": "Vapid Dominator - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-dominator-asp",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Dominator ASP",
+		"status": "confirmed",
+		"description": "A muscle car styled after the Ford Mustang SVT Cobra R. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/dominator-asp",
+				"title": "Vapid Dominator ASP - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-dominator-gtx",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Dominator GTX",
+		"status": "confirmed",
+		"description": "A muscle car styled after the modern Ford Mustang. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/dominator-gtx",
+				"title": "Vapid Dominator GTX - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/benefactor-dubsta",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Benefactor Dubsta",
+		"status": "confirmed",
+		"description": "A luxury off-roader styled after the Mercedes-Benz G-Class. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/dubsta",
+				"title": "Benefactor Dubsta - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/annis-elegy-90",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Annis Elegy '90",
+		"status": "confirmed",
+		"description": "A sports car styled after the Nissan Skyline GT-R. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/elegy-retro-custom",
+				"title": "Annis Elegy '90 - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-gauntlet-classic",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Bravado Gauntlet Classic",
+		"status": "confirmed",
+		"description": "A muscle car styled after the first-generation Dodge Challenger. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/gauntlet-classic",
+				"title": "Bravado Gauntlet Classic - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/grotti-itali-gto",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Grotti Itali GTO",
+		"status": "confirmed",
+		"description": "A sports car styled after the Ferrari 812 Superfast. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/itali-gto",
+				"title": "Grotti Itali GTO - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/ocelot-jugular",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Ocelot Jugular",
+		"status": "confirmed",
+		"description": "A sports sedan styled after the Jaguar XE SV Project 8. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/jugular",
+				"title": "Ocelot Jugular - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/obey-omnis-e-gt",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Obey Omnis e-GT",
+		"status": "confirmed",
+		"description": "An electric sports sedan styled after the Audi e-tron GT. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/omnis-e-gt",
+				"title": "Obey Omnis e-GT - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-reclaimer",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Reclaimer",
+		"status": "confirmed",
+		"description": "A pickup truck styled after the Ford Ranger. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/reclaimer",
+				"title": "Vapid Reclaimer - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/declasse-sabre-turbo",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Declasse Sabre Turbo",
+		"status": "confirmed",
+		"description": "A muscle car styled after the Chevrolet Chevelle. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/sabre-turbo",
+				"title": "Declasse Sabre Turbo - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/canis-seminole-frontier",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Canis Seminole Frontier",
+		"status": "confirmed",
+		"description": "A SUV styled after the Jeep Cherokee (XJ). Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/seminole-frontier",
+				"title": "Canis Seminole Frontier - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-slamvan",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Slamvan",
+		"status": "confirmed",
+		"description": "A rat-rod pickup styled after the 1950s Ford F-Series. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/slamvan",
+				"title": "Vapid Slamvan - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/zirconium-stratum",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Zirconium Stratum",
+		"status": "confirmed",
+		"description": "A station wagon styled after the Honda Accord wagon. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/stratum",
+				"title": "Zirconium Stratum - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/karin-sultan",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Karin Sultan",
+		"status": "confirmed",
+		"description": "A sports sedan styled after the Mitsubishi Lancer Evolution. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/sultan",
+				"title": "Karin Sultan - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/nagasaki-carbon-rs",
+		"category": "vehicles",
+		"group": "motorcycles",
+		"name": "Nagasaki Carbon RS",
+		"status": "confirmed",
+		"description": "A sport bike styled after the Ducati 1199, seen in a red and white colourway in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/carbon-rs",
+				"title": "Nagasaki Carbon RS - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/western-sovereign",
+		"category": "vehicles",
+		"group": "motorcycles",
+		"name": "Western Sovereign",
+		"status": "confirmed",
+		"description": "A cruiser motorcycle styled after the Harley-Davidson Road King. Seen on a street of customized vehicles in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/sovereign",
+				"title": "Western Sovereign - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/dinka-double-t",
+		"category": "vehicles",
+		"group": "motorcycles",
+		"name": "Dinka Double-T",
+		"status": "confirmed",
+		"description": "A sport bike styled after the Honda CBR. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/double-t",
+				"title": "Dinka Double-T - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/pegassi-speeder",
+		"category": "vehicles",
+		"group": "boats",
+		"name": "Pegassi Speeder",
+		"status": "confirmed",
+		"description": "A speedboat styled after the classic Italian runabout. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/speeder",
+				"title": "Pegassi Speeder - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/shitzu-tropic",
+		"category": "vehicles",
+		"group": "boats",
+		"name": "Shitzu Tropic",
+		"status": "confirmed",
+		"description": "A cabin cruiser styled after the Sea Ray Sundancer. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/tropic",
+				"title": "Shitzu Tropic - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/mammoth-dodo",
+		"category": "vehicles",
+		"group": "aircraft",
+		"name": "Mammoth Dodo",
+		"status": "confirmed",
+		"description": "A seaplane styled after the de Havilland Canada Beaver. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/dodo",
+				"title": "Mammoth Dodo - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/buckingham-nimbus",
+		"category": "vehicles",
+		"group": "aircraft",
+		"name": "Buckingham Nimbus",
+		"status": "confirmed",
+		"description": "A business jet styled after the Cessna Citation X. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/nimbus",
+				"title": "Buckingham Nimbus - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/sea-sparrow",
+		"category": "vehicles",
+		"group": "aircraft",
+		"name": "Sea Sparrow",
+		"status": "confirmed",
+		"description": "A light helicopter styled after the Sikorsky S-300. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/sea-sparrow",
+				"title": "Sea Sparrow - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/buckingham-supervolito",
+		"category": "vehicles",
+		"group": "aircraft",
+		"name": "Buckingham SuperVolito",
+		"status": "confirmed",
+		"description": "A luxury helicopter styled after the Eurocopter EC145. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/supervolito",
+				"title": "Buckingham SuperVolito - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/buckingham-police-maverick",
+		"category": "vehicles",
+		"group": "aircraft",
+		"name": "Buckingham Police Maverick",
+		"status": "confirmed",
+		"description": "A police helicopter styled after the Eurocopter AS350. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/police-maverick",
+				"title": "Police Maverick - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-stanier-le-police-cruiser",
+		"category": "vehicles",
+		"group": "emergency",
+		"name": "Vapid Stanier LE Police Cruiser",
+		"status": "confirmed",
+		"description": "A police cruiser styled after the Ford Crown Victoria. Seen in police chases in Trailers 1 and 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/police-cruiser",
+				"title": "Police Cruiser (Stanier LE) - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-buffalo-police-cruiser",
+		"category": "vehicles",
+		"group": "emergency",
+		"name": "Bravado Buffalo Police Cruiser",
+		"status": "confirmed",
+		"description": "A police car styled after the Dodge Charger. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/police-cruiser-buffalo",
+				"title": "Police Cruiser (Buffalo) - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-buffalo-stx-pursuit",
+		"category": "vehicles",
+		"group": "emergency",
+		"name": "Bravado Buffalo STX Pursuit",
+		"status": "confirmed",
+		"description": "A police pursuit car styled after the 2015 Dodge Charger. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/police-cruiser-buffalo-stx",
+				"title": "Police Buffalo STX Pursuit - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-gauntlet-interceptor",
+		"category": "vehicles",
+		"group": "emergency",
+		"name": "Bravado Gauntlet Interceptor",
+		"status": "confirmed",
+		"description": "A police interceptor styled after the Dodge Challenger SRT Demon. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/police-cruiser-gauntlet-hellfire",
+				"title": "Police Gauntlet Interceptor - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-lowline-police-interceptor",
+		"category": "vehicles",
+		"group": "emergency",
+		"name": "Vapid Lowline Police Interceptor",
+		"status": "confirmed",
+		"description": "A police sedan styled after the Ford Police Interceptor. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/police-cruiser-interceptor",
+				"title": "Police Lowline (Interceptor) - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-montagne-police",
+		"category": "vehicles",
+		"group": "emergency",
+		"name": "Vapid Montagne Police",
+		"status": "confirmed",
+		"description": "A police SUV styled after the Ford Explorer. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/ford-explorer-suv-police",
+				"title": "Police Montagne - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/jobuilt-phantom",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "JoBuilt Phantom",
+		"status": "confirmed",
+		"description": "A semi truck styled after the Peterbilt 359. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/phantom",
+				"title": "JoBuilt Phantom - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-speedo",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Vapid Speedo",
+		"status": "confirmed",
+		"description": "A van styled after the Chevrolet Express. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/speedo",
+				"title": "Vapid Speedo - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/declasse-burrito",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Declasse Burrito",
+		"status": "confirmed",
+		"description": "A van styled after the Chevrolet Express. Seen in Trailer 1 and An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/burrito",
+				"title": "Declasse Burrito - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-rumpo",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Bravado Rumpo",
+		"status": "confirmed",
+		"description": "A van styled after the Ford E-Series. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/rumpo",
+				"title": "Bravado Rumpo - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/dashound",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Dashound",
+		"status": "confirmed",
+		"description": "An intercity coach styled after the Greyhound bus. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/dashound",
+				"title": "Dashound - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-tow-truck",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Vapid Tow Truck",
+		"status": "confirmed",
+		"description": "A tow truck styled after the 1980s International S-Series. Seen in Trailer 1 and An Extended Look.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+				"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/tow-truck",
+				"title": "Tow Truck - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/maibatsu-mule",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Maibatsu Mule",
+		"status": "confirmed",
+		"description": "A box truck styled after the Mitsubishi Fuso Canter. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/mule",
+				"title": "Maibatsu Mule - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/jobuilt-rubble",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "JoBuilt Rubble",
+		"status": "confirmed",
+		"description": "A dump truck styled after the Peterbilt 359. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/rubble",
+				"title": "JoBuilt Rubble - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-stanier-taxi",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Vapid Stanier Taxi",
+		"status": "confirmed",
+		"description": "A taxi styled after the Ford Crown Victoria. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/taxi",
+				"title": "Stanier Taxi - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-youga-classic",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Bravado Youga Classic",
+		"status": "confirmed",
+		"description": "A van styled after the second-generation Ford Econoline. Seen in Trailer 1.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/youga-classic",
+				"title": "Bravado Youga Classic - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-aleutian",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Aleutian",
+		"status": "confirmed",
+		"description": "A full-size SUV styled after the Ford Expedition. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/aleutian",
+				"title": "Vapid Aleutian - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-banshee",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Bravado Banshee",
+		"status": "confirmed",
+		"description": "A sports car styled after the Dodge Viper, in blue chrome and white. Seen in a line of sports cars outside a hotel in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/banshee",
+				"title": "Bravado Banshee - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-bison",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Bravado Bison",
+		"status": "confirmed",
+		"description": "A pickup truck styled after the fourth-generation Dodge Ram. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/bison",
+				"title": "Bravado Bison - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/bravado-bison-1800",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Bravado Bison 1800",
+		"status": "confirmed",
+		"description": "A pickup truck styled after the Ram 1500. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/bison-ii",
+				"title": "Bravado Bison 1800 - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-caracara-4x4",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Caracara 4x4",
+		"status": "confirmed",
+		"description": "An off-road pickup styled after the Ford F-150 Raptor. Jason's landlord Brian Heder owns one in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/caracara-4x4",
+				"title": "Vapid Caracara 4x4 - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			},
+			{
+				"url": "https://www.pcgamer.com/gta-6-cars-list/",
+				"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+			}
+		]
+	},
+	{
+		"id": "vehicles/pfister-growler",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Pfister Growler",
+		"status": "confirmed",
+		"description": "A sports car styled after the Porsche 718 Cayman. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/growler",
+				"title": "Pfister Growler - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/dundreary-landstalker-xl",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Dundreary Landstalker XL",
+		"status": "confirmed",
+		"description": "A luxury SUV styled after the Lincoln Navigator. Seen in Trailers 1 and 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+				"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/landstalker-xl",
+				"title": "Dundreary Landstalker XL - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/maibatsu-penumbra",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Maibatsu Penumbra",
+		"status": "confirmed",
+		"description": "A sports coupe styled after the Mitsubishi Eclipse. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/penumbra",
+				"title": "Maibatsu Penumbra - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/imponte-phoenix",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Imponte Phoenix",
+		"status": "confirmed",
+		"description": "A muscle car styled after the second-generation Pontiac Firebird. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/phoenix",
+				"title": "Imponte Phoenix - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/pfister-astron",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Pfister Astron",
+		"status": "confirmed",
+		"description": "A SUV styled after the Porsche Macan. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/astron",
+				"title": "Pfister Astron - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/invetero-coquette",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Invetero Coquette",
+		"status": "confirmed",
+		"description": "A sports car styled after the Chevrolet Corvette C7. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/coquette",
+				"title": "Invetero Coquette - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/declasse-granger",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Declasse Granger",
+		"status": "confirmed",
+		"description": "A full-size SUV styled after the Chevrolet Suburban. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/granger",
+				"title": "Declasse Granger - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-montagne",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Vapid Montagne",
+		"status": "confirmed",
+		"description": "A SUV styled after the Ford Explorer. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/ford-explorer-6th-gen",
+				"title": "Vapid Montagne - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/ubermacht-sentinel-xs",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Ubermacht Sentinel XS",
+		"status": "confirmed",
+		"description": "A sports coupe styled after the BMW M3 (E92). Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/sentinel-xs",
+				"title": "Übermacht Sentinel XS - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/pegassi-tempesta",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Pegassi Tempesta",
+		"status": "confirmed",
+		"description": "A supercar styled after the Lamborghini Huracán. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/tempesta",
+				"title": "Pegassi Tempesta - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/emperor-vectre",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Emperor Vectre",
+		"status": "confirmed",
+		"description": "A sports coupe styled after the Lexus RC F. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/vectre",
+				"title": "Emperor Vectre - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/enus-windsor",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Enus Windsor",
+		"status": "confirmed",
+		"description": "A luxury coupe styled after the Rolls-Royce Wraith. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/windsor",
+				"title": "Enus Windsor - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/albany-emperor",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Albany Emperor",
+		"status": "confirmed",
+		"description": "A large sedan styled after the late-1970s Cadillac Sedan de Ville. Seen during an arrest scene in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/emperor",
+				"title": "Albany Emperor - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/gallivanter-baller",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Gallivanter Baller",
+		"status": "confirmed",
+		"description": "An SUV parked in the background of a motel fight in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/declasse-rancher",
+		"category": "vehicles",
+		"group": "cars",
+		"name": "Declasse Rancher",
+		"status": "confirmed",
+		"description": "An off-road SUV styled after an older Chevrolet Suburban. Seen on the highway in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/rancher",
+				"title": "Declasse Rancher - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/western-zombie-chopper",
+		"category": "vehicles",
+		"group": "motorcycles",
+		"name": "Western Zombie Chopper",
+		"status": "confirmed",
+		"description": "A chopper styled after the Harley-Davidson Fat Bob. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/zombie-chopper",
+				"title": "Western Zombie Chopper - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/nagasaki-dinghy",
+		"category": "vehicles",
+		"group": "boats",
+		"name": "Nagasaki Dinghy",
+		"status": "confirmed",
+		"description": "A rigid inflatable boat. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/dinghy",
+				"title": "Nagasaki Dinghy - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/speedophile-seashark",
+		"category": "vehicles",
+		"group": "boats",
+		"name": "Speedophile Seashark",
+		"status": "confirmed",
+		"description": "A jet ski styled after the Sea-Doo RXT. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/vehicles/seashark",
+				"title": "Speedophile Seashark - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/nagasaki-buzzard-attack-chopper",
+		"category": "vehicles",
+		"group": "aircraft",
+		"name": "Nagasaki Buzzard Attack Chopper",
+		"status": "confirmed",
+		"description": "A light attack helicopter styled after the MD Helicopters AH-6 Little Bird. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/buzzard-attack-chopper",
+				"title": "Nagasaki Buzzard Attack Chopper - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/mammoth-streamer216",
+		"category": "vehicles",
+		"group": "aircraft",
+		"name": "Mammoth Streamer216",
+		"status": "confirmed",
+		"description": "A twin-engine utility plane styled after the de Havilland Canada Twin Otter. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/streamer216",
+				"title": "Mammoth Streamer216 - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/vapid-stanier-le-police-ghost",
+		"category": "vehicles",
+		"group": "emergency",
+		"name": "Vapid Stanier LE Police Ghost",
+		"status": "confirmed",
+		"description": "A police car styled after the Ford Crown Victoria. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/police-ghost-stanier-le",
+				"title": "Police Ghost (Stanier LE) - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/brute-police-riot",
+		"category": "vehicles",
+		"group": "emergency",
+		"name": "Brute Police Riot",
+		"status": "confirmed",
+		"description": "An armored police truck styled after the Lenco BearCat. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/police-riot",
+				"title": "Police Riot - GTA 6 Vehicle - GTABase"
+			},
+			{
+				"url": "https://www.gamesradar.com/gta-6-cars/",
+				"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+			}
+		]
+	},
+	{
+		"id": "vehicles/mtl-packer",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "MTL Packer",
+		"status": "confirmed",
+		"description": "A semi truck styled after the International 9000. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/packer",
+				"title": "MTL Packer - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/brute-rental-shuttle-bus",
+		"category": "vehicles",
+		"group": "commercial",
+		"name": "Brute Rental Shuttle Bus",
+		"status": "confirmed",
+		"description": "A shuttle bus styled after the Chevrolet Express. Seen in Trailer 2.",
+		"sources": [
+			{
+				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+				"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+			},
+			{
+				"url": "https://www.gtabase.com/vehicles/gta-6/rental-shuttle-bus",
+				"title": "Rental Shuttle Bus - GTA 6 Vehicle - GTABase"
+			}
+		]
+	},
+	{
+		"id": "vehicles/pay-n-spray",
+		"category": "vehicles",
+		"group": "service",
+		"name": "Pay 'n' Spray",
+		"status": "expected",
+		"precedent": "GTA Vice City",
+		"description": "The respray shop from GTA Vice City returns, according to press previews. It repaints cars to shake off the police, repairs them, assesses their value and registers stolen cars.",
+		"sources": [
+			{
+				"url": "https://www.gtabase.com/articles/gta-6/gta-6-previews-recap-all-new-gameplay-features-revealed",
+				"title": "GTA 6 Previews Roundup - All New Gameplay Features Revealed - GTABase"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-vice-city/vehicles/",
+				"title": "GTA Vice City Cars List, Stats & Vehicles Database - GTABase"
+			}
+		]
 	}
 ]

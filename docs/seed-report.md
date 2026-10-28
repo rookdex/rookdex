@@ -189,3 +189,254 @@ gtabase.com map page states Rockstar "plans to continue to develop the game's wo
 kept unchanged.
 
 All fixes verified with `npx vitest run src/model/seed.test.ts` (18/18 passing) after the edits.
+
+## Refresh, 28 October 2026
+
+The second research pass, three weeks before launch. Four research agents (one per category) read
+the official material published since 18 September (the Launch Trailer on 15 October, An Extended
+Look, Rockstar Newswire, the `rockstargames.com/VI` pages with every panel and dialog opened) and
+the allowlisted press that identifies what those videos and pages show. Reports are in
+`.superpowers/sdd/2026-10-28-seed-refresh/research-*.md`. The same tier rules and the same leak rule
+apply as in the first pass, and every candidate passed the gate before I ruled on it.
+
+The seed grows from 43 to 215 items: 1 wildlife, 141 vehicles, 24 places and 6 collectibles.
+
+**What the new material holds.** The Launch Trailer Newswire text names no vehicles, places or
+animals. The new names sit behind clicks: the expandable panels on `/VI/editions` (the Ultimate
+Edition vehicles and mod shops) and the Explore dialogs on `/VI/only-in-leonida` (neighbourhoods,
+landmarks and businesses). Most vehicles come from press identifications of Trailer 1, Trailer 2 and
+An Extended Look, the same pattern as the shipped Declasse Tulip: an official video plus a press page
+naming the vehicle and the trailer it was seen in. GTABase's per-vehicle pages state where each
+vehicle was seen, and that sentence is how leak-sourced entries were filtered out.
+
+**My rulings.**
+
+- Vehicles: the 141 trailer and editions sightings ship. 59 vehicles seen only in official
+  screenshots or artwork wait until after launch, because no official text names them and nobody
+  checked the images. The Declasse Vamos stays out: GTABase traces it to the 2022 leak.
+- Wildlife: only the ray ships. Rockstar named whales, macaques, armadillos, toads, feral cats and
+  jellyfish in Game Informer's cover story, but none is in official footage yet, and filing them as
+  `expected` would need a precedent they don't have. They wait for launch footage.
+- Collectibles: all six ship, including the races and BASE jumps, which sit in Challenges beside
+  Time Trials.
+- Places: all 24 ship. Five of them (Ocean Beach, Washington Beach, Lake Leonida, Stockyard, Watson
+  Bay) were rejected in September as leak names. Rockstar's own text names them now, and an official
+  naming outranks the leak overlap.
+
+**Ids.** Three place ids would carry a brand token, so they follow `places/the-city`:
+`places/southside`, `places/the-city-airport` and `places/the-lake`. The display names keep the real
+words. Übermacht is written Ubermacht, because names are ASCII.
+
+**New groups.** Aircraft, Emergency and Commercial (vehicles) and Neighborhoods (places), with labels
+in both locales.
+
+### Wildlife (1)
+
+| id | name | status | sources |
+|---|---|---|---|
+| wildlife/ray | Ray | confirmed | Rockstar Newswire; GamesRadar; RockstarINTEL |
+
+### Vehicles (141)
+
+| id | name | status | sources |
+|---|---|---|---|
+| vehicles/grotti-cheetah-95 | 1995 Grotti Cheetah | confirmed | rockstargames.com/VI/editions; GTABase; PC Gamer |
+| vehicles/vapid-ganado | Vapid Ganado | confirmed | rockstargames.com/VI/editions; GTABase; GamesRadar; PC Gamer |
+| vehicles/vapid-dominator-67-buggy | 1967 Vapid Dominator Buggy | confirmed | rockstargames.com/VI/editions; GTABase; GamesRadar; PC Gamer |
+| vehicles/dinka-enduro | Dinka Enduro | confirmed | rockstargames.com/VI/editions; GTABase; GamesRadar; PC Gamer |
+| vehicles/crest-kayak | Crest Kayak | confirmed | rockstargames.com/VI/editions; GTABase; GamesRadar |
+| vehicles/shitzu-squalo | Shitzu Squalo | confirmed | rockstargames.com/VI/editions; GTABase; GamesRadar |
+| vehicles/rideout-customs | Rideout Customs | confirmed | rockstargames.com/VI/editions; GamesRadar |
+| vehicles/one-eyed-willies-mod-shop | One-Eyed Willie's Mod Shop | confirmed | rockstargames.com/VI/editions; GamesRadar |
+| vehicles/buckingham-windsor-drop | Buckingham Windsor Drop | confirmed | Rockstar Newswire; GTABase |
+| vehicles/declasse-granger-police | Declasse Granger Police | confirmed | Rockstar Newswire; GTABase |
+| vehicles/ubermacht-sentinel-classic | Ubermacht Sentinel Classic | confirmed | Rockstar Newswire; GTABase; GamesRadar |
+| vehicles/maibatsu-penumbra-ff | Maibatsu Penumbra FF | confirmed | Rockstar Newswire; GTABase |
+| vehicles/progen-emerus | Progen Emerus | confirmed | Rockstar Newswire; GTABase |
+| vehicles/karin-feroci | Karin Feroci | confirmed | Rockstar Newswire; GTABase |
+| vehicles/fathom-fr36 | Fathom FR36 | confirmed | Rockstar Newswire; GTABase |
+| vehicles/pegassi-infernus-classic | Pegassi Infernus Classic | confirmed | Rockstar Newswire; GTABase |
+| vehicles/grotti-itali-rsx | Grotti Itali RSX | confirmed | Rockstar Newswire; GTABase |
+| vehicles/vapid-lowline | Vapid Lowline | confirmed | Rockstar Newswire; GTABase |
+| vehicles/pfister-neon | Pfister Neon | confirmed | Rockstar Newswire; GTABase |
+| vehicles/mammoth-patriot-mil-spec | Mammoth Patriot Mil-Spec | confirmed | Rockstar Newswire; GTABase |
+| vehicles/ubermacht-rebla-gts | Ubermacht Rebla GTS | confirmed | Rockstar Newswire; GTABase |
+| vehicles/canis-terminus | Canis Terminus | confirmed | Rockstar Newswire; GTABase |
+| vehicles/karin-vivanite | Karin Vivanite | confirmed | Rockstar Newswire; GTABase |
+| vehicles/benefactor-xls | Benefactor XLS | confirmed | Rockstar Newswire; GTABase |
+| vehicles/ubermacht-zion-cabrio | Ubermacht Zion Cabrio | confirmed | Rockstar Newswire; GTABase |
+| vehicles/principe-lectro | Principe Lectro | confirmed | Rockstar Newswire; GTABase |
+| vehicles/pegassi-faggio | Pegassi Faggio | confirmed | Rockstar Newswire; GTABase |
+| vehicles/buckingham-luxor | Buckingham Luxor | confirmed | Rockstar Newswire; GTABase |
+| vehicles/buckingham-valkyrie | Buckingham Valkyrie | confirmed | Rockstar Newswire; GTABase |
+| vehicles/dundreary-landstalker-xl-police | Dundreary Landstalker XL Police | confirmed | Rockstar Newswire; GTABase |
+| vehicles/brute-ambulance | Brute Ambulance | confirmed | Rockstar Newswire; GTABase |
+| vehicles/brute-stockade | Brute Stockade | confirmed | Rockstar Newswire; GTABase; GamesRadar |
+| vehicles/hvy-airtug | HVY Airtug | confirmed | Rockstar Newswire; GTABase |
+| vehicles/vapid-benson | Vapid Benson | confirmed | Rockstar Newswire; GTABase |
+| vehicles/hvy-biff | HVY Biff | confirmed | Rockstar Newswire; GTABase |
+| vehicles/jobuilt-flatbed | JoBuilt Flatbed | confirmed | Rockstar Newswire; GTABase |
+| vehicles/declasse-granger-taxi | Declasse Granger Taxi | confirmed | Rockstar Newswire; GTABase |
+| vehicles/brute-tipper | Brute Tipper | confirmed | Rockstar Newswire; GTABase |
+| vehicles/brute-utility-truck | Brute Utility Truck | confirmed | Rockstar Newswire; GTABase |
+| vehicles/nagasaki-caddy | Nagasaki Caddy | confirmed | Rockstar Newswire; GTABase |
+| vehicles/bravado-bison-900-95 | Bravado Bison 900 '95 | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/nagasaki-blazer | Nagasaki Blazer | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/albany-buccaneer | Albany Buccaneer | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/albany-buccaneer-custom | Albany Buccaneer Custom | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar; PC Gamer |
+| vehicles/bravado-buffalo | Bravado Buffalo | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/bravado-buffalo-stx | Bravado Buffalo STX | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/vapid-caracara | Vapid Caracara | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/grotti-carbonizzare | Grotti Carbonizzare | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar; PC Gamer |
+| vehicles/vapid-chino | Vapid Chino | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/pfister-comet-retro-custom | Pfister Comet Retro Custom | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/pfister-comet-s2-cabrio | Pfister Comet S2 Cabrio | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar; PC Gamer |
+| vehicles/invetero-coquette-d10 | Invetero Coquette D10 | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/grotti-furia | Grotti Furia | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar; PC Gamer |
+| vehicles/karin-futo | Karin Futo | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/bravado-gauntlet-hellfire | Bravado Gauntlet Hellfire | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar; PC Gamer |
+| vehicles/declasse-granger-3600lx | Declasse Granger 3600LX | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/annis-hellion | Annis Hellion | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/karin-intruder | Karin Intruder | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/vapid-liberator | Vapid Liberator | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/nagasaki-outlaw | Nagasaki Outlaw | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/schyster-pmp-700 | Schyster PMP 700 | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar; PC Gamer |
+| vehicles/albany-primo | Albany Primo | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/imponte-ruiner | Imponte Ruiner | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/vapid-sandking-xl | Vapid Sandking XL | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/benefactor-schafter-v12 | Benefactor Schafter V12 | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar; PC Gamer |
+| vehicles/obey-tailgater | Obey Tailgater | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/declasse-tulip-m-100 | Declasse Tulip M-100 | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar; PC Gamer |
+| vehicles/pegassi-zorrusso | Pegassi Zorrusso | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/declasse-bobcat-xl | Declasse Bobcat XL | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/ubermacht-cypher | Ubermacht Cypher | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/vapid-dominator | Vapid Dominator | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/vapid-dominator-asp | Vapid Dominator ASP | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/vapid-dominator-gtx | Vapid Dominator GTX | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/benefactor-dubsta | Benefactor Dubsta | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/annis-elegy-90 | Annis Elegy '90 | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/bravado-gauntlet-classic | Bravado Gauntlet Classic | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/grotti-itali-gto | Grotti Itali GTO | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/ocelot-jugular | Ocelot Jugular | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/obey-omnis-e-gt | Obey Omnis e-GT | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/vapid-reclaimer | Vapid Reclaimer | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/declasse-sabre-turbo | Declasse Sabre Turbo | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/canis-seminole-frontier | Canis Seminole Frontier | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/vapid-slamvan | Vapid Slamvan | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/zirconium-stratum | Zirconium Stratum | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/karin-sultan | Karin Sultan | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/nagasaki-carbon-rs | Nagasaki Carbon RS | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar; PC Gamer |
+| vehicles/western-sovereign | Western Sovereign | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/dinka-double-t | Dinka Double-T | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/pegassi-speeder | Pegassi Speeder | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/shitzu-tropic | Shitzu Tropic | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/mammoth-dodo | Mammoth Dodo | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/buckingham-nimbus | Buckingham Nimbus | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/sea-sparrow | Sea Sparrow | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/buckingham-supervolito | Buckingham SuperVolito | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/buckingham-police-maverick | Buckingham Police Maverick | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/vapid-stanier-le-police-cruiser | Vapid Stanier LE Police Cruiser | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/bravado-buffalo-police-cruiser | Bravado Buffalo Police Cruiser | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/bravado-buffalo-stx-pursuit | Bravado Buffalo STX Pursuit | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/bravado-gauntlet-interceptor | Bravado Gauntlet Interceptor | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/vapid-lowline-police-interceptor | Vapid Lowline Police Interceptor | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/vapid-montagne-police | Vapid Montagne Police | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/jobuilt-phantom | JoBuilt Phantom | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/vapid-speedo | Vapid Speedo | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/declasse-burrito | Declasse Burrito | confirmed | Trailer 1 (YouTube); Rockstar Newswire; GTABase; GamesRadar |
+| vehicles/bravado-rumpo | Bravado Rumpo | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/dashound | Dashound | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/vapid-tow-truck | Vapid Tow Truck | confirmed | Trailer 1 (YouTube); Rockstar Newswire; GTABase; GamesRadar |
+| vehicles/maibatsu-mule | Maibatsu Mule | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/jobuilt-rubble | JoBuilt Rubble | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/vapid-stanier-taxi | Vapid Stanier Taxi | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/bravado-youga-classic | Bravado Youga Classic | confirmed | Trailer 1 (YouTube); GTABase |
+| vehicles/vapid-aleutian | Vapid Aleutian | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/bravado-banshee | Bravado Banshee | confirmed | Trailer 2 (YouTube); GTABase; GamesRadar; PC Gamer |
+| vehicles/bravado-bison | Bravado Bison | confirmed | Trailer 2 (YouTube); GTABase; GamesRadar |
+| vehicles/bravado-bison-1800 | Bravado Bison 1800 | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/vapid-caracara-4x4 | Vapid Caracara 4x4 | confirmed | Trailer 2 (YouTube); GTABase; GamesRadar; PC Gamer |
+| vehicles/pfister-growler | Pfister Growler | confirmed | Trailer 2 (YouTube); GTABase; GamesRadar |
+| vehicles/dundreary-landstalker-xl | Dundreary Landstalker XL | confirmed | Trailer 1 (YouTube); Trailer 2 (YouTube); GTABase; GamesRadar |
+| vehicles/maibatsu-penumbra | Maibatsu Penumbra | confirmed | Trailer 2 (YouTube); GTABase; GamesRadar |
+| vehicles/imponte-phoenix | Imponte Phoenix | confirmed | Trailer 2 (YouTube); GTABase; GamesRadar |
+| vehicles/pfister-astron | Pfister Astron | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/invetero-coquette | Invetero Coquette | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/declasse-granger | Declasse Granger | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/vapid-montagne | Vapid Montagne | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/ubermacht-sentinel-xs | Ubermacht Sentinel XS | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/pegassi-tempesta | Pegassi Tempesta | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/emperor-vectre | Emperor Vectre | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/enus-windsor | Enus Windsor | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/albany-emperor | Albany Emperor | confirmed | Trailer 2 (YouTube); GTABase; GamesRadar |
+| vehicles/gallivanter-baller | Gallivanter Baller | confirmed | Trailer 2 (YouTube); GamesRadar |
+| vehicles/declasse-rancher | Declasse Rancher | confirmed | Trailer 2 (YouTube); GTABase; GamesRadar |
+| vehicles/western-zombie-chopper | Western Zombie Chopper | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/nagasaki-dinghy | Nagasaki Dinghy | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/speedophile-seashark | Speedophile Seashark | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/nagasaki-buzzard-attack-chopper | Nagasaki Buzzard Attack Chopper | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/mammoth-streamer216 | Mammoth Streamer216 | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/vapid-stanier-le-police-ghost | Vapid Stanier LE Police Ghost | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/brute-police-riot | Brute Police Riot | confirmed | Trailer 2 (YouTube); GTABase; GamesRadar |
+| vehicles/mtl-packer | MTL Packer | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/brute-rental-shuttle-bus | Brute Rental Shuttle Bus | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/pay-n-spray | Pay 'n' Spray | expected (GTA Vice City) | GTABase |
+
+### Places (24)
+
+| id | name | status | sources |
+|---|---|---|---|
+| places/ocean-beach | Ocean Beach | confirmed | rockstargames.com/VI/only-in-leonida; rockstargames.com/VI/editions |
+| places/little-cuba | Little Cuba | confirmed | rockstargames.com/VI/only-in-leonida; GamesRadar |
+| places/stockyard | Stockyard | confirmed | rockstargames.com/VI/editions; GamesRadar |
+| places/washington-beach | Washington Beach | confirmed | rockstargames.com/VI/editions |
+| places/southside | Southside Vice City | confirmed | rockstargames.com/VI/editions |
+| places/watson-bay | Watson Bay | confirmed | rockstargames.com/VI/editions |
+| places/kelly-county | Kelly County | confirmed | Trailer 1 (YouTube); GamesRadar |
+| places/goose-key | Goose Key | confirmed | Rockstar Newswire; GameSpot |
+| places/vc-port | VC Port | confirmed | rockstargames.com/VI/only-in-leonida; GamesRadar |
+| places/the-city-airport | Vice City International Airport | confirmed | Trailer 1 (YouTube); GamesRadar; RockstarINTEL |
+| places/tisha-wocka-flea-market | Tisha-Wocka Flea Market | confirmed | rockstargames.com/VI/only-in-leonida |
+| places/the-lake | Lake Leonida | confirmed | rockstargames.com/VI/editions |
+| places/gambit-bay | Gambit Bay | confirmed | rockstargames.com/VI/editions |
+| places/paradise-garage | Paradise Garage | confirmed | rockstargames.com/VI/editions |
+| places/allied-crystal-sugar-refinery | Allied Crystal Sugar Refinery | confirmed | rockstargames.com/VI/only-in-leonida; GamesRadar |
+| places/the-rusty-anchor | The Rusty Anchor | confirmed | rockstargames.com/VI/only-in-leonida; GamesRadar |
+| places/starlet-motel | Starlet Motel | confirmed | rockstargames.com/VI/only-in-leonida; GamesRadar |
+| places/delights-cabaret | Delights Cabaret | confirmed | rockstargames.com/VI/only-in-leonida; GamesRadar |
+| places/ptt-youngins-illegal-goods-store | PTT Youngin$ Illegal Goods Store | confirmed | rockstargames.com/VI/editions |
+| places/rideout-customs-mod-shop | Rideout Customs Mod Shop | confirmed | rockstargames.com/VI/editions |
+| places/saras-unisex-salon | Sara's Unisex Salon | confirmed | rockstargames.com/VI/editions |
+| places/stock-305-clothing-store | Stock 305 Clothing Store | confirmed | rockstargames.com/VI/editions |
+| places/electric-fang-tattoo-parlor | Electric Fang Tattoo Parlor | confirmed | rockstargames.com/VI/editions |
+| places/one-eyed-willies-mod-shop | One-Eyed Willie's Mod Shop | confirmed | rockstargames.com/VI/editions |
+
+### Collectibles (6)
+
+| id | name | status | sources |
+|---|---|---|---|
+| collectibles/hidden-packages | Hidden Packages | expected (GTA Vice City) | GTABase |
+| collectibles/sunken-treasure | Sunken Treasure | expected (GTA Online) | GameSpot; GTABase; GamesRadar |
+| collectibles/base-jumps | Base Jumps | expected (GTA V) | RockstarINTEL; GamesRadar; GTABase |
+| collectibles/street-races | Street Races | expected (GTA V) | GamesRadar; RockstarINTEL; GTABase |
+| collectibles/off-road-races | Off-Road Races | expected (GTA V) | GamesRadar; RockstarINTEL; GTABase |
+| collectibles/sea-races | Sea Races | expected (GTA V) | GTABase |
+
+### Rejected this round
+
+Full lists are in each research report. In short: vehicles whose GTABase page cites the 2022 leak
+or the August 2026 leaked gameplay (most of GTABase's 16 October batch); vehicles known only by a
+real-world model name; generic or scenery vehicles (ferry, freight train, blimp); places that trace
+back to either leak or appear only on non-allowlisted sites; roads, radio stations and nicknames;
+pets and game systems (animal study, Legendary animals) in wildlife; activities without a checklist
+structure (hunting, fishing, golf) and physical merchandise in collectibles.
+
+### Source check
+
+A fresh agent that had not seen the research re-fetched a reproducible random sample of 27 new items
+(12 vehicles, 8 places, all 6 collectibles and the ray). 26 were supported, and none was leak-derived.
+Sea Races is the weakest: GTABase is its only GTA 6 source, so its description says press expects it
+rather than that it is confirmed. One pattern to know: the Extended Look vehicles cite the Newswire
+article as their official source, and that text never names a vehicle, so the identification rests
+on GTABase. The gate only demands a press source when every official source is a YouTube video. Each
+of these items has one anyway.
