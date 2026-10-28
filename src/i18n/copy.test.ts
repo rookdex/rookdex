@@ -64,7 +64,7 @@ describe("search titles and description (SEO spec §4.4)", () => {
 	it("keeps the visible headings as they were", () => {
 		expect(en["tracker.title"]).toBe("Tracker")
 		expect(nb["tracker.title"]).toBe("Oversikt")
-		expect(en["seo.titles.home"]).toBe("Rookdex: GTA 6 countdown, tracker and launch guide")
+		expect(en["seo.titles.home"]).toBe("Rookdex: GTA 6 companion app, countdown and tracker")
 	})
 })
 
