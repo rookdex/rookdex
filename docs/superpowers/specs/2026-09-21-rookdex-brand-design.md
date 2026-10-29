@@ -219,6 +219,8 @@ Two new dependencies, pinned like Inter: `@fontsource/bebas-neue` (400 only) and
 
 `<link rel="preload" as="font" type="font/woff2" crossorigin>` for the Bebas Neue latin file only, because the wordmark is in every header. DM Sans and Inter load through the CSS as now.
 
+**Amended 29.10.2026:** the Inter latin file gets the same preload. At 375 px the hub tagline wraps to three lines in Inter and two in the fallback, so the swap after first paint pushed the hub down 27 px (layout shift 0.042). With the preload Inter is ready before first paint and the shift is gone. DM Sans still loads through the CSS.
+
 The preload `href` is never written by hand. Astro emits the face as `_astro/<name>.<hash>.woff2`, so `Base.astro` imports the URL and uses it:
 
 ```astro
