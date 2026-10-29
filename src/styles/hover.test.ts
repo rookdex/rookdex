@@ -47,4 +47,13 @@ describe("hover and focus rules (feedback spec §3.2)", () => {
 		const universal = /\*,\s*\*::before,\s*\*::after\s*\{\s*transition: none !important;/
 		expect(reduced.some(([, body]) => universal.test(body))).toBe(true)
 	})
+
+	// The island always renders the seconds, so the server HTML and the hydrated tree match.
+	it("hides the countdown seconds under reduced motion in CSS", () => {
+		const reduced = topLevel(css).filter(([prelude]) =>
+			prelude.startsWith("@media (prefers-reduced-motion: reduce)")
+		)
+		const hidden = /\.countdown \.unit-seconds\s*\{\s*display: none;\s*\}/
+		expect(reduced.some(([, body]) => hidden.test(body))).toBe(true)
+	})
 })

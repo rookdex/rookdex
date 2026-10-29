@@ -110,17 +110,24 @@ describe("Hub before launch", () => {
 		)
 	})
 
-	it("hides the seconds under reduced motion", () => {
+	// The server cannot know the setting, so CSS hides the seconds (hover.test.ts). If the island
+	// dropped the unit after hydration instead, the phone grid's columns would shift.
+	it("renders the same units as the server HTML under reduced motion", () => {
 		vi.setSystemTime(new Date(before))
+		const units = (html: string) => html.match(/class="unit[ "]/g)?.length
+		const server = renderToString(<Hub {...props()} />)
 		const original = window.matchMedia
 		window.matchMedia = vi.fn().mockImplementation((query: string) => ({
 			...original(query),
 			matches: query.includes("reduce"),
 		}))
-		hub()
-		expect(screen.queryByText("seconds")).not.toBeInTheDocument()
-		expect(screen.getByText("minutes")).toBeInTheDocument()
-		window.matchMedia = original
+		try {
+			const { container } = hub()
+			expect(units(container.innerHTML)).toBe(units(server))
+			expect(screen.getByText("seconds").closest(".unit")).toHaveClass("unit-seconds")
+		} finally {
+			window.matchMedia = original
+		}
 	})
 
 	// Vitest runs with import.meta.env.DEV true, so this proves the hub wires the override in;

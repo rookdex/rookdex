@@ -906,6 +906,14 @@ p {
 	letter-spacing: 0.05em;
 }
 
+/* The island always renders the seconds and CSS hides them here, so the server HTML already has
+   the hydrated layout and the auto-fit columns never shift. The tick slows to once a minute. */
+@media (prefers-reduced-motion: reduce) {
+	.countdown .unit-seconds {
+		display: none;
+	}
+}
+
 /* Hub after launch (dashboard spec §4). Every block has a fixed or reserved height, and the
    skeleton uses the same classes, so swapping one for the other shifts nothing (spec §10). */
 
@@ -2711,8 +2719,8 @@ p {
 		display: none;
 	}
 
-	/* A row of content-sized units: with reduced motion the seconds unit drops out after hydration,
-	   and auto-fit columns then moved hours and minutes sideways. It wraps at 200 % text. */
+	/* A row of content-sized units, so hours and minutes keep their place whether or not the
+	   seconds show. It wraps at 200 % text. */
 	.hero-before .countdown {
 		display: flex;
 		flex-wrap: wrap;
