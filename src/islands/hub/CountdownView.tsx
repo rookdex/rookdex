@@ -33,12 +33,14 @@ function DaysLine({ text, n }: { text: string; n: number }) {
  */
 export function CountdownView({ locale, state, guideHref }: Props) {
 	const { t, plural, money } = translator(locale)
-	const units: [number, string][] = [
-		[state.parts.days, t("hub.days")],
-		[state.parts.hours, t("hub.hours")],
-		[state.parts.minutes, t("hub.minutes")],
+	// The seconds always render and CSS hides them under reduced motion. The server cannot know
+	// that setting, so dropping the unit after hydration would shift the phone grid's columns.
+	const units: [number, string, string][] = [
+		[state.parts.days, t("hub.days"), "unit"],
+		[state.parts.hours, t("hub.hours"), "unit"],
+		[state.parts.minutes, t("hub.minutes"), "unit"],
+		[state.parts.seconds, t("hub.seconds"), "unit unit-seconds"],
 	]
-	if (!state.reducedMotion) units.push([state.parts.seconds, t("hub.seconds")])
 
 	return (
 		<section className="hub-state" aria-labelledby="hub-heading">
@@ -47,8 +49,8 @@ export function CountdownView({ locale, state, guideHref }: Props) {
 				<DaysLine text={plural("hub.daysToGo", state.daysToGo)} n={state.daysToGo} />
 			</p>
 			<div className="countdown" aria-live="off" data-testid="countdown-digits">
-				{units.map(([value, label]) => (
-					<div className="unit" key={label}>
+				{units.map(([value, label, className]) => (
+					<div className={className} key={label}>
 						<span className="value">{String(value).padStart(2, "0")}</span>
 						<span className="label">{label}</span>
 					</div>
