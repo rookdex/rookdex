@@ -88,6 +88,23 @@ describe("main navigation (spec §5, §12)", () => {
 	})
 })
 
+describe("font preloads (brand spec §6.2)", () => {
+	// Inter too: the hub tagline wraps one line more in Inter than in the fallback, so a late swap
+	// shifted the phone hub by 27 px.
+	it("preloads the Bebas Neue and Inter latin files from the bundled URLs", async () => {
+		const doc = await page("")
+		const links = [...doc.querySelectorAll('link[rel="preload"][as="font"]')]
+		expect(links.map((l) => l.getAttribute("href"))).toEqual([
+			expect.stringContaining("bebas-neue-latin-400-normal"),
+			expect.stringContaining("inter-latin-wght-normal"),
+		])
+		for (const link of links) {
+			expect(link.getAttribute("type")).toBe("font/woff2")
+			expect(link.hasAttribute("crossorigin")).toBe(true)
+		}
+	})
+})
+
 describe("title (SEO spec §4.4)", () => {
 	it("writes the title prop verbatim, with no suffix added", async () => {
 		const doc = await page("tracker")
