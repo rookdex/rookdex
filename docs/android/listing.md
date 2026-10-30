@@ -1,6 +1,10 @@
 # Store listing
 
-Pasted into Play Console, Grow, Store presence, Main store listing. English (en-US) is the default language; Norwegian (nb-NO) is a translation added under Manage translations.
+Pasted into Play Console, Store listings, Edit default listing. English (en-US) is the default language. Norwegian is a translation: the Console offers only "Norwegian – no-NO", added from the language dropdown at the top of the editor, by hand (no AI or Google translation). The editor has two steps, Assets then Review; only Save on Review commits.
+
+The icon and feature graphic fall back to en-US. The Norwegian listing needs its own `nb-*.png` screenshots, or it shows the English ones. On Review, the AI asset declaration is "Don't label assets": the icon and banner are hand-written SVG, the screenshots are captures of the real app.
+
+Store settings (category and contact details) are a separate page. Phone stays blank and External marketing stays at its default (on).
 
 ## Contact details
 
