@@ -2,7 +2,7 @@
 
 Android spec §6. The plan was 26 to 28 October, with the closed test live by Thursday 29 October. That leaves 14 days of testing to 12 November and up to 7 days of production review before launch on 19 November.
 
-**Status 27 October:** identity verification is on its third attempt, and Create app stays blocked until it passes. The bundle (step 2) is built and the forms for step 5 are ready. Steps 4 to 6 run on the day Google approves. Every day past 29 October pushes production access past launch day. If that happens, the site still launches on 19 November as a PWA and the Play listing follows later.
+**Status 30 October:** steps 1 to 7 are done. The closed test went live on 29 October at 14:02, and PR 2 (Digital Asset Links) merged on 30 October. 10 testers had opted in by then, so the 14-day clock had not started yet. Every day without 12 pushes production access further past launch day. The site still launches on 19 November as a PWA, and the Play listing follows when Google approves it.
 
 | Day | Steps |
 |---|---|
@@ -43,7 +43,7 @@ Open https://www.pwabuilder.com, enter `https://rookdex.app`, choose Android, Go
 
 ## 3. Keep the key safe
 
-- [ ] PWABuilder generates this key on its own servers. With Play App Signing on, it is only the **upload** key: Google holds the key that signs what users install. If I ever suspect the upload key leaked, reset it in Play Console (App integrity) the same way as a lost one.
+- [ ] PWABuilder generates this key on its own servers. With Play App Signing on, it is only the **upload** key: Google holds the key that signs what users install. If I ever suspect the upload key leaked, reset it in Play Console (Protected with Play, Play Store protection, Manage Play app signing) the same way as a lost one.
 - [ ] Unzip the download **outside** the repo.
 - [ ] Keystore and its passwords go into my password manager, plus one offline copy.
 - [ ] Never paste the key, its passwords or `signing-key-info.txt` into a chat or an AI tool. `.gitignore` refuses them if they land in the repo by mistake.
@@ -53,6 +53,7 @@ Open https://www.pwabuilder.com, enter `https://rookdex.app`, choose Android, Go
 
 - [ ] Play Console, Create app: default language English (United States), App, Free.
 - [ ] Play App Signing on (the default).
+- [ ] Automatic protection: leave it on. It blocks installs that don't come from Play, so testers install through the opt-in link. It lives under Protected with Play (the shield icon in the left rail).
 
 ## 5. Fill in the forms
 
@@ -60,17 +61,20 @@ Open https://www.pwabuilder.com, enter `https://rookdex.app`, choose Android, Go
 - [ ] Data safety from `data-safety.md`.
 - [ ] Content rating from `content-rating.md`.
 - [ ] Everything else from `app-content.md`.
+- [ ] Finished forms leave the dashboard. To reopen one: Policy and programs (the pulse icon), App content, Actioned, Manage.
 
 ## 6. Closed testing
 
 - [ ] Test and release, Closed testing: create a track, upload the `.aab`.
 - [ ] Testers: an email list with every collected address (aim for 14 or 15, so one dropping out doesn't reset the 14-day clock).
-- [ ] Send for review. When approved, share the opt-in link with every tester.
-- [ ] Check the count of opted-in testers daily: the clock only counts days with 12 or more.
+- [ ] Send for review. While it is in review, the Test and release overview can still show "Closed testing: Get started". That card is stale. Clicking it makes a second track.
+- [ ] When approved, share the opt-in link with every tester: the track's Testers tab, Copy link (the web one), which is `https://play.google.com/apps/testing/app.rookdex`. Not "Copy shareable link" on the app bundle page: that is internal app sharing, and those installs don't count toward the 12.
+- [ ] Check the count of opted-in testers daily on the Dashboard: the clock only counts days with 12 or more. Play shows the count only, never who opted in, so a reminder goes to everyone.
 
 ## 7. Fingerprints for PR 2
 
-- [ ] Test and release, App integrity, App signing: copy the SHA-256 of the **app signing key** and of the **upload key**. Both are public values.
+- [ ] Protected with Play (the shield icon), expand Play Store protection, Manage Play app signing. The old App integrity page is now only a pointer to it.
+- [ ] Copy the SHA-256 of the **app signing key** and of the **upload key**. Both are public values. The page's own Digital Asset Links JSON lists the app signing key only. The upload key is added on top (Android spec §7). The certificate zip also holds two hybrid (post-quantum) certificates: they are not needed in `assetlinks.json`.
 - [ ] Take them from Play Console only, never from `signing-key-info.txt` (it also holds the passwords).
 - [ ] Build PR 2 (plan Part 2) with them. Target: merged by 31 October.
 
