@@ -1,0 +1,13 @@
+[
+	{
+		"relation": ["delegate_permission/common.handle_all_urls"],
+		"target": {
+			"namespace": "android_app",
+			"package_name": "app.rookdex",
+			"sha256_cert_fingerprints": [
+				"DA:7F:E2:6E:D3:89:D5:4F:36:25:EB:22:D4:23:6D:4F:0C:35:5A:45:02:A9:65:55:5C:5F:C7:5B:F9:90:D4:B7",
+				"76:CE:2B:C1:AF:8B:42:A9:28:6A:B3:A1:35:D7:E5:36:DD:20:A8:D3:52:2C:05:A4:39:F7:4E:E7:E4:3B:1C:D6"
+			]
+		}
+	}
+]

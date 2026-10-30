@@ -21,11 +21,12 @@ const SKIP = new Set([
 const LATIN_FONT = /^[^.]*-latin-(?!ext-)/
 
 /** Which built files the worker precaches: pages and assets, minus the worker's own files, the
- *  crawler-only files (robots, sitemap, IndexNow key, OG banner) and every non-latin font subset
- *  (they load on demand online). */
+ *  crawler-only files (robots, sitemap, IndexNow key, OG banner, the Digital Asset Links file) and
+ *  every non-latin font subset (they load on demand online). */
 export function shouldPrecache(file) {
 	if (SKIP.has(file)) return false
 	if (/^og\./.test(file)) return false
+	if (file.startsWith(".well-known/")) return false
 	if (file.startsWith("_astro/") && file.endsWith(".woff2")) {
 		return LATIN_FONT.test(file.slice("_astro/".length))
 	}

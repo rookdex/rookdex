@@ -92,6 +92,10 @@ describe("shouldPrecache", () => {
 			expect(shouldPrecache(file), file).toBe(false)
 		}
 	})
+
+	it("skips the Digital Asset Links file: Google fetches it, not the app", () => {
+		expect(shouldPrecache(".well-known/assetlinks.json")).toBe(false)
+	})
 })
 
 describe("withVersionHeader (feedback spec §10.2)", () => {
