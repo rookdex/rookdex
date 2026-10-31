@@ -56,6 +56,17 @@ describe("search row CSS (tracker search spec §5)", () => {
 		expect(css).toMatch(/\.search-toggle\[aria-pressed="true"\][^{]*\{[^}]*Highlight/)
 	})
 
+	it("hides the toggle label on phones and restores it from 768 px", () => {
+		const wide = mediaBlock("(min-width: 768px)")
+		const base = css.replace(wide, "")
+		expect(base).toMatch(
+			/\.search-toggle-label\s*\{[^}]*position:\s*absolute[^}]*clip-path:\s*inset\(50%\)/
+		)
+		expect(base).toMatch(/\.search-count::before\s*\{[^}]*content:\s*none/)
+		expect(wide).toMatch(/\.search-toggle-label\s*\{[^}]*position:\s*static[^}]*clip-path:\s*none/)
+		expect(wide).toMatch(/\.search-count::before\s*\{[^}]*content:\s*"· " \/ ""/)
+	})
+
 	it("adds no max-width queries", () => {
 		expect(css).not.toMatch(/@media[^{]*max-width[^{]*\{[^}]*search/)
 	})

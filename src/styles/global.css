@@ -1470,8 +1470,19 @@ html:has(.search-row) {
 	white-space: nowrap;
 }
 
+/* On phones the toggle shows its icon only, so the field keeps its width; the label stays in the
+   accessible name. */
+.search-toggle-label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
 .search-count::before {
-	content: "· " / "";
+	content: none;
 }
 
 .search-elsewhere {
@@ -2520,6 +2531,18 @@ html:has(.search-row) {
 }
 
 @media (min-width: 768px) {
+	.search-toggle-label {
+		position: static;
+		width: auto;
+		height: auto;
+		overflow: visible;
+		clip-path: none;
+	}
+
+	.search-count::before {
+		content: "· " / "";
+	}
+
 	.hub-dashboard {
 		padding: var(--space-4) min(var(--space-4), 7.5vw);
 	}
