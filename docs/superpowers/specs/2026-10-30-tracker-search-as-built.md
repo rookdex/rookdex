@@ -17,12 +17,15 @@ Written 31.10.2026 after the build on `feat/tracker-search`. It records where th
 - **`--search-row-h` sits on `html:has(.search-row)`**, not on `.search-row`. `scroll-padding-top` is set on `html`, and custom properties only inherit downwards. The row inherits the same value, so the formula still lives in one place.
 - **No match is announced as its own text.** Spec §5 only gives counts as typing examples, so the first build said "0 results" while the list said `No match for "…".` The announcement now mirrors all three empty states (no match, other categories, everything found).
 - **The toggle shows its icon only below 768 px.** At 320 px the label squeezed the field to 136.8 px (8.55 rem), under the 9 rem floor. The label stays in the accessible name ("Hide found 37 hidden"); the `·` before the count returns at 768 px with the label.
+- **Pressed chips keep a visible focus ring in forced colours.** The P3 rule opts out of forced colours, which also kept the light focus outline; on a light high-contrast theme it vanished. The ring now uses `CanvasText` there.
 
 ## Known limits (accepted)
 
 - The status text is not cleared on a profile switch, and a line identical to the current one is not announced again.
 - Spec §7 calls restore a profile change, but restore keeps the profile. The snapshot is still retaken after restore and after a confirmed import.
 - The persist hint is a second `role="status"` inside the tracker. It is older than this branch and only shows once.
+- Turning Hide found on in the moment before the tracker has loaded announces "0 hidden".
+- Typing a category name ("dyreliv", "places") finds nothing: category labels are not search terms (spec §3.2). Cheap to add after launch if players type them.
 
 ## Measured (served build, 31.10.2026)
 
