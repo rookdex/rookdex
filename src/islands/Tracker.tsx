@@ -130,6 +130,7 @@ export function Tracker({ locale }: Props) {
 	// with a non-empty query, so "none" here means the list has results.
 	function resultsText(view: SearchView, query: string): string {
 		const kind = emptyState(view, query)
+		if (kind === "no-match") return t("tracker.search.noMatch", { query: query.trim() })
 		if (kind === "elsewhere") return t("tracker.search.resultsElsewhere", { count: view.elsewhere })
 		if (kind === "all-found") return t("tracker.search.allFound")
 		return plural("tracker.search.results", view.visible.length)

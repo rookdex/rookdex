@@ -146,6 +146,13 @@ describe("Tracker search announcements (tracker search spec §5)", () => {
 		)
 	})
 
+	it("announces the no-match text the way the screen shows it", async () => {
+		await ready()
+		type("zzzz")
+		await waitFor(() => expect(status()).toHaveTextContent('No match for "zzzz".'))
+		expect(status()).not.toHaveTextContent("0 results")
+	})
+
 	it("drops a pending result when the chips change", async () => {
 		await ready()
 		type("peli")
