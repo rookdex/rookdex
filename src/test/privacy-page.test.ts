@@ -115,7 +115,7 @@ describe("Privacy page (Android spec §3)", () => {
 		const items = [...doc.querySelectorAll('section[aria-labelledby="privacy-stored"] li')]
 		expect(items.map((li) => li.textContent)).toEqual([
 			"Your profiles and what you have ticked off (IndexedDB).",
-			'Which profile is active, the language you picked, which items you ticked on the before-launch list, and two notes that a message was already shown: the install prompt and the storage hint (localStorage). If you choose "update later", that is kept only until you close the tab (sessionStorage).',
+			'Which profile is active, the language you picked, which items you ticked on the before-launch list, whether Hide found is on in the tracker, and two notes that a message was already shown: the install prompt and the storage hint (localStorage). If you choose "update later", that is kept only until you close the tab (sessionStorage).',
 			"An offline copy of the site, so it works without a network (the service worker cache).",
 		])
 	})
