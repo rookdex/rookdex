@@ -10,10 +10,10 @@ Leonida is waiting, and you'll want somewhere to keep score. Rookdex gives you a
 
 ## <img src="docs/readme/map.svg" width="22" height="22" alt=""> What you get
 
-- **A countdown** to 19 November 2026, ticking down to the minute.
+- **A countdown** to 19 November 2026, ticking down to the minute. At midnight on launch night the home page turns into your dashboard.
 - **A tracker** for wildlife, vehicles, places and collectibles. Spot a gator, tick a box, watch the bar fill up.
 - **Confirmed, expected or rumour.** Every tracker item shows its tier and its sources. Rumours live on the News page with a label on them, so you can tell a trailer frame from somebody's cousin's friend.
-- **Before you start**, a short guide to editions and what to sort out before launch night.
+- **Two short guides.** Before you start covers editions and what to sort out before launch night. Your first hour covers what to check, claim and skip once the game unlocks.
 
 ## <img src="docs/readme/save.svg" width="22" height="22" alt=""> Your save file stays with you
 
