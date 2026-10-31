@@ -267,7 +267,7 @@
 	"privacy.androidBody": "Rookdex-appen på Google Play er dette nettstedet, åpnet i en nettleser på telefonen. Som regel er det Chrome, men det kan være en annen nettleser du har valgt som standard. Alt på denne siden gjelder for appen, og nettleserens egen personvernerklæring gjelder for nettleseren.",
 	"privacy.androidLink": "Chromes personvernerklæring",
 	"privacy.deleteTitle": "Slett dataene dine",
-	"privacy.deleteBody": "Gå til Innstillinger og velg «{button}». Det sletter profilene, fremgangen og språkvalget ditt. Merknadene om installeringsforslaget og lagringstipset blir liggende, så de ikke kommer tilbake. For å fjerne alt, også kopien som virker uten nett, sletter du nettstedets data i nettleserens nettstedsinnstillinger. Å avinstallere Android-appen gjør ikke dette, fordi dataene ligger i nettleseren.",
+	"privacy.deleteBody": "Gå til Innstillinger og velg «{button}». Det sletter profilene og fremgangen din, hvilken profil som er aktiv, språkvalget ditt, listen før lansering og om Skjul funnet er på. Merknadene om installeringsforslaget og lagringstipset blir liggende, så de ikke kommer tilbake. For å fjerne alt, også kopien som virker uten nett, sletter du nettstedets data i nettleserens nettstedsinnstillinger. Å avinstallere Android-appen gjør ikke dette, fordi dataene ligger i nettleseren.",
 	"privacy.deleteLink": "Åpne Innstillinger",
 	"privacy.whoTitle": "Hvem som driver Rookdex",
 	"privacy.whoBody": "Rookdex drives av Malin Fossum i Norge.",

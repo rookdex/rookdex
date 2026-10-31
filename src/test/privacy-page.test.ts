@@ -146,6 +146,16 @@ describe("Privacy page (Android spec §3)", () => {
 		}
 	)
 
+	it.each(["en", "nb"] as const)("names everything Delete all removes in %s", async (locale) => {
+		const doc = await page(locale)
+		const section = doc.querySelector('section[aria-labelledby="privacy-delete"]')
+		expect(section?.textContent).toContain(
+			locale === "en"
+				? "It deletes your profiles and progress, which profile is active, your language choice, the before-launch list and whether Hide found is on."
+				: "Det sletter profilene og fremgangen din, hvilken profil som er aktiv, språkvalget ditt, listen før lansering og om Skjul funnet er på."
+		)
+	})
+
 	it("links Cloudflare's and Chrome's policies out in a new tab", async () => {
 		const doc = await page("nb")
 		const hrefs = [...doc.querySelectorAll('main a[target="_blank"]')].map((a) =>
