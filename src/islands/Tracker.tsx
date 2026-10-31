@@ -223,86 +223,84 @@ export function Tracker({ locale }: Props) {
 	return (
 		<div className="tracker" aria-busy={state.status === "loading"}>
 			{state.status === "loading" && <p className="visually-hidden">{t("tracker.loading")}</p>}
-			<div className="tracker-top">
-				<ProfileMenu
-					triggerRef={menuButton}
-					profiles={activeProfiles(state.profiles)}
-					current={current}
-					onSwitch={tracker.switchProfile}
-					onNew={() => openDialog("new")}
-					onRename={() => openDialog("rename")}
-					onExport={exportNow}
-					onImport={() => fileInput.current?.click()}
-					onDelete={() => openDialog("delete")}
-					onDeleted={() => openDialog("deleted")}
-					t={t}
-				/>
-				{state.persistHint && (
-					<p className="hint" role="status">
-						{t("tracker.persistHint")}{" "}
-						<button type="button" onClick={dismissHint}>
-							{t("tracker.dismiss")}
-						</button>
-					</p>
-				)}
-			</div>
-			<div className="tracker-main">
-				<SearchBar
-					query={search.query}
-					hideFound={search.hideFound}
-					hiddenCount={view.hiddenCount}
-					inputRef={searchField}
-					onQuery={onQuery}
-					onClear={clearSearch}
-					onToggleHideFound={toggleHideFound}
-					t={t}
-				/>
-				<div className="tracker-body">
-					<CategoryNav
-						categories={categories}
-						selected={state.selected}
-						onSelect={selectCategories}
-						allLabel={t("tracker.all")}
-						navLabel={t("tracker.categories")}
-						sources={{ href: sourcesHref, label: t("tracker.sources") }}
-					/>
-					<div className="tracker-results">
-						{empty === "none" && (
-							<ItemList
-								items={view.visible}
-								records={state.records}
-								disabled={state.status !== "ready"}
-								categoryLabel={(id) => seedLabel(t, "category", id)}
-								groupLabel={(id) => seedLabel(t, "group", id)}
-								onToggle={toggleItem}
-								sourcesHref={sourcesHref}
-								t={t}
-							/>
-						)}
-						{empty === "all-found" && <p className="item-empty">{t("tracker.search.allFound")}</p>}
-						{empty === "no-match" && (
-							<p className="item-empty">
-								{t("tracker.search.noMatch", { query: search.query.trim() })}
-							</p>
-						)}
-						{view.elsewhere > 0 && (
-							<p className="search-elsewhere">
-								{plural("tracker.search.elsewhere", view.elsewhere)}{" "}
-								<button type="button" className="search-elsewhere-btn" onClick={showAllCategories}>
-									{t("tracker.search.showAll")}
-								</button>
-							</p>
-						)}
-					</div>
-				</div>
-			</div>
-			<StatsRail
-				overall={countItems(state.items, state.records)}
-				categories={categories}
-				recent={recentFinds(state.items, state.records)}
-				hubHref={hubHref}
+			<SearchBar
+				query={search.query}
+				hideFound={search.hideFound}
+				hiddenCount={view.hiddenCount}
+				inputRef={searchField}
+				onQuery={onQuery}
+				onClear={clearSearch}
+				onToggleHideFound={toggleHideFound}
 				t={t}
 			/>
+			{state.persistHint && (
+				<p className="hint" role="status">
+					{t("tracker.persistHint")}{" "}
+					<button type="button" onClick={dismissHint}>
+						{t("tracker.dismiss")}
+					</button>
+				</p>
+			)}
+			<div className="tracker-layout">
+				<div className="tracker-top">
+					<ProfileMenu
+						triggerRef={menuButton}
+						profiles={activeProfiles(state.profiles)}
+						current={current}
+						onSwitch={tracker.switchProfile}
+						onNew={() => openDialog("new")}
+						onRename={() => openDialog("rename")}
+						onExport={exportNow}
+						onImport={() => fileInput.current?.click()}
+						onDelete={() => openDialog("delete")}
+						onDeleted={() => openDialog("deleted")}
+						t={t}
+					/>
+				</div>
+				<CategoryNav
+					categories={categories}
+					selected={state.selected}
+					onSelect={selectCategories}
+					allLabel={t("tracker.all")}
+					navLabel={t("tracker.categories")}
+					sources={{ href: sourcesHref, label: t("tracker.sources") }}
+				/>
+				<div className="tracker-results">
+					{empty === "none" && (
+						<ItemList
+							items={view.visible}
+							records={state.records}
+							disabled={state.status !== "ready"}
+							categoryLabel={(id) => seedLabel(t, "category", id)}
+							groupLabel={(id) => seedLabel(t, "group", id)}
+							onToggle={toggleItem}
+							sourcesHref={sourcesHref}
+							t={t}
+						/>
+					)}
+					{empty === "all-found" && <p className="item-empty">{t("tracker.search.allFound")}</p>}
+					{empty === "no-match" && (
+						<p className="item-empty">
+							{t("tracker.search.noMatch", { query: search.query.trim() })}
+						</p>
+					)}
+					{view.elsewhere > 0 && (
+						<p className="search-elsewhere">
+							{plural("tracker.search.elsewhere", view.elsewhere)}{" "}
+							<button type="button" className="search-elsewhere-btn" onClick={showAllCategories}>
+								{t("tracker.search.showAll")}
+							</button>
+						</p>
+					)}
+				</div>
+				<StatsRail
+					overall={countItems(state.items, state.records)}
+					categories={categories}
+					recent={recentFinds(state.items, state.records)}
+					hubHref={hubHref}
+					t={t}
+				/>
+			</div>
 			<p className="visually-hidden" role="status" aria-live="polite">
 				{live.message}
 			</p>

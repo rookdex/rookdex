@@ -44,7 +44,17 @@ describe("search row CSS (tracker search spec §5)", () => {
 	})
 
 	it("sits in a flex column, so stickiness reaches the end of the list", () => {
-		expect(css).toMatch(/\.tracker-main\s*\{[^}]*display:\s*flex[^}]*flex-direction:\s*column/)
+		expect(css).toMatch(/\n\.tracker\s*\{[^}]*display:\s*flex[^}]*flex-direction:\s*column/)
+	})
+
+	// Layout B: the search spans the full width and the profile, list and stats share one top line.
+	it("puts the profile on top of the chip column from 768 px", () => {
+		const layout = (query: string) =>
+			mediaBlocks(query)
+				.map((block) => block.match(/\.tracker-layout\s*\{[^}]*\}/)?.[0] ?? "")
+				.join("")
+		expect(layout("(min-width: 768px)")).toMatch(/"top list"\s*"nav list"/)
+		expect(layout("(min-width: 1024px)")).toMatch(/"top list stats"\s*"nav list stats"/)
 	})
 
 	it("lifts the profile menu above the sticky row", () => {
