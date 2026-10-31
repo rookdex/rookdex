@@ -13,6 +13,8 @@ export const guideSchema = z.object({
 	summary: z.string(),
 	/** The full <title> text for search; the page falls back to "{title} · Rookdex". */
 	searchTitle: z.string().max(65).optional(),
+	/** The meta description for search; the page falls back to the visible `summary`. */
+	searchDescription: z.string().max(160).optional(),
 	updated: z.coerce.date(),
 	sources: z
 		.array(z.url({ protocol: /^https$/ }))

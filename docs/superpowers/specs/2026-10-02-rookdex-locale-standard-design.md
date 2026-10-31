@@ -1,6 +1,6 @@
 # Rookdex locale standard: design
 
-Date: 2026-10-02. Status: approved in brainstorm, awaiting spec review.
+Date: 2026-10-02. Status: shipped in PRs #41 and #42.
 
 Rookdex adopts the Workbench locale standard (`workbench/docs/specs/2026-10-01-locale-standard.md`,
 called "the standard" below) before the 1 November freeze. Rookdex is the first project to

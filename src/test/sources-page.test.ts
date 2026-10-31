@@ -14,7 +14,11 @@ describe("Sources page (feedback spec §5)", () => {
 		expect(doc.querySelector(".lede")?.textContent).toBe(
 			"Where every item in the tracker comes from."
 		)
-		expect(doc.title).toBe("Sources for the GTA 6 tracker · Rookdex")
+		expect(doc.title).toBe("Sources for every item in the GTA 6 tracker · Rookdex")
+		// The lede is too short for a search result, so the description has its own key.
+		expect(doc.querySelector('meta[name="description"]')?.getAttribute("content")).toMatch(
+			/^Where every item in the GTA 6 tracker comes from. /
+		)
 		const lit = doc.querySelector('nav[aria-label="Main"] [aria-current]')
 		expect(text(lit)).toBe("Tracker")
 		expect(lit?.getAttribute("aria-current")).toBe("true")
