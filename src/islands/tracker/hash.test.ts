@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest"
-import { hashTarget } from "./hash"
+import { hashItemId, hashTarget } from "./hash"
 
 beforeEach(() => {
 	document.body.innerHTML = `<input type="checkbox" id="item-wildlife/pelican"><p id="item-note"></p>`
@@ -25,5 +25,15 @@ describe("hashTarget (feedback spec §4)", () => {
 		"#item-note",
 	])("returns null for %j", (hash) => {
 		expect(hashTarget(hash, document)).toBeNull()
+	})
+})
+
+describe("hashItemId", () => {
+	it("reads the seed id from an item hash and never throws", () => {
+		expect(hashItemId("#item-wildlife%2Fpelican")).toBe("wildlife/pelican")
+		expect(hashItemId("#item-wildlife/pelican")).toBe("wildlife/pelican")
+		expect(hashItemId("#item-%")).toBeNull()
+		expect(hashItemId("#top")).toBeNull()
+		expect(hashItemId("")).toBeNull()
 	})
 })
