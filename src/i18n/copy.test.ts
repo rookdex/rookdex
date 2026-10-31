@@ -87,3 +87,34 @@ describe("countdown templates (brand Task 5, locale spec §5.2)", () => {
 		}
 	})
 })
+
+describe("tracker search copy (tracker search spec §6)", () => {
+	const keys = [
+		"tracker.search.label",
+		"tracker.search.placeholder",
+		"tracker.search.clear",
+		"tracker.search.hideFound",
+		"tracker.search.hiddenCount",
+		"tracker.search.elsewhere.one",
+		"tracker.search.elsewhere.other",
+		"tracker.search.showAll",
+		"tracker.search.noMatch",
+		"tracker.search.allFound",
+		"tracker.search.results.one",
+		"tracker.search.results.other",
+		"tracker.search.resultsElsewhere",
+		"tracker.search.hideFoundOn",
+		"tracker.search.hideFoundOff",
+		"tracker.search.cleared",
+	]
+
+	it.each(keys)("%s exists in en and nb", (key) => {
+		expect(en).toHaveProperty([key])
+		expect(nb).toHaveProperty([key])
+	})
+
+	it("quotes the query the way each language does", () => {
+		expect(en["tracker.search.noMatch"]).toBe('No match for "{query}".')
+		expect(nb["tracker.search.noMatch"]).toBe("Ingen treff på «{query}».")
+	})
+})
