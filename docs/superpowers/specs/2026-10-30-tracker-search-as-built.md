@@ -48,7 +48,7 @@ Written 31.10.2026 after the build on `feat/tracker-search`. It records where th
 - One status region in the tracker for search and ticks. The page's other two are the site-wide update and offline notices.
 - Load CLS at 320 px on `/en/tracker/`: 0, re-measured after layout B.
 - Layout B at 1265 px: h1 and row both start at x 106 (nb); the profile button, first card and Progress all start at y 292. Same at 1280 px (x 114) and 900 px (profile and first card at y 276, Progress under the list).
-- Forced colours: the Browser pane cannot emulate them, so I check the pressed toggle and a pressed chip in Edge DevTools (Rendering, "Emulate CSS forced-colors") before merge.
+- Forced colours: the Browser pane cannot emulate them, so I ran headless Brave over the DevTools protocol (`Emulation.setEmulatedMedia` with `forced-colors: active`, light and dark) and reached each control with a real Tab key press. The pressed toggle and the pressed All chip fill with `Highlight` (rgb(55, 0, 110) light, rgb(26, 235, 255) dark) with `HighlightText`. Focused, both show a solid 2 px ring at a 2 px offset: black on the light theme, white on the dark one. In the screenshots the ring band's mean grey is 0.02 on light (the page beside it is 1) and 0.98 on dark (the page is 0).
 
 ## Bundle
 
