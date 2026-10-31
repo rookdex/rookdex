@@ -1549,6 +1549,12 @@ html:has(.search-row) {
 		color: HighlightText;
 		border-color: Highlight;
 	}
+
+	/* The opt-out above also keeps the light focus outline, which a light theme would hide. */
+	.chips button[aria-pressed="true"]:focus-visible,
+	.tracker .search-toggle[aria-pressed="true"]:focus-visible {
+		outline-color: CanvasText;
+	}
 }
 
 .item-category > h2 {

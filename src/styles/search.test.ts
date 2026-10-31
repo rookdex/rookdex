@@ -6,9 +6,9 @@ const css = readFileSync(new URL("./global.css", import.meta.url), "utf8").repla
 	""
 )
 
-/** The body of the first `@media <query> {` block, braces balanced. */
-function mediaBlock(query: string): string {
-	const start = css.indexOf(`@media ${query} {`)
+/** The first `@media <query> {` block at or after `from`, braces balanced. */
+function mediaBlock(query: string, from = 0): string {
+	const start = css.indexOf(`@media ${query} {`, from)
 	if (start < 0) return ""
 	let depth = 0
 	for (let i = css.indexOf("{", start); i < css.length; i++) {
@@ -16,6 +16,16 @@ function mediaBlock(query: string): string {
 		else if (css[i] === "}" && --depth === 0) return css.slice(start, i + 1)
 	}
 	return ""
+}
+
+/** Every `@media <query> {` block, in source order. */
+function mediaBlocks(query: string): string[] {
+	const blocks: string[] = []
+	for (let block = mediaBlock(query); block; ) {
+		blocks.push(block)
+		block = mediaBlock(query, css.indexOf(block) + block.length)
+	}
+	return blocks
 }
 
 describe("search row CSS (tracker search spec §5)", () => {
@@ -50,10 +60,17 @@ describe("search row CSS (tracker search spec §5)", () => {
 		expect(css).toMatch(/\.item-empty\s*\{[^}]*overflow-wrap:\s*anywhere/)
 	})
 
-	it("marks pressed chips and the toggle in forced colours", () => {
-		const forced = [...css.matchAll(/@media \(forced-colors: active\) \{/g)].length
-		expect(forced).toBeGreaterThan(0)
-		expect(css).toMatch(/\.search-toggle\[aria-pressed="true"\][^{]*\{[^}]*Highlight/)
+	// forced-color-adjust: none also keeps the authored light outline, which vanishes on a light
+	// high-contrast theme, so the focus ring gets a system colour of its own.
+	it("marks pressed chips and the toggle in forced colours, focus ring included", () => {
+		const pressed = '.tracker .search-toggle[aria-pressed="true"]'
+		const block = mediaBlocks("(forced-colors: active)").find((b) => b.includes(pressed)) ?? ""
+		expect(block).toMatch(
+			/\.chips button\[aria-pressed="true"\],\s*\.tracker \.search-toggle\[aria-pressed="true"\]\s*\{[^}]*background:\s*Highlight/
+		)
+		expect(block).toMatch(
+			/\.chips button\[aria-pressed="true"\]:focus-visible,\s*\.tracker \.search-toggle\[aria-pressed="true"\]:focus-visible\s*\{[^}]*outline-color:\s*CanvasText/
+		)
 	})
 
 	it("hides the toggle label on phones and restores it from 768 px", () => {
