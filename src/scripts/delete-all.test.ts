@@ -1,6 +1,6 @@
 import { IDBFactory } from "fake-indexeddb"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { CHECKLIST_KEY } from "../islands/seenFlag"
+import { CHECKLIST_KEY, HIDE_FOUND_KEY } from "../islands/seenFlag"
 import { DB_NAME, openStore } from "../model/store"
 import { deleteAllData } from "./delete-all"
 
@@ -13,7 +13,7 @@ afterEach(() => {
 })
 
 describe("deleteAllData (spec §7.2, feedback spec §7.3)", () => {
-	it("deletes the rookdex database, the language choice and the remembered profile and the before-launch list, and keeps the one-shot flags", async () => {
+	it("deletes the rookdex database and every choice, and keeps the one-shot flags", async () => {
 		const storage = { removeItem: vi.fn(), clear: vi.fn(), setItem: vi.fn() }
 		vi.stubGlobal("localStorage", storage)
 		const factory = new IDBFactory()
@@ -27,6 +27,7 @@ describe("deleteAllData (spec §7.2, feedback spec §7.3)", () => {
 			["lang"],
 			["rookdex.active-profile"],
 			[CHECKLIST_KEY],
+			[HIDE_FOUND_KEY],
 		])
 		expect(storage.clear).not.toHaveBeenCalled()
 	})

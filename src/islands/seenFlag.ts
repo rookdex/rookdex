@@ -4,6 +4,8 @@ import type { ActiveProfileStore } from "../model/tracker"
 
 export const INSTALL_SEEN_KEY = "rookdex.install-prompt-seen"
 export const HINT_SEEN_KEY = "rookdex.persist-hint-seen"
+/** "Hide found" on the tracker (tracker search spec §3.3). "1" while on, absent while off. */
+export const HIDE_FOUND_KEY = "rookdex.hide-found"
 /** The profile the hub and the tracker open (dashboard spec §5). Holds a random id, nothing else. */
 export const ACTIVE_PROFILE_KEY = "rookdex.active-profile"
 
@@ -21,6 +23,14 @@ export function writeFlag(key: string): void {
 		localStorage.setItem(key, "1")
 	} catch {
 		// Blocked storage: the prompt or hint simply shows again next visit.
+	}
+}
+
+export function clearFlag(key: string): void {
+	try {
+		localStorage.removeItem(key)
+	} catch {
+		// Blocked storage holds no flag to clear.
 	}
 }
 

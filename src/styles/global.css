@@ -120,7 +120,8 @@ a {
 /* Pink is focus everywhere except on the three pink surfaces (spec §12). */
 .skip:focus-visible,
 .actions .primary:focus-visible,
-.chips button[aria-pressed="true"]:focus-visible {
+.chips button[aria-pressed="true"]:focus-visible,
+.tracker .search-toggle[aria-pressed="true"]:focus-visible {
 	outline-color: var(--text);
 }
 
@@ -594,6 +595,9 @@ p {
 .tabbar a,
 .chips button,
 .chips a,
+.search-toggle,
+.search-clear,
+.tracker .search-elsewhere-btn,
 .history button,
 .lang summary,
 .picker-row,
@@ -639,7 +643,10 @@ p {
 	.hint button:hover,
 	.deleted-list button:hover,
 	.icon-link:hover,
-	.chips button:not([aria-pressed="true"]):hover {
+	.chips button:not([aria-pressed="true"]):hover,
+	.tracker .search-toggle:not([aria-pressed="true"]):hover,
+	.tracker .search-clear:hover,
+	.tracker .search-elsewhere-btn:hover {
 		background: var(--bg-hover);
 		color: var(--text);
 	}
@@ -649,7 +656,8 @@ p {
 	}
 
 	/* Preview: a faint copy of the selected marker. */
-	.chips button:not([aria-pressed="true"]):hover {
+	.chips button:not([aria-pressed="true"]):hover,
+	.tracker .search-toggle:not([aria-pressed="true"]):hover {
 		border-color: color-mix(in srgb, var(--accent) 50%, transparent);
 	}
 
@@ -701,6 +709,9 @@ p {
 	.deleted-list button:active,
 	.icon-link:active,
 	.chips button:not([aria-pressed="true"]):active,
+	.tracker .search-toggle:not([aria-pressed="true"]):active,
+	.tracker .search-clear:active,
+	.tracker .search-elsewhere-btn:active,
 	.chips a:active,
 	.go-link:active {
 		background: var(--bg-hover);
@@ -720,7 +731,10 @@ p {
 .hint button:focus-visible,
 .deleted-list button:focus-visible,
 .icon-link:focus-visible,
-.chips button:not([aria-pressed="true"]):focus-visible {
+.chips button:not([aria-pressed="true"]):focus-visible,
+.tracker .search-toggle:not([aria-pressed="true"]):focus-visible,
+.tracker .search-clear:focus-visible,
+.tracker .search-elsewhere-btn:focus-visible {
 	background: var(--bg-hover);
 	color: var(--text);
 }
@@ -1280,7 +1294,18 @@ p {
 
 /* Tracker */
 
+/* A flex column, not a grid: a sticky grid item never leaves its own grid area, so the search
+   row could not follow the list. As a flex item it sticks to the end of the tracker. */
 .tracker {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+	min-width: 0;
+}
+
+/* Everything under the search row. From 768 px the profile tops the chip column, so the profile,
+   the list and (from 1024 px) the stats all start on one line under the search. */
+.tracker-layout {
 	display: grid;
 	/* minmax(0, 1fr), not auto: the card grid's minimum must not stretch the page at 200 % text. */
 	grid-template-columns: minmax(0, 1fr);
@@ -1319,9 +1344,14 @@ p {
 	grid-area: nav;
 }
 
-.item-list,
-.item-empty {
+.tracker-results {
 	grid-area: list;
+	min-width: 0;
+}
+
+/* A 100-character query with no spaces still wraps inside 320 px. */
+.item-empty {
+	overflow-wrap: anywhere;
 }
 
 .stats {
@@ -1358,6 +1388,127 @@ p {
 	cursor: default;
 }
 
+/* The row's height, declared once. It sits on html (not on the row) because scroll-padding-top is
+   read from html and a custom property only inherits downwards; the row inherits it too. */
+html:has(.search-row) {
+	--search-row-h: calc(var(--tap) + 2 * var(--space-2) + 1px);
+}
+
+/* Search (tracker search spec §5). Both controls are 44 px and share one bottom edge. */
+.search-row {
+	display: flex;
+	align-items: flex-end;
+	gap: var(--space-2);
+	padding-block: var(--space-2);
+	border-bottom: 1px solid var(--border);
+	background: var(--bg);
+}
+
+.search-field {
+	position: relative;
+	flex: 1;
+	min-width: 0;
+}
+
+.search-field input {
+	width: 100%;
+	height: var(--tap);
+	margin: 0;
+	padding-block: 0;
+	padding-inline: var(--space-3) var(--tap);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
+	color: var(--text);
+	font: inherit;
+	appearance: none;
+}
+
+/* The only visible hint once the label is hidden: body-text contrast. Firefox lowers placeholder
+   opacity by default, which would drop it under 4.5:1. */
+.search-field input::placeholder {
+	color: var(--text-muted);
+	opacity: 1;
+}
+
+/* One clear button: mine, which announces itself. */
+.search-field input::-webkit-search-cancel-button {
+	appearance: none;
+}
+
+.tracker .search-clear {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-end: 0;
+	display: grid;
+	place-items: center;
+	width: var(--tap);
+	padding: 0;
+	border: 0;
+	border-radius: var(--radius);
+	background: transparent;
+	color: var(--text-muted);
+}
+
+.tracker .search-toggle {
+	flex: none;
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-1);
+	height: var(--tap);
+	padding: 0 var(--space-3);
+	border-radius: 999px;
+	background: var(--bg-raised);
+	color: var(--text);
+	white-space: nowrap;
+}
+
+/* On phones the toggle shows its icon only, so the field keeps its width; the label stays in the
+   accessible name. */
+.search-toggle-label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.search-count::before {
+	content: none;
+}
+
+.search-elsewhere {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2) var(--space-3);
+	color: var(--text-muted);
+}
+
+.tracker .search-elsewhere-btn {
+	min-height: var(--tap);
+	padding: var(--space-2) var(--space-3);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
+	color: var(--text);
+}
+
+/* Sticky only with room to spare: a landscape phone (about 360 px) or 200 % zoom would lose a
+   third of the screen to the row. scroll-padding keeps a checkbox focused while tabbing backwards
+   out from under it (WCAG 2.4.11). */
+@media (min-height: 500px) {
+	.search-row {
+		position: sticky;
+		top: 0;
+		z-index: 7;
+	}
+
+	html:has(.search-row) {
+		scroll-padding-top: calc(var(--search-row-h) + var(--space-2));
+	}
+}
+
 .chips {
 	list-style: none;
 	margin: 0;
@@ -1375,10 +1526,28 @@ p {
 	color: var(--text);
 }
 
-.chips button[aria-pressed="true"] {
+.chips button[aria-pressed="true"],
+.tracker .search-toggle[aria-pressed="true"] {
 	background: var(--accent);
 	color: var(--accent-text);
 	border-color: var(--accent);
+}
+
+/* Forced colours drop backgrounds, which would make pressed and unpressed look the same. */
+@media (forced-colors: active) {
+	.chips button[aria-pressed="true"],
+	.tracker .search-toggle[aria-pressed="true"] {
+		forced-color-adjust: none;
+		background: Highlight;
+		color: HighlightText;
+		border-color: Highlight;
+	}
+
+	/* The opt-out above also keeps the light focus outline, which a light theme would hide. */
+	.chips button[aria-pressed="true"]:focus-visible,
+	.tracker .search-toggle[aria-pressed="true"]:focus-visible {
+		outline-color: CanvasText;
+	}
 }
 
 .item-category > h2 {
@@ -1693,7 +1862,7 @@ p {
 	position: absolute;
 	top: calc(100% + var(--space-1));
 	left: 0;
-	z-index: 5;
+	z-index: 8;
 	min-width: 14rem;
 	margin: 0;
 	padding: var(--space-1);
@@ -2361,6 +2530,18 @@ p {
 }
 
 @media (min-width: 768px) {
+	.search-toggle-label {
+		position: static;
+		width: auto;
+		height: auto;
+		overflow: visible;
+		clip-path: none;
+	}
+
+	.search-count::before {
+		content: "· " / "";
+	}
+
 	.hub-dashboard {
 		padding: var(--space-4) min(var(--space-4), 7.5vw);
 	}
@@ -2493,10 +2674,13 @@ p {
 		font-size: 3.5rem;
 	}
 
-	.tracker {
+	/* The list spans the profile and chip rows. 1fr on the chip row takes the list's extra height,
+	   so the profile row stays as tall as the profile button and the chips sit right under it. */
+	.tracker-layout {
 		grid-template-columns: 170px minmax(0, 1fr);
+		grid-template-rows: auto 1fr auto;
 		grid-template-areas:
-			"top top"
+			"top list"
 			"nav list"
 			"stats stats";
 		align-items: start;
@@ -2826,12 +3010,25 @@ p {
 		transform: translateX(-50%);
 	}
 
+	/* Same geometry as before search: 170 px chips, the list up to 640 px, 180 px stats. The cap sits
+	   on the whole tracker, so the search row spans exactly the three columns under it. The tracker
+	   page's h1 reads the same width, so the title starts on the search row's left edge. It sits on
+	   main, not with the tokens: it is tracker geometry, and main holds both. */
+	main {
+		--tracker-max-w: calc(170px + 640px + 180px + 2 * var(--space-4));
+	}
+
 	.tracker {
-		grid-template-columns: 170px minmax(0, 640px) 180px;
+		max-width: var(--tracker-max-w);
+		margin-inline: auto;
+	}
+
+	.tracker-layout {
+		grid-template-columns: 170px minmax(0, 1fr) 180px;
+		grid-template-rows: auto 1fr;
 		grid-template-areas:
-			"top top top"
+			"top list stats"
 			"nav list stats";
-		justify-content: center;
 	}
 
 	.stats-grid {

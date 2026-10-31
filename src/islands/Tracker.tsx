@@ -2,6 +2,7 @@ import { type ChangeEvent, useEffect, useRef, useState } from "react"
 import { type Locale, seedLabel, translator } from "../i18n"
 import { hubPhase } from "../model/launch"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
+import { emptyState, type SearchView } from "../model/search"
 import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, recentFinds } from "../model/stats"
 import { parseShow } from "../model/tracker"
@@ -10,12 +11,15 @@ import { HINT_SEEN_KEY, writeFlag } from "./seenFlag"
 import { CategoryNav } from "./tracker/CategoryNav"
 import { DeleteDialog } from "./tracker/DeleteDialog"
 import { DeletedDialog } from "./tracker/DeletedDialog"
-import { hashTarget } from "./tracker/hash"
+import { hashItemId, hashTarget } from "./tracker/hash"
 import { ImportDialog } from "./tracker/ImportDialog"
 import { ItemList } from "./tracker/ItemList"
 import { NameDialog } from "./tracker/NameDialog"
 import { ProfileMenu } from "./tracker/ProfileMenu"
+import { SearchBar } from "./tracker/SearchBar"
 import { StatsRail } from "./tracker/StatsRail"
+import { useLiveStatus } from "./tracker/useLiveStatus"
+import { useSearch } from "./tracker/useSearch"
 import { useShowParam, useTrackerState } from "./useTracker"
 
 export const HINT_KEY = HINT_SEEN_KEY
@@ -26,7 +30,7 @@ interface Props {
 
 /** Island root. `client:only`: the first render reads the URL and IndexedDB. */
 export function Tracker({ locale }: Props) {
-	const { t } = translator(locale)
+	const { t, plural } = translator(locale)
 	const [tracker] = useState(() =>
 		buildTracker(
 			t("profile.defaultName"),
@@ -35,6 +39,11 @@ export function Tracker({ locale }: Props) {
 	)
 	const state = useTrackerState(tracker)
 	useShowParam(state.selected)
+	// The item a Sources back link points at stays visible on arrival, even if found (Task 4).
+	const [arrival] = useState(() => hashItemId(window.location.hash) ?? undefined)
+	const search = useSearch(state, arrival)
+	const live = useLiveStatus()
+	const searchField = useRef<HTMLInputElement>(null)
 	// From launch on the hub is the dashboard, so Progress links there (dashboard spec §4).
 	const [hubHref] = useState(() => (hubPhase(new Date()) === "after" ? `/${locale}/` : undefined))
 	const [dialog, setDialog] = useState<"new" | "rename" | "delete" | "deleted" | null>(null)
@@ -117,27 +126,91 @@ export function Tracker({ locale }: Props) {
 		tracker.dismissPersistHint()
 	}
 
+	// Says what the screen shows: the same three empty states as the list (spec §4). Only called
+	// with a non-empty query, so "none" here means the list has results.
+	function resultsText(view: SearchView, query: string): string {
+		const kind = emptyState(view, query)
+		if (kind === "no-match") return t("tracker.search.noMatch", { query: query.trim() })
+		if (kind === "elsewhere") return t("tracker.search.resultsElsewhere", { count: view.elsewhere })
+		if (kind === "all-found") return t("tracker.search.allFound")
+		return plural("tracker.search.results", view.visible.length)
+	}
+
+	// A typing result still pending would describe the old chips.
+	function selectCategories(ids: string[]) {
+		live.cancel()
+		tracker.selectCategories(ids)
+	}
+
+	function onQuery(query: string) {
+		search.setQuery(query)
+		if (query.trim() === "") live.cancel()
+		else live.sayLater(resultsText(search.viewFor({ query }), query))
+	}
+
+	function clearSearch() {
+		search.clearQuery()
+		live.say(t("tracker.search.cleared"))
+	}
+
+	function toggleHideFound() {
+		const on = !search.hideFound
+		search.toggleHideFound()
+		live.say(
+			on
+				? t("tracker.search.hideFoundOn", {
+						count: search.viewFor({ hideFound: true }).hiddenCount,
+					})
+				: t("tracker.search.hideFoundOff")
+		)
+	}
+
+	// The button disappears with the hint, so focus goes to the field rather than to <body>.
+	function showAllCategories() {
+		tracker.selectCategories([])
+		searchField.current?.focus()
+		live.say(resultsText(search.viewFor({ selected: [] }), search.query))
+	}
+
+	// A tick is announced as before, and it cancels a pending typing result (spec §5).
+	async function toggleItem(id: string, done: boolean) {
+		live.cancel()
+		const before = tracker.getState().announcement
+		await (done ? tracker.tick(id) : tracker.untick(id))
+		const after = tracker.getState().announcement
+		if (after && after !== before)
+			live.say(
+				t("tracker.announce", {
+					category: seedLabel(t, "category", after.category),
+					done: after.done,
+					total: after.total,
+				})
+			)
+	}
+
+	async function confirmImport(target: "current" | "new") {
+		await tracker.confirmImport(target)
+		search.resnapshot()
+	}
+
+	// A restore keeps the current profile, but the list can change under a new snapshot (F16).
+	async function restoreProfile(id: string) {
+		await tracker.restoreProfile(id)
+		search.resnapshot()
+	}
+
 	const categories = perCategory(countable(state.items), state.records).map((c) => ({
 		...c,
 		id: c.category,
 		label: seedLabel(t, "category", c.category),
 	}))
-	const visible =
-		state.selected.length === 0
-			? state.items
-			: state.items.filter((item) => state.selected.includes(item.category))
-	const announcement = state.announcement
-		? t("tracker.announce", {
-				category: seedLabel(t, "category", state.announcement.category),
-				done: state.announcement.done,
-				total: state.announcement.total,
-			})
-		: ""
 	const error = state.error ? t(`tracker.errors.${state.error}`) : ""
 	const nameError = state.error === "name" ? error : ""
 	const pageError = state.error === "name" ? "" : error
 
 	const sourcesHref = `/${locale}/tracker/sources/`
+	const { view } = search
+	const empty = emptyState(view, search.query)
 
 	if (state.status === "error") {
 		return (
@@ -150,56 +223,86 @@ export function Tracker({ locale }: Props) {
 	return (
 		<div className="tracker" aria-busy={state.status === "loading"}>
 			{state.status === "loading" && <p className="visually-hidden">{t("tracker.loading")}</p>}
-			<div className="tracker-top">
-				<ProfileMenu
-					triggerRef={menuButton}
-					profiles={activeProfiles(state.profiles)}
-					current={current}
-					onSwitch={tracker.switchProfile}
-					onNew={() => openDialog("new")}
-					onRename={() => openDialog("rename")}
-					onExport={exportNow}
-					onImport={() => fileInput.current?.click()}
-					onDelete={() => openDialog("delete")}
-					onDeleted={() => openDialog("deleted")}
+			<SearchBar
+				query={search.query}
+				hideFound={search.hideFound}
+				hiddenCount={view.hiddenCount}
+				inputRef={searchField}
+				onQuery={onQuery}
+				onClear={clearSearch}
+				onToggleHideFound={toggleHideFound}
+				t={t}
+			/>
+			{state.persistHint && (
+				<p className="hint" role="status">
+					{t("tracker.persistHint")}{" "}
+					<button type="button" onClick={dismissHint}>
+						{t("tracker.dismiss")}
+					</button>
+				</p>
+			)}
+			<div className="tracker-layout">
+				<div className="tracker-top">
+					<ProfileMenu
+						triggerRef={menuButton}
+						profiles={activeProfiles(state.profiles)}
+						current={current}
+						onSwitch={tracker.switchProfile}
+						onNew={() => openDialog("new")}
+						onRename={() => openDialog("rename")}
+						onExport={exportNow}
+						onImport={() => fileInput.current?.click()}
+						onDelete={() => openDialog("delete")}
+						onDeleted={() => openDialog("deleted")}
+						t={t}
+					/>
+				</div>
+				<CategoryNav
+					categories={categories}
+					selected={state.selected}
+					onSelect={selectCategories}
+					allLabel={t("tracker.all")}
+					navLabel={t("tracker.categories")}
+					sources={{ href: sourcesHref, label: t("tracker.sources") }}
+				/>
+				<div className="tracker-results">
+					{empty === "none" && (
+						<ItemList
+							items={view.visible}
+							records={state.records}
+							disabled={state.status !== "ready"}
+							categoryLabel={(id) => seedLabel(t, "category", id)}
+							groupLabel={(id) => seedLabel(t, "group", id)}
+							onToggle={toggleItem}
+							sourcesHref={sourcesHref}
+							t={t}
+						/>
+					)}
+					{empty === "all-found" && <p className="item-empty">{t("tracker.search.allFound")}</p>}
+					{empty === "no-match" && (
+						<p className="item-empty">
+							{t("tracker.search.noMatch", { query: search.query.trim() })}
+						</p>
+					)}
+					{view.elsewhere > 0 && (
+						<p className="search-elsewhere">
+							{plural("tracker.search.elsewhere", view.elsewhere)}{" "}
+							<button type="button" className="search-elsewhere-btn" onClick={showAllCategories}>
+								{t("tracker.search.showAll")}
+							</button>
+						</p>
+					)}
+				</div>
+				<StatsRail
+					overall={countItems(state.items, state.records)}
+					categories={categories}
+					recent={recentFinds(state.items, state.records)}
+					hubHref={hubHref}
 					t={t}
 				/>
-				{state.persistHint && (
-					<p className="hint" role="status">
-						{t("tracker.persistHint")}{" "}
-						<button type="button" onClick={dismissHint}>
-							{t("tracker.dismiss")}
-						</button>
-					</p>
-				)}
 			</div>
-			<CategoryNav
-				categories={categories}
-				selected={state.selected}
-				onSelect={tracker.selectCategories}
-				allLabel={t("tracker.all")}
-				navLabel={t("tracker.categories")}
-				sources={{ href: sourcesHref, label: t("tracker.sources") }}
-			/>
-			<ItemList
-				items={visible}
-				records={state.records}
-				disabled={state.status !== "ready"}
-				categoryLabel={(id) => seedLabel(t, "category", id)}
-				groupLabel={(id) => seedLabel(t, "group", id)}
-				onToggle={(id, done) => (done ? tracker.tick(id) : tracker.untick(id))}
-				sourcesHref={sourcesHref}
-				t={t}
-			/>
-			<StatsRail
-				overall={countItems(state.items, state.records)}
-				categories={categories}
-				recent={recentFinds(state.items, state.records)}
-				hubHref={hubHref}
-				t={t}
-			/>
 			<p className="visually-hidden" role="status" aria-live="polite">
-				{announcement}
+				{live.message}
 			</p>
 			<p className="tracker-alert" role="alert">
 				{pageError}
@@ -230,15 +333,15 @@ export function Tracker({ locale }: Props) {
 				open={dialog === "deleted"}
 				profiles={deletedProfiles(state.profiles)}
 				t={t}
-				onRestore={tracker.restoreProfile}
+				onRestore={restoreProfile}
 				onClose={closeDialog}
 			/>
 			<ImportDialog
 				file={state.pendingImport}
 				into={currentName}
 				t={t}
-				onInto={() => tracker.confirmImport("current")}
-				onCreate={() => tracker.confirmImport("new")}
+				onInto={() => confirmImport("current")}
+				onCreate={() => confirmImport("new")}
 				onCancel={tracker.cancelImport}
 				returnTo={menuButton}
 			/>

@@ -28,3 +28,23 @@ export function FlagIcon() {
 		</svg>
 	)
 }
+
+export function EyeOffIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			{/* My own geometry (an eye and a slash), so no icon set's licence or notice applies. */}
+			<path d="M2 12c2.5-4.5 6-7 10-7s7.5 2.5 10 7c-2.5 4.5-6 7-10 7s-7.5-2.5-10-7z" />
+			<circle cx="12" cy="12" r="3" />
+			<path d="M4 4l16 16" />
+		</svg>
+	)
+}
+
+export function CloseIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<path d="M18 6 6 18" />
+			<path d="m6 6 12 12" />
+		</svg>
+	)
+}

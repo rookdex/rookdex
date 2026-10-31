@@ -34,4 +34,14 @@ const { t } = translator(locale as Locale)
 			min-height: 0;
 		}
 	}
+
+	/* Centred at the tracker's own cap (global.css), so the title shares the search row's left edge.
+	   Here rather than a :has(.tracker) rule, which would only match after the island mounts and
+	   shift the title sideways. */
+	@media (min-width: 1024px) {
+		h1 {
+			max-width: var(--tracker-max-w);
+			margin-inline: auto;
+		}
+	}
 </style>
