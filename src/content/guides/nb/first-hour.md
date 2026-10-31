@@ -2,6 +2,7 @@
 title: Den første timen
 searchTitle: "Den første timen i GTA 6: lanseringskvelden · Rookdex"
 summary: Det du bør sjekke, hente og la være den første timen etter at GTA VI låses opp.
+searchDescription: "Den første timen i GTA 6 på lanseringskvelden: hva du sjekker før midnatt, hva du gjør hvis spillet ikke starter, hva du kan droppe, og Jason og Lucia."
 updated: 2026-10-27
 sources:
   - https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing

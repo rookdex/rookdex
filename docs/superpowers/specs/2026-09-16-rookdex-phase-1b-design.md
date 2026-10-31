@@ -1,6 +1,6 @@
 # Rookdex phase 1b — tracker, profiles, rumours, offline fix
 
-Date: 2026-09-16 · Status: approved design, stress-tested (14 findings folded), plan pending · Builds on `2026-09-09-rookdex-design.md` §5 and the stress test of the same date.
+Date: 2026-09-16 · Status: shipped in PR #12; approved design, stress-tested (14 findings folded) · Builds on `2026-09-09-rookdex-design.md` §5 and the stress test of the same date.
 
 ## 1. What 1b ships
 

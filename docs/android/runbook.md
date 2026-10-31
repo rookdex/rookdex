@@ -1,8 +1,10 @@
 # Play session runbook
 
-Android spec §6. The plan was 26 to 28 October, with the closed test live by Thursday 29 October. That leaves 14 days of testing to 12 November and up to 7 days of production review before launch on 19 November.
+Android spec §6. The plan was 26 to 28 October, with the closed test live by Thursday 29 October. That would have left 14 days of testing to 12 November and up to 7 days of production review before launch on 19 November.
 
-**Status 30 October:** steps 1 to 7 are done. The closed test went live on 29 October at 14:02, and PR 2 (Digital Asset Links) merged on 30 October. 10 testers had opted in by then, so the 14-day clock had not started yet. Every day without 12 pushes production access further past launch day. The site still launches on 19 November as a PWA, and the Play listing follows when Google approves it.
+**Status 31 October:** steps 1 to 8 are done. The closed test went live on 29 October at 14:02. PR 2 (Digital Asset Links) merged on 30 October, and the same day the app passed the phone check: it opens without a URL bar.
+
+The 12th tester opted in on the morning of 31 October, so the 14-day clock started that day. 15 testers are on the list and at least 12 have opted in. Play only shows "12 or more", so the exact count above 12 is unknown. The earliest date to apply for production access is 14 November, and review takes up to 7 days. The Play listing is live by launch only if review takes 5 days or less. The site launches on 19 November as a PWA either way, and the Play listing follows when Google approves it.
 
 | Day | Steps |
 |---|---|
@@ -76,7 +78,7 @@ Open https://www.pwabuilder.com, enter `https://rookdex.app`, choose Android, Go
 - [ ] Protected with Play (the shield icon), expand Play Store protection, Manage Play app signing. The old App integrity page is now only a pointer to it.
 - [ ] Copy the SHA-256 of the **app signing key** and of the **upload key**. Both are public values. The page's own Digital Asset Links JSON lists the app signing key only. The upload key is added on top (Android spec §7). The certificate zip also holds two hybrid (post-quantum) certificates: they are not needed in `assetlinks.json`.
 - [ ] Take them from Play Console only, never from `signing-key-info.txt` (it also holds the passwords).
-- [ ] Build PR 2 (plan Part 2) with them. Target: merged by 31 October.
+- [ ] Build PR 2 (plan Part 2) with them. Done: merged on 30 October.
 
 ## 8. Device check on a tester phone (after PR 2 deploys)
 
@@ -86,5 +88,5 @@ Open https://www.pwabuilder.com, enter `https://rookdex.app`, choose Android, Go
 
 ## Later
 
-- [ ] 14 days after 12 or more testers opted in (12 November at the earliest): apply for production access (review takes up to 7 days).
+- [ ] 14 November at the earliest (14 days after the 12th tester opted in on 31 October): apply for production access. Review takes up to 7 days. Until then, keep at least 12 testers opted in: the clock only counts days with 12 or more.
 - [ ] After launch (19 November): the hub screenshots show the countdown, which is gone by then. Re-run `docs/android/screenshots.mjs` against a local `npm run preview` with the hub path set to `?phase=after` (works on localhost only) and replace the hub shots in Play Console.

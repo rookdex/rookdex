@@ -33,7 +33,7 @@ const updated = entry.data.updated.toLocaleDateString(dateLocale, { dateStyle: "
 <Base
 	locale={locale}
 	title={entry.data.searchTitle ?? `${entry.data.title} · ${t("siteName")}`}
-	description={entry.data.summary}
+	description={entry.data.searchDescription ?? entry.data.summary}
 	path={`guides/${slug}`}
 >
 	<article class="guide" lang={fellBack ? defaultLocale : undefined}>

@@ -75,7 +75,7 @@ repo (public)
 - **Worker.** One Cloudflare Worker with two jobs: a cron trigger that runs the pipeline, and a tiny JSON API (`/api/feed`, `/api/facts`, `/api/seed-delta`, `/api/report`) that islands read. API responses are cached at the edge for 5 minutes, so a spike hits Cloudflare's cache, not Neon. The API answers only the site's own origin and the preview domain. Every endpoint is `GET` except `/api/report`.
 - **Database.** Neon Postgres. Tables: `feed_items` (with `extraction_status`), `facts`, `fact_sources`, `checklist_items` (the live delta on top of the seed), `reports`, `switches` (kill-switch, per-source pause, budget cap). Phase 2 adds `users`, `profiles`, `progress`.
 - **Progress.** IndexedDB per local profile. The export file is versioned JSON. Phase 2 syncs the same record shape to Neon; nothing in the tracker changes.
-- **Deploy.** Merge to `main` builds and deploys the site and the Worker. Pull requests get a preview URL. Two extra workflows: `flip-switch` (manual, see §7) and `launch-rebuild` (scheduled once, 19 Nov 00:05 CET).
+- **Deploy.** Merge to `main` builds and deploys the site and the Worker. Pull requests get a preview URL. Two extra workflows: `flip-switch` (manual, see §7) and `launch-rebuild` (scheduled once, 19 Nov 00:05 CET). As built, the launch rebuild is a cron in `deploy.yml` (`5 23 18 11 *`, gated to 2026), not its own workflow. `flip-switch` and the phase 1c pipeline are not built yet.
 
 Cloudflare has no hard spend cap. Mitigation: Workers Paid is only enabled if the free 100k requests per day are exceeded, the AI budget cap lives in the pipeline, and a Cloudflare notification is set at $10.
 

@@ -1,6 +1,6 @@
 # Rookdex SEO design
 
-Date: 2026-09-25 · Status: approved in brainstorming; stress test (`2026-09-25-rookdex-seo-stress-test.md`) folded in; awaiting written-spec review · Ships before Spec A (`2026-09-25-rookdex-feedback-round-design.md`) is built, so indexing has time to settle before launch on 19 November 2026.
+Date: 2026-09-25 · Status: shipped in PR #22; stress test (`2026-09-25-rookdex-seo-stress-test.md`) folded in · Ships before Spec A (`2026-09-25-rookdex-feedback-round-design.md`) is built, so indexing has time to settle before launch on 19 November 2026.
 
 ## 1. Goal
 

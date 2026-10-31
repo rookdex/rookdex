@@ -39,9 +39,11 @@ describe("Privacy page (Android spec §3)", () => {
 	})
 
 	it("is labelled a privacy policy in its heading and search title (Play User Data policy)", async () => {
-		expect((await page("en")).title).toBe("Privacy policy · Rookdex")
+		expect((await page("en")).title).toBe(
+			"Privacy policy: your data stays on your device · Rookdex"
+		)
 		const nb = await page("nb")
-		expect(nb.title).toBe("Personvernerklæring · Rookdex")
+		expect(nb.title).toBe("Personvernerklæring: dataene dine blir på enheten · Rookdex")
 		expect(nb.querySelector("h1")?.textContent).toBe("Personvern\u00aderklæring")
 	})
 

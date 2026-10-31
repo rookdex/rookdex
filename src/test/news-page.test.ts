@@ -116,10 +116,10 @@ describe("News page (spec §8)", () => {
 
 	it("has a search title that differs from the heading", async () => {
 		expect((await renderDoc(News, { params: { locale: "en" } })).title).toBe(
-			"GTA 6 news and rumours · Rookdex"
+			"GTA 6 news, confirmed facts and rumours · Rookdex"
 		)
 		expect((await renderDoc(News, { params: { locale: "nb" } })).title).toBe(
-			"GTA 6-nyheter og rykter · Rookdex"
+			"GTA 6-nyheter, bekreftede fakta og rykter · Rookdex"
 		)
 	})
 

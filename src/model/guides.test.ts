@@ -62,6 +62,16 @@ describe("guideSchema (spec §9)", () => {
 		expect(guideSchema.safeParse({ ...guide, searchTitle: "x".repeat(65) }).success).toBe(true)
 		expect(guideSchema.safeParse({ ...guide, searchTitle: "x".repeat(66) }).success).toBe(false)
 	})
+
+	it("takes an optional search description of at most 160 characters", () => {
+		expect(guideSchema.parse(guide).searchDescription).toBeUndefined()
+		expect(guideSchema.safeParse({ ...guide, searchDescription: "x".repeat(160) }).success).toBe(
+			true
+		)
+		expect(guideSchema.safeParse({ ...guide, searchDescription: "x".repeat(161) }).success).toBe(
+			false
+		)
+	})
 })
 
 describe("guide sources are https only (feedback spec §9)", () => {

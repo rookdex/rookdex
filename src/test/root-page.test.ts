@@ -3,10 +3,11 @@ import RootPage from "../pages/index.astro"
 import { renderDoc } from "./render"
 
 describe("root page (locale spec §6.4)", () => {
-	it("is English, named Rookdex, with the canonical root and the full hreflang set", async () => {
+	it("is English, with the home search title, the canonical root and the full hreflang set", async () => {
 		const doc = await renderDoc(RootPage)
 		expect(doc.documentElement.lang).toBe("en")
-		expect(doc.title).toBe("Rookdex")
+		expect(doc.title).toBe("Rookdex: GTA 6 companion app, countdown and tracker")
+		expect(doc.querySelector('meta[property="og:title"]')?.getAttribute("content")).toBe(doc.title)
 		expect(doc.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe(
 			"https://rookdex.app/"
 		)

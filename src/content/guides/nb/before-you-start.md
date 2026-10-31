@@ -2,6 +2,7 @@
 title: Før du begynner
 searchTitle: "Før du begynner: GTA 6-sjekkliste for lanseringen · Rookdex"
 summary: Det du bør ordne før lanseringskvelden, så du kan spille med en gang det låses opp.
+searchDescription: "Det du bør ordne før GTA 6 kommer 19. november 2026: utgaver, bonus ved forhåndsbestilling, GTA+, forhåndsnedlasting fra 12. november og priser i Norge."
 updated: 2026-10-27
 sources:
   - https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions
