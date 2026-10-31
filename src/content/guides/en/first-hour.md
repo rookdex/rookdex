@@ -2,6 +2,7 @@
 title: Your first hour
 searchTitle: "Your first hour in GTA 6: launch-night checklist · Rookdex"
 summary: What to check, claim and skip in the first hour after GTA VI unlocks.
+searchDescription: "Your first hour of GTA 6 on launch night: what to check before midnight, what to do if it won't start, what you can skip, and playing as Jason and Lucia."
 updated: 2026-10-27
 sources:
   - https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing

@@ -24,7 +24,7 @@ const sections = categoryIds(live).map((category) => ({
 const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 ---
 
-<Base locale={locale} title={t("seo.titles.sources")} description={t("sources.lede")} path="tracker/sources">
+<Base locale={locale} title={t("seo.titles.sources")} description={t("sources.description")} path="tracker/sources">
 	<h1>{t("sources.title")}</h1>
 	<p class="lede">{t("sources.lede")}</p>
 	<nav aria-label={t("tracker.categories")}>

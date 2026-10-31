@@ -24,7 +24,7 @@ describe("Settings page (spec §7)", () => {
 	it("uses the whole word in the title, without the tab label's soft hyphen", async () => {
 		const doc = await settings("nb")
 		expect(doc.querySelector("h1")?.textContent).toBe("Innstillinger")
-		expect(doc.title).toBe("Innstillinger · Rookdex")
+		expect(doc.title).toBe("Innstillinger: språk, oppdateringer og data · Rookdex")
 	})
 
 	const languageGroup = (doc: Document) =>

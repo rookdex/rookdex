@@ -10,6 +10,14 @@ const titles = (bundle: Record<string, string>) =>
 	Object.entries(bundle)
 		.filter(([key]) => key.startsWith("seo.titles."))
 		.map(([, v]) => v)
+// The meta descriptions of the indexable pages other than home (Bing flags short ones).
+const descriptionKeys = [
+	"tracker.description",
+	"news.description",
+	"sources.description",
+	"settings.description",
+	"privacy.description",
+] as const
 
 describe("copy rules (spec §9)", () => {
 	it("walks a real number of strings", () => {
@@ -39,7 +47,7 @@ describe("soft hyphens (spec §5, §11)", () => {
 	it("break the Norwegian privacy heading at its joint, never the search title", () => {
 		// "Personvernerklæring" is wider than a 320 px phone at h1 size (Android spec §3).
 		expect(nb["privacy.title"]).toBe("Personvern\u00aderklæring")
-		expect(nb["seo.titles.privacy"]).toBe("Personvernerklæring · Rookdex")
+		expect(nb["seo.titles.privacy"]).toMatch(/^Personvernerklæring: /)
 	})
 })
 
@@ -51,6 +59,29 @@ describe("search titles and description (SEO spec §4.4)", () => {
 		for (const title of titles(bundle)) {
 			expect([...title].length, title).toBeLessThanOrEqual(65)
 			expect(title).toContain("Rookdex")
+		}
+	})
+
+	it.each([
+		["en", en],
+		["nb", nb],
+	] as const)(
+		"%s titles of indexable pages are long enough to describe them",
+		(_locale, bundle) => {
+			for (const title of titles(bundle).filter((t) => t !== bundle["seo.titles.notFound"])) {
+				expect([...title].length, title).toBeGreaterThanOrEqual(40)
+			}
+		}
+	)
+
+	it.each([
+		["en", en],
+		["nb", nb],
+	] as const)("%s page descriptions are 120 to 160 characters", (_locale, bundle) => {
+		for (const key of descriptionKeys) {
+			const length = [...bundle[key]].length
+			expect(length, key).toBeGreaterThanOrEqual(120)
+			expect(length, key).toBeLessThanOrEqual(160)
 		}
 	})
 
