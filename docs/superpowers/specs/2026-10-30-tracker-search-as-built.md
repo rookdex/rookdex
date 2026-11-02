@@ -54,6 +54,13 @@ Written 31.10.2026 after the build on `feat/tracker-search`. It records where th
 
 Tracker island chunk: 10631 bytes before, 17162 bytes after (+6531), for search, the terms table, Hide found and the status hook.
 
+## Changed after merge (02.11.2026)
+
+- **Enter finishes the search.** Testing on my phone, I had to tap out of the field to close the keyboard before I could reach the results. Enter, which is also the phone keyboard's Search key, now says the result count at once and moves focus to the results (`.tracker-results`, `tabindex="-1"`). That answers the objection in spec §10: focus moves forward to the list instead of back to `<body>`. An Enter that commits an input method's composition is left alone.
+- **The list's start comes into view only when it is off screen.** The browser's own focus scroll centred the list on a phone, so the first cards sat under the sticky row. Measured on the served build: at 375 x 740 the list top lands at 69 px, 8 px under the row's 61 px bottom, and the next Tab reaches the first card. At 1280 x 800 the list already shows, so the page does not move.
+- **The results region shows no focus ring.** A ring round the whole list read as a fault. The next Tab lands on the first card, which has its own ring.
+- Tapping outside the field already closed the keyboard: focus leaves the field, and the list is filtered on every keystroke anyway.
+
 ## Left for later
 
 Small test and code gaps that the per-task reviews deferred: an island test for the restore resnapshot and the arrival spare with Hide found on, a stricter forced-colours CSS test, a guard for stale `SEARCH_TERMS` entries, and `delete-all.ts` reusing `clearFlag`. None changes behaviour.

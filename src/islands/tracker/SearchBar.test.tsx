@@ -6,7 +6,12 @@ import { translator } from "../../i18n"
 import { SearchBar } from "./SearchBar"
 
 function setup(props: { query?: string; hideFound?: boolean; hiddenCount?: number } = {}) {
-	const handlers = { onQuery: vi.fn(), onClear: vi.fn(), onToggleHideFound: vi.fn() }
+	const handlers = {
+		onQuery: vi.fn(),
+		onClear: vi.fn(),
+		onSearch: vi.fn(),
+		onToggleHideFound: vi.fn(),
+	}
 	const inputRef = createRef<HTMLInputElement>()
 	render(
 		<SearchBar
@@ -54,15 +59,31 @@ describe("SearchBar (tracker search spec §5)", () => {
 		expect(document.activeElement).toBe(field)
 	})
 
-	it("clears on Escape and leaves Enter alone", () => {
+	it("clears on Escape", () => {
 		const { field, onClear, onQuery } = setup({ query: "boat" })
-		expect(field.closest("form")).toBeNull()
-		fireEvent.keyDown(field, { key: "Enter" })
-		expect(onClear).not.toHaveBeenCalled()
 		// fireEvent returns false when the handler called preventDefault.
 		expect(fireEvent.keyDown(field, { key: "Escape" })).toBe(false)
 		expect(onClear).toHaveBeenCalledOnce()
 		expect(onQuery).not.toHaveBeenCalled()
+	})
+
+	it("finishes the search on Enter, which is also the phone keyboard's Search key", () => {
+		const { field, onClear, onSearch } = setup({ query: "boat" })
+		expect(fireEvent.keyDown(field, { key: "Enter" })).toBe(false)
+		expect(onSearch).toHaveBeenCalledOnce()
+		expect(onClear).not.toHaveBeenCalled()
+	})
+
+	it("finishes an empty search on Enter too", () => {
+		const { field, onSearch } = setup()
+		fireEvent.keyDown(field, { key: "Enter" })
+		expect(onSearch).toHaveBeenCalledOnce()
+	})
+
+	it("leaves an Enter that commits an input method's composition alone", () => {
+		const { field, onSearch } = setup({ query: "boat" })
+		fireEvent.keyDown(field, { key: "Enter", isComposing: true })
+		expect(onSearch).not.toHaveBeenCalled()
 	})
 
 	it("ignores Escape in an empty field", () => {

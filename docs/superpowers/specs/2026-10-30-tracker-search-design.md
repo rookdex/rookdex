@@ -128,7 +128,7 @@ The sticky row: the field, its clear button and the toggle. Props carry the quer
 
 - **Row:** a `role="search"` element above the chips with a solid `--bg` background and a hairline bottom border. The field and the toggle are both `var(--tap)` (44 px) high and share one bottom edge. The row is about 60 px high.
 - **Sticky only where there is room:** the base style is static. From `@media (min-height: 500px)` the row gets `position: sticky; top: 0`. A phone in landscape (about 360 px high) or a page at 200 % zoom would otherwise lose a third of the screen to the row.
-- **Field:** `<input type="search">` with a visually hidden `<label>` and a placeholder, `maxlength="100"`, `autocomplete="off"`, `enterkeyhint="search"`. Enter does nothing (no form submit). Escape clears the field. A clear button (44 px target, accessible name "Clear search") shows only while there is text, and puts focus back in the field.
+- **Field:** `<input type="search">` with a visually hidden `<label>` and a placeholder, `maxlength="100"`, `autocomplete="off"`, `enterkeyhint="search"`. Enter does nothing (no form submit). *Changed 02.11.2026: Enter moves focus to the results, see the as-built note.* Escape clears the field. A clear button (44 px target, accessible name "Clear search") shows only while there is text, and puts focus back in the field.
 - **Placeholder contrast:** the placeholder is the only visible hint once the label is hidden, so its colour meets 4.5:1 against the field background, like body text.
 - **Toggle:** `<button aria-pressed>` with an eye-off icon. It uses the chips' pressed style, including their `forced-colors` handling, so the on state never depends on colour alone. At narrow widths the label may become visually hidden, leaving the icon and count. I decide this by measuring at 320 px in both languages ("Skjul funnet" is longer), not by guessing.
 - **Focus not obscured (WCAG 2.2, 2.4.11; house bar 2.4.12):** while the row is sticky, the tracker page sets `scroll-padding-top` to the row's height, so a checkbox focused while tabbing backwards never sits under the row.
@@ -210,7 +210,7 @@ Plural keys follow the existing `.one` / `.other` pattern (`hub.foundToday`).
 ## 10. Considered and rejected
 
 - **Constant `aria-pressed="true"` on the toggle.** The house rule for settings toggles applies to a button whose text shows the current value. "Hide found" has a fixed label, like the chips, so the standard `true`/`false` pattern is right and matches `CategoryNav`.
-- **Enter closes the phone keyboard by blurring the field.** Blurring sends focus to `<body>`, which loses a keyboard user's place. The phone's own back or hide-keyboard key does the job.
+- **Enter closes the phone keyboard by blurring the field.** Blurring sends focus to `<body>`, which loses a keyboard user's place. The phone's own back or hide-keyboard key does the job. *Reversed 02.11.2026: Enter now moves focus to the results, which keeps the user's place and closes the keyboard. See the as-built note.*
 - **Whole-word or prefix matching for group terms**, so "bus" stops listing businesses. It would also break partial typing ("helik" finding helicopters). The false positives are few, visible and harmless.
 - **A second live region for search.** One status region per page is the house rule. The tick-cancels-pending rule in section 5 solves the clash that a second region was meant to avoid.
 - **Syncing Hide found across tabs.** Another tab keeps its own setting until it reloads. A storage listener for one view flag is more code than the case is worth.
