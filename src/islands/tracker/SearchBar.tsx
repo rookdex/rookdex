@@ -9,6 +9,7 @@ interface Props {
 	inputRef: RefObject<HTMLInputElement | null>
 	onQuery: (query: string) => void
 	onClear: () => void
+	onSearch: () => void
 	onToggleHideFound: () => void
 	t: Translate
 }
@@ -21,10 +22,18 @@ export function SearchBar({
 	inputRef,
 	onQuery,
 	onClear,
+	onSearch,
 	onToggleHideFound,
 	t,
 }: Props) {
 	function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+		// The phone keyboard's Search key arrives as Enter. An Enter that commits an input
+		// method's composition is still typing.
+		if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+			event.preventDefault()
+			onSearch()
+			return
+		}
 		if (event.key !== "Escape" || query === "") return
 		// Mine, not the browser's: a native clear would skip the "Search cleared" line.
 		event.preventDefault()
@@ -43,7 +52,7 @@ export function SearchBar({
 				<label htmlFor="tracker-search" className="visually-hidden">
 					{t("tracker.search.label")}
 				</label>
-				{/* No form: Enter has nothing to submit, and blurring would lose a keyboard user's place. */}
+				{/* No form: Enter hands focus to the results instead of submitting anything. */}
 				<input
 					ref={inputRef}
 					id="tracker-search"

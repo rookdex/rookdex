@@ -1349,6 +1349,12 @@ p {
 	min-width: 0;
 }
 
+/* Enter in the search field lands here. A ring round the whole list reads as a fault; the next
+   Tab reaches the first card, which carries its own ring. */
+.tracker-results:focus {
+	outline: none;
+}
+
 /* A 100-character query with no spaces still wraps inside 320 px. */
 .item-empty {
 	overflow-wrap: anywhere;

@@ -28,6 +28,29 @@ interface Props {
 	locale: Locale
 }
 
+// The phone keyboard closes after focus leaves the field, and the page height or the browser's
+// pan changes under it as it goes. One scroll at Enter left the list mid-screen on my phone, so
+// the scroll repeats on each viewport resize until the keyboard has settled, or until the user
+// touches or scrolls the page themselves.
+const KEYBOARD_SETTLE_MS = 1000
+// Not keydown: the Enter that started this is still bubbling up to window.
+const USER_SCROLL = ["touchstart", "wheel"] as const
+
+function scrollToStart(element: HTMLElement) {
+	const scroll = () => element.scrollIntoView({ block: "start" })
+	scroll()
+	const viewport = window.visualViewport
+	if (!viewport) return
+	const stop = () => {
+		clearTimeout(timer)
+		viewport.removeEventListener("resize", scroll)
+		for (const type of USER_SCROLL) window.removeEventListener(type, stop)
+	}
+	const timer = setTimeout(stop, KEYBOARD_SETTLE_MS)
+	viewport.addEventListener("resize", scroll)
+	for (const type of USER_SCROLL) window.addEventListener(type, stop, { passive: true })
+}
+
 /** Island root. `client:only`: the first render reads the URL and IndexedDB. */
 export function Tracker({ locale }: Props) {
 	const { t, plural } = translator(locale)
@@ -44,6 +67,7 @@ export function Tracker({ locale }: Props) {
 	const search = useSearch(state, arrival)
 	const live = useLiveStatus()
 	const searchField = useRef<HTMLInputElement>(null)
+	const results = useRef<HTMLDivElement>(null)
 	// From launch on the hub is the dashboard, so Progress links there (dashboard spec §4).
 	const [hubHref] = useState(() => (hubPhase(new Date()) === "after" ? `/${locale}/` : undefined))
 	const [dialog, setDialog] = useState<"new" | "rename" | "delete" | "deleted" | null>(null)
@@ -148,6 +172,22 @@ export function Tracker({ locale }: Props) {
 		else live.sayLater(resultsText(search.viewFor({ query }), query))
 	}
 
+	// Enter or the phone's Search key: the list already matches, so say it now and move focus
+	// there. Leaving the field closes the phone keyboard, and the results are where the user
+	// goes next, so a keyboard user's place moves forward instead of back to <body>.
+	function finishSearch() {
+		if (search.query.trim() !== "") live.say(resultsText(search.view, search.query))
+		const list = results.current
+		if (!list) return
+		// The browser's own focus scroll centres a long list and hides its first cards under the
+		// sticky row. Scroll its start into view only when it is off screen, so a desktop page
+		// with the list already showing stays put.
+		list.focus({ preventScroll: true })
+		const top = list.getBoundingClientRect().top
+		const rowBottom = searchField.current?.closest(".search-row")?.getBoundingClientRect().bottom
+		if (top < Math.max(rowBottom ?? 0, 0) || top >= window.innerHeight) scrollToStart(list)
+	}
+
 	function clearSearch() {
 		search.clearQuery()
 		live.say(t("tracker.search.cleared"))
@@ -230,6 +270,7 @@ export function Tracker({ locale }: Props) {
 				inputRef={searchField}
 				onQuery={onQuery}
 				onClear={clearSearch}
+				onSearch={finishSearch}
 				onToggleHideFound={toggleHideFound}
 				t={t}
 			/>
@@ -265,7 +306,7 @@ export function Tracker({ locale }: Props) {
 					navLabel={t("tracker.categories")}
 					sources={{ href: sourcesHref, label: t("tracker.sources") }}
 				/>
-				<div className="tracker-results">
+				<div className="tracker-results" ref={results} tabIndex={-1}>
 					{empty === "none" && (
 						<ItemList
 							items={view.visible}

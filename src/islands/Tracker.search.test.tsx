@@ -193,6 +193,44 @@ describe("Tracker search announcements (tracker search spec §5)", () => {
 		expect(status()).toHaveTextContent("Search cleared")
 	})
 
+	it("moves focus to the results on Enter and says the count at once", async () => {
+		await ready()
+		type("peli")
+		fireEvent.keyDown(field(), { key: "Enter" })
+		expect(status()).toHaveTextContent("1 result")
+		const results = document.querySelector(".tracker-results")
+		expect(document.activeElement).toBe(results)
+		expect(results).toHaveAttribute("tabindex", "-1")
+		type("zzz")
+		fireEvent.keyDown(field(), { key: "Enter" })
+		expect(document.activeElement).toBe(results)
+		expect(within(results as HTMLElement).getByText(/zzz/)).toBeInTheDocument()
+	})
+
+	it("scrolls the list's start into view again while the phone keyboard closes", async () => {
+		const scroll = vi.fn()
+		Element.prototype.scrollIntoView = scroll
+		const viewport = new EventTarget()
+		Object.defineProperty(window, "visualViewport", { value: viewport, configurable: true })
+		// jsdom lays nothing out, so every top is 0: a zero-height window puts the list off screen.
+		Object.defineProperty(window, "innerHeight", { value: 0, configurable: true })
+		try {
+			await ready()
+			type("boat")
+			fireEvent.keyDown(field(), { key: "Enter" })
+			expect(scroll).toHaveBeenCalledExactlyOnceWith({ block: "start" })
+			viewport.dispatchEvent(new Event("resize"))
+			expect(scroll).toHaveBeenCalledTimes(2)
+			// A finger on the page means the user scrolls from here, so the list stops following.
+			fireEvent.touchStart(window)
+			viewport.dispatchEvent(new Event("resize"))
+			expect(scroll).toHaveBeenCalledTimes(2)
+		} finally {
+			Object.defineProperty(window, "visualViewport", { value: undefined, configurable: true })
+			Object.defineProperty(window, "innerHeight", { value: 768, configurable: true })
+		}
+	})
+
 	it("keeps one status region", async () => {
 		await ready()
 		expect(screen.getAllByRole("status")).toHaveLength(1)
