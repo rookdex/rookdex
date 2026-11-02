@@ -30,6 +30,10 @@ const type = (value: string) => fireEvent.change(field(), { target: { value } })
 const names = () => screen.queryAllByRole("checkbox").map((box) => box.getAttribute("id"))
 const status = () => screen.getByRole("status")
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const tick = async (name: string) => {
+	fireEvent.click(screen.getByRole("checkbox", { name }))
+	await waitFor(() => expect(screen.getByRole("checkbox", { name })).toBeChecked())
+}
 
 describe("Tracker search (tracker search spec §4)", () => {
 	it("filters on every keystroke by name and by group term", async () => {
@@ -79,6 +83,44 @@ describe("Tracker search (tracker search spec §4)", () => {
 		type("<b>zzz</b>")
 		expect(screen.getByText('No match for "<b>zzz</b>".')).toBeInTheDocument()
 		expect(document.querySelector(".tracker b")).toBeNull()
+	})
+
+	it("hides what was found before a reload when Hide found is remembered", async () => {
+		const first = await ready()
+		await tick("Pelican")
+		first.unmount()
+		localStorage.setItem(HIDE_FOUND_KEY, "1")
+
+		await ready()
+		expect(names()).not.toContain("item-wildlife/pelican")
+		expect(names()).toHaveLength(2)
+		const toggle = screen.getByRole("button", { name: /^Hide found/ })
+		expect(toggle).toHaveAttribute("aria-pressed", "true")
+		expect(toggle).toHaveAccessibleName("Hide found 1 hidden")
+	})
+
+	it("spares the item a Sources back link points at until the search changes", async () => {
+		const first = await ready()
+		await tick("Pelican")
+		await tick("Bike")
+		first.unmount()
+		localStorage.setItem(HIDE_FOUND_KEY, "1")
+		window.history.replaceState(null, "", "/en/tracker/#item-wildlife/pelican")
+
+		await ready()
+		const pelican = screen.getByRole("checkbox", { name: "Pelican" })
+		await waitFor(() => expect(document.activeElement).toBe(pelican))
+		expect(names()).not.toContain("item-vehicles/bike")
+		expect(screen.getByRole("button", { name: /^Hide found/ })).toHaveAccessibleName(
+			"Hide found 1 hidden"
+		)
+		// Any change to the search takes a new snapshot, and that one spares nothing.
+		type("a")
+		type("")
+		expect(names()).toEqual(["item-wildlife/american-alligator"])
+		expect(screen.getByRole("button", { name: /^Hide found/ })).toHaveAccessibleName(
+			"Hide found 2 hidden"
+		)
 	})
 
 	it("hides what an import brings in when Hide found is on", async () => {
