@@ -28,6 +28,29 @@ interface Props {
 	locale: Locale
 }
 
+// The phone keyboard closes after focus leaves the field, and the page height or the browser's
+// pan changes under it as it goes. One scroll at Enter left the list mid-screen on my phone, so
+// the scroll repeats on each viewport resize until the keyboard has settled, or until the user
+// touches or scrolls the page themselves.
+const KEYBOARD_SETTLE_MS = 1000
+// Not keydown: the Enter that started this is still bubbling up to window.
+const USER_SCROLL = ["touchstart", "wheel"] as const
+
+function scrollToStart(element: HTMLElement) {
+	const scroll = () => element.scrollIntoView({ block: "start" })
+	scroll()
+	const viewport = window.visualViewport
+	if (!viewport) return
+	const stop = () => {
+		clearTimeout(timer)
+		viewport.removeEventListener("resize", scroll)
+		for (const type of USER_SCROLL) window.removeEventListener(type, stop)
+	}
+	const timer = setTimeout(stop, KEYBOARD_SETTLE_MS)
+	viewport.addEventListener("resize", scroll)
+	for (const type of USER_SCROLL) window.addEventListener(type, stop, { passive: true })
+}
+
 /** Island root. `client:only`: the first render reads the URL and IndexedDB. */
 export function Tracker({ locale }: Props) {
 	const { t, plural } = translator(locale)
@@ -162,8 +185,7 @@ export function Tracker({ locale }: Props) {
 		list.focus({ preventScroll: true })
 		const top = list.getBoundingClientRect().top
 		const rowBottom = searchField.current?.closest(".search-row")?.getBoundingClientRect().bottom
-		if (top < Math.max(rowBottom ?? 0, 0) || top >= window.innerHeight)
-			list.scrollIntoView({ block: "start" })
+		if (top < Math.max(rowBottom ?? 0, 0) || top >= window.innerHeight) scrollToStart(list)
 	}
 
 	function clearSearch() {
