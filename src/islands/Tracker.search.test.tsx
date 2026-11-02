@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { fireEvent, screen, waitFor, within } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { renderReady, resetBrowser } from "../test/tracker-fixtures"
+import { openMenu, renderReady, resetBrowser } from "../test/tracker-fixtures"
 import { HIDE_FOUND_KEY } from "./seenFlag"
 import { Tracker } from "./Tracker"
 
@@ -30,6 +30,10 @@ const type = (value: string) => fireEvent.change(field(), { target: { value } })
 const names = () => screen.queryAllByRole("checkbox").map((box) => box.getAttribute("id"))
 const status = () => screen.getByRole("status")
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const tick = async (name: string) => {
+	fireEvent.click(screen.getByRole("checkbox", { name }))
+	await waitFor(() => expect(screen.getByRole("checkbox", { name })).toBeChecked())
+}
 
 describe("Tracker search (tracker search spec §4)", () => {
 	it("filters on every keystroke by name and by group term", async () => {
@@ -81,6 +85,44 @@ describe("Tracker search (tracker search spec §4)", () => {
 		expect(document.querySelector(".tracker b")).toBeNull()
 	})
 
+	it("hides what was found before a reload when Hide found is remembered", async () => {
+		const first = await ready()
+		await tick("Pelican")
+		first.unmount()
+		localStorage.setItem(HIDE_FOUND_KEY, "1")
+
+		await ready()
+		expect(names()).not.toContain("item-wildlife/pelican")
+		expect(names()).toHaveLength(2)
+		const toggle = screen.getByRole("button", { name: /^Hide found/ })
+		expect(toggle).toHaveAttribute("aria-pressed", "true")
+		expect(toggle).toHaveAccessibleName("Hide found 1 hidden")
+	})
+
+	it("spares the item a Sources back link points at until the search changes", async () => {
+		const first = await ready()
+		await tick("Pelican")
+		await tick("Bike")
+		first.unmount()
+		localStorage.setItem(HIDE_FOUND_KEY, "1")
+		window.history.replaceState(null, "", "/en/tracker/#item-wildlife/pelican")
+
+		await ready()
+		const pelican = screen.getByRole("checkbox", { name: "Pelican" })
+		await waitFor(() => expect(document.activeElement).toBe(pelican))
+		expect(names()).not.toContain("item-vehicles/bike")
+		expect(screen.getByRole("button", { name: /^Hide found/ })).toHaveAccessibleName(
+			"Hide found 1 hidden"
+		)
+		// Any change to the search takes a new snapshot, and that one spares nothing.
+		type("a")
+		type("")
+		expect(names()).toEqual(["item-wildlife/american-alligator"])
+		expect(screen.getByRole("button", { name: /^Hide found/ })).toHaveAccessibleName(
+			"Hide found 2 hidden"
+		)
+	})
+
 	it("hides what an import brings in when Hide found is on", async () => {
 		const { container } = await ready()
 		fireEvent.click(screen.getByRole("button", { name: "Hide found" }))
@@ -110,6 +152,34 @@ describe("Tracker search (tracker search spec §4)", () => {
 		fireEvent.click(within(dialog).getByRole("button", { name: "Import into Player 1" }))
 		await waitFor(() =>
 			expect(screen.queryByRole("checkbox", { name: "American alligator" })).toBeNull()
+		)
+	})
+
+	// Restore keeps the current profile, but the snapshot is still retaken (as-built note).
+	it("takes a new snapshot when a deleted profile is restored", async () => {
+		await ready()
+		openMenu()
+		fireEvent.click(screen.getByRole("menuitem", { name: "Delete" }))
+		const confirm = screen.getByRole("dialog", { name: "Delete Player 1?" })
+		fireEvent.click(within(confirm).getByRole("button", { name: "Delete" }))
+		// The dialog closes before the switch to the fresh default profile lands, so wait for that.
+		const openDeleted = () => {
+			openMenu()
+			fireEvent.click(screen.getByRole("menuitem", { name: "Deleted profiles" }))
+			return screen.getByRole("dialog", { name: "Deleted profiles" })
+		}
+		const deleted = openDeleted()
+		await within(deleted).findByRole("button", { name: "Restore Player 1" })
+		fireEvent.click(within(deleted).getByRole("button", { name: "Close" }))
+
+		fireEvent.click(screen.getByRole("button", { name: "Hide found" }))
+		await tick("Pelican")
+		expect(names()).toContain("item-wildlife/pelican")
+
+		fireEvent.click(within(openDeleted()).getByRole("button", { name: "Restore Player 1" }))
+		await waitFor(() => expect(names()).not.toContain("item-wildlife/pelican"))
+		expect(screen.getByRole("button", { name: /^Hide found/ })).toHaveAccessibleName(
+			"Hide found 1 hidden"
 		)
 	})
 })

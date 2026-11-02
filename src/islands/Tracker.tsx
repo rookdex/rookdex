@@ -2,7 +2,7 @@ import { type ChangeEvent, useEffect, useRef, useState } from "react"
 import { type Locale, seedLabel, translator } from "../i18n"
 import { hubPhase } from "../model/launch"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
-import { emptyState, type SearchView } from "../model/search"
+import { type EmptyState, emptyState, type SearchView } from "../model/search"
 import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, recentFinds } from "../model/stats"
 import { parseShow } from "../model/tracker"
@@ -150,14 +150,20 @@ export function Tracker({ locale }: Props) {
 		tracker.dismissPersistHint()
 	}
 
+	// The text that stands in for the list when it is empty (spec §4). "elsewhere" has none: the
+	// list area shows only the other-categories line then.
+	function emptyText(kind: EmptyState, query: string): string | undefined {
+		if (kind === "no-match") return t("tracker.search.noMatch", { query: query.trim() })
+		if (kind === "all-found") return t("tracker.search.allFound")
+		return undefined
+	}
+
 	// Says what the screen shows: the same three empty states as the list (spec §4). Only called
 	// with a non-empty query, so "none" here means the list has results.
 	function resultsText(view: SearchView, query: string): string {
 		const kind = emptyState(view, query)
-		if (kind === "no-match") return t("tracker.search.noMatch", { query: query.trim() })
 		if (kind === "elsewhere") return t("tracker.search.resultsElsewhere", { count: view.elsewhere })
-		if (kind === "all-found") return t("tracker.search.allFound")
-		return plural("tracker.search.results", view.visible.length)
+		return emptyText(kind, query) ?? plural("tracker.search.results", view.visible.length)
 	}
 
 	// A typing result still pending would describe the old chips.
@@ -251,6 +257,7 @@ export function Tracker({ locale }: Props) {
 	const sourcesHref = `/${locale}/tracker/sources/`
 	const { view } = search
 	const empty = emptyState(view, search.query)
+	const emptyMessage = emptyText(empty, search.query)
 
 	if (state.status === "error") {
 		return (
@@ -319,12 +326,7 @@ export function Tracker({ locale }: Props) {
 							t={t}
 						/>
 					)}
-					{empty === "all-found" && <p className="item-empty">{t("tracker.search.allFound")}</p>}
-					{empty === "no-match" && (
-						<p className="item-empty">
-							{t("tracker.search.noMatch", { query: search.query.trim() })}
-						</p>
-					)}
+					{emptyMessage && <p className="item-empty">{emptyMessage}</p>}
 					{view.elsewhere > 0 && (
 						<p className="search-elsewhere">
 							{plural("tracker.search.elsewhere", view.elsewhere)}{" "}
