@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { fireEvent, screen, waitFor, within } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { renderReady, resetBrowser } from "../test/tracker-fixtures"
+import { openMenu, renderReady, resetBrowser } from "../test/tracker-fixtures"
 import { HIDE_FOUND_KEY } from "./seenFlag"
 import { Tracker } from "./Tracker"
 
@@ -152,6 +152,34 @@ describe("Tracker search (tracker search spec §4)", () => {
 		fireEvent.click(within(dialog).getByRole("button", { name: "Import into Player 1" }))
 		await waitFor(() =>
 			expect(screen.queryByRole("checkbox", { name: "American alligator" })).toBeNull()
+		)
+	})
+
+	// Restore keeps the current profile, but the snapshot is still retaken (as-built note).
+	it("takes a new snapshot when a deleted profile is restored", async () => {
+		await ready()
+		openMenu()
+		fireEvent.click(screen.getByRole("menuitem", { name: "Delete" }))
+		const confirm = screen.getByRole("dialog", { name: "Delete Player 1?" })
+		fireEvent.click(within(confirm).getByRole("button", { name: "Delete" }))
+		// The dialog closes before the switch to the fresh default profile lands, so wait for that.
+		const openDeleted = () => {
+			openMenu()
+			fireEvent.click(screen.getByRole("menuitem", { name: "Deleted profiles" }))
+			return screen.getByRole("dialog", { name: "Deleted profiles" })
+		}
+		const deleted = openDeleted()
+		await within(deleted).findByRole("button", { name: "Restore Player 1" })
+		fireEvent.click(within(deleted).getByRole("button", { name: "Close" }))
+
+		fireEvent.click(screen.getByRole("button", { name: "Hide found" }))
+		await tick("Pelican")
+		expect(names()).toContain("item-wildlife/pelican")
+
+		fireEvent.click(within(openDeleted()).getByRole("button", { name: "Restore Player 1" }))
+		await waitFor(() => expect(names()).not.toContain("item-wildlife/pelican"))
+		expect(screen.getByRole("button", { name: /^Hide found/ })).toHaveAccessibleName(
+			"Hide found 1 hidden"
 		)
 	})
 })
