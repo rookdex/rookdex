@@ -250,6 +250,7 @@ export function Tracker({ locale }: Props) {
 		id: c.category,
 		label: seedLabel(t, "category", c.category),
 	}))
+	const overall = countItems(state.items, state.records)
 	const error = state.error ? t(`tracker.errors.${state.error}`) : ""
 	const nameError = state.error === "name" ? error : ""
 	const pageError = state.error === "name" ? "" : error
@@ -307,11 +308,13 @@ export function Tracker({ locale }: Props) {
 				</div>
 				<CategoryNav
 					categories={categories}
+					overall={overall}
 					selected={state.selected}
 					onSelect={selectCategories}
 					allLabel={t("tracker.all")}
 					navLabel={t("tracker.categories")}
 					sources={{ href: sourcesHref, label: t("tracker.sources") }}
+					t={t}
 				/>
 				<div className="tracker-results" ref={results} tabIndex={-1}>
 					{empty === "none" && (
@@ -337,7 +340,7 @@ export function Tracker({ locale }: Props) {
 					)}
 				</div>
 				<StatsRail
-					overall={countItems(state.items, state.records)}
+					overall={overall}
 					categories={categories}
 					recent={recentFinds(state.items, state.records)}
 					hubHref={hubHref}
