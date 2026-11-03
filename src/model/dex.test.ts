@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { dexCategory, dexIndex, dexKeys } from "./dex"
+import { translator } from "../i18n"
+import { dexCategory, dexCopy, dexIndex, dexKeys, dexStatus } from "./dex"
 import type { SeedItem } from "./schema"
 import { categoryIds, groupItems, seedItems } from "./seed"
 
@@ -83,5 +84,42 @@ describe("dexKeys (category pages spec §8)", () => {
 			"dex.description.wildlife.one",
 			"dex.description.wildlife.other",
 		])
+	})
+})
+
+describe("dexCopy (category pages spec §8)", () => {
+	const en = translator("en")
+	const nb = translator("nb")
+
+	it("builds the title, lede and description for a category", () => {
+		const copy = dexCopy(en, dexCategory(fixture, "wildlife"))
+		expect(copy.title).toBe("GTA 6 animals: every species confirmed so far · Rookdex")
+		expect(copy.lede).toBe("3 animals so far: 2 confirmed, 1 expected.")
+		expect(copy.description).toMatch(/^All 3 GTA 6 animals in the Dex so far/)
+	})
+
+	it("picks the singular and keeps zero counts readable", () => {
+		const one = dexCategory([item("crane", "birds")], "wildlife")
+		expect(dexCopy(en, one).lede).toBe("1 animal so far: 1 confirmed, 0 expected.")
+		expect(dexCopy(nb, one).lede).toBe("1 dyr så langt: 1 bekreftet, 0 forventet.")
+	})
+
+	it("throws on a category without copy, naming the key", () => {
+		const bogus = { ...dexCategory(fixture, "wildlife"), id: "bogus" }
+		expect(() => dexCopy(en, bogus)).toThrow('"seo.titles.dex.bogus"')
+	})
+})
+
+describe("dexStatus (category pages spec §5.2)", () => {
+	const { t } = translator("en")
+
+	it("says Confirmed, or Expected with its precedent", () => {
+		expect(dexStatus(t, item("crane", "birds"))).toBe("Confirmed")
+		expect(dexStatus(t, item("ibis", "birds", "expected"))).toBe("Expected, as in GTA V")
+	})
+
+	it("never ends in 'as in' when an expected item has no precedent", () => {
+		const bare = { ...item("ibis", "birds", "expected"), precedent: undefined }
+		expect(dexStatus(t, bare)).toBe("Expected")
 	})
 })

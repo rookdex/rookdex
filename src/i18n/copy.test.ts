@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest"
 import en from "../locales/en.json"
 import nb from "../locales/nb.json"
+import { dexKeys } from "../model/dex"
+import { categoryIds, seedItems } from "../model/seed"
 
 const bundles = { en, nb } as const
 const all: [string, string][] = Object.entries(bundles).flatMap(([lang, bundle]) =>
@@ -17,6 +19,7 @@ const descriptionKeys = [
 	"sources.description",
 	"settings.description",
 	"privacy.description",
+	"dex.indexDescription",
 ] as const
 
 describe("copy rules (spec §9)", () => {
@@ -147,5 +150,52 @@ describe("tracker search copy (tracker search spec §6)", () => {
 	it("quotes the query the way each language does", () => {
 		expect(en["tracker.search.noMatch"]).toBe('No match for "{query}".')
 		expect(nb["tracker.search.noMatch"]).toBe("Ingen treff på «{query}».")
+	})
+})
+
+describe("Dex copy (category pages spec §8, §12)", () => {
+	const categories = categoryIds(seedItems.filter((item) => !item.retired))
+	const missing = (bundle: Record<string, string>, category: string) =>
+		dexKeys(category).filter((key) => !Object.hasOwn(bundle, key))
+
+	it.each([
+		["en", en],
+		["nb", nb],
+	] as const)("%s has every live category's title, lede and description", (_locale, bundle) => {
+		for (const category of categories) expect(missing(bundle, category), category).toEqual([])
+	})
+
+	it("goes red on a category without its keys", () => {
+		expect(missing(en, "fixture")).toEqual(dexKeys("fixture"))
+	})
+
+	it.each([
+		["en", en],
+		["nb", nb],
+	] as const)("%s category descriptions are 120 to 160 characters at any count", (_l, bundle) => {
+		const strings: Record<string, string> = bundle
+		for (const category of categories) {
+			for (const form of ["one", "other"]) {
+				const key = `dex.description.${category}.${form}`
+				for (const count of [1, 999]) {
+					const length = [...strings[key].replace("{count}", String(count))].length
+					expect(length, `${key} at ${count}`).toBeGreaterThanOrEqual(120)
+					expect(length, `${key} at ${count}`).toBeLessThanOrEqual(160)
+				}
+			}
+		}
+	})
+
+	it.each([
+		["en", en],
+		["nb", nb],
+	] as const)("%s ledes carry all three numbers", (_locale, bundle) => {
+		const strings: Record<string, string> = bundle
+		for (const category of categories) {
+			for (const form of ["one", "other"]) {
+				const lede = strings[`dex.lede.${category}.${form}`]
+				for (const name of ["{count}", "{confirmed}", "{expected}"]) expect(lede).toContain(name)
+			}
+		}
 	})
 })

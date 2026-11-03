@@ -22,7 +22,7 @@ const i18n = createTranslator(bundles, { fallback: "en" })
 export interface Translator {
 	readonly locale: Locale
 	t(key: Key, vars?: Vars): string
-	plural(key: PluralKey, count: number): string
+	plural(key: PluralKey, count: number, vars?: Vars): string
 	money(price: Price): string
 	displayName(tag: Locale): string
 }
@@ -32,7 +32,7 @@ export function translator(locale: Locale): Translator {
 	return {
 		locale,
 		t: (key, vars) => i18n.t(locale, key, vars),
-		plural: (key, count) => i18n.plural(locale, key, count),
+		plural: (key, count, vars) => i18n.plural(locale, key, count, vars),
 		money: (price) => i18n.money(locale, price.amount, price.currency, { stripWhole: true }),
 		displayName: (tag) => i18n.displayName(tag),
 	}
