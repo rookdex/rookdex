@@ -9,6 +9,8 @@ interface Props {
 	/** Gets the Closest tag after launch. The dashboard passes it only once something is found. */
 	closest?: string
 	trackerHref: string
+	/** The Dex index, linked beside the heading (category pages spec §7). */
+	dexHref: string
 	t: Translate
 }
 
@@ -16,11 +18,14 @@ interface Props {
  * One row-as-bar per category (desktop dashboard spec §4.3). The fill sits behind the text. Before
  * launch every fill is 0 and the row emits no style attribute, because this renders on the server.
  */
-export function CategoryBars({ rows, phase, closest, trackerHref, t }: Props) {
+export function CategoryBars({ rows, phase, closest, trackerHref, dexHref, t }: Props) {
 	return (
 		<section className="cat-bars" aria-labelledby="cat-bars-heading">
 			<div className="deco">
 				<h2 id="cat-bars-heading">{t("hub.categories")}</h2>
+				<a className="go-link deco-link" href={dexHref}>
+					{t("dex.everyItem")}
+				</a>
 			</div>
 			<ul className="ledger">
 				{rows.map((row) => {

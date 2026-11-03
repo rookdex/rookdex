@@ -31,6 +31,7 @@ export interface DashboardProps {
 	daysSince: number
 	guideHref: string
 	trackerHref: string
+	dexHref: string
 	/** Writes one line to the hub's status region. */
 	announce: (message: string) => void
 }
@@ -45,6 +46,7 @@ export function Dashboard({
 	daysSince,
 	guideHref,
 	trackerHref,
+	dexHref,
 	announce,
 }: DashboardProps) {
 	const { t, plural } = translator(locale)
@@ -242,6 +244,7 @@ export function Dashboard({
 				phase="after"
 				closest={view.overall.done > 0 ? view.closest : undefined}
 				trackerHref={trackerHref}
+				dexHref={dexHref}
 				t={t}
 			/>
 			<RecentFinds recent={view.recent} days={view.days} today={today} locale={locale} t={t} />

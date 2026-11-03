@@ -61,6 +61,7 @@ export function DashboardSkeleton({ categoryCount, t }: Props) {
 			<section className="cat-bars" aria-hidden="true">
 				<div className="deco">
 					<h2>{t("hub.categories")}</h2>
+					<span className="go-link deco-link">{t("dex.everyItem")}</span>
 				</div>
 				<ul className="ledger">
 					{keys("cat", categoryCount).map((key) => (

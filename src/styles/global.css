@@ -2284,6 +2284,14 @@ html:has(.search-row) {
 	letter-spacing: 0.12em;
 }
 
+/* The Dex link ends the heading row, after the right-hand rule (order puts it past ::after). */
+.cat-bars .deco-link {
+	order: 1;
+	flex: none;
+	color: var(--text-muted);
+	font-size: 0.8125rem;
+}
+
 .ledger {
 	display: grid;
 	gap: var(--space-2) var(--space-3);

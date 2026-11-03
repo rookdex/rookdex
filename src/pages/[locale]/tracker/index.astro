@@ -1,7 +1,10 @@
 ---
-import { isLocale, type Locale, locales, translator } from "../../../i18n"
+import { getRelativeLocaleUrl } from "astro:i18n"
+import ChipNav from "../../../components/ChipNav.astro"
+import { isLocale, type Locale, locales, seedLabel, translator } from "../../../i18n"
 import { Tracker } from "../../../islands/Tracker"
 import Base from "../../../layouts/Base.astro"
+import { categoryIds, seedItems } from "../../../model/seed"
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale }, props: {} }))
@@ -10,6 +13,10 @@ export function getStaticPaths() {
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const { t } = translator(locale as Locale)
+const browse = categoryIds(seedItems.filter((item) => !item.retired)).map((id) => ({
+	href: getRelativeLocaleUrl(locale as Locale, `dex/${id}`),
+	label: seedLabel(t, "category", id),
+}))
 ---
 
 <Base locale={locale} title={t("seo.titles.tracker")} description={t("tracker.description")} path="tracker">
@@ -18,6 +25,11 @@ const { t } = translator(locale as Locale)
 	<Tracker client:only="react" locale={locale}>
 		<div slot="fallback" class="tracker-fallback"></div>
 	</Tracker>
+	{/* Server-rendered under the fallback's reserved height, so it adds no layout shift (category
+	    pages spec §7). The tracker refresh also edits this file; whichever lands second rebases. */}
+	<div class="dex-browse">
+		<ChipNav label={t("dex.browse")} headingId="dex-browse" chips={browse} />
+	</div>
 </Base>
 
 <style>
@@ -38,8 +50,13 @@ const { t } = translator(locale as Locale)
 	/* Centred at the tracker's own cap (global.css), so the title shares the search row's left edge.
 	   Here rather than a :has(.tracker) rule, which would only match after the island mounts and
 	   shift the title sideways. */
+	.dex-browse {
+		margin-top: var(--space-5);
+	}
+
 	@media (min-width: 1024px) {
-		h1 {
+		h1,
+		.dex-browse {
 			max-width: var(--tracker-max-w);
 			margin-inline: auto;
 		}

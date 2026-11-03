@@ -30,6 +30,7 @@ interface Props {
 	initialNow: string
 	guideHref: string
 	trackerHref: string
+	dexHref: string
 	newsHref: string
 	/** The newest rumours, built into the page. */
 	latest: LatestItem[]
@@ -58,6 +59,7 @@ export function Hub({
 	initialNow,
 	guideHref,
 	trackerHref,
+	dexHref,
 	newsHref,
 	latest,
 	categories,
@@ -212,6 +214,7 @@ export function Hub({
 							daysSince={state.daysSince}
 							guideHref={guideHref}
 							trackerHref={trackerHref}
+							dexHref={dexHref}
 							announce={announce}
 						/>
 					) : (
@@ -232,7 +235,13 @@ export function Hub({
 						<SegmentBar rows={categories} />
 					</div>
 					<PrelaunchChecklist links={checklistLinks} t={t} />
-					<CategoryBars rows={categories} phase="before" trackerHref={trackerHref} t={t} />
+					<CategoryBars
+						rows={categories}
+						phase="before"
+						trackerHref={trackerHref}
+						dexHref={dexHref}
+						t={t}
+					/>
 					{newsTile}
 					{tiles}
 				</div>

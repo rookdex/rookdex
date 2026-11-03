@@ -62,6 +62,7 @@ function props(today = "2026-11-20"): DashboardProps {
 		daysSince: 1,
 		guideHref: "/en/guides/before-you-start/",
 		trackerHref: "/en/tracker/",
+		dexHref: "/en/dex/",
 		announce,
 	}
 }
@@ -193,6 +194,10 @@ describe("desktop blocks (desktop spec §3)", () => {
 			"/en/tracker/?show=wildlife"
 		)
 		expect(document.querySelector(".dash-top .dash-day")).toHaveTextContent("Day 1 since launch")
+		expect(screen.getByRole("link", { name: "Every item in the Dex" })).toHaveAttribute(
+			"href",
+			"/en/dex/"
+		)
 	})
 
 	it("keeps the hero's visible label out of the reading order", async () => {
