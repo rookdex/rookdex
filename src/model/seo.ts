@@ -7,25 +7,27 @@ export const SITE = "https://rookdex.app"
 
 const SLUG = /^[a-z0-9-]+$/
 
-/** Guide slugs, deduped and sorted. Throws on a slug that isn't safe to put in a URL unescaped. */
-export function validSlugs(slugs: string[]): string[] {
+/** Slugs, deduped and sorted. Throws on a slug that isn't safe to put in a URL unescaped; `fix`
+ *  tells the reader where the slug comes from. */
+export function validSlugs(
+	slugs: string[],
+	fix = "rename the file in src/content/guides/"
+): string[] {
 	for (const slug of slugs) {
-		if (!SLUG.test(slug)) {
-			throw new Error(
-				`Guide slug "${slug}" must match ${SLUG}; rename the file in src/content/guides/`
-			)
-		}
+		if (!SLUG.test(slug)) throw new Error(`Slug "${slug}" must match ${SLUG}; ${fix}`)
 	}
 	return [...new Set(slugs)].sort()
 }
 
 /** Locale-less paths the sitemap lists and IndexNow pings, in the same form pages pass to Base.
  *  New indexable pages are added here. */
-export function indexablePaths(guideSlugs: string[]): string[] {
+export function indexablePaths(guideSlugs: string[], categoryIds: string[]): string[] {
 	return [
 		"",
 		"tracker",
 		"tracker/sources",
+		"dex",
+		...validSlugs(categoryIds, "rename the seed file in src/seed/").map((id) => `dex/${id}`),
 		"news",
 		"privacy",
 		...validSlugs(guideSlugs).map((slug) => `guides/${slug}`),
