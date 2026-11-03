@@ -47,7 +47,7 @@ function Tile({ label, count, pressed, onClick, Icon, t }: TileProps) {
 			<span className="tile-icon" aria-hidden="true">
 				<Icon />
 			</span>
-			<span className="tile-label">{label}</span>
+			<span className="tile-name">{label}</span>
 			<span className="tile-count" aria-hidden="true">
 				{count.done}
 				<small>/{count.total}</small>

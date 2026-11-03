@@ -37,8 +37,16 @@ describe("tracker refresh look (spec §3, §4)", () => {
 	})
 
 	it("breaks a tile label only inside a word that cannot fit on its own line (R2)", () => {
-		expect(rule(".tile-label")).toMatch(/overflow-wrap:\s*break-word/)
-		expect(rule(".tile-label")).toMatch(/hyphens:\s*auto/)
+		expect(rule(".tile-name")).toMatch(/overflow-wrap:\s*break-word/)
+		expect(rule(".tile-name")).toMatch(/hyphens:\s*auto/)
+	})
+
+	it("keeps the hub's uppercase label look off the tracker tile name", () => {
+		const uppercased = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)]
+			.filter(([, , body]) => /text-transform:\s*uppercase/.test(body))
+			.map(([, selectors]) => selectors)
+		expect(uppercased.some((selectors) => selectors.includes(".tile-label"))).toBe(true)
+		expect(uppercased.some((selectors) => selectors.includes(".tile-name"))).toBe(false)
 	})
 
 	it("leaves no .chips selector behind", () => {

@@ -1565,7 +1565,7 @@ html:has(.search-row) {
 	padding: 10px;
 }
 
-.tiles .tile-all :is(.tile-label, .tile-count) {
+.tiles .tile-all :is(.tile-name, .tile-count) {
 	align-self: baseline;
 }
 
@@ -1598,7 +1598,7 @@ html:has(.search-row) {
 
 /* Wraps at 200 % text; the count sits on its own grid line, so the two never overlap. break-word,
    not anywhere: a word only breaks when it cannot fit a line on its own, and hyphens marks it. */
-.tile-label {
+.tile-name {
 	grid-area: label;
 	min-width: 0;
 	font-size: 0.75rem;
@@ -1607,7 +1607,7 @@ html:has(.search-row) {
 	hyphens: auto;
 }
 
-.tiles .tile-all .tile-label {
+.tiles .tile-all .tile-name {
 	font-size: 0.8125rem;
 }
 
@@ -3254,11 +3254,11 @@ html:has(.search-row) {
 		padding: 10px;
 	}
 
-	.tiles :is(.tile-label, .tile-count) {
+	.tiles :is(.tile-name, .tile-count) {
 		align-self: baseline;
 	}
 
-	.tile-label {
+	.tile-name {
 		font-size: 0.8125rem;
 	}
 
