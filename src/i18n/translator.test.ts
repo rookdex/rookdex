@@ -19,6 +19,12 @@ describe("translator (locale spec §5.2)", () => {
 		expect(nb.plural("footer.daysToLaunch", 0)).toBe("0 dager til lansering")
 	})
 
+	it("fills extra vars in a plural", () => {
+		expect(en.plural("dex.lede.wildlife", 25, { confirmed: 24, expected: 1 })).toBe(
+			"25 animals so far: 24 confirmed, 1 expected."
+		)
+	})
+
 	it("falls back to English for a key a bundle lacks (library contract)", () => {
 		const fixture = createTranslator({ en: { a: "A" }, nb: {} })
 		expect(fixture.t("nb", "a" as never)).toBe("A")

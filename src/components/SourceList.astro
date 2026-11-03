@@ -1,0 +1,59 @@
+---
+import type { Locale } from "../i18n"
+import { outletOf } from "../model/outlet"
+import type { Source } from "../model/schema"
+import ExternalLink from "./ExternalLink.astro"
+
+interface Props {
+	sources: Source[]
+	locale: Locale
+	/** "en" on nb pages: source titles are English seed text (category pages spec §10). */
+	lang?: string
+}
+
+// One item's sources, title first and the outlet under it (category pages spec §5.3). The Sources
+// page and the Dex cards share it. Many items cite two trailers on youtube.com, so the title leads.
+const { sources, locale, lang } = Astro.props
+---
+
+<ul class="tap-links source-list">
+	{
+		sources.map((source) => (
+			<li>
+				{/* No whitespace around the title: a space before the ↗ would let it wrap alone. The lang
+				    span stays inside the link and stops before the Norwegian new-tab note. */}
+				<ExternalLink href={source.url} locale={locale} class="go-link"
+					>{lang ? <span lang={lang}>{source.title}</span> : source.title}</ExternalLink
+				>
+				<span class="outlet">{outletOf(source.url)}</span>
+			</li>
+		))
+	}
+</ul>
+
+<style>
+	.source-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	/* The 44 px target is the link itself (the global .tap-links utility), not the row. */
+	.source-list li {
+		display: flex;
+		flex-direction: column;
+	}
+
+	/* In a flex link a wrapped title and its ↗ are separate items, which pushes the ↗ out to the
+	   right edge. Plain block flow keeps it after the last word; the padding centres one line in
+	   the 44 px target. ExternalLink renders the <a>, outside this component's scope. */
+	.source-list li :global(a) {
+		display: block;
+		padding-block: calc((var(--tap) - 1lh) / 2);
+	}
+
+	.outlet {
+		color: var(--text-muted);
+		font-size: 0.75rem;
+	}
+</style>

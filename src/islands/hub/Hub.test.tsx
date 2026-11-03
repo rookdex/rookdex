@@ -35,6 +35,7 @@ function props(overrides: Partial<ComponentProps<typeof Hub>> = {}): ComponentPr
 		initialNow: before,
 		guideHref: "/en/guides/before-you-start/",
 		trackerHref: "/en/tracker/",
+		dexHref: "/en/dex/",
 		newsHref: "/en/news/",
 		latest,
 		categories,
@@ -161,6 +162,10 @@ describe("desktop dashboard before launch (desktop spec §4)", () => {
 		expect(screen.getByRole("list", { name: "Before launch" })).toBeInTheDocument()
 		expect(screen.getByRole("heading", { level: 2, name: "Categories" })).toBeInTheDocument()
 		expect(screen.getByRole("link", { name: /^Vehicles/ })).toHaveTextContent("8 to find")
+		expect(screen.getByRole("link", { name: "Every item in the Dex" })).toHaveAttribute(
+			"href",
+			"/en/dex/"
+		)
 		expect(screen.getByRole("region", { name: "Latest news" })).toBeInTheDocument()
 		expect(screen.getByRole("link", { name: /^Leonida on Rockstar's site/ })).toBeInTheDocument()
 		expect(screen.getByRole("link", { name: "Open: Your first hour" })).toHaveAttribute(

@@ -1,0 +1,149 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n"
+import { isLocale, type Locale, locales, seedLabel, translator } from "../../../i18n"
+import Base from "../../../layouts/Base.astro"
+import { dexIndex } from "../../../model/dex"
+import { seedItems } from "../../../model/seed"
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale }, props: {} }))
+}
+
+// The Dex's front page (category pages spec §6): one whole-card link per category.
+const { locale } = Astro.params
+if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
+const { t } = translator(locale as Locale)
+const categories = dexIndex(seedItems.filter((item) => !item.retired))
+---
+
+<Base locale={locale} title={t("seo.titles.dexIndex")} description={t("dex.indexDescription")} path="dex" tab="tracker">
+	<h1>{t("dex.title")}</h1>
+	<p class="lede">{t("dex.indexLede")}</p>
+	<ul class="dex-index">
+		{
+			categories.map((c) => (
+				<li>
+					<a class="dex-tile" href={getRelativeLocaleUrl(locale as Locale, `dex/${c.id}`)}>
+						<span class="name">{seedLabel(t, "category", c.id)}</span>
+						<span class="counts">
+							<span class="dot confirmed" aria-hidden="true" />
+							{t("dex.confirmedCount", { count: c.confirmed })}
+							<span class="visually-hidden">, </span>
+							<span class="sep" aria-hidden="true">·</span>
+							<span class="dot expected" aria-hidden="true" />
+							{t("dex.expectedCount", { count: c.expected })}
+						</span>
+						<span class="groups">{c.groups.map((g) => seedLabel(t, "group", g.id)).join(" · ")}</span>
+					</a>
+				</li>
+			))
+		}
+	</ul>
+	<p>
+		<a class="go-link sources-link" href={getRelativeLocaleUrl(locale as Locale, "tracker/sources")}>
+			{t("sources.title")}
+		</a>
+	</p>
+</Base>
+
+<style>
+	h1 {
+		font-size: 1.75rem;
+		font-weight: 700;
+		margin-bottom: var(--space-1);
+	}
+
+	.lede {
+		color: var(--text-muted);
+		font-size: 0.875rem;
+		line-height: 1.5;
+	}
+
+	.dex-index {
+		display: grid;
+		gap: 12px;
+		margin: 0 0 var(--space-4);
+		padding: 0;
+		list-style: none;
+	}
+
+	@media (min-width: 768px) {
+		.dex-index {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	.dex-tile {
+		display: grid;
+		gap: var(--space-1);
+		height: 100%;
+		min-height: var(--tap);
+		padding: var(--space-3);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg-raised);
+		color: var(--text);
+		text-decoration: none;
+		transition: background-color 120ms, border-color 120ms;
+	}
+
+	@media (hover: hover) {
+		.dex-tile:hover {
+			background: var(--bg-hover);
+			border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+		}
+	}
+
+	@media (hover: none) {
+		.dex-tile:active {
+			background: var(--bg-hover);
+		}
+	}
+
+	/* Same lift as the chips: the global ring alone is thin on a large card. */
+	.dex-tile:focus-visible {
+		background: var(--bg-hover);
+	}
+
+	.name {
+		font-family: var(--font-display);
+		font-size: 2rem;
+		line-height: 1;
+		letter-spacing: 0.02em;
+	}
+
+	.counts {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-2);
+		color: var(--text-muted);
+		font-size: 0.875rem;
+	}
+
+	.dot {
+		flex: none;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+	}
+
+	.confirmed {
+		background: var(--tier-confirmed);
+	}
+
+	.expected {
+		background: var(--tier-expected);
+	}
+
+	@media (forced-colors: active) {
+		.dot {
+			border: 1px solid CanvasText;
+		}
+	}
+
+	.groups {
+		color: var(--text-muted);
+		font-size: 0.8125rem;
+	}
+</style>

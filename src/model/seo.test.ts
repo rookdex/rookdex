@@ -20,12 +20,17 @@ describe("validSlugs (SEO spec §4.1)", () => {
 	})
 })
 
-describe("indexablePaths (SEO spec §4.1)", () => {
-	it("lists home, tracker, its sources, news, privacy, then each guide once under guides/", () => {
-		expect(indexablePaths(["before-you-start", "before-you-start"])).toEqual([
+describe("indexablePaths (SEO spec §4.1, category pages spec §9)", () => {
+	it("lists home, the tracker pages, the Dex, news, privacy, then each guide once", () => {
+		expect(
+			indexablePaths(["before-you-start", "before-you-start"], ["wildlife", "places"])
+		).toEqual([
 			"",
 			"tracker",
 			"tracker/sources",
+			"dex",
+			"dex/places",
+			"dex/wildlife",
 			"news",
 			"privacy",
 			"guides/before-you-start",
@@ -33,11 +38,17 @@ describe("indexablePaths (SEO spec §4.1)", () => {
 	})
 
 	it("never lists settings", () => {
-		expect(indexablePaths(["before-you-start"])).not.toContain("settings")
+		expect(indexablePaths(["before-you-start"], ["wildlife"])).not.toContain("settings")
 	})
 
 	it("throws on a bad guide slug", () => {
-		expect(() => indexablePaths(["Bad Slug"])).toThrow()
+		expect(() => indexablePaths(["Bad Slug"], ["wildlife"])).toThrow("src/content/guides/")
+	})
+
+	it("throws on a bad category slug, pointing at the seed", () => {
+		expect(() => indexablePaths(["before-you-start"], ["Wild Life"])).toThrow(
+			/"Wild Life".*src\/seed\//
+		)
 	})
 })
 

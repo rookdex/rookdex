@@ -47,13 +47,36 @@ describe("Sources page (feedback spec §5)", () => {
 
 	it("counts the live items of each category on its chip, in the tracker's order", async () => {
 		const doc = await page("en")
-		const chips = [...doc.querySelectorAll(".source-chips a")]
+		const chips = [...doc.querySelectorAll(".chip-list a")]
 		const categories = categoryIds(live)
 		expect(chips.map((a) => a.getAttribute("href"))).toEqual(categories.map((c) => `#cat-${c}`))
 		expect(chips.map((a) => a.querySelector(".count")?.textContent)).toEqual(
 			categories.map((c) => String(live.filter((item) => item.category === c).length))
 		)
 		for (const c of categories) expect(doc.getElementById(`cat-${c}`)?.tagName).toBe("H2")
+	})
+
+	it("links each category heading to its Dex page", async () => {
+		const doc = await page("nb")
+		for (const c of categoryIds(live)) {
+			const link = doc.getElementById(`cat-${c}`)?.querySelector("a")
+			expect(link?.getAttribute("href")).toBe(`/nb/dex/${c}/`)
+		}
+	})
+
+	it("marks the English seed text on nb, and only that", async () => {
+		const doc = await page("nb")
+		for (const item of live.slice(0, 5)) {
+			const entry = doc.getElementById(item.id)
+			expect(entry?.querySelector("h3")?.getAttribute("lang")).toBe("en")
+			const titles = [...(entry?.querySelectorAll(".source-list a > span[lang='en']") ?? [])]
+			expect(titles.map((s) => s.textContent)).toEqual(item.sources.map((s) => s.title))
+		}
+		for (const note of doc.querySelectorAll(".new-tab-note")) {
+			expect(note.closest("[lang='en']")).toBeNull()
+		}
+		const en = await page("en")
+		expect(en.querySelector(".source-section [lang='en']")).toBeNull()
 	})
 
 	it("links back to each item's checkbox, named with the item", async () => {
