@@ -1,0 +1,260 @@
+# Rookdex: tracker refresh design spec
+
+Written 03.11.2026 from the tracker refresh brainstorm (sessions 98 to 100), with mockups in the visual companion. It gives the tracker page a stronger look and denser cards before launch: category tiles with icons, big section titles, icon-lead cards with a round check, a slimmer stats rail, a "Last found" row on phones and the profile button in the title row.
+
+GTA VI launches Thursday 19.11.2026. The freeze is Thursday 12.11.2026, so both PRs are merged by Tuesday 10.11.2026 at the latest. Going faster is fine; the dates are ceilings, not a pace.
+
+## 1. What this spec covers
+
+- **PR 1, the look:** category tiles, section and group titles with counts, spacing and page width, a round check with a ✓.
+- **PR 2, the structure:** the icon-lead card, the slim stats rail with relative times, the phone "Last found" row and the profile button in the title row.
+
+PR 1 changes styling and markup only. Card behaviour, the rail and profiles work exactly as today. If PR 2 is not green by 10.11, it waits until after launch week and PR 1 ships alone.
+
+### Non-goals
+
+- No change to the tracker model, records, storage, export format or progress maths.
+- No change to search, Hide found, the category filter logic or the hub (dashboard). The hub's `RecentFinds` and its `Bar` import keep working as they are.
+- No Dex entry link, no favourites star, no profile picture and no site-header profile. Those are December work (§13). This spec only keeps room for them.
+- No per-category colours. The brand keeps one accent (pink) and cyan for links and Expected. Category identity comes from icons.
+
+## 2. Locked decisions
+
+| Decision | Choice | Why |
+| --- | --- | --- |
+| Sidebar | Count cards (Q1 A) with an icon per category | Her pick; tiles across the top would undo layout B |
+| Phone tiles | All as a full-width hero row, the four categories in a 2×2 grid (Q2 P2) | One tile component, layouts in CSS only |
+| Filters | Stay multi-select toggle buttons with `aria-pressed` | Unchanged behaviour, unchanged tests |
+| Profile placement | Tracker title row, top right (Q3 T), initial avatar | Fits before the freeze; the header version is December |
+| Card | Icon lead (Q4 B): icon tile, name, one meta line, round check top right, book and flag in the footer, description clamped to 2 lines | 164 px tall against 231 px today |
+| Rail | Big overall % and Recent finds with icons and relative times (Q5 R1); the four category bars go | The tiles carry per-category counts now |
+| Phones | One "Last found" row (Q5 M1); tapping it jumps to the card | The rail does not fit beside the list |
+| Spacing | S3 mix: true black, no panels; 12 px cards, 40 px groups, 72 px categories, 48 px columns | Her verdict on S1, S2 and S3 |
+| Titles | Category title in Bebas Neue 40 px with icon, count and a gradient line to the edge; group title 14 px bold uppercase white with its own count and a 1 px line above | Borrowed from the trackers she sent |
+| Found state | Icon tile and card border turn pink, the check shows a ✓ | Never colour alone (her feedback on S3) |
+| Counts | Always the whole category or group, never the filtered view | Numbers must not jump while typing |
+| Delivery | One spec, two PRs | The look can ship alone if PR 2 slips |
+
+## 3. Layout per breakpoint
+
+Mobile-first: the base styles are the phone, then `min-width` 768 px and 1024 px.
+
+### 3.1 Phones (under 768 px)
+
+From top: title row (h1 and profile button), sticky search row, tiles (All hero, 2×2 grid, Sources link full width), "Last found" row, then the list in one column. No rail.
+
+### 3.2 Tablet (768 to 1023 px)
+
+All as a full-width row, then the four categories in one row of four (about 176 px each at 768 px), then Sources. The list shows two cards across where it has room (§3.4). No rail; the "Last found" row stays.
+
+Section 1 of the brainstorm said all five tiles in one row. At 768 px that leaves about 137 px a tile, and "Collectibles" with its count does not fit, so All keeps its own row. This keeps the tablet from being a stretched phone layout either way.
+
+### 3.3 Desktop (1024 px and up)
+
+Three columns: tiles stacked (200 px), the list, the rail (200 px), with 48 px between columns. `--tracker-max-w` becomes `calc(200px + 624px + 200px + 2 * 48px)` = 1120 px. The h1 keeps reading the same width, so the title starts on the search row's left edge.
+
+### 3.4 The card grid
+
+`grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))` with a 12 px gap. At 1024 px the list is about 496 px, so it shows one card across; from about 1200 px it shows two.
+
+### 3.5 Spacing
+
+| Between | Space |
+| --- | --- |
+| Cards | 12 px |
+| Groups | 40 px |
+| Categories | 72 px |
+| Columns (desktop) | 48 px |
+
+The page background stays true black (`--bg`). No panels around categories or groups.
+
+## 4. PR 1: the look
+
+### 4.1 Category tiles (`CategoryNav.tsx`)
+
+Each filter button becomes a tile: an icon tile (36 px), the label, a count and a slim progress bar.
+
+- The count shows "40/148" in Bebas Neue at 26 px, **regular weight (400)**, with "/148" at 0.6 em in `--text-muted`. Bebas Neue ships one weight; any bold would be faked by the browser and smear the digits (her feedback on S3).
+- The button's accessible name is the label and the count in words: "Vehicles, 40 of 148" (`tracker.count`). The visual "40/148" and the bar are `aria-hidden`. A `role="progressbar"` inside a button would lose its role anyway (button children are presentational).
+- **Two arrangements of the one tile, set in CSS only:**
+  - **Wide:** icon, label, count right-aligned on the label's line, bar under. Used for All on phones and tablet, and for every tile on desktop (S3).
+  - **Stacked:** icon and label on the first line, the count under it, the bar under that. Used for the four category tiles in the phone 2×2 grid and the tablet row of four (the approved P2 mockup). At 320 px a grid tile is about 138 px wide, and the wide arrangement does not fit "Collectibles" and its count.
+  - The label may wrap at 200 % text; the count never overlaps it.
+- Pressed tiles get the pink border and the pink icon tile, as in S3. In forced colours they join today's rule for pressed chips (`forced-color-adjust: none`, `Highlight` background and border, `HighlightText`), because forced colours drop the pink and pressed would look like not pressed.
+- Tiles are at least 44 px tall; S3 measured 58 px, all five the same height. Tiles in one row share one height.
+- `CategoryNav` gets the per-category counts it needs as a prop (`counts: Record<string, Count>` plus the overall count for All). `Tracker.tsx` already computes them for the rail.
+
+### 4.2 Icons (`icons.tsx`)
+
+Five new icons in the existing style (24 viewBox, 2 px stroke, `currentColor`, `aria-hidden`): All (a 2×2 grid), Collectibles (a star), Places (a map pin), Vehicles (a car), Wildlife (a paw). My own geometry, so no icon set's licence applies. A `categoryIcon(id)` helper maps category ids to icons and falls back to the All icon for an unknown id.
+
+### 4.3 Section and group titles (`ItemList.tsx`)
+
+- **Category:** icon tile, the name as `h2` in Bebas Neue (40 px from 1024 px, 32 px below), "40 of 148" in Bebas Neue 22 px muted (a sibling of the `h2`, not inside it, so the headings list and the existing heading-name tests read just "Vehicles"), then a 2 px line with the brand gradient fading to transparent at the edge. Bebas Neue has capitals only, so "of" shows as "OF". The line is decorative (`aria-hidden`).
+- **Group:** the `h3` in 14 px, bold, white, uppercase with letter spacing, then "12 of 61" in 13 px muted, also outside the heading. A 1 px `--border` line above each group.
+- The counts come in as props: `perCategory` (exists) and a new `perGroup` in `src/model/stats.ts`, both over `countable(items)` and the records, never over `view.visible`.
+- Heading levels and ids stay as today, so `aria-labelledby` and the search tests keep working.
+
+### 4.4 The round check
+
+The checkbox keeps today's technique (`appearance: none`, the ✓ as a clip-path `::before`, `CanvasText` in forced colours). It becomes round (24 px, `border-radius: 50%`) with a 44 px hit area. Checked: pink fill, black ✓ (`--accent-text`). In PR 1 it stays where it is today.
+
+### 4.5 Width and spacing
+
+The new `--tracker-max-w` (§3.3), the spacing table (§3.5) and the tablet and phone tile layouts. The sticky search row is unchanged.
+
+## 5. PR 2: the structure
+
+### 5.1 The card (`ItemList.tsx`, `ItemRow`)
+
+Order in the DOM, which is also the Tab order: checkbox, book link, flag button.
+
+- **Icon tile** (36 px) with the category icon. Found: pink background tint and pink icon.
+- **Name** (15 px, semibold), as the checkbox's `label`.
+- **Meta line** (12 px, muted): a 7 px dot (pink for Confirmed, cyan for Expected), the tier text as today (`tracker.confirmed` or `tracker.expectedFrom`), " · ", the group label. It may wrap on narrow phones; it is never cut off.
+- **Check** top right, absolutely placed in a 44 px box. The label's `::after` still covers the card, so a tap anywhere on the card toggles it.
+- **Description** clamped to 2 lines (`-webkit-line-clamp: 2`). The full text stays in the DOM, so screen readers read all of it.
+- **Footer**, right-aligned: book (Sources) and flag ("coming soon", `aria-disabled`). Both sit above the label's click layer, as today. The footer is a flex row so December can add "Entry →" and a star without changing the layout. No empty placeholders now.
+- **Found:** the card border turns pink (45 % mix), the icon tile turns pink and the check shows the ✓.
+
+### 5.2 The rail (`StatsRail.tsx`, desktop only)
+
+- The heading stays `h2`, "Overall" (`tracker.overall`). From launch it links to the hub, as today (`hubHref`).
+- The big number: the overall percentage in Bebas Neue 48 px, the % sign smaller, then one bar. The percentage is rounded **down** (`Math.floor`), so 214 of 215 reads 99 %, never 100 % before everything is found. A total of 0 reads 0 %. The bar keeps `role="progressbar"` with `aria-valuetext` as "60 of 215".
+- The four category bars are removed. `Bar` stays exported, because the hub's `Dashboard.tsx` imports it.
+- **Recent finds** (`h3`, as today): up to 5 rows, each with the category icon tile (28 px, pink), the name and a `<time datetime>` with the relative time (§5.4).
+- New styles are scoped to `.stats`. The hub also uses `.recent`, so unscoped rules would leak onto the dashboard.
+
+### 5.3 The "Last found" row (phones and tablet, under 1024 px)
+
+- Shows the most recent find: icon, "Last found" (`tracker.lastFound`), the name and the relative time.
+- It is a `button` when the item's card is in the current view. Activating it focuses that card's checkbox. `focus()` scrolls the card into view, and the existing `scroll-padding-top` keeps it clear of the sticky search row.
+- When search, Hide found or the category filter hides that card, or the checkboxes are disabled (the tracker is not `ready`, and a disabled input cannot take focus), the row renders as plain text. Nothing is there to jump to, and the row never changes the user's filters.
+- With no finds, the row is not rendered.
+- Hidden from 1024 px, where the rail shows the same information.
+
+### 5.4 Relative time (`src/model/relativeTime.ts`, pure)
+
+`relativeTime(then: string, now: Date, locale: Locale): string` with `Intl.RelativeTimeFormat(locale, { numeric: "auto", style: "short" })`:
+
+| Age | Unit |
+| --- | --- |
+| Under 1 minute, or in the future | 0 seconds ("now" / "nå") |
+| Under 1 hour | minutes |
+| Same local calendar day | hours |
+| Earlier days | days by local calendar day (`daysAgo`, `localDayKey`), so 1 reads "yesterday" / "i går" |
+
+A find at 23:00 yesterday reads "yesterday" at 08:00, not "9 hours ago". A future timestamp (clock skew, an import from another device) reads "now". The exact words come from the browser's CLDR data, so tests compare against `Intl.RelativeTimeFormat` output, never hard-coded strings.
+
+A `useNow(60_000)` hook re-renders the rail and the row once a minute and on `visibilitychange`, so "2 min ago" never goes stale, also after sleep or a throttled background tab. The interval is cleared on unmount. The hook is called inside `StatsRail` and `LastFound`, never in `Tracker.tsx`, so the minute tick does not re-render 215 cards. Neither the rail nor the row is a live region, so the changing times are never announced.
+
+### 5.5 Profile button in the title row
+
+- The Astro page wraps the h1 in `.tracker-head` (flex, `justify-content: space-between`, `align-items: center`, `min-height: 44px`) with an empty `<div id="tracker-profile">` after it.
+- `ProfileMenu` renders into that slot with a React portal. Portals keep React events and state, so the menu, its keyboard pattern and the dialogs are unchanged. If the slot is missing (component tests, or a page without it), it renders in place, where `.tracker-top` holds it today.
+- The slot is at the right edge, so the button appearing on mount moves nothing. The row's height is fixed, so there is no layout shift.
+- Tab order: the profile button comes before the search field, which matches reading order.
+- **Trigger:** a 28 px round avatar (pink tint, the profile's first character) and the name. The accessible name stays `profile.menu` ("Profile: Malin"); the avatar is `aria-hidden`.
+- **First character:** the first grapheme of the trimmed name from `Intl.Segmenter`, upper-cased for the page locale, so a name starting with an emoji or a combining character shows the whole character. Where `Intl.Segmenter` is missing, `Array.from(name)[0]` is the fallback.
+- **Long names:** up to 40 characters (the existing limit). On phones the visible name is cut with an ellipsis at a max width; the accessible name is always the full name.
+- The avatar is its own element with a fixed size, so a picture can replace the letter later without changing the layout.
+
+## 6. Copy
+
+| Key | English | Norwegian |
+| --- | --- | --- |
+| `tracker.lastFound` | Last found | Sist funnet |
+
+Everything else reuses existing keys: `tracker.count`, `tracker.overall`, `tracker.recent`, `tracker.confirmed`, `tracker.expectedFrom`, `profile.menu`, `category.*` and the group labels. The relative times come from `Intl`, not from the bundles. `tracker.progress` stays: the hub dashboard and its skeleton use it.
+
+## 7. Accessibility
+
+- Nothing is told by colour alone: found shows a ✓, a pink border and a pink icon tile; Confirmed and Expected keep their words next to the dot.
+- Every control is at least 44 px. Controls on one row share one height and one bottom edge: the profile button with the h1 row, and the search field with Hide found.
+- Labels look like labels: group titles and "Overall" / "Recent finds" stand apart from their values by weight, size and colour.
+- Forced colours: tiles, cards and the check keep visible borders and the ✓ (`CanvasText`). Pressed tiles use `Highlight` (§4.1). A found card loses its pink border and tile there but keeps the ✓, which is enough. The gradient line can disappear; it is decorative.
+- Reduced motion: no new motion. The jump from the "Last found" row is a focus move, not an animation.
+- Muted text keeps AA (4.5:1) on true black, as ruled for the dashboard.
+- Screen readers: tile names include counts; the card's name, tier and description are read in order; relative times are `<time>` with a `datetime`.
+
+## 8. Edge cases
+
+- **No finds:** the rail shows `tracker.noRecent` as today; the phone row is not rendered.
+- **Profile with a 40-character name:** cut with an ellipsis on phones, full on desktop where it fits, full accessible name everywhere.
+- **Empty search result:** unchanged empty state; the titles and counts of hidden categories are not shown, because their sections are not rendered.
+- **A category with every item found and Hide found on:** its section disappears as today; its tile still shows the full count.
+- **Unknown category id in a future seed:** the All icon and the raw id label (`seedLabel`'s fallback).
+- **Launch:** the rail heading links to the hub from launch; tested with a date before and after `hubPhase`.
+- **Long Norwegian group names:** they wrap; the count stays on the title's line or wraps below it, never overlapping.
+
+## 9. Privacy, security and performance
+
+- No new data, storage, network calls or third parties. Relative times are computed on the device.
+- No inline styles from the server; bar widths keep going through the CSSOM, which the CSP allows.
+- Bebas Neue is already preloaded, so the bigger titles add no font request. Layout shift on load is measured at 0 at 320, 768, 1024 and 1280 px, including a slow simulated connection.
+- The once-a-minute tick re-renders only the rail and the row.
+
+## 10. Units touched
+
+| File | PR | Change |
+| --- | --- | --- |
+| `src/islands/tracker/icons.tsx` | 1 | Five category icons, `categoryIcon(id)` |
+| `src/islands/tracker/CategoryNav.tsx` | 1 | Tiles with icon, count and bar |
+| `src/islands/tracker/ItemList.tsx` | 1, 2 | Titles with counts (1); icon-lead card (2) |
+| `src/islands/Tracker.tsx` | 1, 2 | Pass counts (1); row, portal target, `now` (2) |
+| `src/styles/global.css` | 1, 2 | Layout, tiles, titles, check (1); card, rail, row, profile (2) |
+| `src/islands/tracker/StatsRail.tsx` | 2 | Big %, recent with icons and times |
+| `src/islands/tracker/LastFound.tsx` | 2 | New: the phone row |
+| `src/islands/tracker/ProfileMenu.tsx` | 2 | Avatar trigger, portal |
+| `src/islands/tracker/useNow.ts` | 2 | New: minute tick |
+| `src/model/relativeTime.ts` | 2 | New: pure relative time |
+| `src/model/stats.ts` | 1 | New `perGroup(items, records)` beside `perCategory`, both over `countable` items |
+| `src/pages/[locale]/tracker/index.astro` | 2 | `.tracker-head` and the profile slot |
+| `src/locales/en.json`, `nb.json` | 2 | `tracker.lastFound` |
+
+## 11. Tests
+
+**PR 1**
+
+- `CategoryNav`: each tile's accessible name includes its count; `aria-pressed` and multi-select behaviour unchanged; Sources stays a link without `aria-pressed`.
+- `ItemList`: every category and group title shows its count from all items, not the filtered view (search for one item, the count stays the same).
+- `categoryIcon`: every category in the seed has its own icon; an unknown id gets the fallback.
+- Category and group heading names are the label alone ("Vehicles"), with the count beside them.
+- A CSS test (as `src/styles/hover.test.ts` does) checks that pressed tiles are in the forced-colours `Highlight` rule.
+- Measured: the stacked tiles at 320 px and at 320 px with 200 % text, no overlap and one height per row.
+- Existing tracker, search and profile tests pass unchanged.
+
+**PR 2**
+
+- `relativeTime`: now, future, minutes, same-day hours, yesterday across midnight, older days, in `en` and `nb`, compared against `Intl.RelativeTimeFormat` output.
+- `useNow`: ticks with fake timers and clears on unmount.
+- `ItemRow`: Tab order is checkbox, book, flag; a click on the card body toggles; found adds the found class; the description is in the DOM in full.
+- `StatsRail`: big percentage rounded down (214 of 215 reads 99 %, 0 of 0 reads 0 %), no category bars, recent rows with `<time datetime>`, hub link only from launch.
+- `LastFound`: a button when the card is visible, focus lands on the checkbox; plain text when hidden by search, Hide found or a filter, and while the tracker is not ready; absent with no finds. `useNow` is not called by `Tracker.tsx` (a render count on an item card stays the same across a tick).
+- `ProfileMenu`: renders into the slot when present and in place when not; accessible name "Profile: {name}"; first grapheme of an emoji name; the menu keyboard pattern unchanged.
+- Old tests that find the checkbox or the book by position are rewritten to find them by role and name.
+
+**Both PRs, before opening**
+
+`npm test`, `npx biome ci .` and the build; Lighthouse CI; layout shift and alignment measured at 320, 768, 1024 and 1280 px in English and Norwegian; keyboard-only, reduced motion and forced colours. Each PR gets a preview URL for a phone check.
+
+## 12. Considered and rejected
+
+- **Tiles across the top on desktop (Q1 C):** undoes layout B and needed per-category hues the brand does not have.
+- **Category panels (S2):** boxes inside boxes; S3 keeps the separation with lines and type instead.
+- **Profile in the site header (Q3 H):** about 8 to 12 hours across every page; too big before the freeze. December.
+- **Absolutely positioning the profile button over the h1:** a portal into a reserved slot is simpler and cannot overlap a long title.
+- **Five tablet tiles in one row:** does not fit at 768 px (§3.2).
+- **Expanding a clamped description on tap:** competes with the card-wide toggle. The Dex gives every item its full text in December.
+- **Keeping the four category bars in the rail:** they repeat the tiles.
+- **Showing the full description when text spacing is raised (WCAG 1.4.12):** the 2-line clamp is a deliberate cut, not a loss caused by spacing, and the full text is in the DOM for assistive tech. Accepted until the Dex.
+- **Hiding the profile name on a shared device:** the name already shows in today's profile button; moving it to the title row shows nothing new.
+- **Making the Last found row clear filters so it can always jump:** it would change state the user set without asking.
+
+## 13. Later (December)
+
+- **Dex:** an "Entry →" link in the card footer, per-item pages sharing the seed. The crawlable category pages built for SEO may become its start; the URLs should not change when it does.
+- **Favourites:** a star in the card footer, its own field and timestamp in the record, export v2.
+- **Profile in the site header,** with an own profile picture (local-only, size-capped, in export and import) replacing the letter avatar.
+
+> Stress-tested 2026-11-03 (skill b9705f6): 7 applied, 1 adapted, 0 decided by me.
