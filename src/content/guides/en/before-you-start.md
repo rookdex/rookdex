@@ -1,8 +1,8 @@
 ---
 title: Before you start
-searchTitle: "Before you start: GTA 6 launch checklist · Rookdex"
+searchTitle: "GTA 6 release date, price and preload: launch checklist · Rookdex"
 summary: What to sort out before launch night so you can play the moment it unlocks.
-searchDescription: "What to sort out before GTA 6 launches on 19 November 2026: editions, the pre-order bonus, GTA+, preload from 12 November and prices in Norway."
+searchDescription: "GTA 6 comes out on 19 November 2026 on PS5 and Xbox Series X|S. Preload from 12 November, editions, the pre-order bonus, GTA+ and prices in Norway."
 updated: 2026-10-27
 sources:
   - https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions
