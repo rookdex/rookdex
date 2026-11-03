@@ -36,6 +36,24 @@ export function perCategory(items: SeedItem[], records: Records): CategoryCount[
 	}))
 }
 
+/** The key `perGroup` and the list share. Group ids repeat across categories, so both are in it. */
+export function groupKey(category: string, group: string): string {
+	return `${category}/${group}`
+}
+
+/** Per group, keyed by `groupKey`. Always over every countable item, never a filtered view. */
+export function perGroup(items: SeedItem[], records: Records): Record<string, Count> {
+	const counts: Record<string, Count> = {}
+	for (const item of countable(items)) {
+		const key = groupKey(item.category, item.group)
+		const count = counts[key] ?? { done: 0, total: 0 }
+		count.total += 1
+		if (records[item.id]?.done) count.done += 1
+		counts[key] = count
+	}
+	return counts
+}
+
 export function recentFinds(items: SeedItem[], records: Records, limit = 5): RecentFind[] {
 	return countable(items)
 		.flatMap((item) => {
