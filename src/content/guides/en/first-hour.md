@@ -3,13 +3,14 @@ title: Your first hour
 searchTitle: "Your first hour in GTA 6: launch-night checklist · Rookdex"
 summary: What to check, claim and skip in the first hour after GTA VI unlocks.
 searchDescription: "Your first hour of GTA 6 on launch night: what to check before midnight, what to do if it won't start, what you can skip, and playing as Jason and Lucia."
-updated: 2026-10-27
+updated: 2026-11-03
 sources:
   - https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing
   - https://support.rockstargames.com/articles/3SZF8cy8dG7lHsLf38uWK1/redeeming-the-one-month-gta-membership-included-with-your-grand-theft-auto-vi-pre-order
   - https://www.playstation.com/en-no/games/grand-theft-auto-vi/
   - https://www.xbox.com/en-US/games/store/grand-theft-auto-vi/9NL3WWNZLZZN
   - https://www.gamespot.com/articles/how-switching-between-gta-6s-two-protagonists-works/
+  - https://www.gamesradar.com/edge/gtavi-cover/
 ---
 
 ## Before midnight
@@ -29,6 +30,10 @@ Check the service status page on support.rockstargames.com first. Busy servers o
 ## Playing as two
 
 You play as Jason and Lucia. Some missions lock you to one of them, some make you switch and some let you choose. So don't worry if you can't switch whenever you like.
+
+## When the police are after you
+
+Edge's preview describes a new heat system. Icons at the top of the screen show what the police know about you: your description, whether you had a partner, what you wore, whether CCTV caught you and what weapon you carried. Split up, change clothes or drop the weapon and you match the report less. A newer, expensive car may hide a tracker. A separate Criminal Profile rates how you play, from Professional to Irredeemable.
 
 ## Rookdex on launch night
 

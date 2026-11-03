@@ -86,5 +86,28 @@
 				"title": "GTA 6 Launch Trailer Released"
 			}
 		]
+	},
+	{
+		"id": "facts/score-and-album",
+		"claim_key": "score-album-release",
+		"name": {
+			"en": "Justice Score Out 11 December, Album on Launch Day",
+			"nb": "Justice-musikken kommer 11. desember, albumet på lanseringsdagen"
+		},
+		"summary": {
+			"en": "Justice composed the game's adaptive score. The 30-track Original Score comes out on 11 December on streaming services, CD and vinyl. Grand Theft Auto VI: The Album, with 34 original songs, comes out with the game on 19 November.",
+			"nb": "Justice har laget musikken til spillet, og den tilpasser seg det du gjør. Original Score med 30 spor kommer 11. desember på strømmetjenester, CD og vinyl. Grand Theft Auto VI: The Album, med 34 nye låter, kommer samtidig med spillet 19. november."
+		},
+		"announced": "2026-10-29",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/39ak8a12395591/grand-theft-auto-vi-original-score-by-justice",
+				"title": "Grand Theft Auto VI: Original Score by Justice"
+			},
+			{
+				"url": "https://www.rockstargames.com/newswire/article/7599a881942544/announcing-grand-theft-auto-vi-the-album-coming-november-19",
+				"title": "Announcing Grand Theft Auto VI: The Album, Coming November 19"
+			}
+		]
 	}
 ]

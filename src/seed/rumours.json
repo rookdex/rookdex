@@ -18,14 +18,18 @@
 	},
 	{
 		"id": "rumours/online-2027-launch",
-		"name": "GTA 6 Multiplayer in 2027",
+		"name": "Online Mode Reported for 2027",
 		"claim_key": "online-2027-launch",
-		"summary": "Twitch CEO Dan Clancy told Bloomberg that Rockstar plans to launch GTA 6's online multiplayer mode in 2027, a year after the single player game, though Rockstar itself has not confirmed a date.",
+		"summary": "Twitch CEO Dan Clancy told Bloomberg in September that GTA 6's online mode launches in 2027, a year after the story game. Bloomberg's own feature on 14 October also says the online component is expected in 2027. Rockstar has not confirmed a date.",
 		"added": "2026-09-18",
 		"sources": [
 			{
 				"url": "https://www.pcgamer.com/games/grand-theft-auto/twitch-ceo-says-gta-6-multiplayer-will-launch-in-2027/",
 				"title": "Twitch CEO says GTA 6 multiplayer will launch in 2027"
+			},
+			{
+				"url": "https://www.bloomberg.com/features/2026-grand-theft-auto-6-making-of/",
+				"title": "Inside the Making of Grand Theft Auto 6"
 			}
 		]
 	},
@@ -51,19 +55,6 @@
 		]
 	},
 	{
-		"id": "rumours/review-copies-october",
-		"name": "Review Copies Before November",
-		"claim_key": "review-copies-october",
-		"summary": "Insider NateTheHate claims review copies go out before the end of October, and Insider Gaming reports that reviews go live before the 19 November launch; Rockstar has not announced a review date.",
-		"added": "2026-10-15",
-		"sources": [
-			{
-				"url": "https://rockstarintel.com/gta-6-will-be-sent-out-very-soon-to-reviewers-its-claimed/",
-				"title": "GTA 6 Will Be Sent Out Very Soon To Reviewers It's Claimed"
-			}
-		]
-	},
-	{
 		"id": "rumours/preorder-estimate",
 		"name": "Record Pre-Order Estimates",
 		"claim_key": "preorder-estimate-us-digital",
@@ -73,6 +64,23 @@
 			{
 				"url": "https://rockstarintel.com/gta-6-pre-order-numbers-are-146-more-than-any-other-game/",
 				"title": "GTA 6 Pre-Orders Are 148% More Than Any Other Game"
+			}
+		]
+	},
+	{
+		"id": "rumours/reviews-november-18",
+		"name": "Reviews Reportedly Land 18 November",
+		"claim_key": "reviews-date-november-18",
+		"summary": "Insider NateTheHate says review copies went out in late October and that reviews can go live on 18 November, the day before launch, and Insider Gaming reports that reviews land before 19 November. Rockstar has not announced a review date.",
+		"added": "2026-10-26",
+		"sources": [
+			{
+				"url": "https://rockstarintel.com/gta-6-has-just-been-sent-out-early-to-reviewers/",
+				"title": "GTA 6 Has Just Been Sent Out Early To Reviewers"
+			},
+			{
+				"url": "https://www.gamespot.com/articles/gta-6-reviews-when-they-could-be-released/",
+				"title": "GTA 6 Reviews: Here's When The Scores Might Come In"
 			}
 		]
 	}
