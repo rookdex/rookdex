@@ -1,0 +1,87 @@
+---
+interface Chip {
+	href: string
+	label: string
+	count?: number
+}
+
+interface Props {
+	/** The nav's name. With `headingId` it is also shown, as an H2 the nav is labelled by. */
+	label: string
+	chips: Chip[]
+	headingId?: string
+}
+
+// A row of 44 px chip links (category pages spec §5.1, the Sources page's chips). Used for in-page
+// jumps and for links between pages.
+const { label, chips, headingId } = Astro.props
+---
+
+<nav class="chip-nav" aria-label={headingId ? undefined : label} aria-labelledby={headingId}>
+	{headingId && <h2 id={headingId} class="chip-heading">{label}</h2>}
+	<ul class="chip-list">
+		{
+			chips.map((chip) => (
+				<li>
+					<a href={chip.href}>
+						{chip.label}
+						{chip.count !== undefined && <span class="count">{chip.count}</span>}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</nav>
+
+<style>
+	.chip-heading {
+		margin: 0 0 var(--space-2);
+		font-size: 1.125rem;
+	}
+
+	.chip-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+		margin: 0 0 var(--space-4);
+		padding: 0;
+		list-style: none;
+	}
+
+	.chip-list a {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		min-height: var(--tap);
+		padding: 0 var(--space-3);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		background: var(--bg-raised);
+		color: var(--text);
+		font-size: 0.9375rem;
+		text-decoration: none;
+		transition: background-color 120ms, border-color 120ms;
+	}
+
+	@media (hover: hover) {
+		.chip-list a:hover {
+			background: var(--bg-hover);
+			border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+		}
+	}
+
+	@media (hover: none) {
+		.chip-list a:active {
+			background: var(--bg-hover);
+		}
+	}
+
+	.chip-list a:focus-visible {
+		background: var(--bg-hover);
+	}
+
+	.count {
+		color: var(--text-muted);
+		font-size: 0.75rem;
+	}
+</style>

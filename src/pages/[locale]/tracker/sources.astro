@@ -1,9 +1,9 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n"
-import ExternalLink from "../../../components/ExternalLink.astro"
+import ChipNav from "../../../components/ChipNav.astro"
+import SourceList from "../../../components/SourceList.astro"
 import { isLocale, type Locale, locales, seedLabel, translator } from "../../../i18n"
 import Base from "../../../layouts/Base.astro"
-import { outletOf } from "../../../model/outlet"
 import { categoryIds, groupItems, seedItems } from "../../../model/seed"
 
 export function getStaticPaths() {
@@ -22,45 +22,35 @@ const sections = categoryIds(live).map((category) => ({
 	items: [...groupItems(live.filter((item) => item.category === category)).values()].flat(),
 }))
 const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
+// Seed text is English; nb pages say so (category pages spec §10).
+const itemLang = locale === "en" ? undefined : "en"
 ---
 
 <Base locale={locale} title={t("seo.titles.sources")} description={t("sources.description")} path="tracker/sources">
 	<h1>{t("sources.title")}</h1>
 	<p class="lede">{t("sources.lede")}</p>
-	<nav aria-label={t("tracker.categories")}>
-		<ul class="source-chips">
-			{
-				sections.map((section) => (
-					<li>
-						<a href={`#cat-${section.category}`}>
-							{section.label}
-							<span class="count">{section.items.length}</span>
-						</a>
-					</li>
-				))
-			}
-		</ul>
-	</nav>
+	<ChipNav
+		label={t("tracker.categories")}
+		chips={sections.map((section) => ({
+			href: `#cat-${section.category}`,
+			label: section.label,
+			count: section.items.length,
+		}))}
+	/>
 	{
 		sections.map((section) => (
 			<section class="source-section" aria-labelledby={`cat-${section.category}`}>
-				<h2 id={`cat-${section.category}`}>{section.label}</h2>
+				<h2 id={`cat-${section.category}`}>
+					<a class="go-link" href={getRelativeLocaleUrl(locale as Locale, `dex/${section.category}`)}>
+						{section.label}
+					</a>
+				</h2>
 				{section.items.map((item) => (
 					<article id={item.id} class="source-entry">
-						<h3>{item.name}</h3>
-						<ul class="tap-links">
-							{item.sources.map((source) => (
-								<li>
-									{/* No whitespace around the title: a space before the ↗ would let it wrap alone. */}
-									<ExternalLink href={source.url} locale={locale as Locale} class="go-link"
-										>{source.title}</ExternalLink
-									>
-									<span class="outlet">{outletOf(source.url)}</span>
-								</li>
-							))}
-						</ul>
+						<h3 lang={itemLang}>{item.name}</h3>
+						<SourceList sources={item.sources} locale={locale as Locale} lang={itemLang} />
 						<a class="back go-link" href={`${tracker}#item-${item.id}`}>
-							{t("sources.back")}<span class="visually-hidden">: {item.name}</span>
+							{t("sources.back")}<span class="visually-hidden">: <span lang={itemLang}>{item.name}</span></span>
 						</a>
 					</article>
 				))}
@@ -80,52 +70,6 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 		color: var(--text-muted);
 		font-size: 0.875rem;
 		line-height: 1.5;
-	}
-
-	.source-chips {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-2);
-		margin: 0 0 var(--space-4);
-		padding: 0;
-		list-style: none;
-	}
-
-	.source-chips a {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-2);
-		min-height: var(--tap);
-		padding: 0 var(--space-3);
-		border: 1px solid var(--border);
-		border-radius: 999px;
-		background: var(--bg-raised);
-		color: var(--text);
-		font-size: 0.9375rem;
-		text-decoration: none;
-		transition: background-color 120ms, border-color 120ms;
-	}
-
-	@media (hover: hover) {
-		.source-chips a:hover {
-			background: var(--bg-hover);
-			border-color: color-mix(in srgb, var(--accent) 50%, transparent);
-		}
-	}
-
-	@media (hover: none) {
-		.source-chips a:active {
-			background: var(--bg-hover);
-		}
-	}
-
-	.source-chips a:focus-visible {
-		background: var(--bg-hover);
-	}
-
-	.count {
-		color: var(--text-muted);
-		font-size: 0.75rem;
 	}
 
 	.source-section {
@@ -161,31 +105,6 @@ const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 		margin: 0 0 var(--space-1);
 		font-size: 0.9375rem;
 		font-weight: 600;
-	}
-
-	.source-entry ul {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	/* The 44 px target is the link itself (the global .tap-links utility), not the row. */
-	.source-entry li {
-		display: flex;
-		flex-direction: column;
-	}
-
-	/* In a flex link a wrapped title and its ↗ are separate items, which pushes the ↗ out to the
-	   right edge. Plain block flow keeps it after the last word; the padding centres one line in
-	   the 44 px target. ExternalLink renders the <a>, outside this page's scope. */
-	.source-entry li :global(a) {
-		display: block;
-		padding-block: calc((var(--tap) - 1lh) / 2);
-	}
-
-	.outlet {
-		color: var(--text-muted);
-		font-size: 0.75rem;
 	}
 
 	.back {
