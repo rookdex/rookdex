@@ -39,7 +39,6 @@ function Tile({ label, count, pressed, onClick, Icon, t }: TileProps) {
 	return (
 		<button
 			type="button"
-			className="tile"
 			aria-pressed={pressed}
 			aria-label={`${label}, ${t("tracker.count", { done: count.done, total: count.total })}`}
 			onClick={onClick}

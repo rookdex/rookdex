@@ -28,6 +28,13 @@ function renderNav(selected: string[] = [], locale: Locale = "en") {
 }
 
 describe("CategoryNav tiles (tracker refresh spec §4.1)", () => {
+	it("does not borrow the hub dashboard's tile class", () => {
+		const { container } = renderNav()
+		const buttons = container.querySelectorAll("button[aria-pressed]")
+		expect(buttons.length).toBeGreaterThan(0)
+		for (const button of buttons) expect(button).not.toHaveClass("tile")
+	})
+
 	it("names each tile with its count in words and hides the digits and the bar", () => {
 		renderNav()
 		expect(screen.getByRole("button", { name: "All, 45 of 172" })).toHaveAttribute(

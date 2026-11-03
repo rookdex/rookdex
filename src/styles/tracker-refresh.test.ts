@@ -69,6 +69,16 @@ describe("tracker refresh look (spec §3, §4)", () => {
 		)
 	})
 
+	it("draws the tile edge and top-aligns its rows itself, without the hub's .tile class", () => {
+		expect(rule(".tiles button")).toMatch(/border:\s*1px solid var\(--border\)/)
+		expect(rule(".tiles button")).toMatch(/align-content:\s*start/)
+	})
+
+	it("sets the All tile label to 12 px on desktop so every desktop tile has one height", () => {
+		const desktop = css.slice(css.indexOf("@media (min-width: 1024px)"))
+		expect(desktop).toMatch(/\.tiles \.tile-all \.tile-name\s*\{[^}]*font-size:\s*0\.75rem/)
+	})
+
 	it("leaves no .chips selector behind", () => {
 		expect(css).not.toMatch(/\.chips\b/)
 	})
