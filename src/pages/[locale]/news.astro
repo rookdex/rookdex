@@ -1,8 +1,11 @@
 ---
+import { getCollection } from "astro:content"
+import { getRelativeLocaleUrl } from "astro:i18n"
 import ExternalLink from "../../components/ExternalLink.astro"
-import { isLocale, type Locale, locales, translator } from "../../i18n"
+import { defaultLocale, isLocale, type Locale, locales, translator } from "../../i18n"
 import Base from "../../layouts/Base.astro"
 import { latestRumours, newestFacts } from "../../model/dashboard"
+import { guideSlugs, resolveGuide } from "../../model/guides"
 import { outletOf } from "../../model/outlet"
 import { facts, rumours } from "../../model/seed"
 
@@ -26,6 +29,15 @@ const channels = [
 	{ name: "X", href: "https://x.com/rockstargames" },
 	{ name: "Instagram", href: "https://instagram.com/rockstargames" },
 ]
+// The launch guides close the page, so a reader who came for the news finds the checklist next.
+const guideEntries = await getCollection("guides")
+const guides = guideSlugs(guideEntries)
+	.sort()
+	.map((slug) => {
+		const found = resolveGuide(guideEntries, locale, slug, defaultLocale)
+		if (!found) throw new Error(`Missing guide: ${slug}`)
+		return { href: getRelativeLocaleUrl(locale, `guides/${slug}`), ...found.entry.data }
+	})
 ---
 
 <Base locale={locale} title={t("seo.titles.news")} description={t("news.description")} path="news">
@@ -98,6 +110,21 @@ const channels = [
 				}
 			</ul>
 		</section>
+		<section aria-labelledby="guides">
+			<h2 id="guides">{t("newsGuides.title")}</h2>
+			<ul class="rumour-list guide-list">
+				{
+					guides.map((guide) => (
+						<li>
+							<h3>
+								<a href={guide.href}>{guide.title}</a>
+							</h3>
+							<p class="summary">{guide.summary}</p>
+						</li>
+					))
+				}
+			</ul>
+		</section>
 	</article>
 </Base>
 
@@ -114,6 +141,13 @@ const channels = [
 	}
 
 	.channel-list :global(a) {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tap);
+	}
+
+	/* The guide title is the link, so it gets the full tap height like the channels above. */
+	.guide-list a {
 		display: inline-flex;
 		align-items: center;
 		min-height: var(--tap);

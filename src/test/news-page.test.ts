@@ -44,6 +44,19 @@ vi.mock("../model/seed", async (importOriginal) => {
 	}
 })
 
+// Vitest has no content layer, so the guide entries the page links to are stubbed in each language.
+vi.mock("astro:content", () => {
+	const guide = (id: string, title: string) => ({ id, data: { title, summary: `${title}.` } })
+	return {
+		getCollection: async () => [
+			guide("en/first-hour", "Your first hour"),
+			guide("en/before-you-start", "Before you start"),
+			guide("nb/before-you-start", "Før du begynner"),
+			guide("nb/first-hour", "Den første timen"),
+		],
+	}
+})
+
 describe("News page (spec §8)", () => {
 	it("is the News tab, with Confirmed above Rumours", async () => {
 		const doc = await renderDoc(News, { params: { locale: "en" } })
@@ -52,10 +65,24 @@ describe("News page (spec §8)", () => {
 			"Confirmed",
 			"Rumours",
 			"Official channels",
+			"Getting ready",
 		])
 		expect(
 			doc.querySelector('nav[aria-label="Main"] [aria-current="page"]')?.textContent?.trim()
 		).toBe("News")
+	})
+
+	it("ends with the launch guides, linked in the page's language", async () => {
+		const doc = await renderDoc(News, { params: { locale: "nb" } })
+		const links = [...doc.querySelectorAll('[aria-labelledby="guides"] a')].map((a) => [
+			a.textContent,
+			a.getAttribute("href"),
+		])
+		expect(links).toEqual([
+			["Før du begynner", "/nb/guides/before-you-start/"],
+			["Den første timen", "/nb/guides/first-hour/"],
+		])
+		expect(doc.querySelector("#guides")?.textContent).toBe("Gjør deg klar")
 	})
 
 	it("lists each rumour under an h3, newest first (dashboard spec §6.3)", async () => {
