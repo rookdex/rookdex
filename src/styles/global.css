@@ -3265,10 +3265,6 @@ html:has(.search-row) {
 		align-self: baseline;
 	}
 
-	.tile-name {
-		font-size: 0.8125rem;
-	}
-
 	.tile-icon {
 		width: 36px;
 		height: 36px;

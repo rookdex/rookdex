@@ -41,6 +41,14 @@ describe("tracker refresh look (spec §3, §4)", () => {
 		expect(rule(".tile-name")).toMatch(/hyphens:\s*auto/)
 	})
 
+	it("keeps the desktop tile label at the phone size so a long Norwegian name fits on one line", () => {
+		const sizes = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)]
+			.filter(([, selectors]) => selectors.trim() === ".tile-name")
+			.map(([, , body]) => body.match(/font-size:\s*([^;]+);/)?.[1]?.trim())
+		expect(sizes.length).toBeGreaterThan(0)
+		expect(sizes).toEqual(sizes.map(() => "0.75rem"))
+	})
+
 	it("lets a long category title break instead of widening the page at large text", () => {
 		expect(rule(".cat-head h2")).toMatch(/min-width:\s*0/)
 		expect(rule(".cat-head h2")).toMatch(/overflow-wrap:\s*break-word/)
