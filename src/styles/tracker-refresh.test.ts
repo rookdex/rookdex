@@ -52,6 +52,7 @@ describe("tracker refresh look (spec §3, §4)", () => {
 	it("lets a long category title break instead of widening the page at large text", () => {
 		expect(rule(".cat-head h2")).toMatch(/min-width:\s*0/)
 		expect(rule(".cat-head h2")).toMatch(/overflow-wrap:\s*break-word/)
+		expect(rule(".item-list")).toMatch(/grid-template-columns:\s*minmax\(0, 1fr\)/)
 	})
 
 	it("keeps the hub's uppercase label look off the tracker tile name", () => {

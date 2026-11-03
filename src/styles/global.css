@@ -1692,6 +1692,8 @@ html:has(.search-row) {
    True black, no panels: lines and type separate the sections. */
 .item-list {
 	display: grid;
+	/* I give the list one shrinkable column so a long title at 200 % text wraps instead of widening the track. */
+	grid-template-columns: minmax(0, 1fr);
 	gap: 72px;
 }
 
