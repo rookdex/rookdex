@@ -3,13 +3,14 @@ title: Den første timen
 searchTitle: "Den første timen i GTA 6: lanseringskvelden · Rookdex"
 summary: Det du bør sjekke, hente og la være den første timen etter at GTA VI låses opp.
 searchDescription: "Den første timen i GTA 6 på lanseringskvelden: hva du sjekker før midnatt, hva du gjør hvis spillet ikke starter, hva du kan droppe, og Jason og Lucia."
-updated: 2026-10-27
+updated: 2026-11-03
 sources:
   - https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing
   - https://support.rockstargames.com/articles/3SZF8cy8dG7lHsLf38uWK1/redeeming-the-one-month-gta-membership-included-with-your-grand-theft-auto-vi-pre-order
   - https://www.playstation.com/en-no/games/grand-theft-auto-vi/
   - https://www.xbox.com/en-US/games/store/grand-theft-auto-vi/9NL3WWNZLZZN
   - https://www.gamespot.com/articles/how-switching-between-gta-6s-two-protagonists-works/
+  - https://www.gamesradar.com/edge/gtavi-cover/
 ---
 
 ## Før midnatt
@@ -29,6 +30,10 @@ Sjekk driftsstatusen på support.rockstargames.com først. Det er vanlig at serv
 ## To spillbare figurer
 
 Du spiller som Jason og Lucia. Noen oppdrag låser deg til én av dem, noen tvinger deg til å bytte og noen lar deg velge. Så ikke bekymre deg om du ikke kan bytte når du vil.
+
+## Når politiet er etter deg
+
+Edge beskriver et nytt system for hvor ettersøkt du er. Ikoner øverst på skjermen viser hva politiet vet om deg: hvordan du ser ut, om du hadde en partner, hva du hadde på deg, om et overvåkingskamera fanget deg og hvilket våpen du bar. Skiller dere lag, bytter du klær eller kaster våpenet, passer du dårligere med beskrivelsen. En nyere, dyr bil kan ha en sporingsenhet. En egen Criminal Profile vurderer hvordan du spiller, fra Professional til Irredeemable.
 
 ## Rookdex på lanseringskvelden
 

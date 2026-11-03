@@ -218,6 +218,25 @@
 		]
 	},
 	{
+		"id": "wildlife/pigeon",
+		"category": "wildlife",
+		"group": "birds",
+		"name": "Pigeon",
+		"status": "expected",
+		"precedent": "GTA V",
+		"description": "Edge's hands-on preview describes a flock of pigeons bursting into the air on a city sidewalk. Rockstar has not shown them in its own material yet.",
+		"sources": [
+			{
+				"url": "https://www.gamesradar.com/edge/gtavi-cover/",
+				"title": "Grand Theft Auto VI exclusive: The state that never sleeps (Edge)"
+			},
+			{
+				"url": "https://www.gtabase.com/gta-6/animals/",
+				"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+			}
+		]
+	},
+	{
 		"id": "wildlife/raccoon",
 		"category": "wildlife",
 		"group": "mammals",
