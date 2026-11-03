@@ -96,6 +96,8 @@ jobs:
             --args "${urls[@]}" > body.json
           status=$(curl -sS --max-time 20 -o resp.txt -w '%{http_code}' -X POST https://api.indexnow.org/indexnow \
             -H 'Content-Type: application/json; charset=utf-8' --data @body.json) || true
+          # Also in the log, where the summary's status is hard to find later.
+          echo "IndexNow: HTTP ${status:-none} for ${#urls[@]} URLs"
           {
             echo "## IndexNow"
             echo "HTTP ${status:-none} for ${#urls[@]} URLs"
