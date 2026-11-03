@@ -275,9 +275,10 @@ const more = [
 		color: var(--text-muted);
 	}
 
-	/* Wide enough for both labels: the tick link shares the summary row, open or closed. In em, so
-	   at 200 % text the threshold grows with the labels. Value measured in Task 8. */
-	@container (min-width: 26em) {
+	/* Wide enough for both labels with a 16 px gap: the tick link shares the summary row, open or
+	   closed. In em, so at 200 % text the threshold grows with the labels. Measured 03.11.2026: the
+	   labels need 24.32 em in English and 21.60 em in Norwegian, rounded up to 25 em. */
+	@container (min-width: 25em) {
 		.tick {
 			position: absolute;
 			inset-block-start: 0;
