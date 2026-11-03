@@ -1719,9 +1719,13 @@ html:has(.search-row) {
 	height: 20px;
 }
 
-/* Bebas Neue has capitals only; uppercase keeps the fallback face the same shape. */
+/* Bebas Neue has capitals only; uppercase keeps the fallback face the same shape. A flex item
+   defaults to min-width: auto, so SAMLEOBJEKTER at 200 % text widened the page. I use min-width: 0
+   with break-word, as the tile name does: only a word that cannot fit a line breaks. */
 .cat-head h2 {
+	min-width: 0;
 	margin: 0;
+	overflow-wrap: break-word;
 	font-family: var(--font-display);
 	font-weight: 400;
 	font-size: 2rem;

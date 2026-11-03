@@ -41,6 +41,11 @@ describe("tracker refresh look (spec §3, §4)", () => {
 		expect(rule(".tile-name")).toMatch(/hyphens:\s*auto/)
 	})
 
+	it("lets a long category title break instead of widening the page at large text", () => {
+		expect(rule(".cat-head h2")).toMatch(/min-width:\s*0/)
+		expect(rule(".cat-head h2")).toMatch(/overflow-wrap:\s*break-word/)
+	})
+
 	it("keeps the hub's uppercase label look off the tracker tile name", () => {
 		const uppercased = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)]
 			.filter(([, , body]) => /text-transform:\s*uppercase/.test(body))
