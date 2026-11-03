@@ -47,13 +47,13 @@ const browse = categoryIds(seedItems.filter((item) => !item.retired)).map((id) =
 		}
 	}
 
-	/* Centred at the tracker's own cap (global.css), so the title shares the search row's left edge.
-	   Here rather than a :has(.tracker) rule, which would only match after the island mounts and
-	   shift the title sideways. */
 	.dex-browse {
 		margin-top: var(--space-5);
 	}
 
+	/* Centred at the tracker's own cap (global.css), so the title shares the search row's left edge.
+	   Here rather than a :has(.tracker) rule, which would only match after the island mounts and
+	   shift the title sideways. */
 	@media (min-width: 1024px) {
 		h1,
 		.dex-browse {

@@ -276,9 +276,10 @@ const more = [
 	}
 
 	/* Wide enough for both labels with a 16 px gap: the tick link shares the summary row, open or
-	   closed. In em, so at 200 % text the threshold grows with the labels. Measured 03.11.2026: the
-	   labels need 24.32 em in English and 21.60 em in Norwegian, rounded up to 25 em. */
-	@container (min-width: 25em) {
+	   closed. In em, so at 200 % text the threshold grows with the labels. Measured 03.11.2026:
+	   the labels need 24.32 em in English and 21.60 em in Norwegian, so 24.5 em, which still turns
+	   the row on for a 3-column desktop card (24.97 em at 1280 px). */
+	@container (min-width: 24.5em) {
 		.tick {
 			position: absolute;
 			inset-block-start: 0;
