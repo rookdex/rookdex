@@ -49,6 +49,12 @@ describe("tracker refresh look (spec §3, §4)", () => {
 		expect(uppercased.some((selectors) => selectors.includes(".tile-name"))).toBe(false)
 	})
 
+	it("thickens the pressed tile edge so pressed differs from hover by more than colour", () => {
+		expect(rule('.tiles button[aria-pressed="true"]')).toMatch(
+			/box-shadow:\s*inset 0 0 0 1px color-mix\(in srgb, var\(--accent\) 55%, transparent\)/
+		)
+	})
+
 	it("leaves no .chips selector behind", () => {
 		expect(css).not.toMatch(/\.chips\b/)
 	})

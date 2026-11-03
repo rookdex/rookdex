@@ -1636,9 +1636,12 @@ html:has(.search-row) {
 	overflow: hidden;
 }
 
-/* Pressed: a pink edge and a pink icon tile, as in S3. The label stays in its own ink. */
+/* Pressed: a pink edge and a pink icon tile, as in S3. The label stays in its own ink. Hover
+   previews a 50 % pink border, so I add an inset ring: the thicker edge tells pressed from hover,
+   not the colour alone, and an inset shadow shifts no layout on toggle. */
 .tiles button[aria-pressed="true"] {
 	border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
 .tiles button[aria-pressed="true"] .tile-icon {
