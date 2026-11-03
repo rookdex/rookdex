@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import type { SeedItem } from "./schema"
-import { countItems, perCategory, type Records, recentFinds } from "./stats"
+import { countItems, groupKey, perCategory, perGroup, type Records, recentFinds } from "./stats"
 
 const src = { url: "https://www.rockstargames.com/VI", title: "Site", tier: "official" as const }
 function item(id: string, category: string, retired?: boolean): SeedItem {
@@ -65,5 +65,20 @@ describe("recentFinds", () => {
 		}
 		expect(recentFinds(items, more).map((f) => f.item.id)).toEqual(["wildlife/b", "wildlife/a"])
 		expect(recentFinds(items, more, 1).map((f) => f.item.id)).toEqual(["wildlife/b"])
+	})
+})
+
+describe("perGroup (tracker refresh spec §4.3)", () => {
+	it("counts each group inside its own category and leaves retired items out", () => {
+		// The same group id in two categories: group ids repeat across categories in the seed.
+		const grouped = items.map((i) => ({ ...i, group: "birds" }))
+		expect(perGroup(grouped, records)).toEqual({
+			"wildlife/birds": { done: 1, total: 2 },
+			"vehicles/birds": { done: 0, total: 1 },
+		})
+	})
+
+	it("keys groups the way the list reads them", () => {
+		expect(groupKey("wildlife", "birds")).toBe("wildlife/birds")
 	})
 })

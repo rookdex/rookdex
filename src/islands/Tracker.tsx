@@ -4,7 +4,7 @@ import { hubPhase } from "../model/launch"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { type EmptyState, emptyState, type SearchView } from "../model/search"
 import { categoryIds, seedItems } from "../model/seed"
-import { countable, countItems, perCategory, recentFinds } from "../model/stats"
+import { countable, countItems, perCategory, perGroup, recentFinds } from "../model/stats"
 import { parseShow } from "../model/tracker"
 import { buildTracker } from "./buildTracker"
 import { HINT_SEEN_KEY, writeFlag } from "./seenFlag"
@@ -250,6 +250,8 @@ export function Tracker({ locale }: Props) {
 		id: c.category,
 		label: seedLabel(t, "category", c.category),
 	}))
+	const overall = countItems(state.items, state.records)
+	const categoryCounts = Object.fromEntries(categories.map((c) => [c.id, c]))
 	const error = state.error ? t(`tracker.errors.${state.error}`) : ""
 	const nameError = state.error === "name" ? error : ""
 	const pageError = state.error === "name" ? "" : error
@@ -307,11 +309,13 @@ export function Tracker({ locale }: Props) {
 				</div>
 				<CategoryNav
 					categories={categories}
+					overall={overall}
 					selected={state.selected}
 					onSelect={selectCategories}
 					allLabel={t("tracker.all")}
 					navLabel={t("tracker.categories")}
 					sources={{ href: sourcesHref, label: t("tracker.sources") }}
+					t={t}
 				/>
 				<div className="tracker-results" ref={results} tabIndex={-1}>
 					{empty === "none" && (
@@ -321,6 +325,8 @@ export function Tracker({ locale }: Props) {
 							disabled={state.status !== "ready"}
 							categoryLabel={(id) => seedLabel(t, "category", id)}
 							groupLabel={(id) => seedLabel(t, "group", id)}
+							categoryCounts={categoryCounts}
+							groupCounts={perGroup(state.items, state.records)}
 							onToggle={toggleItem}
 							sourcesHref={sourcesHref}
 							t={t}
@@ -337,7 +343,7 @@ export function Tracker({ locale }: Props) {
 					)}
 				</div>
 				<StatsRail
-					overall={countItems(state.items, state.records)}
+					overall={overall}
 					categories={categories}
 					recent={recentFinds(state.items, state.records)}
 					hubHref={hubHref}

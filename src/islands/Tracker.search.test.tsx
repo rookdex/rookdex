@@ -66,12 +66,12 @@ describe("Tracker search (tracker search spec §4)", () => {
 
 	it("points to other categories and shows them all on request", async () => {
 		await ready()
-		fireEvent.click(screen.getByRole("button", { name: "Vehicles" }))
+		fireEvent.click(screen.getByRole("button", { name: /^Vehicles,/ }))
 		type("pelican")
 		expect(names()).toEqual([])
 		expect(screen.getByText("1 more in other categories")).toBeInTheDocument()
 		fireEvent.click(screen.getByRole("button", { name: "Show all categories" }))
-		expect(screen.getByRole("button", { name: "All" })).toHaveAttribute("aria-pressed", "true")
+		expect(screen.getByRole("button", { name: /^All,/ })).toHaveAttribute("aria-pressed", "true")
 		expect(names()).toEqual(["item-wildlife/pelican"])
 		expect(document.activeElement).toBe(field())
 		expect(field()).toHaveValue("pelican")
@@ -194,7 +194,7 @@ describe("Tracker search announcements (tracker search spec §5)", () => {
 
 	it("announces the other categories when the chips hold no match", async () => {
 		await ready()
-		fireEvent.click(screen.getByRole("button", { name: "Vehicles" }))
+		fireEvent.click(screen.getByRole("button", { name: /^Vehicles,/ }))
 		type("pelican")
 		await waitFor(() =>
 			expect(status()).toHaveTextContent(
@@ -226,7 +226,7 @@ describe("Tracker search announcements (tracker search spec §5)", () => {
 	it("drops a pending result when the chips change", async () => {
 		await ready()
 		type("peli")
-		fireEvent.click(screen.getByRole("button", { name: "Vehicles" }))
+		fireEvent.click(screen.getByRole("button", { name: /^Vehicles,/ }))
 		await wait(700)
 		expect(status()).not.toHaveTextContent("1 result")
 	})

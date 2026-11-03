@@ -71,8 +71,8 @@ describe("Tracker list", () => {
 describe("Category toggles", () => {
 	it("start on All, mirror to ?show=, and All clears", async () => {
 		await ready()
-		const all = screen.getByRole("button", { name: "All" })
-		const vehicles = screen.getByRole("button", { name: "Vehicles" })
+		const all = screen.getByRole("button", { name: /^All,/ })
+		const vehicles = screen.getByRole("button", { name: /^Vehicles,/ })
 		expect(all).toHaveAttribute("aria-pressed", "true")
 		fireEvent.click(vehicles)
 		expect(vehicles).toHaveAttribute("aria-pressed", "true")
@@ -98,9 +98,22 @@ describe("Category toggles", () => {
 	it("reads a deep link and drops unknown ids", async () => {
 		window.history.replaceState(null, "", "/en/tracker/?show=wildlife,evil")
 		await ready()
-		expect(screen.getByRole("button", { name: "Wildlife" })).toHaveAttribute("aria-pressed", "true")
-		expect(screen.getByRole("button", { name: "All" })).toHaveAttribute("aria-pressed", "false")
+		expect(screen.getByRole("button", { name: /^Wildlife,/ })).toHaveAttribute(
+			"aria-pressed",
+			"true"
+		)
+		expect(screen.getByRole("button", { name: /^All,/ })).toHaveAttribute("aria-pressed", "false")
 		expect(window.location.search).toBe("?show=wildlife")
+	})
+
+	it("keeps the whole category in a tile's count with Hide found on", async () => {
+		await ready()
+		fireEvent.click(screen.getByRole("button", { name: "Hide found" }))
+		fireEvent.click(screen.getByRole("checkbox", { name: "Bike" }))
+		await waitFor(() =>
+			expect(screen.getByRole("button", { name: "Vehicles, 1 of 1" })).toBeInTheDocument()
+		)
+		expect(screen.getByRole("button", { name: "All, 1 of 3" })).toBeInTheDocument()
 	})
 
 	it("has no Rumours link now that News is a tab", async () => {
@@ -196,5 +209,31 @@ describe("Progress heading (dashboard spec §4)", () => {
 		vi.setSystemTime(new Date("2026-11-19T00:00:00+01:00"))
 		await renderReady(<Tracker locale="en" />)
 		expect(screen.getByRole("link", { name: "Progress" })).toHaveAttribute("href", "/en/")
+	})
+})
+
+describe("Section and group counts (tracker refresh spec §4.3)", () => {
+	const catCount = (id: string) =>
+		document.querySelector(`[aria-labelledby="cat-${id}"] .cat-head .cat-count`)
+	const groupCount = (id: string) =>
+		document.getElementById(`group-${id}`)?.parentElement?.querySelector(".group-count")
+
+	it("puts each count beside its heading, not inside it", async () => {
+		await ready()
+		expect(screen.getByRole("heading", { name: "Wildlife", level: 2 })).toBeInTheDocument()
+		expect(screen.getByRole("heading", { name: "Birds", level: 3 })).toBeInTheDocument()
+		expect(catCount("wildlife")).toHaveTextContent("0 of 2")
+		expect(groupCount("wildlife/birds")).toHaveTextContent("0 of 1")
+		expect(document.querySelector(".cat-rule")).toHaveAttribute("aria-hidden", "true")
+	})
+
+	it("counts the whole category and group while a search narrows the list", async () => {
+		await ready()
+		fireEvent.change(screen.getByRole("searchbox"), { target: { value: "peli" } })
+		expect(screen.queryByRole("checkbox", { name: "American alligator" })).toBeNull()
+		expect(catCount("wildlife")).toHaveTextContent("0 of 2")
+		fireEvent.click(screen.getByRole("checkbox", { name: "Pelican" }))
+		await waitFor(() => expect(catCount("wildlife")).toHaveTextContent("1 of 2"))
+		expect(groupCount("wildlife/birds")).toHaveTextContent("1 of 1")
 	})
 })

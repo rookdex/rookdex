@@ -48,12 +48,13 @@ describe("search row CSS (tracker search spec §5)", () => {
 	})
 
 	// Layout B: the search spans the full width and the profile, list and stats share one top line.
-	it("puts the profile on top of the chip column from 768 px", () => {
+	// Tablet is one column (tracker refresh spec §3.2): tiles across the top, then the list.
+	it("stacks the tiles over the list from 768 px and puts the profile on top of the tile column from 1024 px", () => {
 		const layout = (query: string) =>
 			mediaBlocks(query)
 				.map((block) => block.match(/\.tracker-layout\s*\{[^}]*\}/)?.[0] ?? "")
 				.join("")
-		expect(layout("(min-width: 768px)")).toMatch(/"top list"\s*"nav list"/)
+		expect(layout("(min-width: 768px)")).toMatch(/"top"\s*"nav"\s*"list"\s*"stats"/)
 		expect(layout("(min-width: 1024px)")).toMatch(/"top list stats"\s*"nav list stats"/)
 	})
 
@@ -72,14 +73,14 @@ describe("search row CSS (tracker search spec §5)", () => {
 
 	// forced-color-adjust: none also keeps the authored light outline, which vanishes on a light
 	// high-contrast theme, so the focus ring gets a system colour of its own.
-	it("marks pressed chips and the toggle in forced colours, focus ring included", () => {
+	it("marks pressed tiles and the toggle in forced colours, focus ring included", () => {
 		const pressed = '.tracker .search-toggle[aria-pressed="true"]'
 		const block = mediaBlocks("(forced-colors: active)").find((b) => b.includes(pressed)) ?? ""
 		expect(block).toMatch(
-			/\.chips button\[aria-pressed="true"\],\s*\.tracker \.search-toggle\[aria-pressed="true"\]\s*\{[^}]*background:\s*Highlight/
+			/\.tiles button\[aria-pressed="true"\],\s*\.tracker \.search-toggle\[aria-pressed="true"\]\s*\{[^}]*background:\s*Highlight/
 		)
 		expect(block).toMatch(
-			/\.chips button\[aria-pressed="true"\]:focus-visible,\s*\.tracker \.search-toggle\[aria-pressed="true"\]:focus-visible\s*\{[^}]*outline-color:\s*CanvasText/
+			/\.tiles button\[aria-pressed="true"\]:focus-visible,\s*\.tracker \.search-toggle\[aria-pressed="true"\]:focus-visible\s*\{[^}]*outline-color:\s*CanvasText/
 		)
 	})
 

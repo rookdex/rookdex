@@ -120,7 +120,6 @@ a {
 /* Pink is focus everywhere except on the three pink surfaces (spec §12). */
 .skip:focus-visible,
 .actions .primary:focus-visible,
-.chips button[aria-pressed="true"]:focus-visible,
 .tracker .search-toggle[aria-pressed="true"]:focus-visible {
 	outline-color: var(--text);
 }
@@ -593,8 +592,8 @@ p {
    also preview their selected marker. Hover lives behind (hover: hover), so touch gets :active. */
 
 .tabbar a,
-.chips button,
-.chips a,
+.tiles button,
+.tiles a,
 .search-toggle,
 .search-clear,
 .tracker .search-elsewhere-btn,
@@ -643,7 +642,7 @@ p {
 	.hint button:hover,
 	.deleted-list button:hover,
 	.icon-link:hover,
-	.chips button:not([aria-pressed="true"]):hover,
+	.tiles button:not([aria-pressed="true"]):hover,
 	.tracker .search-toggle:not([aria-pressed="true"]):hover,
 	.tracker .search-clear:hover,
 	.tracker .search-elsewhere-btn:hover {
@@ -651,12 +650,12 @@ p {
 		color: var(--text);
 	}
 
-	.chips a:hover {
+	.tiles a:hover {
 		background: var(--bg-hover);
 	}
 
 	/* Preview: a faint copy of the selected marker. */
-	.chips button:not([aria-pressed="true"]):hover,
+	.tiles button:not([aria-pressed="true"]):hover,
 	.tracker .search-toggle:not([aria-pressed="true"]):hover {
 		border-color: color-mix(in srgb, var(--accent) 50%, transparent);
 	}
@@ -708,11 +707,11 @@ p {
 	.hint button:active,
 	.deleted-list button:active,
 	.icon-link:active,
-	.chips button:not([aria-pressed="true"]):active,
+	.tiles button:not([aria-pressed="true"]):active,
 	.tracker .search-toggle:not([aria-pressed="true"]):active,
 	.tracker .search-clear:active,
 	.tracker .search-elsewhere-btn:active,
-	.chips a:active,
+	.tiles a:active,
 	.go-link:active {
 		background: var(--bg-hover);
 	}
@@ -731,7 +730,7 @@ p {
 .hint button:focus-visible,
 .deleted-list button:focus-visible,
 .icon-link:focus-visible,
-.chips button:not([aria-pressed="true"]):focus-visible,
+.tiles button:not([aria-pressed="true"]):focus-visible,
 .tracker .search-toggle:not([aria-pressed="true"]):focus-visible,
 .tracker .search-clear:focus-visible,
 .tracker .search-elsewhere-btn:focus-visible {
@@ -740,7 +739,7 @@ p {
 }
 
 /* The Sources chip and links on their own line keep their cyan: focus is the lift plus the outline. */
-.chips a:focus-visible,
+.tiles a:focus-visible,
 .go-link:focus-visible {
 	background: var(--bg-hover);
 }
@@ -1515,24 +1514,144 @@ html:has(.search-row) {
 	}
 }
 
-.chips {
+/* Filter tiles (tracker refresh spec §4.1). Phones: All across, the categories two by two, Sources
+   across. One tile component; the arrangements are CSS only. */
+.tiles {
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: var(--space-2);
 }
 
-.chips button {
-	min-height: var(--tap);
-	padding: var(--space-2) var(--space-3);
-	border-radius: 999px;
-	background: var(--bg-raised);
-	color: var(--text);
+/* Rows stretch and each button fills its item, so tiles in one row share one height. */
+.tiles li {
+	display: flex;
 }
 
-.chips button[aria-pressed="true"],
+.tiles .tile-all,
+.tiles .tile-sources {
+	grid-column: 1 / -1;
+}
+
+/* Stacked (the phone grid and the tablet row): icon and label, then the count, then the bar. */
+.tiles button {
+	flex: 1;
+	display: grid;
+	grid-template-columns: 24px minmax(0, 1fr);
+	grid-template-areas:
+		"icon label"
+		"count count"
+		"bar bar";
+	align-items: center;
+	/* The P2 measures (R2): at 320 px they leave about 92 px for "Samleobjekter". */
+	gap: 6px;
+	min-height: var(--tap);
+	padding: 8px;
+	/* I draw the edge and top-align the rows here, so the tile needs no hub class. */
+	border: 1px solid var(--border);
+	align-content: start;
+	border-radius: var(--radius);
+	background: var(--bg-raised);
+	color: var(--text);
+	text-align: start;
+}
+
+/* Wide (All below 1024 px, every tile from there): the count rides the label's line. */
+.tiles .tile-all button {
+	grid-template-columns: 36px minmax(0, 1fr) auto;
+	grid-template-areas:
+		"icon label count"
+		"icon bar bar";
+	column-gap: 10px;
+	padding: 10px;
+}
+
+.tiles .tile-all :is(.tile-name, .tile-count) {
+	align-self: baseline;
+}
+
+/* --border, not --bg-hover: the hover lift paints the tile --bg-hover and would swallow it. */
+.tile-icon {
+	grid-area: icon;
+	display: grid;
+	place-items: center;
+	width: 24px;
+	height: 24px;
+	border-radius: var(--radius);
+	background: var(--border);
+	color: var(--text-muted);
+}
+
+.tile-icon svg {
+	width: 14px;
+	height: 14px;
+}
+
+.tiles .tile-all .tile-icon {
+	width: 36px;
+	height: 36px;
+}
+
+.tiles .tile-all .tile-icon svg {
+	width: 20px;
+	height: 20px;
+}
+
+/* Wraps at 200 % text; the count sits on its own grid line, so the two never overlap. break-word,
+   not anywhere: a word only breaks when it cannot fit a line on its own, and hyphens marks it. */
+.tile-name {
+	grid-area: label;
+	min-width: 0;
+	font-size: 0.75rem;
+	font-weight: 600;
+	overflow-wrap: break-word;
+	hyphens: auto;
+}
+
+.tiles .tile-all .tile-name {
+	font-size: 0.8125rem;
+}
+
+/* Bebas Neue ships one weight: a bold here would be faked and smear the digits. */
+.tile-count {
+	grid-area: count;
+	font-family: var(--font-display);
+	font-weight: 400;
+	font-size: 1.625rem;
+	line-height: 0.9;
+	letter-spacing: 0.02em;
+}
+
+.tile-count small {
+	margin-inline-start: 1px;
+	font-size: 0.6em;
+	color: var(--text-muted);
+}
+
+.tile-bar {
+	grid-area: bar;
+	display: block;
+	height: 6px;
+	border-radius: 3px;
+	background: var(--border);
+	overflow: hidden;
+}
+
+/* Pressed: a pink edge and a pink icon tile, as in S3. The label stays in its own ink. Hover
+   previews a 50 % pink border, so I add an inset ring: the thicker edge tells pressed from hover,
+   not the colour alone, and an inset shadow shifts no layout on toggle. */
+.tiles button[aria-pressed="true"] {
+	border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.tiles button[aria-pressed="true"] .tile-icon {
+	background: color-mix(in srgb, var(--accent) 22%, transparent);
+	color: var(--accent);
+}
+
 .tracker .search-toggle[aria-pressed="true"] {
 	background: var(--accent);
 	color: var(--accent-text);
@@ -1541,7 +1660,7 @@ html:has(.search-row) {
 
 /* Forced colours drop backgrounds, which would make pressed and unpressed look the same. */
 @media (forced-colors: active) {
-	.chips button[aria-pressed="true"],
+	.tiles button[aria-pressed="true"],
 	.tracker .search-toggle[aria-pressed="true"] {
 		forced-color-adjust: none;
 		background: Highlight;
@@ -1550,29 +1669,131 @@ html:has(.search-row) {
 	}
 
 	/* The opt-out above also keeps the light focus outline, which a light theme would hide. */
-	.chips button[aria-pressed="true"]:focus-visible,
+	.tiles button[aria-pressed="true"]:focus-visible,
 	.tracker .search-toggle[aria-pressed="true"]:focus-visible {
 		outline-color: CanvasText;
 	}
+
+	/* The opt-out above keeps authored colours inside the tile too, so the parts follow the
+	   system's pressed ink instead. */
+	.tiles button[aria-pressed="true"] :is(.tile-icon, .tile-count small) {
+		background: transparent;
+		color: HighlightText;
+	}
+
+	.tiles button[aria-pressed="true"] .tile-bar {
+		background: transparent;
+		outline: 1px solid HighlightText;
+	}
+
+	.tiles button[aria-pressed="true"] .bar-fill {
+		background: HighlightText;
+	}
 }
 
-.item-category > h2 {
-	font-size: 1.25rem;
+/* S3 spacing (spec §3.5): 72 px between categories, 40 px between groups, 12 px between cards.
+   True black, no panels: lines and type separate the sections. */
+.item-list {
+	display: grid;
+	/* I give the list one shrinkable column so a long title at 200 % text wraps
+	   instead of widening the track. */
+	grid-template-columns: minmax(0, 1fr);
+	gap: 72px;
 }
 
-.item-group > h3 {
-	font-size: 0.875rem;
+.cat-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2) 14px;
+	margin-bottom: 28px;
+}
+
+.cat-icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 36px;
+	height: 36px;
+	border-radius: var(--radius);
+	background: var(--border);
 	color: var(--text-muted);
+}
+
+.cat-icon svg {
+	width: 20px;
+	height: 20px;
+}
+
+/* Bebas Neue has capitals only; uppercase keeps the fallback face the same shape. A flex item
+   defaults to min-width: auto, so SAMLEOBJEKTER at 200 % text widened the page. I use min-width: 0
+   with break-word, as the tile name does: only a word that cannot fit a line breaks. */
+.cat-head h2 {
+	min-width: 0;
+	margin: 0;
+	overflow-wrap: break-word;
+	font-family: var(--font-display);
+	font-weight: 400;
+	font-size: 2rem;
+	line-height: 1;
+	letter-spacing: 0.02em;
 	text-transform: uppercase;
-	letter-spacing: 0.05em;
+}
+
+.cat-count {
+	font-family: var(--font-display);
+	font-weight: 400;
+	font-size: 1.375rem;
+	line-height: 1;
+	color: var(--text-muted);
+}
+
+/* Decorative: the brand gradient, fading out at the edge. */
+.cat-rule {
+	flex: 1 1 2rem;
+	height: 2px;
+	background: linear-gradient(90deg, var(--accent), var(--accent-2) 40%, transparent);
+}
+
+.item-groups {
+	display: grid;
+	gap: 40px;
+}
+
+.item-group {
+	padding-top: 20px;
+	border-top: 1px solid var(--border);
+}
+
+.group-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: var(--space-1) 10px;
+	margin-bottom: 14px;
+}
+
+/* A label, so it stands apart from the count by weight, size and ink. */
+.group-head h3 {
+	margin: 0;
+	font-size: 0.875rem;
+	font-weight: 700;
+	color: var(--text);
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+}
+
+.group-count {
+	font-size: 0.8125rem;
+	color: var(--text-muted);
 }
 
 .item-group ul {
 	display: grid;
 	/* min() keeps one column inside a 320 px screen at 200 % text (reflow). */
-	grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
 	gap: 12px;
-	margin: 0 0 var(--space-4);
+	margin: 0;
 	padding: 0;
 	list-style: none;
 }
@@ -1603,18 +1824,18 @@ html:has(.search-row) {
 	display: grid;
 	place-content: center;
 	flex: none;
-	width: 20px;
-	height: 20px;
+	width: 24px;
+	height: 24px;
 	margin: 0;
 	border: 2px solid var(--text-muted);
-	border-radius: 4px;
+	border-radius: 50%;
 	background: transparent;
 }
 
 .item-main input::before {
 	content: "";
-	width: 12px;
-	height: 12px;
+	width: 14px;
+	height: 14px;
 	clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
 	background: var(--accent-text);
 	transform: scale(0);
@@ -1663,7 +1884,7 @@ html:has(.search-row) {
 
 .tier {
 	align-self: flex-start;
-	margin-inline-start: 28px;
+	margin-inline-start: 32px;
 	padding: 1px 8px;
 	border: 1px solid color-mix(in srgb, currentColor 50%, transparent);
 	border-radius: 999px;
@@ -1681,7 +1902,7 @@ html:has(.search-row) {
 }
 
 .item-desc {
-	margin: 0 0 0 28px;
+	margin: 0 0 0 32px;
 	color: var(--text-muted);
 	font-size: 0.875rem;
 	line-height: 1.5;
@@ -1765,20 +1986,22 @@ html:has(.search-row) {
 	}
 }
 
-/* The Sources chip: a link, drawn as an outlined cyan chip. */
-.chips a {
-	display: inline-flex;
+/* The Sources tile: a link, outlined in cyan. */
+.tiles a {
+	flex: 1;
+	display: flex;
 	align-items: center;
 	gap: var(--space-2);
 	min-height: var(--tap);
-	padding: var(--space-2) var(--space-3);
-	border: 1px solid var(--link);
-	border-radius: 999px;
+	padding: 0 12px;
+	border: 1px solid color-mix(in srgb, var(--link) 60%, transparent);
+	border-radius: var(--radius);
 	color: var(--link);
+	font-weight: 500;
 	text-decoration: none;
 }
 
-.chips a svg {
+.tiles a svg {
 	flex: none;
 	width: 18px;
 	height: 18px;
@@ -2688,27 +2911,18 @@ html:has(.search-row) {
 		font-size: 3.5rem;
 	}
 
-	/* The list spans the profile and chip rows. 1fr on the chip row takes the list's extra height,
-	   so the profile row stays as tall as the profile button and the chips sit right under it. */
+	/* One column (spec §3.2): the tiles across the top, then the list. The rail stays under the
+	   list until PR 2 hides it below 1024 px. */
 	.tracker-layout {
-		grid-template-columns: 170px minmax(0, 1fr);
-		grid-template-rows: auto 1fr auto;
 		grid-template-areas:
-			"top list"
-			"nav list"
-			"stats stats";
-		align-items: start;
+			"top"
+			"nav"
+			"list"
+			"stats";
 	}
 
-	.chips {
-		flex-direction: column;
-	}
-
-	.chips button,
-	.chips a {
-		width: 100%;
-		text-align: left;
-		border-radius: var(--radius);
+	.tiles {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 
 	.stats-grid {
@@ -3024,12 +3238,12 @@ html:has(.search-row) {
 		transform: translateX(-50%);
 	}
 
-	/* Same geometry as before search: 170 px chips, the list up to 640 px, 180 px stats. The cap sits
-	   on the whole tracker, so the search row spans exactly the three columns under it. The tracker
-	   page's h1 reads the same width, so the title starts on the search row's left edge. It sits on
-	   main, not with the tokens: it is tracker geometry, and main holds both. */
+	/* Tiles 200 px, the list, the rail 200 px, 48 px between (spec §3.3). The cap sits on the whole
+	   tracker, so the search row spans the three columns; the tracker page's h1 reads the same
+	   width. .wrap caps main at 72rem, so at full width this resolves to 1088 px and the list to
+	   592 px, still two 280 px cards across. */
 	main {
-		--tracker-max-w: calc(170px + 640px + 180px + 2 * var(--space-4));
+		--tracker-max-w: calc(200px + 624px + 200px + 2 * 48px);
 	}
 
 	.tracker {
@@ -3038,11 +3252,50 @@ html:has(.search-row) {
 	}
 
 	.tracker-layout {
-		grid-template-columns: 170px minmax(0, 1fr) 180px;
+		grid-template-columns: 200px minmax(0, 1fr) 200px;
 		grid-template-rows: auto 1fr;
+		column-gap: 48px;
 		grid-template-areas:
 			"top list stats"
 			"nav list stats";
+		align-items: start;
+	}
+
+	/* Every tile is wide here, stacked in one column. */
+	.tiles {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.tiles button {
+		grid-template-columns: 36px minmax(0, 1fr) auto;
+		grid-template-areas:
+			"icon label count"
+			"icon bar bar";
+		column-gap: 10px;
+		padding: 10px;
+	}
+
+	.tiles :is(.tile-name, .tile-count) {
+		align-self: baseline;
+	}
+
+	/* I match the All label to the other tiles here so the desktop column has one tile height. */
+	.tiles .tile-all .tile-name {
+		font-size: 0.75rem;
+	}
+
+	.tile-icon {
+		width: 36px;
+		height: 36px;
+	}
+
+	.tile-icon svg {
+		width: 20px;
+		height: 20px;
+	}
+
+	.cat-head h2 {
+		font-size: 2.5rem;
 	}
 
 	.stats-grid {
