@@ -1,8 +1,10 @@
 import type { Translate } from "../../i18n"
 import type { SeedItem } from "../../model/schema"
 import { categoryIds, groupItems } from "../../model/seed"
-import type { Records } from "../../model/stats"
-import { BookIcon, FlagIcon } from "./icons"
+import { type Count, groupKey, type Records } from "../../model/stats"
+import { BookIcon, categoryIcon, FlagIcon } from "./icons"
+
+const none: Count = { done: 0, total: 0 }
 
 interface Props {
 	items: SeedItem[]
@@ -10,6 +12,10 @@ interface Props {
 	disabled: boolean
 	categoryLabel: (id: string) => string
 	groupLabel: (id: string) => string
+	/** Over every item, never the filtered view, so the numbers hold still while typing (spec §2). */
+	categoryCounts: Record<string, Count>
+	/** Keyed by `groupKey`, also over every item. */
+	groupCounts: Record<string, Count>
 	onToggle: (id: string, done: boolean) => void
 	/** The Sources page; each book link adds "#<item id>". */
 	sourcesHref: string
@@ -23,6 +29,8 @@ export function ItemList({
 	disabled,
 	categoryLabel,
 	groupLabel,
+	categoryCounts,
+	groupCounts,
 	onToggle,
 	sourcesHref,
 	t,
@@ -30,40 +38,59 @@ export function ItemList({
 	const live = items.filter((item) => !item.retired)
 	if (live.length === 0) return <p className="item-empty">{t("tracker.empty")}</p>
 
+	const countText = (count: Count = none) =>
+		t("tracker.count", { done: count.done, total: count.total })
+
 	return (
 		<div className="item-list">
-			{categoryIds(live).map((category) => (
-				<section key={category} className="item-category" aria-labelledby={`cat-${category}`}>
-					<h2 id={`cat-${category}`}>{categoryLabel(category)}</h2>
-					<div className="item-groups">
-						{[...groupItems(live.filter((item) => item.category === category))].map(
-							([group, groupList]) => (
-								<section
-									key={group}
-									className="item-group"
-									aria-labelledby={`group-${category}/${group}`}
-								>
-									{/* A slash is valid in an HTML id and cannot appear in a slug, so no two ids collide. */}
-									<h3 id={`group-${category}/${group}`}>{groupLabel(group)}</h3>
-									<ul>
-										{groupList.map((item) => (
-											<ItemRow
-												key={item.id}
-												item={item}
-												done={records[item.id]?.done ?? false}
-												disabled={disabled}
-												onToggle={onToggle}
-												sourcesHref={sourcesHref}
-												t={t}
-											/>
-										))}
-									</ul>
-								</section>
-							)
-						)}
-					</div>
-				</section>
-			))}
+			{categoryIds(live).map((category) => {
+				const Icon = categoryIcon(category)
+				return (
+					<section key={category} className="item-category" aria-labelledby={`cat-${category}`}>
+						{/* The count is the heading's sibling, so the heading's name is the label alone. */}
+						<div className="cat-head">
+							<span className="cat-icon" aria-hidden="true">
+								<Icon />
+							</span>
+							<h2 id={`cat-${category}`}>{categoryLabel(category)}</h2>
+							<span className="cat-count">{countText(categoryCounts[category])}</span>
+							<span className="cat-rule" aria-hidden="true" />
+						</div>
+						<div className="item-groups">
+							{[...groupItems(live.filter((item) => item.category === category))].map(
+								([group, groupList]) => (
+									<section
+										key={group}
+										className="item-group"
+										aria-labelledby={`group-${category}/${group}`}
+									>
+										<div className="group-head">
+											{/* A slash is valid in an HTML id and cannot appear in a slug, so no two ids collide. */}
+											<h3 id={`group-${category}/${group}`}>{groupLabel(group)}</h3>
+											<span className="group-count">
+												{countText(groupCounts[groupKey(category, group)])}
+											</span>
+										</div>
+										<ul>
+											{groupList.map((item) => (
+												<ItemRow
+													key={item.id}
+													item={item}
+													done={records[item.id]?.done ?? false}
+													disabled={disabled}
+													onToggle={onToggle}
+													sourcesHref={sourcesHref}
+													t={t}
+												/>
+											))}
+										</ul>
+									</section>
+								)
+							)}
+						</div>
+					</section>
+				)
+			})}
 		</div>
 	)
 }

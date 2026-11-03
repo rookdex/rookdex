@@ -211,3 +211,29 @@ describe("Progress heading (dashboard spec §4)", () => {
 		expect(screen.getByRole("link", { name: "Progress" })).toHaveAttribute("href", "/en/")
 	})
 })
+
+describe("Section and group counts (tracker refresh spec §4.3)", () => {
+	const catCount = (id: string) =>
+		document.querySelector(`[aria-labelledby="cat-${id}"] .cat-head .cat-count`)
+	const groupCount = (id: string) =>
+		document.getElementById(`group-${id}`)?.parentElement?.querySelector(".group-count")
+
+	it("puts each count beside its heading, not inside it", async () => {
+		await ready()
+		expect(screen.getByRole("heading", { name: "Wildlife", level: 2 })).toBeInTheDocument()
+		expect(screen.getByRole("heading", { name: "Birds", level: 3 })).toBeInTheDocument()
+		expect(catCount("wildlife")).toHaveTextContent("0 of 2")
+		expect(groupCount("wildlife/birds")).toHaveTextContent("0 of 1")
+		expect(document.querySelector(".cat-rule")).toHaveAttribute("aria-hidden", "true")
+	})
+
+	it("counts the whole category and group while a search narrows the list", async () => {
+		await ready()
+		fireEvent.change(screen.getByRole("searchbox"), { target: { value: "peli" } })
+		expect(screen.queryByRole("checkbox", { name: "American alligator" })).toBeNull()
+		expect(catCount("wildlife")).toHaveTextContent("0 of 2")
+		fireEvent.click(screen.getByRole("checkbox", { name: "Pelican" }))
+		await waitFor(() => expect(catCount("wildlife")).toHaveTextContent("1 of 2"))
+		expect(groupCount("wildlife/birds")).toHaveTextContent("1 of 1")
+	})
+})

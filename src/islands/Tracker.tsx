@@ -4,7 +4,7 @@ import { hubPhase } from "../model/launch"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { type EmptyState, emptyState, type SearchView } from "../model/search"
 import { categoryIds, seedItems } from "../model/seed"
-import { countable, countItems, perCategory, recentFinds } from "../model/stats"
+import { countable, countItems, perCategory, perGroup, recentFinds } from "../model/stats"
 import { parseShow } from "../model/tracker"
 import { buildTracker } from "./buildTracker"
 import { HINT_SEEN_KEY, writeFlag } from "./seenFlag"
@@ -251,6 +251,7 @@ export function Tracker({ locale }: Props) {
 		label: seedLabel(t, "category", c.category),
 	}))
 	const overall = countItems(state.items, state.records)
+	const categoryCounts = Object.fromEntries(categories.map((c) => [c.id, c]))
 	const error = state.error ? t(`tracker.errors.${state.error}`) : ""
 	const nameError = state.error === "name" ? error : ""
 	const pageError = state.error === "name" ? "" : error
@@ -324,6 +325,8 @@ export function Tracker({ locale }: Props) {
 							disabled={state.status !== "ready"}
 							categoryLabel={(id) => seedLabel(t, "category", id)}
 							groupLabel={(id) => seedLabel(t, "group", id)}
+							categoryCounts={categoryCounts}
+							groupCounts={perGroup(state.items, state.records)}
 							onToggle={toggleItem}
 							sourcesHref={sourcesHref}
 							t={t}
