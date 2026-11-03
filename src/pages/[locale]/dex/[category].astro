@@ -1,0 +1,287 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n"
+import Chevron from "../../../components/Chevron.astro"
+import ChipNav from "../../../components/ChipNav.astro"
+import SourceList from "../../../components/SourceList.astro"
+import { isLocale, type Locale, locales, seedLabel, translator } from "../../../i18n"
+import { BookIcon } from "../../../islands/tracker/icons"
+import Base from "../../../layouts/Base.astro"
+import { dexCategory, dexCopy, dexStatus } from "../../../model/dex"
+import { categoryIds, seedItems } from "../../../model/seed"
+
+export function getStaticPaths() {
+	const ids = categoryIds(seedItems.filter((item) => !item.retired))
+	return locales.flatMap((locale) =>
+		ids.map((category) => ({ params: { locale, category }, props: {} }))
+	)
+}
+
+// One Dex page per tracker category (category pages spec §5). Zero JavaScript: the sources
+// dropdown is a native <details>, and the BookIcon renders once, on the server.
+const { locale, category } = Astro.params
+if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
+const tr = translator(locale as Locale)
+const { t } = tr
+const live = seedItems.filter((item) => !item.retired)
+const dex = dexCategory(live, String(category))
+const copy = dexCopy(tr, dex)
+const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
+// Seed text is English; nb pages say so (spec §10).
+const itemLang = locale === "en" ? undefined : "en"
+const more = [
+	...categoryIds(live)
+		.filter((id) => id !== dex.id)
+		.map((id) => ({
+			href: getRelativeLocaleUrl(locale as Locale, `dex/${id}`),
+			label: seedLabel(t, "category", id),
+		})),
+	{ href: getRelativeLocaleUrl(locale as Locale, "tracker/sources"), label: t("sources.title") },
+]
+---
+
+<Base locale={locale} title={copy.title} description={copy.description} path={`dex/${dex.id}`} tab="tracker">
+	<h1>{seedLabel(t, "category", dex.id)}</h1>
+	<p class="lede">{copy.lede}</p>
+	<ChipNav
+		label={t("dex.groups")}
+		chips={dex.groups.map((group) => ({
+			href: `#group-${group.id}`,
+			label: seedLabel(t, "group", group.id),
+			count: group.items.length,
+		}))}
+	/>
+	{
+		dex.groups.map((group) => (
+			<section class="dex-group" aria-labelledby={`group-${group.id}`}>
+				<h2 id={`group-${group.id}`}>
+					{seedLabel(t, "group", group.id)} <span class="count">{group.items.length}</span>
+				</h2>
+				<div class="dex-grid">
+					{group.items.map((item) => (
+						<article id={item.id} class="dex-card">
+							<h3 lang={itemLang}>{item.name}</h3>
+							<p class:list={["status", item.status]}>
+								<span class="dot" aria-hidden="true" />
+								{dexStatus(t, item)}
+							</p>
+							{item.description && (
+								<p class="desc" lang={itemLang}>
+									{item.description}
+								</p>
+							)}
+							<div class="card-foot">
+								<details class="card-sources">
+									<summary>
+										<span class="summary-row">
+											<BookIcon />
+											{t("dex.sources", { count: item.sources.length })}
+											<Chevron down />
+										</span>
+									</summary>
+									<SourceList sources={item.sources} locale={locale as Locale} lang={itemLang} />
+								</details>
+								{/* One line on purpose: Astro keeps the whitespace between lines, and the name
+								    would read "tracker : Crane". */}
+								<a class="tick go-link" href={`${tracker}#item-${item.id}`}>
+									{t("dex.tick")}<span class="visually-hidden">: <span lang={itemLang}>{item.name}</span></span>
+								</a>
+							</div>
+						</article>
+					))}
+				</div>
+			</section>
+		))
+	}
+	<ChipNav label={t("dex.more")} headingId="dex-more" chips={more} />
+</Base>
+
+<style>
+	h1 {
+		font-size: 1.75rem;
+		font-weight: 700;
+		margin-bottom: var(--space-1);
+	}
+
+	.lede {
+		color: var(--text-muted);
+		font-size: 0.875rem;
+		line-height: 1.5;
+	}
+
+	.dex-group {
+		margin-bottom: var(--space-5);
+	}
+
+	/* The tracker refresh's group heading (S3): small bold capitals, the count in muted ink, a hairline above. */
+	.dex-group h2 {
+		margin: 0 0 12px;
+		padding-top: var(--space-2);
+		border-top: 1px solid var(--border);
+		font-size: 0.875rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.dex-group h2 .count {
+		color: var(--text-muted);
+		font-weight: 600;
+	}
+
+	/* align-items: start, so opening one card's sources never stretches its neighbours. */
+	.dex-grid {
+		display: grid;
+		gap: 12px;
+		align-items: start;
+	}
+
+	@media (min-width: 768px) {
+		.dex-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.dex-grid {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+
+	.dex-card {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-1);
+		padding: 12px 12px 0 16px;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg-raised);
+		min-width: 0;
+	}
+
+	/* The card a link pointed at, as on the Sources page. */
+	.dex-card:target {
+		border-color: var(--link);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.dex-card:target {
+			box-shadow: 0 0 16px color-mix(in srgb, var(--link) 20%, transparent);
+		}
+	}
+
+	.dex-card h3 {
+		margin: 0;
+		font-size: 0.9375rem;
+		font-weight: 600;
+	}
+
+	.status {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 0.8125rem;
+	}
+
+	.dot {
+		flex: none;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+	}
+
+	.confirmed .dot {
+		background: var(--tier-confirmed);
+	}
+
+	.expected .dot {
+		background: var(--tier-expected);
+	}
+
+	/* Forced colours drop backgrounds; the border keeps the dot, and the word carries the status. */
+	@media (forced-colors: active) {
+		.dot {
+			border: 1px solid CanvasText;
+		}
+	}
+
+	.desc {
+		margin: 0;
+		font-size: 0.875rem;
+		line-height: 1.5;
+	}
+
+	/* The footer is the size container for the tick link's placement (spec §5.2). */
+	.card-foot {
+		position: relative;
+		container-type: inline-size;
+		font-size: 0.8125rem;
+	}
+
+	/* The summary keeps its native display (list-item) and disclosure role; the flex row sits on the
+	   inner span. fit-content keeps its hit area to its own label. */
+	.card-sources summary {
+		width: fit-content;
+		list-style: none;
+		cursor: pointer;
+		color: var(--text-muted);
+		border-radius: var(--radius);
+	}
+
+	.card-sources summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.summary-row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		min-height: var(--tap);
+	}
+
+	.summary-row :global(svg) {
+		flex: none;
+		width: 18px;
+		height: 18px;
+	}
+
+	.summary-row :global(.row-chevron) {
+		width: 16px;
+		height: 16px;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.summary-row :global(.row-chevron) {
+			transition: rotate 150ms;
+		}
+	}
+
+	.card-sources[open] .summary-row :global(.row-chevron) {
+		rotate: 180deg;
+	}
+
+	@media (hover: hover) {
+		.card-sources summary:hover {
+			color: var(--text);
+		}
+	}
+
+	.card-sources :global(.source-list) {
+		padding-bottom: var(--space-2);
+	}
+
+	.tick {
+		color: var(--text-muted);
+	}
+
+	/* Wide enough for both labels: the tick link shares the summary row, open or closed. In em, so
+	   at 200 % text the threshold grows with the labels. Value measured in Task 8. */
+	@container (min-width: 26em) {
+		.tick {
+			position: absolute;
+			inset-block-start: 0;
+			inset-inline-end: var(--space-2);
+		}
+	}
+</style>
