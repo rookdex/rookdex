@@ -2240,7 +2240,8 @@ html:has(.search-row) {
 	line-height: 1;
 }
 
-/* Cut on phones so the title row never wraps; the accessible name always has the whole name. */
+/* Cut on phones so a long name never pushes the title row wider than the screen; the accessible
+   name always has the whole name. */
 .profile-name {
 	min-width: 0;
 	max-width: min(8rem, 30vw);
