@@ -61,18 +61,26 @@ const browse = categoryIds(seedItems.filter((item) => !item.retired)).map((id) =
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		flex-wrap: wrap;
 		gap: var(--space-3);
 		min-height: var(--tap);
 		margin-bottom: var(--space-3);
 	}
 
+	/* The title never shrinks or breaks; a long profile name ellipses instead. */
 	.tracker-head h1 {
 		flex: none;
 		margin: 0;
 	}
 
+	/* 62 px holds the avatar-only button (8 + 28 + 8 + 12 + 2 border). When the title and that floor
+	   do not fit on one line (320 px at 200 % text), the slot wraps under the title, right-aligned. */
 	#tracker-profile {
-		min-width: 0;
+		display: flex;
+		flex: 1 1 0;
+		justify-content: flex-end;
+		min-width: 62px;
+		min-height: var(--tap);
 	}
 
 	/* Centred at the tracker's own cap (global.css), so the title shares the search row's left edge.

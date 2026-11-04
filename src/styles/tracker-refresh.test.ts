@@ -138,7 +138,8 @@ describe("profile button size and the title row (final review E1, E3)", () => {
 		const h1 = page.match(/\.tracker-head h1\s*\{([^}]*)\}/)?.[1] ?? ""
 		expect(h1).toMatch(/flex:\s*none/)
 		expect(h1).not.toMatch(/min-width:\s*0/)
-		expect(page).toMatch(/#tracker-profile\s*\{[^}]*min-width:\s*0/)
+		expect(page).toMatch(/\.tracker-head\s*\{[^}]*flex-wrap:\s*wrap/)
+		expect(page).toMatch(/#tracker-profile\s*\{[^}]*flex:\s*1 1 0[^}]*min-width:\s*62px/)
 		expect(rule("#tracker-profile .profile-menu > button")).toMatch(/max-width:\s*100%/)
 	})
 })
