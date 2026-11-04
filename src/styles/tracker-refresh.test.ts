@@ -32,8 +32,8 @@ describe("tracker refresh look (spec §3, §4)", () => {
 	})
 
 	it("makes the check a 24 px circle", () => {
-		expect(rule(".item-main input")).toMatch(/border-radius:\s*50%/)
-		expect(rule(".item-main input")).toMatch(/width:\s*24px/)
+		expect(rule(".item-check")).toMatch(/border-radius:\s*50%/)
+		expect(rule(".item-check")).toMatch(/width:\s*24px/)
 	})
 
 	it("breaks a tile label only inside a word that cannot fit on its own line (R2)", () => {
@@ -81,5 +81,17 @@ describe("tracker refresh look (spec §3, §4)", () => {
 
 	it("leaves no .chips selector behind", () => {
 		expect(css).not.toMatch(/\.chips\b/)
+	})
+})
+
+describe("icon-lead card (spec §5.1)", () => {
+	it("clamps the description to two lines and keeps the 65ch cap off", () => {
+		expect(rule(".item-desc")).toMatch(/-webkit-line-clamp:\s*2/)
+		expect(rule(".item-desc")).toMatch(/max-width:\s*none/)
+	})
+
+	it("turns a found card's border and icon tile pink", () => {
+		expect(rule(".item.found")).toMatch(/border-color:[^;]*var\(--accent\)/)
+		expect(rule(".item.found .item-tile")).toMatch(/color:\s*var\(--accent\)/)
 	})
 })

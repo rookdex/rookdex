@@ -36,14 +36,6 @@ describe("Tracker list", () => {
 		expect(flags[0]).toHaveAttribute("aria-disabled", "true")
 		// aria-disabled, not disabled: it stays focusable so its tooltip is reachable.
 		expect(flags[0]).not.toBeDisabled()
-
-		// Tab runs top to bottom: checkbox, book (top right), flag (bottom right).
-		const card = document.querySelector("li.item") as HTMLElement
-		expect([...card.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
-			"INPUT",
-			"A",
-			"BUTTON",
-		])
 	})
 
 	it("toggles an item from its label, and a flag tap shows the tooltip without toggling", async () => {
@@ -235,5 +227,44 @@ describe("Section and group counts (tracker refresh spec §4.3)", () => {
 		fireEvent.click(screen.getByRole("checkbox", { name: "Pelican" }))
 		await waitFor(() => expect(catCount("wildlife")).toHaveTextContent("1 of 2"))
 		expect(groupCount("wildlife/birds")).toHaveTextContent("1 of 1")
+	})
+})
+
+describe("Item card (tracker refresh spec §5.1)", () => {
+	const card = (name: string) =>
+		screen.getByRole("checkbox", { name }).closest("li.item") as HTMLElement
+
+	it("leads with the category icon, then the name and one meta line", async () => {
+		await ready()
+		const pelican = card("Pelican")
+		expect(pelican.querySelector(".item-tile")).toHaveAttribute("aria-hidden", "true")
+		expect(pelican.querySelector(".item-tile svg")).not.toBeNull()
+		expect(pelican.querySelector(".item-meta")).toHaveTextContent("Expected, as in GTA V · Birds")
+		expect(pelican.querySelector('.item-dot[data-status="expected"]')).not.toBeNull()
+	})
+
+	it("runs Tab as checkbox, book, flag, with the book and flag in the footer", async () => {
+		await ready()
+		const gator = card("American alligator")
+		expect([...gator.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
+			"INPUT",
+			"A",
+			"BUTTON",
+		])
+		expect(gator.querySelector(".item-foot .item-book")).not.toBeNull()
+	})
+
+	it("keeps the whole description in the DOM", async () => {
+		await ready()
+		expect(card("American alligator").querySelector(".item-desc")).toHaveTextContent(
+			"Everglades native."
+		)
+	})
+
+	it("marks a found card", async () => {
+		await ready()
+		expect(card("Pelican")).not.toHaveClass("found")
+		fireEvent.click(screen.getByText("Pelican"))
+		await waitFor(() => expect(card("Pelican")).toHaveClass("found"))
 	})
 })

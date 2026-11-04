@@ -1709,7 +1709,8 @@ html:has(.search-row) {
 	margin-bottom: 28px;
 }
 
-.cat-icon {
+.cat-icon,
+.item-tile {
 	display: grid;
 	place-items: center;
 	flex: none;
@@ -1720,7 +1721,8 @@ html:has(.search-row) {
 	color: var(--text-muted);
 }
 
-.cat-icon svg {
+.cat-icon svg,
+.item-tile svg {
 	width: 20px;
 	height: 20px;
 }
@@ -1804,22 +1806,33 @@ html:has(.search-row) {
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-1);
-	padding: 12px 12px 12px 16px;
+	padding: 12px 12px 4px 14px;
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
 	background: var(--bg-raised);
 }
 
-/* 40 px on the right keeps the name clear of the book icon. */
+/* 40 px on the right keeps the name clear of the check. */
 .item-main {
 	display: flex;
 	align-items: center;
-	gap: var(--space-2);
+	gap: 10px;
 	min-height: var(--tap);
 	padding-right: 40px;
 }
 
-.item-main input {
+.item-text {
+	display: grid;
+	gap: 2px;
+	min-width: 0;
+}
+
+.item-check {
+	/* The centre of a 44 px box 12 px from the top and 6 px from the right (spec §5.1). The hit
+	   area is the whole card, through the label's ::after. */
+	position: absolute;
+	top: 22px;
+	right: 16px;
 	appearance: none;
 	display: grid;
 	place-content: center;
@@ -1832,7 +1845,7 @@ html:has(.search-row) {
 	background: transparent;
 }
 
-.item-main input::before {
+.item-check::before {
 	content: "";
 	width: 14px;
 	height: 14px;
@@ -1841,28 +1854,27 @@ html:has(.search-row) {
 	transform: scale(0);
 }
 
-.item-main input:checked {
+.item-check:checked {
 	border-color: var(--accent);
 	background: var(--accent);
 }
 
-.item-main input:checked::before {
+.item-check:checked::before {
 	transform: scale(1);
 }
 
 @media (forced-colors: active) {
-	.item-main input::before {
+	.item-check::before {
 		background: CanvasText;
 	}
 }
 
 /* The card carries the focus ring instead (below). */
-.item-main input:focus-visible {
+.item-check:focus-visible {
 	outline: none;
 }
 
 .item-main label {
-	flex: 1;
 	font-size: 0.9375rem;
 	font-weight: 600;
 	/* A long word breaks instead of running under the book icon or out of the card. */
@@ -1882,27 +1894,39 @@ html:has(.search-row) {
 	cursor: default;
 }
 
-.tier {
-	align-self: flex-start;
-	margin-inline-start: 32px;
-	padding: 1px 8px;
-	border: 1px solid color-mix(in srgb, currentColor 50%, transparent);
-	border-radius: 999px;
-	color: var(--text-muted);
+/* Wraps on narrow phones; never cut off. Tier words stay beside the dot, so colour is never alone. */
+.item-meta {
 	font-size: 0.75rem;
+	color: var(--text-muted);
 }
 
 /* Tier colours come from their own tokens so a theme can swap them without touching the accent. */
-.tier[data-status="confirmed"] {
-	color: var(--tier-confirmed);
+.item-dot {
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	margin-inline-end: 6px;
+	border-radius: 50%;
+	vertical-align: 1px;
 }
 
-.tier[data-status="expected"] {
-	color: var(--tier-expected);
+.item-dot[data-status="confirmed"] {
+	background: var(--tier-confirmed);
 }
 
+.item-dot[data-status="expected"] {
+	background: var(--tier-expected);
+}
+
+/* Two lines (spec §5.1); the full text stays in the DOM for screen readers. No 65ch cap: ch
+   follows the font, and the swap from the fallback face would rewrap the clamp. */
 .item-desc {
-	margin: 0 0 0 32px;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+	max-width: none;
+	margin: 0 0 0 46px;
 	color: var(--text-muted);
 	font-size: 0.875rem;
 	line-height: 1.5;
@@ -1913,7 +1937,7 @@ html:has(.search-row) {
 .item-foot {
 	display: flex;
 	justify-content: flex-end;
-	margin: auto -6px 0 0;
+	margin: auto -6px 0 46px;
 }
 
 /* .item .item-icon outranks the shared `.tracker button` reset. */
@@ -1941,10 +1965,14 @@ html:has(.search-row) {
 	cursor: default;
 }
 
-.item .item-book {
-	position: absolute;
-	top: 12px;
-	right: 6px;
+/* Found: a pink edge and a pink icon tile beside the ✓, never colour alone (spec §5.1). */
+.item.found {
+	border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.item.found .item-tile {
+	background: color-mix(in srgb, var(--accent) 22%, transparent);
+	color: var(--accent);
 }
 
 .item .item-book:focus-visible {
