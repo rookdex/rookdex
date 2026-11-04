@@ -20,13 +20,16 @@ const browse = categoryIds(seedItems.filter((item) => !item.retired)).map((id) =
 ---
 
 <Base locale={locale} title={t("seo.titles.tracker")} description={t("tracker.description")} path="tracker">
-	<h1>{t("tracker.title")}</h1>
+	<div class="tracker-head">
+		<h1>{t("tracker.title")}</h1>
+		<div id="tracker-profile"></div>
+	</div>
 	<noscript><p>{t("tracker.needsJs")}</p></noscript>
 	<Tracker client:only="react" locale={locale}>
 		<div slot="fallback" class="tracker-fallback"></div>
 	</Tracker>
 	{/* Server-rendered under the fallback's reserved height, so it adds no layout shift (category
-	    pages spec §7). The tracker refresh also edits this file; whichever lands second rebases. */}
+	    pages spec §7). */}
 	<div class="dex-browse">
 		<ChipNav label={t("dex.browse")} headingId="dex-browse" chips={browse} />
 	</div>
@@ -51,11 +54,28 @@ const browse = categoryIds(seedItems.filter((item) => !item.retired)).map((id) =
 		margin-top: var(--space-5);
 	}
 
+	/* The title row (tracker refresh spec §5.5): the h1 left, the island portals the profile button
+	   into the slot on the right. The slot is at the edge, so the button's arrival moves nothing,
+	   and min-height holds its 44 px before the island mounts. */
+	.tracker-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: var(--space-3);
+		min-height: var(--tap);
+		margin-bottom: var(--space-3);
+	}
+
+	.tracker-head h1 {
+		min-width: 0;
+		margin: 0;
+	}
+
 	/* Centred at the tracker's own cap (global.css), so the title shares the search row's left edge.
-	   Here rather than a :has(.tracker) rule, which would only match after the island mounts and
-	   shift the title sideways. */
+	   Here rather than a :has(.tracker) rule, which would only match after the island mounts. The
+	   Browse row keeps the same cap. */
 	@media (min-width: 1024px) {
-		h1,
+		.tracker-head,
 		.dex-browse {
 			max-width: var(--tracker-max-w);
 			margin-inline: auto;

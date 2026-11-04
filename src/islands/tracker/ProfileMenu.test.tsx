@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
 import { translator } from "../../i18n"
-import { ProfileMenu } from "./ProfileMenu"
+import { initial, ProfileMenu } from "./ProfileMenu"
 
 const profiles = [
 	{ id: "p1", name: "Player 1", created_at: "2026-09-01T00:00:00.000Z" },
@@ -112,5 +112,79 @@ describe("ProfileMenu", () => {
 		)
 		fireEvent.click(screen.getByRole("button", { name: "Profile: Player 1" }))
 		expect(screen.getByRole("menu").querySelector("hr")).toBeNull()
+	})
+})
+
+describe("ProfileMenu in the title row (tracker refresh spec §5.5)", () => {
+	const t = translator("en").t
+
+	it("renders into the slot when it exists, and the menu still works from there", () => {
+		const slot = document.createElement("div")
+		slot.id = "tracker-profile"
+		document.body.append(slot)
+		const { container } = render(
+			<ProfileMenu
+				profiles={profiles}
+				current={profiles[0]}
+				onSwitch={vi.fn()}
+				slotId="tracker-profile"
+				t={t}
+			/>
+		)
+		const trigger = screen.getByRole("button", { name: "Profile: Player 1" })
+		expect(slot).toContainElement(trigger)
+		expect(container).not.toContainElement(trigger)
+		fireEvent.click(trigger)
+		fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" })
+		expect(trigger).toHaveFocus()
+		slot.remove()
+	})
+
+	it("renders in place when the slot is missing", () => {
+		const { container } = render(
+			<ProfileMenu
+				profiles={profiles}
+				current={profiles[0]}
+				onSwitch={vi.fn()}
+				slotId="tracker-profile"
+				t={t}
+			/>
+		)
+		expect(container).toContainElement(screen.getByRole("button", { name: "Profile: Player 1" }))
+	})
+
+	it("shows an initial avatar hidden from screen readers, then the name", () => {
+		render(<ProfileMenu profiles={profiles} current={profiles[1]} onSwitch={vi.fn()} t={t} />)
+		const trigger = screen.getByRole("button", { name: "Profile: Dad" })
+		expect(trigger.querySelector(".avatar")).toHaveAttribute("aria-hidden", "true")
+		expect(trigger.querySelector(".avatar")).toHaveTextContent("D")
+		expect(trigger.querySelector(".profile-name")).toHaveTextContent("Dad")
+	})
+})
+
+describe("initial (tracker refresh spec §5.5)", () => {
+	it("takes the first character of the trimmed name, upper-cased", () => {
+		expect(initial("  malin ", "en")).toBe("M")
+		expect(initial("   ", "en")).toBe("")
+	})
+
+	it("keeps a whole emoji or a letter with its combining mark", () => {
+		expect(initial("👩‍🚀 Ana", "en")).toBe("👩‍🚀")
+		// A decomposed e: the letter and U+0301 are one grapheme.
+		expect(initial("e\u0301mile", "en")).toBe("E\u0301")
+	})
+
+	it("upper-cases for the page's language", () => {
+		expect(initial("istanbul", "tr")).toBe("İ")
+	})
+
+	it("falls back to the first code point without Intl.Segmenter", () => {
+		const saved = Intl.Segmenter
+		Object.defineProperty(Intl, "Segmenter", { value: undefined, configurable: true })
+		try {
+			expect(initial("👩‍🚀 Ana", "en")).toBe("👩")
+		} finally {
+			Object.defineProperty(Intl, "Segmenter", { value: saved, configurable: true })
+		}
 	})
 })

@@ -313,6 +313,7 @@ export function Tracker({ locale }: Props) {
 				<div className="tracker-top">
 					<ProfileMenu
 						triggerRef={menuButton}
+						slotId="tracker-profile"
 						profiles={activeProfiles(state.profiles)}
 						current={current}
 						onSwitch={tracker.switchProfile}

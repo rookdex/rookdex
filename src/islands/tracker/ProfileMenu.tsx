@@ -1,4 +1,5 @@
 import { type KeyboardEvent, type RefObject, useEffect, useId, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import type { Translate } from "../../i18n"
 import type { Profile } from "../../model/schema"
 
@@ -19,9 +20,31 @@ interface Props {
 	t: Translate
 	/** The parent may own the trigger ref so a dialog opened from the menu can return focus to it. */
 	triggerRef?: RefObject<HTMLButtonElement | null>
+	/** Renders into the element with this id when it exists (the tracker's title row), in place otherwise. */
+	slotId?: string
 }
 
 const ITEMS = '[role^="menuitem"]'
+
+/** The profile's first character as the eye sees it: a whole emoji or a letter with its combining
+ *  mark, upper-cased for the page's language (spec §5.5). */
+export function initial(name: string, lang?: string): string {
+	const trimmed = name.trim()
+	if (trimmed === "") return ""
+	const first =
+		typeof Intl.Segmenter === "function"
+			? new Intl.Segmenter(lang, { granularity: "grapheme" })
+					.segment(trimmed)
+					[Symbol.iterator]()
+					.next().value?.segment
+			: undefined
+	return (first ?? Array.from(trimmed)[0]).toLocaleUpperCase(lang)
+}
+
+/** The page's language; the hub renders on the server too, where there is no document. */
+function pageLang(): string | undefined {
+	return typeof document === "undefined" ? undefined : document.documentElement.lang || undefined
+}
 
 /**
  * Menu button (WAI-ARIA pattern): arrows move, Escape closes and returns focus to the trigger,
@@ -41,8 +64,12 @@ export function ProfileMenu({
 	manageHref,
 	t,
 	triggerRef,
+	slotId,
 }: Props) {
 	const [open, setOpen] = useState(false)
+	// Read once: the island is client-only and the slot is server HTML, so it exists from the start.
+	const [slot] = useState(() => (slotId ? document.getElementById(slotId) : null))
+	const name = current?.name ?? ""
 	const ownTrigger = useRef<HTMLButtonElement>(null)
 	const trigger = triggerRef ?? ownTrigger
 	const menu = useRef<HTMLUListElement>(null)
@@ -101,17 +128,22 @@ export function ProfileMenu({
 	).filter((entry): entry is readonly [string, () => void] => entry[1] !== undefined)
 	const hasExtras = actions.length > 0 || manageHref !== undefined
 
-	return (
+	const menuButton = (
 		<div className="profile-menu">
 			<button
 				ref={trigger}
 				type="button"
+				aria-label={t("profile.menu", { name })}
 				aria-haspopup="menu"
 				aria-expanded={open}
 				aria-controls={menuId}
 				onClick={() => setOpen((value) => !value)}
 			>
-				{t("profile.menu", { name: current?.name ?? "" })}
+				{/* Its own element at a fixed size, so a picture can replace the letter later. */}
+				<span className="avatar" aria-hidden="true">
+					{initial(name, pageLang())}
+				</span>
+				<span className="profile-name">{name}</span>
 			</button>
 			{open && (
 				// biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: WAI-ARIA menu button pattern; the list is the menu and its buttons are the items.
@@ -151,4 +183,7 @@ export function ProfileMenu({
 			)}
 		</div>
 	)
+
+	// A portal keeps React's events and state, so the menu pattern and the dialogs are unchanged.
+	return slot ? createPortal(menuButton, slot) : menuButton
 }

@@ -104,3 +104,10 @@ describe("layout without the rail below 1024 px (spec §3, §5.3)", () => {
 		expect(desktop).toMatch(/\.stats\s*\{[^}]*display:\s*block/)
 	})
 })
+
+describe("profile in the title row (spec §5.5)", () => {
+	it("sets the initial in --text and opens the menu leftwards from the slot", () => {
+		expect(rule(".avatar")).toMatch(/color:\s*var\(--text\)/)
+		expect(rule("#tracker-profile .menu")).toMatch(/right:\s*0/)
+	})
+})

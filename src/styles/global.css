@@ -2216,6 +2216,43 @@ html:has(.search-row) {
 	color: var(--text);
 }
 
+.profile-menu > button {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2);
+	padding-inline-start: var(--space-2);
+}
+
+/* The initial is --text on the pink tint: pink on that tint is about 3.9:1, under AA. */
+.avatar {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--accent) 30%, transparent);
+	color: var(--text);
+	font-size: 0.8125rem;
+	font-weight: 600;
+	line-height: 1;
+}
+
+/* Cut on phones so the title row never wraps; the accessible name always has the whole name. */
+.profile-name {
+	min-width: 0;
+	max-width: min(8rem, 30vw);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* The slot sits at the right edge, so the menu opens leftwards and stays on screen. */
+#tracker-profile .menu {
+	left: auto;
+	right: 0;
+}
+
 .menu {
 	position: absolute;
 	top: calc(100% + var(--space-1));
@@ -2896,6 +2933,10 @@ html:has(.search-row) {
 }
 
 @media (min-width: 768px) {
+	.profile-name {
+		max-width: 20rem;
+	}
+
 	.search-toggle-label {
 		position: static;
 		width: auto;
