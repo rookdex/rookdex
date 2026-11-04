@@ -145,6 +145,7 @@
 	"tracker.overall": "Overall",
 	"tracker.recent": "Recent finds",
 	"tracker.noRecent": "Nothing ticked yet.",
+	"tracker.lastFound": "Last found",
 	"tracker.empty": "Nothing here yet.",
 	"tracker.confirmed": "Confirmed",
 	"tracker.expectedFrom": "Expected, as in {precedent}",

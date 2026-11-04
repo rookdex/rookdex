@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react"
-import { describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
 import { translator } from "../../i18n"
 import type { SeedItem } from "../../model/schema"
@@ -16,65 +16,65 @@ const gator: SeedItem = {
 	sources: [src],
 }
 
-describe("StatsRail", () => {
-	it("links the Progress heading to the hub when given hubHref (dashboard spec §4)", () => {
-		render(
-			<StatsRail
-				overall={{ done: 0, total: 0 }}
-				categories={[]}
-				recent={[]}
-				hubHref="/en/"
-				t={translator("en").t}
-			/>
-		)
-		const link = screen.getByRole("link", { name: "Progress" })
+const t = translator("en").t
+const renderRail = (
+	overall: { done: number; total: number },
+	recent: { item: SeedItem; updated_at: string }[] = [],
+	hubHref?: string
+) => render(<StatsRail overall={overall} recent={recent} hubHref={hubHref} locale="en" t={t} />)
+
+afterEach(() => {
+	vi.useRealTimers()
+})
+
+describe("StatsRail (tracker refresh spec §5.2)", () => {
+	it("links the Overall heading to the hub when given hubHref", () => {
+		renderRail({ done: 0, total: 0 }, [], "/en/")
+		const link = screen.getByRole("link", { name: "Overall" })
 		expect(link).toHaveAttribute("href", "/en/")
 		expect(link).toHaveClass("go-link")
-		expect(screen.getByRole("heading", { name: "Progress" })).toContainElement(link)
+		expect(screen.getByRole("heading", { name: "Overall", level: 2 })).toContainElement(link)
 	})
 
-	it("keeps the Progress heading plain without hubHref", () => {
-		render(
-			<StatsRail
-				overall={{ done: 0, total: 0 }}
-				categories={[]}
-				recent={[]}
-				t={translator("en").t}
-			/>
-		)
-		expect(screen.queryByRole("link", { name: "Progress" })).toBeNull()
+	it("keeps the heading plain without hubHref", () => {
+		renderRail({ done: 0, total: 0 })
+		expect(screen.queryByRole("link", { name: "Overall" })).toBeNull()
 	})
 
-	it("renders labelled progress bars with visible counts", () => {
-		render(
-			<StatsRail
-				overall={{ done: 1, total: 3 }}
-				categories={[{ category: "wildlife", label: "Wildlife", done: 1, total: 2 }]}
-				recent={[{ item: gator, updated_at: "2026-09-16T10:00:00.000Z" }]}
-				t={translator("en").t}
-			/>
-		)
-		const bars = screen.getAllByRole("progressbar")
-		expect(bars[0]).toHaveAccessibleName("Overall")
-		expect(bars[0]).toHaveAttribute("aria-valuenow", "1")
-		expect(bars[0]).toHaveAttribute("aria-valuemax", "3")
-		expect(bars[1]).toHaveAccessibleName("Wildlife")
-		expect(screen.getByText("1 of 3")).toBeInTheDocument()
-		expect(screen.getByText("1 of 2")).toBeInTheDocument()
-		expect(screen.getByRole("list", { name: "Recent finds" })).toHaveTextContent(
-			"American alligator"
-		)
+	it("rounds the big percentage down, so nothing reads 100 % early", () => {
+		const { container } = renderRail({ done: 214, total: 215 })
+		expect(container.querySelector(".stats-percent")).toHaveTextContent("99%")
+		const bar = screen.getByRole("progressbar")
+		expect(bar).toHaveAccessibleName("Overall")
+		expect(bar).toHaveAttribute("aria-valuetext", "214 of 215")
+	})
+
+	it("reads 0 % for an empty total and draws one bar, no category bars", () => {
+		const { container } = renderRail({ done: 0, total: 0 })
+		expect(container.querySelector(".stats-percent")).toHaveTextContent("0%")
+		expect(screen.getAllByRole("progressbar")).toHaveLength(1)
+	})
+
+	it("lists recent finds with a category icon and a relative time", () => {
+		vi.useFakeTimers({ toFake: ["Date"] })
+		vi.setSystemTime(new Date("2026-11-20T10:05:00Z"))
+		const updated = "2026-11-20T10:00:00.000Z"
+		renderRail({ done: 1, total: 3 }, [{ item: gator, updated_at: updated }])
+		const list = screen.getByRole("list", { name: "Recent finds" })
+		expect(list).toHaveTextContent("American alligator")
+		expect(list.querySelector(".find-icon svg")).not.toBeNull()
+		const time = list.querySelector("time")
+		expect(time).toHaveAttribute("datetime", updated)
+		// Five minutes old, so the minute branch; the words come from the browser's CLDR data.
+		const expected = new Intl.RelativeTimeFormat("en-GB", {
+			numeric: "auto",
+			style: "short",
+		}).format(-5, "minute")
+		expect(time).toHaveTextContent(expected)
 	})
 
 	it("says when nothing is ticked and has no axe violations", async () => {
-		const { container } = render(
-			<StatsRail
-				overall={{ done: 0, total: 0 }}
-				categories={[]}
-				recent={[]}
-				t={translator("en").t}
-			/>
-		)
+		const { container } = renderRail({ done: 0, total: 0 })
 		expect(screen.getByText("Nothing ticked yet.")).toBeInTheDocument()
 		expect(await axe(container)).toHaveNoViolations()
 	})

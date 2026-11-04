@@ -145,6 +145,7 @@
 	"tracker.overall": "Totalt",
 	"tracker.recent": "Siste funn",
 	"tracker.noRecent": "Ingenting avkrysset ennå.",
+	"tracker.lastFound": "Sist funnet",
 	"tracker.empty": "Ingenting her ennå.",
 	"tracker.confirmed": "Bekreftet",
 	"tracker.expectedFrom": "Forventet, som i {precedent}",

@@ -14,6 +14,7 @@ import { DeletedDialog } from "./tracker/DeletedDialog"
 import { hashItemId, hashTarget } from "./tracker/hash"
 import { ImportDialog } from "./tracker/ImportDialog"
 import { ItemList } from "./tracker/ItemList"
+import { jumpable, LastFound } from "./tracker/LastFound"
 import { NameDialog } from "./tracker/NameDialog"
 import { ProfileMenu } from "./tracker/ProfileMenu"
 import { SearchBar } from "./tracker/SearchBar"
@@ -51,6 +52,15 @@ function scrollToStart(element: HTMLElement) {
 	for (const type of USER_SCROLL) window.addEventListener(type, stop, { passive: true })
 }
 
+// Draws the card's ring where the browser skips :focus-visible (after a click or a page load, in
+// Chromium); the mark goes when the checkbox loses focus.
+function markCard(box: HTMLElement) {
+	const card = box.closest(".item")
+	if (!card) return
+	card.setAttribute("data-arrived", "")
+	box.addEventListener("blur", () => card.removeAttribute("data-arrived"), { once: true })
+}
+
 /** Island root. `client:only`: the first render reads the URL and IndexedDB. */
 export function Tracker({ locale }: Props) {
 	const { t, plural } = translator(locale)
@@ -68,7 +78,7 @@ export function Tracker({ locale }: Props) {
 	const live = useLiveStatus()
 	const searchField = useRef<HTMLInputElement>(null)
 	const results = useRef<HTMLDivElement>(null)
-	// From launch on the hub is the dashboard, so Progress links there (dashboard spec §4).
+	// From launch on the hub is the dashboard, so Overall links there (dashboard spec §4).
 	const [hubHref] = useState(() => (hubPhase(new Date()) === "after" ? `/${locale}/` : undefined))
 	const [dialog, setDialog] = useState<"new" | "rename" | "delete" | "deleted" | null>(null)
 	// Bumped per opening: the NameDialog keys on this alone, so its field resets on each opening
@@ -92,17 +102,24 @@ export function Tracker({ locale }: Props) {
 		try {
 			const box = hashTarget(window.location.hash, document)
 			if (!box) return
-			const card = box.closest(".item")
-			if (card) {
-				card.setAttribute("data-arrived", "")
-				box.addEventListener("blur", () => card.removeAttribute("data-arrived"), { once: true })
-			}
+			markCard(box)
 			box.focus({ preventScroll: true, focusVisible: true })
 			box.scrollIntoView({ block: "center" })
 		} catch {
 			// A browser without scrollIntoView options still got the focus.
 		}
 	}, [state.status])
+
+	// The Last found row (spec §5.3). The card scrolls, not the checkbox: the checkbox sits 22 px
+	// below the card's top, so a focus scroll would tuck the card under the sticky search row.
+	// scroll-padding-top still clears the row for scrollIntoView. Instant: a focus move, not motion.
+	function jumpTo(id: string) {
+		const box = document.getElementById(`item-${id}`)
+		if (!(box instanceof HTMLInputElement)) return
+		markCard(box)
+		box.focus({ preventScroll: true, focusVisible: true })
+		box.closest(".item")?.scrollIntoView({ block: "start", behavior: "instant" })
+	}
 
 	function openDialog(kind: "new" | "rename" | "delete" | "deleted") {
 		setOpening((n) => n + 1)
@@ -252,6 +269,7 @@ export function Tracker({ locale }: Props) {
 	}))
 	const overall = countItems(state.items, state.records)
 	const categoryCounts = Object.fromEntries(categories.map((c) => [c.id, c]))
+	const recent = recentFinds(state.items, state.records)
 	const error = state.error ? t(`tracker.errors.${state.error}`) : ""
 	const nameError = state.error === "name" ? error : ""
 	const pageError = state.error === "name" ? "" : error
@@ -293,19 +311,22 @@ export function Tracker({ locale }: Props) {
 			)}
 			<div className="tracker-layout">
 				<div className="tracker-top">
-					<ProfileMenu
-						triggerRef={menuButton}
-						profiles={activeProfiles(state.profiles)}
-						current={current}
-						onSwitch={tracker.switchProfile}
-						onNew={() => openDialog("new")}
-						onRename={() => openDialog("rename")}
-						onExport={exportNow}
-						onImport={() => fileInput.current?.click()}
-						onDelete={() => openDialog("delete")}
-						onDeleted={() => openDialog("deleted")}
-						t={t}
-					/>
+					{current && (
+						<ProfileMenu
+							triggerRef={menuButton}
+							slotId="tracker-profile"
+							profiles={activeProfiles(state.profiles)}
+							current={current}
+							onSwitch={tracker.switchProfile}
+							onNew={() => openDialog("new")}
+							onRename={() => openDialog("rename")}
+							onExport={exportNow}
+							onImport={() => fileInput.current?.click()}
+							onDelete={() => openDialog("delete")}
+							onDeleted={() => openDialog("deleted")}
+							t={t}
+						/>
+					)}
 				</div>
 				<CategoryNav
 					categories={categories}
@@ -315,6 +336,13 @@ export function Tracker({ locale }: Props) {
 					allLabel={t("tracker.all")}
 					navLabel={t("tracker.categories")}
 					sources={{ href: sourcesHref, label: t("tracker.sources") }}
+					t={t}
+				/>
+				<LastFound
+					find={recent[0]}
+					canJump={jumpable(recent[0], view.visible, state.status === "ready")}
+					onJump={jumpTo}
+					locale={locale}
 					t={t}
 				/>
 				<div className="tracker-results" ref={results} tabIndex={-1}>
@@ -342,13 +370,7 @@ export function Tracker({ locale }: Props) {
 						</p>
 					)}
 				</div>
-				<StatsRail
-					overall={overall}
-					categories={categories}
-					recent={recentFinds(state.items, state.records)}
-					hubHref={hubHref}
-					t={t}
-				/>
+				<StatsRail overall={overall} recent={recent} hubHref={hubHref} locale={locale} t={t} />
 			</div>
 			<p className="visually-hidden" role="status" aria-live="polite">
 				{live.message}

@@ -32,8 +32,8 @@ describe("tracker refresh look (spec §3, §4)", () => {
 	})
 
 	it("makes the check a 24 px circle", () => {
-		expect(rule(".item-main input")).toMatch(/border-radius:\s*50%/)
-		expect(rule(".item-main input")).toMatch(/width:\s*24px/)
+		expect(rule(".item-check")).toMatch(/border-radius:\s*50%/)
+		expect(rule(".item-check")).toMatch(/width:\s*24px/)
 	})
 
 	it("breaks a tile label only inside a word that cannot fit on its own line (R2)", () => {
@@ -81,5 +81,74 @@ describe("tracker refresh look (spec §3, §4)", () => {
 
 	it("leaves no .chips selector behind", () => {
 		expect(css).not.toMatch(/\.chips\b/)
+	})
+})
+
+describe("icon-lead card (spec §5.1)", () => {
+	it("clamps the description to two lines and keeps the 65ch cap off", () => {
+		expect(rule(".item-desc")).toMatch(/-webkit-line-clamp:\s*2/)
+		expect(rule(".item-desc")).toMatch(/max-width:\s*none/)
+	})
+
+	it("turns a found card's border and icon tile pink", () => {
+		expect(rule(".item.found")).toMatch(/border-color:[^;]*var\(--accent\)/)
+		expect(rule(".item.found .item-tile")).toMatch(/color:\s*var\(--accent\)/)
+	})
+})
+
+describe("layout without the rail below 1024 px (spec §3, §5.3)", () => {
+	it("hides the rail below 1024 px and the Last found row from there", () => {
+		expect(rule(".stats")).toMatch(/display:\s*none/)
+		const desktop = css.slice(css.indexOf("@media (min-width: 1024px)"))
+		expect(desktop).toMatch(/\.last-found\s*\{\s*display:\s*none/)
+		expect(desktop).toMatch(/\.stats\s*\{[^}]*display:\s*block/)
+	})
+})
+
+describe("profile in the title row (spec §5.5)", () => {
+	it("sets the initial in --text and opens the menu leftwards from the slot", () => {
+		expect(rule(".avatar")).toMatch(/color:\s*var\(--text\)/)
+		expect(rule("#tracker-profile .menu")).toMatch(/right:\s*0/)
+	})
+})
+
+describe("wide steps (spec §14.2)", () => {
+	it("widens the tracker page in two steps that each add a card column", () => {
+		const step = (px: number) =>
+			css.match(new RegExp(`@media \\(min-width: ${px}px\\) \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? ""
+		expect(step(1600)).toMatch(/\.wrap\.tracker-wide\s*\{[^}]*max-width:\s*90rem/)
+		expect(step(1600)).toMatch(/\.wrap\.tracker-wide\s*\{[^}]*--tracker-max-w:\s*none/)
+		expect(step(1920)).toMatch(/\.wrap\.tracker-wide\s*\{[^}]*max-width:\s*120rem/)
+		// The hub keeps its own cap.
+		expect(step(1600)).toMatch(/\.wrap\.wide\s*\{[^}]*max-width:\s*85rem/)
+	})
+})
+
+describe("profile button size and the title row (final review E1, E3)", () => {
+	const page = readFileSync(
+		new URL("../pages/[locale]/tracker/index.astro", import.meta.url),
+		"utf8"
+	)
+
+	it("holds the profile button at the tap height with no vertical padding", () => {
+		expect(rule(".profile-menu > button")).toMatch(/padding-block:\s*0/)
+	})
+
+	it("keeps the title whole and lets the profile name ellipsise instead", () => {
+		const h1 = page.match(/\.tracker-head h1\s*\{([^}]*)\}/)?.[1] ?? ""
+		expect(h1).toMatch(/flex:\s*none/)
+		expect(h1).not.toMatch(/min-width:\s*0/)
+		expect(page).toMatch(/\.tracker-head\s*\{[^}]*flex-wrap:\s*wrap/)
+		expect(page).toMatch(
+			/#tracker-profile\s*\{[^}]*flex:\s*1 1 0[^}]*min-width:\s*calc\(2 \* var\(--space-2\) \+ var\(--space-3\) \+ 30px\)/
+		)
+		expect(rule("#tracker-profile .profile-menu > button")).toMatch(/max-width:\s*100%/)
+	})
+
+	it("reserves the button's full height before it arrives, also at 200 % text", () => {
+		// The button is one 1.5em line plus its 1 px borders, or 44 px, whichever is taller.
+		expect(page).toMatch(
+			/#tracker-profile\s*\{[^}]*min-height:\s*max\(var\(--tap\),\s*calc\(1\.5em \+ 2px\)\)/
+		)
 	})
 })

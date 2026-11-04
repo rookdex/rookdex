@@ -19,14 +19,17 @@ const browse = categoryIds(seedItems.filter((item) => !item.retired)).map((id) =
 }))
 ---
 
-<Base locale={locale} title={t("seo.titles.tracker")} description={t("tracker.description")} path="tracker">
-	<h1>{t("tracker.title")}</h1>
+<Base locale={locale} title={t("seo.titles.tracker")} description={t("tracker.description")} path="tracker" trackerWide>
+	<div class="tracker-head">
+		<h1>{t("tracker.title")}</h1>
+		<div id="tracker-profile"></div>
+	</div>
 	<noscript><p>{t("tracker.needsJs")}</p></noscript>
 	<Tracker client:only="react" locale={locale}>
 		<div slot="fallback" class="tracker-fallback"></div>
 	</Tracker>
 	{/* Server-rendered under the fallback's reserved height, so it adds no layout shift (category
-	    pages spec §7). The tracker refresh also edits this file; whichever lands second rebases. */}
+	    pages spec §7). */}
 	<div class="dex-browse">
 		<ChipNav label={t("dex.browse")} headingId="dex-browse" chips={browse} />
 	</div>
@@ -51,11 +54,44 @@ const browse = categoryIds(seedItems.filter((item) => !item.retired)).map((id) =
 		margin-top: var(--space-5);
 	}
 
+	/* The title row (tracker refresh spec §5.5): the h1 left, the island portals the profile button
+	   into the slot on the right. The slot is at the edge, so the button's arrival moves nothing,
+	   and min-height holds its 44 px before the island mounts. */
+	.tracker-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: var(--space-3);
+		min-height: var(--tap);
+		margin-bottom: var(--space-3);
+	}
+
+	/* The title never shrinks or breaks; a long profile name ellipses instead. */
+	.tracker-head h1 {
+		flex: none;
+		margin: 0;
+	}
+
+	/* The floor is the avatar-only button: start padding and gap (--space-2 each), end padding
+	   (--space-3), the 28 px avatar and 2 px of border. That is 62 px at 100 % text and 94 px at
+	   200 %, because the spacing is in rem. When the title and that floor do not fit on one line
+	   (320 px at 200 % text), the slot wraps under the title, right-aligned.
+	   The height is the button's: one 1.5em line plus 2 px of border, or 44 px, whichever is taller,
+	   so the button's arrival moves nothing at any text size. */
+	#tracker-profile {
+		display: flex;
+		flex: 1 1 0;
+		justify-content: flex-end;
+		min-width: calc(2 * var(--space-2) + var(--space-3) + 30px);
+		min-height: max(var(--tap), calc(1.5em + 2px));
+	}
+
 	/* Centred at the tracker's own cap (global.css), so the title shares the search row's left edge.
-	   Here rather than a :has(.tracker) rule, which would only match after the island mounts and
-	   shift the title sideways. */
+	   Here rather than a :has(.tracker) rule, which would only match after the island mounts. The
+	   Browse row keeps the same cap. */
 	@media (min-width: 1024px) {
-		h1,
+		.tracker-head,
 		.dex-browse {
 			max-width: var(--tracker-max-w);
 			margin-inline: auto;

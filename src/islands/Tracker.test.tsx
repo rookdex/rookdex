@@ -16,6 +16,15 @@ beforeEach(resetBrowser)
 
 const ready = (locale: "en" | "nb" = "en") => renderReady(<Tracker locale={locale} />)
 
+describe("Profile button while loading (final review E2)", () => {
+	it("paints no name-less trigger before the profile is known", async () => {
+		render(<Tracker locale="en" />)
+		expect(screen.queryByRole("button", { name: /^Profile:/ })).toBeNull()
+		expect(document.querySelector(".avatar")).toBeNull()
+		expect(await screen.findByRole("button", { name: "Profile: Player 1" })).toBeInTheDocument()
+	})
+})
+
 describe("Tracker list", () => {
 	it("renders one card per item, with a book link and a flag instead of source links", async () => {
 		await ready()
@@ -36,14 +45,6 @@ describe("Tracker list", () => {
 		expect(flags[0]).toHaveAttribute("aria-disabled", "true")
 		// aria-disabled, not disabled: it stays focusable so its tooltip is reachable.
 		expect(flags[0]).not.toBeDisabled()
-
-		// Tab runs top to bottom: checkbox, book (top right), flag (bottom right).
-		const card = document.querySelector("li.item") as HTMLElement
-		expect([...card.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
-			"INPUT",
-			"A",
-			"BUTTON",
-		])
 	})
 
 	it("toggles an item from its label, and a flag tap shows the tooltip without toggling", async () => {
@@ -191,7 +192,7 @@ describe("Arriving from the Sources page (feedback spec §4)", () => {
 	)
 })
 
-describe("Progress heading (dashboard spec §4)", () => {
+describe("Overall heading (dashboard spec §4, refresh spec §5.2)", () => {
 	afterEach(() => {
 		vi.useRealTimers()
 	})
@@ -201,14 +202,14 @@ describe("Progress heading (dashboard spec §4)", () => {
 		vi.useFakeTimers({ toFake: ["Date"] })
 		vi.setSystemTime(new Date("2026-11-18T12:00:00Z"))
 		await renderReady(<Tracker locale="en" />)
-		expect(screen.queryByRole("link", { name: "Progress" })).toBeNull()
+		expect(screen.queryByRole("link", { name: "Overall" })).toBeNull()
 	})
 
 	it("links to the hub from launch on", async () => {
 		vi.useFakeTimers({ toFake: ["Date"] })
 		vi.setSystemTime(new Date("2026-11-19T00:00:00+01:00"))
 		await renderReady(<Tracker locale="en" />)
-		expect(screen.getByRole("link", { name: "Progress" })).toHaveAttribute("href", "/en/")
+		expect(screen.getByRole("link", { name: "Overall" })).toHaveAttribute("href", "/en/")
 	})
 })
 
@@ -235,5 +236,101 @@ describe("Section and group counts (tracker refresh spec §4.3)", () => {
 		fireEvent.click(screen.getByRole("checkbox", { name: "Pelican" }))
 		await waitFor(() => expect(catCount("wildlife")).toHaveTextContent("1 of 2"))
 		expect(groupCount("wildlife/birds")).toHaveTextContent("1 of 1")
+	})
+})
+
+describe("Item card (tracker refresh spec §5.1)", () => {
+	const card = (name: string) =>
+		screen.getByRole("checkbox", { name }).closest("li.item") as HTMLElement
+
+	it("leads with the category icon, then the name and one meta line", async () => {
+		await ready()
+		const pelican = card("Pelican")
+		expect(pelican.querySelector(".item-tile")).toHaveAttribute("aria-hidden", "true")
+		expect(pelican.querySelector(".item-tile svg")).not.toBeNull()
+		expect(pelican.querySelector(".item-meta")).toHaveTextContent("Expected, as in GTA V · Birds")
+		expect(pelican.querySelector('.item-dot[data-status="expected"]')).not.toBeNull()
+	})
+
+	it("runs Tab as checkbox, book, flag, with the book and flag in the footer", async () => {
+		await ready()
+		const gator = card("American alligator")
+		expect([...gator.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
+			"INPUT",
+			"A",
+			"BUTTON",
+		])
+		expect(gator.querySelector(".item-foot .item-book")).not.toBeNull()
+	})
+
+	it("keeps the whole description in the DOM", async () => {
+		await ready()
+		expect(card("American alligator").querySelector(".item-desc")).toHaveTextContent(
+			"Everglades native."
+		)
+	})
+
+	it("marks a found card", async () => {
+		await ready()
+		expect(card("Pelican")).not.toHaveClass("found")
+		fireEvent.click(screen.getByText("Pelican"))
+		await waitFor(() => expect(card("Pelican")).toHaveClass("found"))
+	})
+})
+
+describe("Last found row (tracker refresh spec §5.3)", () => {
+	const row = () => document.querySelector(".last-found")
+	const jump = () => screen.queryByRole("button", { name: /^Last found/ })
+	const tickPelican = async () => {
+		fireEvent.click(screen.getByRole("checkbox", { name: "Pelican" }))
+		await screen.findByRole("button", { name: /^Last found Pelican/ })
+	}
+
+	beforeEach(() => {
+		Element.prototype.scrollIntoView = vi.fn()
+	})
+
+	it("is absent with no finds", async () => {
+		await ready()
+		expect(row()).toBeNull()
+	})
+
+	it("moves focus to the card's checkbox and marks the card", async () => {
+		await ready()
+		await tickPelican()
+		fireEvent.click(jump() as HTMLElement)
+		const box = screen.getByRole("checkbox", { name: "Pelican" })
+		expect(box).toHaveFocus()
+		expect(box.closest(".item")).toHaveAttribute("data-arrived")
+		expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({
+			block: "start",
+			behavior: "instant",
+		})
+		expect(vi.mocked(Element.prototype.scrollIntoView).mock.contexts[0]).toBe(box.closest(".item"))
+	})
+
+	it("is plain text when a search hides the card", async () => {
+		await ready()
+		await tickPelican()
+		fireEvent.change(screen.getByRole("searchbox"), { target: { value: "bike" } })
+		expect(jump()).toBeNull()
+		expect(row()?.tagName).toBe("P")
+		expect(row()).toHaveTextContent("Pelican")
+	})
+
+	it("is plain text when a category filter hides the card", async () => {
+		await ready()
+		await tickPelican()
+		fireEvent.click(screen.getByRole("button", { name: /^Vehicles,/ }))
+		expect(jump()).toBeNull()
+		expect(row()?.tagName).toBe("P")
+	})
+
+	it("is plain text when Hide found hides the card", async () => {
+		await ready()
+		await tickPelican()
+		fireEvent.click(screen.getByRole("button", { name: "Hide found" }))
+		expect(jump()).toBeNull()
+		expect(row()?.tagName).toBe("P")
 	})
 })

@@ -597,6 +597,7 @@ p {
 .search-toggle,
 .search-clear,
 .tracker .search-elsewhere-btn,
+.tracker button.last-found,
 .history button,
 .lang summary,
 .picker-row,
@@ -645,7 +646,8 @@ p {
 	.tiles button:not([aria-pressed="true"]):hover,
 	.tracker .search-toggle:not([aria-pressed="true"]):hover,
 	.tracker .search-clear:hover,
-	.tracker .search-elsewhere-btn:hover {
+	.tracker .search-elsewhere-btn:hover,
+	.tracker button.last-found:hover {
 		background: var(--bg-hover);
 		color: var(--text);
 	}
@@ -711,6 +713,7 @@ p {
 	.tracker .search-toggle:not([aria-pressed="true"]):active,
 	.tracker .search-clear:active,
 	.tracker .search-elsewhere-btn:active,
+	.tracker button.last-found:active,
 	.tiles a:active,
 	.go-link:active {
 		background: var(--bg-hover);
@@ -733,7 +736,8 @@ p {
 .tiles button:not([aria-pressed="true"]):focus-visible,
 .tracker .search-toggle:not([aria-pressed="true"]):focus-visible,
 .tracker .search-clear:focus-visible,
-.tracker .search-elsewhere-btn:focus-visible {
+.tracker .search-elsewhere-btn:focus-visible,
+.tracker button.last-found:focus-visible {
 	background: var(--bg-hover);
 	color: var(--text);
 }
@@ -1302,22 +1306,16 @@ p {
 	min-width: 0;
 }
 
-/* Everything under the search row. From 768 px the profile tops the chip column, so the profile,
-   the list and (from 1024 px) the stats all start on one line under the search. */
+/* Everything under the search row. From 1024 px the list and the stats rail start on one line
+   under the search. */
 .tracker-layout {
 	display: grid;
 	/* minmax(0, 1fr), not auto: the card grid's minimum must not stretch the page at 200 % text. */
 	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-4);
-	grid-template-areas:
-		"top"
-		"stats"
-		"nav"
-		"list";
 }
 
 .tracker-top {
-	grid-area: top;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -1339,12 +1337,7 @@ p {
 	max-width: none;
 }
 
-.cat-nav {
-	grid-area: nav;
-}
-
 .tracker-results {
-	grid-area: list;
 	min-width: 0;
 }
 
@@ -1359,8 +1352,56 @@ p {
 	overflow-wrap: anywhere;
 }
 
+/* An empty fallback: the profile button lives in the title row (spec §5.5). */
+.tracker-top:empty {
+	display: none;
+}
+
+/* Phones and tablets (spec §5.3). The rail shows the same from 1024 px. */
+.last-found {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	width: 100%;
+	min-height: var(--tap);
+	margin: 0;
+	padding: var(--space-1) 10px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: none;
+	color: var(--text);
+	text-align: start;
+	max-width: none;
+}
+
+/* Beats `.tracker button { font: inherit }`, so the row keeps one size as button or plain text. */
+.tracker .last-found {
+	font: inherit;
+	font-size: 0.75rem;
+}
+
+.last-found-text {
+	flex: 1;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+/* A label beside its value: muted and lighter than the name. */
+.last-found-label {
+	color: var(--text-muted);
+}
+
+.last-found-name {
+	font-weight: 600;
+}
+
+.last-found time {
+	flex: none;
+	color: var(--text-muted);
+}
+
 .stats {
-	grid-area: stats;
+	display: none;
 	padding: var(--space-3);
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
@@ -1380,6 +1421,71 @@ p {
 	font-size: 0.875rem;
 	color: var(--text-muted);
 	margin-top: var(--space-3);
+}
+
+.stats-percent {
+	margin: 0 0 var(--space-2);
+	font-family: var(--font-display);
+	font-weight: 400;
+	font-size: 3rem;
+	line-height: 0.9;
+	letter-spacing: 0.02em;
+}
+
+.stats-percent small {
+	font-size: 0.5em;
+	color: var(--text-muted);
+}
+
+/* The glow moves here from the old overall bar. */
+.stats .bar {
+	box-shadow: var(--glow);
+}
+
+.stats .recent {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--space-2);
+}
+
+.stats .recent li {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 0.8125rem;
+}
+
+.stats .find-icon,
+.last-found-icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 28px;
+	height: 28px;
+	border-radius: var(--radius);
+	background: color-mix(in srgb, var(--accent) 22%, transparent);
+	color: var(--accent);
+}
+
+.stats .find-icon svg,
+.last-found-icon svg {
+	width: 15px;
+	height: 15px;
+}
+
+.stats .find-text {
+	display: grid;
+	min-width: 0;
+	line-height: 1.25;
+}
+
+.stats .find-name {
+	overflow-wrap: anywhere;
+}
+
+.stats .find-when {
+	font-size: 0.75rem;
+	color: var(--text-muted);
 }
 
 /* Shared button reset; each kind below sets only what differs. */
@@ -1709,7 +1815,8 @@ html:has(.search-row) {
 	margin-bottom: 28px;
 }
 
-.cat-icon {
+.cat-icon,
+.item-tile {
 	display: grid;
 	place-items: center;
 	flex: none;
@@ -1720,7 +1827,8 @@ html:has(.search-row) {
 	color: var(--text-muted);
 }
 
-.cat-icon svg {
+.cat-icon svg,
+.item-tile svg {
 	width: 20px;
 	height: 20px;
 }
@@ -1804,22 +1912,33 @@ html:has(.search-row) {
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-1);
-	padding: 12px 12px 12px 16px;
+	padding: 12px 12px 4px 14px;
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
 	background: var(--bg-raised);
 }
 
-/* 40 px on the right keeps the name clear of the book icon. */
+/* 40 px on the right keeps the name clear of the check. */
 .item-main {
 	display: flex;
 	align-items: center;
-	gap: var(--space-2);
+	gap: 10px;
 	min-height: var(--tap);
 	padding-right: 40px;
 }
 
-.item-main input {
+.item-text {
+	display: grid;
+	gap: 2px;
+	min-width: 0;
+}
+
+.item-check {
+	/* The centre of a 44 px box 12 px from the top and 6 px from the right (spec §5.1). The hit
+	   area is the whole card, through the label's ::after. */
+	position: absolute;
+	top: 22px;
+	right: 16px;
 	appearance: none;
 	display: grid;
 	place-content: center;
@@ -1832,7 +1951,7 @@ html:has(.search-row) {
 	background: transparent;
 }
 
-.item-main input::before {
+.item-check::before {
 	content: "";
 	width: 14px;
 	height: 14px;
@@ -1841,31 +1960,30 @@ html:has(.search-row) {
 	transform: scale(0);
 }
 
-.item-main input:checked {
+.item-check:checked {
 	border-color: var(--accent);
 	background: var(--accent);
 }
 
-.item-main input:checked::before {
+.item-check:checked::before {
 	transform: scale(1);
 }
 
 @media (forced-colors: active) {
-	.item-main input::before {
+	.item-check::before {
 		background: CanvasText;
 	}
 }
 
 /* The card carries the focus ring instead (below). */
-.item-main input:focus-visible {
+.item-check:focus-visible {
 	outline: none;
 }
 
 .item-main label {
-	flex: 1;
 	font-size: 0.9375rem;
 	font-weight: 600;
-	/* A long word breaks instead of running under the book icon or out of the card. */
+	/* A long word breaks instead of running under the check or out of the card. */
 	overflow-wrap: anywhere;
 	cursor: pointer;
 }
@@ -1882,38 +2000,51 @@ html:has(.search-row) {
 	cursor: default;
 }
 
-.tier {
-	align-self: flex-start;
-	margin-inline-start: 32px;
-	padding: 1px 8px;
-	border: 1px solid color-mix(in srgb, currentColor 50%, transparent);
-	border-radius: 999px;
-	color: var(--text-muted);
+/* Wraps on narrow phones; never cut off. Tier words stay beside the dot, so colour is never alone. */
+.item-meta {
 	font-size: 0.75rem;
+	color: var(--text-muted);
 }
 
 /* Tier colours come from their own tokens so a theme can swap them without touching the accent. */
-.tier[data-status="confirmed"] {
-	color: var(--tier-confirmed);
+.item-dot {
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	margin-inline-end: 6px;
+	border-radius: 50%;
+	vertical-align: 1px;
 }
 
-.tier[data-status="expected"] {
-	color: var(--tier-expected);
+.item-dot[data-status="confirmed"] {
+	background: var(--tier-confirmed);
 }
 
+.item-dot[data-status="expected"] {
+	background: var(--tier-expected);
+}
+
+/* Two lines (spec §5.1); the full text stays in the DOM for screen readers. No 65ch cap: ch
+   follows the font, and the swap from the fallback face would rewrap the clamp. */
 .item-desc {
-	margin: 0 0 0 32px;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+	max-width: none;
+	margin: 0 0 0 46px;
 	color: var(--text-muted);
 	font-size: 0.875rem;
 	line-height: 1.5;
 }
 
-/* In the flow, pushed to the bottom: the flag can never overlap the book. The negative right
-   margin puts its box 13 px from the card's bottom edge and 7 px from its right edge (spec §4). */
+/* The footer row, in the flow and pushed to the bottom. It starts 46 px in (the 36 px tile plus the
+   10 px gap), so the flag never runs under the tile. The negative right margin puts the flag's
+   box 7 px from the card's right edge (spec §4). */
 .item-foot {
 	display: flex;
 	justify-content: flex-end;
-	margin: auto -6px 0 0;
+	margin: auto -6px 0 46px;
 }
 
 /* .item .item-icon outranks the shared `.tracker button` reset. */
@@ -1941,10 +2072,14 @@ html:has(.search-row) {
 	cursor: default;
 }
 
-.item .item-book {
-	position: absolute;
-	top: 12px;
-	right: 6px;
+/* Found: a pink edge and a pink icon tile beside the ✓, never colour alone (spec §5.1). */
+.item.found {
+	border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.item.found .item-tile {
+	background: color-mix(in srgb, var(--accent) 22%, transparent);
+	color: var(--accent);
 }
 
 .item .item-book:focus-visible {
@@ -2042,11 +2177,6 @@ html:has(.search-row) {
 	overflow: hidden;
 }
 
-/* Second glow site: only the overall bar, and on the wrapper, because `.bar` clips the fill. */
-.progress:has(> .progress-label > #progress-overall) .bar {
-	box-shadow: var(--glow);
-}
-
 .bar-fill {
 	display: block;
 	height: 100%;
@@ -2085,6 +2215,54 @@ html:has(.search-row) {
 	border-radius: var(--radius);
 	background: var(--bg-raised);
 	color: var(--text);
+}
+
+.profile-menu > button {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2);
+	padding-block: 0;
+	padding-inline-start: var(--space-2);
+}
+
+/* The initial is --text on the pink tint: pink on that tint is about 3.9:1, under AA. */
+.avatar {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--accent) 30%, transparent);
+	color: var(--text);
+	font-size: 0.8125rem;
+	font-weight: 600;
+	line-height: 1;
+}
+
+/* Cut on phones so a long name never pushes the title row wider than the screen; the accessible
+   name always has the whole name. */
+.profile-name {
+	min-width: 0;
+	max-width: min(8rem, 30vw);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* The slot sits at the right edge, so the menu opens leftwards and stays on screen. */
+#tracker-profile .menu {
+	left: auto;
+	right: 0;
+}
+
+/* A long name ellipses inside the slot instead of squeezing the title (scoped: the hub is untouched). */
+#tracker-profile .profile-menu {
+	max-width: 100%;
+}
+
+#tracker-profile .profile-menu > button {
+	max-width: 100%;
 }
 
 .menu {
@@ -2767,6 +2945,10 @@ html:has(.search-row) {
 }
 
 @media (min-width: 768px) {
+	.profile-name {
+		max-width: 20rem;
+	}
+
 	.search-toggle-label {
 		position: static;
 		width: auto;
@@ -2911,24 +3093,8 @@ html:has(.search-row) {
 		font-size: 3.5rem;
 	}
 
-	/* One column (spec §3.2): the tiles across the top, then the list. The rail stays under the
-	   list until PR 2 hides it below 1024 px. */
-	.tracker-layout {
-		grid-template-areas:
-			"top"
-			"nav"
-			"list"
-			"stats";
-	}
-
 	.tiles {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
-	}
-
-	.stats-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: var(--space-3);
 	}
 }
 
@@ -3239,7 +3405,7 @@ html:has(.search-row) {
 	}
 
 	/* Tiles 200 px, the list, the rail 200 px, 48 px between (spec §3.3). The cap sits on the whole
-	   tracker, so the search row spans the three columns; the tracker page's h1 reads the same
+	   tracker, so the search row spans the three columns; `.tracker-head` reads the same
 	   width. .wrap caps main at 72rem, so at full width this resolves to 1088 px and the list to
 	   592 px, still two 280 px cards across. */
 	main {
@@ -3253,12 +3419,26 @@ html:has(.search-row) {
 
 	.tracker-layout {
 		grid-template-columns: 200px minmax(0, 1fr) 200px;
-		grid-template-rows: auto 1fr;
 		column-gap: 48px;
-		grid-template-areas:
-			"top list stats"
-			"nav list stats";
+		grid-template-areas: "nav list stats";
 		align-items: start;
+	}
+
+	.cat-nav {
+		grid-area: nav;
+	}
+
+	.tracker-results {
+		grid-area: list;
+	}
+
+	.stats {
+		grid-area: stats;
+		display: block;
+	}
+
+	.tracker .last-found {
+		display: none;
 	}
 
 	/* Every tile is wide here, stacked in one column. */
@@ -3296,10 +3476,6 @@ html:has(.search-row) {
 
 	.cat-head h2 {
 		font-size: 2.5rem;
-	}
-
-	.stats-grid {
-		grid-template-columns: 1fr;
 	}
 
 	/* One row: the disclaimer takes the free space, the strip sits at the right. */
@@ -3355,8 +3531,23 @@ html:has(.search-row) {
 	}
 }
 
+/* Wide steps (tracker refresh spec §14.2). Each step adds a whole card column at the 280 px card
+   minimum: 90rem gives the list 880 px (3 cards), 120rem gives 1360 px (4). Lifting
+   --tracker-max-w lets the tracker, its title row and the Browse row fill main together. Above
+   120rem the page stays centred; more than four columns is harder to scan. */
 @media (min-width: 1600px) {
 	.wrap.wide {
 		max-width: 85rem;
+	}
+
+	.wrap.tracker-wide {
+		max-width: 90rem;
+		--tracker-max-w: none;
+	}
+}
+
+@media (min-width: 1920px) {
+	.wrap.tracker-wide {
+		max-width: 120rem;
 	}
 }

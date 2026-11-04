@@ -30,9 +30,20 @@ interface Props {
 	indexable?: boolean
 	/** The hub's wider page: caps at 85rem from 1600 px instead of 72rem (desktop spec §3). */
 	wide?: boolean
+	/** The tracker's wider page: 90rem from 1600 px, 120rem from 1920 px (tracker refresh spec §14.2). */
+	trackerWide?: boolean
 }
 
-const { locale, title, description, path, tab, indexable = true, wide = false } = Astro.props
+const {
+	locale,
+	title,
+	description,
+	path,
+	tab,
+	indexable = true,
+	wide = false,
+	trackerWide = false,
+} = Astro.props
 const { t } = translator(locale)
 const current = currentTab(path, tab)
 const sub = current !== null && path !== TAB_PATHS[current]
@@ -124,7 +135,7 @@ const ogLocale: Record<Locale, string> = { en: "en_US", nb: "nb_NO" }
 			</div>
 		</div>
 		<p class="visually-hidden" role="status" data-update-status></p>
-		<main id="main" class:list={["wrap", { wide }]}>
+		<main id="main" class:list={["wrap", { wide, "tracker-wide": trackerWide }]}>
 			<slot />
 		</main>
 		<p

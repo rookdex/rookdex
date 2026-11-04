@@ -35,4 +35,19 @@ describe("Tracker page", () => {
 		const island = doc.querySelector("astro-island")
 		expect(island?.compareDocumentPosition(nav as Node)).toBe(4) // DOCUMENT_POSITION_FOLLOWING
 	})
+
+	it("reserves the profile slot after the title, in one row (tracker refresh spec §5.5)", async () => {
+		const head = (await renderPage(Tracker)).querySelector(".tracker-head")
+		expect(head?.firstElementChild?.tagName).toBe("H1")
+		expect(head?.lastElementChild?.id).toBe("tracker-profile")
+		expect(head?.lastElementChild?.childElementCount).toBe(0)
+	})
+
+	describe("wide steps (spec §14.2)", () => {
+		it("gives main the tracker's wide steps, not the hub's", async () => {
+			const main = (await renderPage(Tracker)).querySelector("main")
+			expect(main?.classList.contains("tracker-wide")).toBe(true)
+			expect(main?.classList.contains("wide")).toBe(false)
+		})
+	})
 })
