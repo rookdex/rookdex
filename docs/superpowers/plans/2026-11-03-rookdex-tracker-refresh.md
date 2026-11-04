@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Give the tracker page category tiles with icons and counts, big section titles, a round check, an icon-lead card, a slim stats rail with relative times, a phone "Last found" row and the profile button in the title row, in two PRs merged by Tuesday 10.11.2026.
+**Goal:** Give the tracker page category tiles with icons and counts, big section titles, a round check, an icon-lead card, a slim stats rail with relative times, a phone "Last found" row and the profile button in the title row, in two PRs merged by Tuesday 10.11.2026. A third PR (added 04.11) puts group chips under every pressed category.
 
-**Architecture:** PR 1 (the look) changes markup and CSS only: `CategoryNav` buttons become tiles, `ItemList` titles get counts from a new `perGroup` in `src/model/stats.ts`, and five category icons join `icons.tsx` behind `categoryIcon(id)`. PR 2 (the structure) rebuilds `ItemRow` as the icon-lead card, slims `StatsRail`, adds a pure `relativeTime`, a `useNow` minute tick called only inside the rail and the new `LastFound` row, and portals `ProfileMenu` into a slot in the Astro page's new title row. The tracker model, storage, search and the hub do not change.
+**Architecture:** PR 1 (the look) changes markup and CSS only: `CategoryNav` buttons become tiles, `ItemList` titles get counts from a new `perGroup` in `src/model/stats.ts`, and five category icons join `icons.tsx` behind `categoryIcon(id)`. PR 2 (the structure) rebuilds `ItemRow` as the icon-lead card, slims `StatsRail`, adds a pure `relativeTime`, a `useNow` minute tick called only inside the rail and the new `LastFound` row, and portals `ProfileMenu` into a slot in the Astro page's new title row. The tracker model, storage, search and the hub do not change. PR 3 adds `groups` and `toggleGroup` to the tracker model beside `selected`, a `groups` input to `searchView` and `useSearch`, a `GroupChips` row rendered by `ItemList` under each pressed category, and `?group=` beside `?show=`.
 
 **Tech Stack:** Astro 5 island (`client:only="react"`), React 19 (`createPortal` from `react-dom`), TypeScript, Vitest + Testing Library (jsdom) + fake-indexeddb, Biome, plain CSS in `src/styles/global.css`.
 
@@ -20,7 +20,7 @@
 - No raw hex in `global.css` (the tokens test scans for it). Use tokens and `color-mix`.
 - Bebas Neue (`var(--font-display)`) is always `font-weight: 400`. It ships one weight; a bold would be faked.
 - Muted text keeps 4.5:1 on true black. Nothing is told by colour alone.
-- New copy: only `tracker.lastFound` = "Last found" / "Sist funnet". `tracker.progress` stays in both bundles (the hub uses it).
+- New copy: only `tracker.lastFound` = "Last found" / "Sist funnet". `tracker.progress` stays in both bundles (the hub uses it). PR 3 adds `tracker.groupChips` = "Groups: {category}" / "Grupper: {category}" and rewords four keys, verbatim from spec §14.1's copy table.
 - No new storage, network calls or third parties. Bar widths go through React's `style` prop (CSSOM), never a server `style` attribute.
 - Biome is the formatter and linter: tabs, double quotes, no semicolons, line width 100. Run `npx biome check --write <files>` on touched files before each commit.
 - **CRLF trap:** Edit on this Windows working copy can stage CRLF. Before each `git add`, run `sed -i 's/\r$//' <each touched file>`.
@@ -28,7 +28,7 @@
 - **In-place edit trap:** never run `sed -i` with a line address taken from a shell variable without checking the variable first. An empty address applies the edit to every line.
 - Stage explicit paths only, never `git commit -a`.
 - Commit messages: one imperative sentence, sentence case, no prefix (house style: "Add the tracker refresh design spec"). No `Co-Authored-By`, no AI attribution.
-- Branches: PR 1 on `feat/tracker-refresh-look` in worktree `.claude/worktrees/tracker-refresh-look`; PR 2 on `feat/tracker-refresh-structure`, cut from `main` **after PR 1 has merged**, in worktree `.claude/worktrees/tracker-refresh-structure`. I may merge each PR myself once CI is green (her standing go-ahead for refresh PRs).
+- Branches: PR 1 on `feat/tracker-refresh-look` in worktree `.claude/worktrees/tracker-refresh-look`; PR 2 on `feat/tracker-refresh-structure`, cut from `main` **after PR 1 has merged**, in worktree `.claude/worktrees/tracker-refresh-structure`; PR 3 on `feat/tracker-refresh-chips`, cut from `main` **after PR 2 has merged**, in worktree `.claude/worktrees/tracker-refresh-chips`. I may merge each PR myself once CI is green (her standing go-ahead for refresh PRs).
 
 ## Plan rulings (where this plan departs from or fills in the spec)
 
@@ -47,6 +47,12 @@
 - **R13. The no-re-render test ticks through `visibilitychange`**, with only `Date` faked. Faking intervals stalls fake-indexeddb and Testing Library's `waitFor` (search plan P7).
 - **R14. `initial()` reads the page language from `<html lang>`**, so the hub needs no new prop.
 - **R15. The PR 2 check is a 24 px circle at `top: 22px; right: 16px`**, the centre of the spec's 44 px box at `top: 12px; right: 6px`. The hit area is the whole card (the label's `::after`), as today.
+- **R16. `chipGroups` returns a Map,** not a plain object, so a category id such as "constructor" can never read `Object.prototype` (the trap Review Focus 2 guards for icons).
+- **R17. A pressed category with a chip row always renders its title and chips,** not only while one of its chips is pressed. With spec §14.1's narrower rule, unpressing the last chip under a search with no match there would unmount the focused chip, the very loss the rule exists to prevent. The cost: a pressed category with no match shows its title and chips above the empty message. §8's "hidden categories" are the unpressed ones, and they still do not render.
+- **R18. The chip row is a `<fieldset aria-label>`.** Biome's `useSemanticElements` rejects `role="group"` on a div (probed 04.11.2026). The fieldset's UA margin, padding, border and `min-inline-size: min-content` are reset.
+- **R19. A chip is as wide pressed as unpressed.** The unpressed chip carries the ✓'s width (0.875em plus the 6 px gap) as extra inline padding, so a press never reflows the wrapping row under the finger.
+- **R20. The model keeps `groups` in list order and drops any key no chip offers on every change** (`keepChips`), so `groupParam` only joins, `?group=` follows the list, and a chip never stays pressed under an unpressed category.
+- **R21. `useShowParam` and `useGroupParam` share one `useSearchParam(name, value)`,** keyed on the serialised string, so the two mirrors cannot drift.
 
 ## Review Focus
 
@@ -55,6 +61,14 @@
 3. **A 40-character profile name at 320 px** must not push the title row wider than the screen or wrap it. `.profile-name` is capped and ellipsed (Task 12), measured in Task 13.
 4. **Tapping a clamped description or the card's padding toggles the card, and the book and flag stay tappable.** Measured with `elementFromPoint` at 320 and 1280 px (Task 13).
 5. **The hub dashboard keeps its look.** It shares `ProfileMenu` (avatar now) and the `.recent` class. New rail styles are scoped to `.stats`, and the hub is checked at 320 and 1280 px in Task 13.
+
+**PR 3 (group chips):**
+
+1. **Unpressing the last chip while a search matches nothing there** must not drop focus to `<body>`. R17 keeps the row; tested in Task 17.
+2. **The chip under the finger moves when the ✓ appears.** R19 keeps the width; CSS-tested in Task 16 and measured by clicking in Task 18.
+3. **A shared link with a stale or hostile `?group=`** (a group of an unpressed category, a group that lost every item, junk) is dropped and never echoed. Tested in Tasks 14 and 17.
+4. **A long Norwegian label at 320 px with 200 % text** wraps inside its chip and never widens the page. `.chip-name` breaks and the fieldset's `min-content` width is reset; measured in Task 18.
+5. **Switching profile keeps the chips,** as it keeps the tiles. Tested in Task 14.
 
 ---
 
@@ -2885,6 +2899,1183 @@ Times update once a minute and when the tab is shown again. The tick re-renders 
 On wide screens the tracker now grows in two steps: three cards across from 1600 px and four from 1920 px, instead of two in a narrow column. The hub keeps its own width.
 
 Checked: tests, Biome, astro check and the build; card hit testing with elementFromPoint; a 40-character profile name and the open menu at 320 px; the hub at 320 and 1280 px; forced colours, keyboard order, reduced motion; card columns at 1600 and 1920 px; CLS 0 at 320, 768, 1024, 1280, 1600 and 1920 px.
+```
+
+- [ ] **Step 5: Merge when green, before Tuesday 10.11.2026**
+
+Bind the PR with the ccd_pr tools, read CI, merge once green. If it is not green by 10.11, it waits until after launch week (spec §1); say so to her rather than forcing it.
+
+---
+
+## PR 3: group chips (spec §14.1, added 04.11.2026)
+
+Cut from `main` **after PR 2 has merged**: these tasks edit the PR 2 versions of `Tracker.tsx` and `ItemList.tsx` (the Last found row, the icon-lead card) and the CSS hover lists PR 2 extended. Line references below are by anchor text, not number. If PR 2 is held past 10.11, PR 3 is held with it (spec §1).
+
+The fixtures in `src/test/tracker-fixtures.ts` drive every island test here: Vehicles has one group (Bikes), so it never gets chips; Wildlife has Birds (Pelican) and Reptiles (American alligator), so it gets two.
+
+### Task 14: The group selection in the tracker model
+
+**Files:**
+- Modify: `src/model/tracker.ts`
+- Modify: `src/islands/buildTracker.ts`
+- Test: `src/model/tracker.test.ts`
+
+**Interfaces:**
+- Consumes: `countable`, `groupKey` from `src/model/stats.ts` (Task 1); `categoryIds`, `groupItems` from `src/model/seed.ts`.
+- Produces (all in `src/model/tracker.ts`):
+  - `chipGroups(items: SeedItem[], selected: string[]): Map<string, string[]>`: per pressed category with two or more groups, its group ids in list order; categories in seed order (R16).
+  - `parseGroups(search: string, chips: Map<string, string[]>): string[]`: `groupKey`s from `?group=` that a chip offers, in list order.
+  - `groupParam(groups: string[]): string | null`.
+  - `TrackerState.groups: string[]`, `TrackerDeps.groups?: string[]`, `Tracker.toggleGroup(key: string): void`. `selectCategories` now also drops groups (R20).
+  - `buildTracker(defaultProfileName: string, selected?: string[], groups?: string[]): Tracker`.
+
+- [ ] **Step 0: Worktree** (only once PR 2 has merged)
+
+```bash
+gh pr list --state merged --head feat/tracker-refresh-structure --json number,mergedAt
+git fetch origin && git worktree add .claude/worktrees/tracker-refresh-chips -b feat/tracker-refresh-chips origin/main
+```
+
+Then in `.claude/worktrees/tracker-refresh-chips`: `npm ci`, then `npm test`. Expected: PASS, every file, and `src/islands/tracker/LastFound.tsx` exists.
+
+- [ ] **Step 1: Write the failing tests**
+
+In `src/model/tracker.test.ts`, change the import to:
+
+```ts
+import {
+	chipGroups,
+	createTracker,
+	groupParam,
+	parseGroups,
+	parseShow,
+	showParam,
+	type TrackerDeps,
+} from "./tracker"
+```
+
+Append:
+
+```ts
+describe("group chips (tracker refresh spec §14.1)", () => {
+	const grouped: SeedItem[] = [
+		{ ...item("wildlife/a", "wildlife"), group: "reptiles" },
+		{ ...item("wildlife/b", "wildlife"), group: "birds" },
+		{ ...item("wildlife/r", "wildlife"), group: "mammals", retired: true },
+		{ ...item("vehicles/c", "vehicles"), group: "cars" },
+		{ ...item("vehicles/d", "vehicles"), group: "boats" },
+		{ ...item("misc/e", "misc"), group: "only" },
+	]
+
+	it("offers chips per pressed category in list order, never for one group or a retired one", () => {
+		expect([...chipGroups(grouped, [])]).toEqual([])
+		// Pressed out of order on purpose: the chips follow the list, not the press order.
+		expect([...chipGroups(grouped, ["misc", "vehicles", "wildlife"])]).toEqual([
+			["wildlife", ["birds", "reptiles"]],
+			["vehicles", ["boats", "cars"]],
+		])
+	})
+
+	it("parseGroups keeps offered keys in list order; groupParam serialises or drops", () => {
+		const chips = chipGroups(grouped, ["wildlife"])
+		// vehicles is not pressed, mammals has only a retired item, evil is not a key at all.
+		expect(
+			parseGroups(
+				"?group=wildlife/reptiles,wildlife/birds,vehicles/cars,wildlife/mammals,evil",
+				chips
+			)
+		).toEqual(["wildlife/birds", "wildlife/reptiles"])
+		expect(parseGroups("", chips)).toEqual([])
+		expect(groupParam(["wildlife/birds", "wildlife/reptiles"])).toBe(
+			"wildlife/birds,wildlife/reptiles"
+		)
+		expect(groupParam([])).toBeNull()
+	})
+
+	it("toggleGroup presses and unpresses a chip and ignores keys no chip offers", () => {
+		const { tracker } = make({ items: grouped, selected: ["wildlife"] })
+		tracker.toggleGroup("wildlife/reptiles")
+		tracker.toggleGroup("wildlife/birds")
+		expect(tracker.getState().groups).toEqual(["wildlife/birds", "wildlife/reptiles"])
+		tracker.toggleGroup("wildlife/birds")
+		expect(tracker.getState().groups).toEqual(["wildlife/reptiles"])
+		const before = tracker.getState()
+		for (const key of ["vehicles/cars", "misc/only", "wildlife/mammals", "nope"]) {
+			tracker.toggleGroup(key)
+		}
+		expect(tracker.getState()).toBe(before)
+	})
+
+	it("drops a category's chips when it is unpressed, so pressing it again starts with none", () => {
+		const { tracker } = make({ items: grouped, selected: ["wildlife", "vehicles"] })
+		tracker.toggleGroup("wildlife/birds")
+		tracker.toggleGroup("vehicles/cars")
+		tracker.selectCategories(["vehicles"])
+		expect(tracker.getState().groups).toEqual(["vehicles/cars"])
+		tracker.selectCategories(["wildlife", "vehicles"])
+		expect(tracker.getState().groups).toEqual(["vehicles/cars"])
+		tracker.selectCategories([])
+		expect(tracker.getState().groups).toEqual([])
+	})
+
+	it("starts from the groups it is given, keeping only the ones a chip offers", () => {
+		const { tracker } = make({
+			items: grouped,
+			selected: ["wildlife"],
+			groups: ["vehicles/cars", "wildlife/birds"],
+		})
+		expect(tracker.getState().groups).toEqual(["wildlife/birds"])
+	})
+
+	it("keeps the chips across a profile switch", async () => {
+		const { tracker } = make({ items: grouped, selected: ["wildlife"] })
+		await tracker.init()
+		tracker.toggleGroup("wildlife/birds")
+		await tracker.createProfile("Dad")
+		expect(tracker.getState().groups).toEqual(["wildlife/birds"])
+	})
+})
+```
+
+- [ ] **Step 2: Run to see them fail**
+
+Run: `npx vitest run src/model/tracker.test.ts`
+Expected: FAIL, `chipGroups` is not exported.
+
+- [ ] **Step 3: Implement in `src/model/tracker.ts`**
+
+Change the two imports:
+
+```ts
+import { categoryIds, groupItems } from "./seed"
+import { countable, countItems, groupKey, type Records } from "./stats"
+```
+
+In `TrackerState`, after `selected: string[]`:
+
+```ts
+	/** Pressed group chips as `groupKey`s, in list order, only under pressed categories (spec §14.1). */
+	groups: string[]
+```
+
+In `TrackerDeps`, after `selected?: string[]`:
+
+```ts
+	groups?: string[]
+```
+
+In `Tracker`, after `selectCategories(ids: string[]): void`:
+
+```ts
+	toggleGroup(key: string): void
+```
+
+After `showParam`, add:
+
+```ts
+/**
+ * Per pressed category, the groups its chips offer (tracker refresh spec §14.1): every group with
+ * a countable item, in the list's group order. A category with one group gets no chips, because
+ * one chip would filter nothing. Categories come in seed order. A Map, so a category id such as
+ * "constructor" can never read Object.prototype (R16).
+ */
+export function chipGroups(items: SeedItem[], selected: string[]): Map<string, string[]> {
+	const live = countable(items)
+	const chips = new Map<string, string[]>()
+	for (const category of categoryIds(live)) {
+		if (!selected.includes(category)) continue
+		const groups = [...groupItems(live.filter((item) => item.category === category)).keys()]
+		if (groups.length > 1) chips.set(category, groups)
+	}
+	return chips
+}
+
+/** The keys in `keys` that a chip offers, in list order (R20). */
+function keepChips(keys: Iterable<string>, chips: Map<string, string[]>): string[] {
+	const wanted = new Set(keys)
+	return [...chips].flatMap(([category, groups]) =>
+		groups.map((group) => groupKey(category, group)).filter((key) => wanted.has(key))
+	)
+}
+
+/** Group keys named in `?group=`, read after `?show=`: only chips the pressed categories offer,
+ *  in list order. Anything else is dropped, so the raw value is never echoed. */
+export function parseGroups(search: string, chips: Map<string, string[]>): string[] {
+	const raw = new URLSearchParams(search).get("group") ?? ""
+	return keepChips(
+		raw.split(",").map((s) => s.trim()),
+		chips
+	)
+}
+
+export function groupParam(groups: string[]): string | null {
+	return groups.length > 0 ? groups.join(",") : null
+}
+```
+
+In `createTracker`, replace the `selected:` line of the initial state with the two lines below, and declare `selected` just above `let state`:
+
+```ts
+	const selected = (deps.selected ?? []).filter((id) => known.has(id))
+```
+
+```ts
+		selected,
+		groups: keepChips(deps.groups ?? [], chipGroups(deps.items, selected)),
+```
+
+Replace `selectCategories` and add `toggleGroup` after it:
+
+```ts
+		// Unpressing a category drops its chips, so pressing it again starts with none (spec §14.1).
+		selectCategories(ids) {
+			const selected = ids.filter((id) => known.has(id))
+			set({ selected, groups: keepChips(state.groups, chipGroups(deps.items, selected)) })
+		},
+		toggleGroup(key) {
+			const chips = chipGroups(deps.items, state.selected)
+			if (keepChips([key], chips).length === 0) return
+			const next = new Set(state.groups)
+			if (next.has(key)) next.delete(key)
+			else next.add(key)
+			set({ groups: keepChips(next, chips) })
+		},
+```
+
+- [ ] **Step 4: Pass the groups through `buildTracker`**
+
+In `src/islands/buildTracker.ts`, change the signature and add the field after `selected,`:
+
+```ts
+export function buildTracker(
+	defaultProfileName: string,
+	selected: string[] = [],
+	groups: string[] = []
+): Tracker {
+```
+
+```ts
+		groups,
+```
+
+- [ ] **Step 5: Run to see them pass**
+
+Run: `npx vitest run src/model/tracker.test.ts && npm run check`
+Expected: PASS, and `astro check` reports no errors (no test builds a `TrackerState` by hand, so the new field breaks nothing).
+
+- [ ] **Step 6: Commit**
+
+```bash
+F="src/model/tracker.ts src/model/tracker.test.ts src/islands/buildTracker.ts"
+npx biome check --write $F && sed -i 's/\r$//' $F && git add $F
+git commit -m "Keep the pressed group chips in the tracker model beside the categories"
+```
+
+### Task 15: Groups in search
+
+**Files:**
+- Modify: `src/model/search.ts`
+- Modify: `src/islands/tracker/useSearch.ts`
+- Test: `src/model/search.test.ts`, `src/islands/tracker/useSearch.test.ts`
+
+**Interfaces:**
+- Consumes: `groupKey` (stats.ts); `TrackerState.groups` (Task 14).
+- Produces: `SearchInput.groups: string[]`; `SearchSource` gains `"groups"`; `SearchChange.groups?: string[]`. Task 17's Clear filters calls `search.viewFor({ selected: [], groups: [] })`.
+
+- [ ] **Step 1: Write the failing tests**
+
+In `src/model/search.test.ts`, change the `view` helper to:
+
+```ts
+const view = (patch: Partial<Parameters<typeof searchView>[0]>) =>
+	searchView({ items, selected: [], groups: [], query: "", hidden: none, terms, ...patch })
+```
+
+Append:
+
+```ts
+describe("searchView with group chips (tracker refresh spec §14.1)", () => {
+	const both = { selected: ["vehicles", "wildlife"], groups: ["vehicles/cars"] }
+
+	it("narrows only the category whose chips are pressed", () => {
+		expect(ids(view(both).visible)).toEqual([
+			"vehicles/albany-primo",
+			"vehicles/ubermacht-sentinel",
+			"wildlife/pelican",
+			"wildlife/alligator",
+		])
+	})
+
+	it("counts a match a chip hides as outside the filters", () => {
+		const v = view({ ...both, query: "seashark" })
+		expect(v.visible).toEqual([])
+		expect(v.elsewhere).toBe(1)
+	})
+
+	it("counts hidden finds inside the pressed chips only", () => {
+		const hidden = new Set(["vehicles/albany-primo", "vehicles/speedophile", "wildlife/pelican"])
+		const v = view({ ...both, hidden })
+		expect(ids(v.visible)).toEqual(["vehicles/ubermacht-sentinel", "wildlife/alligator"])
+		// The Primo and the Pelican are inside; the Seashark sits behind an unpressed chip.
+		expect(v.hiddenCount).toBe(2)
+	})
+})
+```
+
+In `src/islands/tracker/useSearch.test.ts`, add `groups: [],` to `base` after `selected: [],`, and append inside `describe("useSearch ...")`:
+
+```ts
+	it("takes a new snapshot when the group chips change (tracker refresh spec §14.1)", () => {
+		localStorage.setItem(HIDE_FOUND_KEY, "1")
+		const { result, rerender } = setup({ selected: ["wildlife"] })
+		rerender({ ...base, selected: ["wildlife"], records: found(PELICAN) })
+		expect(visibleIds(result)).toContain(PELICAN)
+		rerender({
+			...base,
+			selected: ["wildlife"],
+			groups: ["wildlife/birds"],
+			records: found(PELICAN),
+		})
+		expect(visibleIds(result)).toEqual([])
+		expect(result.current.view.hiddenCount).toBe(1)
+	})
+
+	it("previews a change of chips with viewFor", () => {
+		const { result } = setup({ selected: ["wildlife"], groups: ["wildlife/birds"] })
+		expect(result.current.viewFor({ query: "gator" }).elsewhere).toBe(1)
+		expect(
+			result.current.viewFor({ query: "gator", groups: [] }).visible.map((item) => item.id)
+		).toEqual([GATOR])
+	})
+```
+
+- [ ] **Step 2: Run to see them fail**
+
+Run: `npx vitest run src/model/search.test.ts src/islands/tracker/useSearch.test.ts`
+Expected: FAIL on the new tests (chips ignored, so `vehicles/speedophile` is visible).
+
+- [ ] **Step 3: Implement `src/model/search.ts`**
+
+Change the stats import to `import { groupKey, type Records } from "./stats"`. In `SearchInput`, after `selected`:
+
+```ts
+	/** Pressed group chips as `groupKey`s. A category with none pressed shows every group. */
+	groups: string[]
+```
+
+In `SearchView`, reword the two "chips" comments (they meant the category tiles): `/** Inside the pressed tiles and chips, matching, not hidden, in seed order. */`, `/** Matching and not hidden outside the filters; 0 with no query. */` and `/** Matching and hidden inside the filters. */`.
+
+Replace the head of `searchView` and its `inside` line:
+
+```ts
+export function searchView({
+	items,
+	selected,
+	groups,
+	query,
+	hidden,
+	terms,
+}: SearchInput): SearchView {
+	const queryWords = words(query)
+	const all = selected.length === 0
+	const pressed = new Set(groups)
+	// The categories a chip narrows: there, only the pressed groups are inside (spec §14.1).
+	const narrowed = new Set(
+		items
+			.filter((item) => pressed.has(groupKey(item.category, item.group)))
+			.map((item) => item.category)
+	)
+```
+
+```ts
+		const inside =
+			(all || selected.includes(item.category)) &&
+			(!narrowed.has(item.category) || pressed.has(groupKey(item.category, item.group)))
+```
+
+- [ ] **Step 4: Implement `src/islands/tracker/useSearch.ts`**
+
+```ts
+export type SearchSource = Pick<
+	TrackerState,
+	"status" | "profileId" | "items" | "records" | "selected" | "groups"
+>
+
+export interface SearchChange {
+	query?: string
+	selected?: string[]
+	groups?: string[]
+	hideFound?: boolean
+}
+```
+
+Add `source.groups` to the key, after `source.selected`:
+
+```ts
+	const key = JSON.stringify([
+		ready,
+		source.profileId,
+		source.selected,
+		source.groups,
+		query,
+		hideFound,
+		imports,
+	])
+```
+
+Give `viewOf` the groups and pass them everywhere:
+
+```ts
+	function viewOf(
+		selected: string[],
+		groups: string[],
+		q: string,
+		hide: ReadonlySet<string>
+	): SearchView {
+		return searchView({
+			items: source.items,
+			selected,
+			groups,
+			query: q,
+			hidden: hide,
+			terms: SEARCH_TERMS,
+		})
+	}
+```
+
+```ts
+		view: viewOf(source.selected, source.groups, query, hidden),
+```
+
+```ts
+		viewFor: (change) =>
+			viewOf(
+				change.selected ?? source.selected,
+				change.groups ?? source.groups,
+				change.query ?? query,
+				snapshot(change.hideFound ?? hideFound)
+			),
+```
+
+- [ ] **Step 5: Run to see them pass**
+
+Run: `npx vitest run src/model/search.test.ts src/islands/tracker/useSearch.test.ts && npm run check`
+Expected: PASS, no type errors (`Tracker.tsx` passes the whole `TrackerState`, which now has `groups`).
+
+- [ ] **Step 6: Commit**
+
+```bash
+F="src/model/search.ts src/model/search.test.ts src/islands/tracker/useSearch.ts src/islands/tracker/useSearch.test.ts"
+npx biome check --write $F && sed -i 's/\r$//' $F && git add $F
+git commit -m "Let the pressed group chips narrow search, Hide found and the elsewhere count"
+```
+
+### Task 16: The chip row
+
+**Files:**
+- Create: `src/islands/tracker/GroupChips.tsx`
+- Modify: `src/styles/global.css`, `src/locales/en.json`, `src/locales/nb.json`
+- Test: `src/islands/tracker/GroupChips.test.tsx` (new), `src/styles/tracker-refresh.test.ts`, `src/i18n/copy.test.ts`
+
+**Interfaces:**
+- Consumes: `Count`, `groupKey` (stats.ts); `Translate`; copy `tracker.count`.
+- Produces: `GroupChips` props `{ category: string; categoryLabel: string; groups: string[]; pressed: string[]; counts: Record<string, Count>; groupLabel: (id: string) => string; onToggle: (key: string) => void; t: Translate }`. Root `fieldset.group-chips` (R18), one `button` per group with `.chip-check` (pressed only), `.chip-name`, `.chip-count`. Copy key `tracker.groupChips`.
+
+- [ ] **Step 1: Write the failing tests**
+
+`src/islands/tracker/GroupChips.test.tsx`:
+
+```tsx
+// @vitest-environment jsdom
+import { fireEvent, render, screen, within } from "@testing-library/react"
+import { describe, expect, it, vi } from "vitest"
+import { seedLabel, translator } from "../../i18n"
+import { GroupChips } from "./GroupChips"
+
+const { t } = translator("en")
+const counts = {
+	"wildlife/birds": { done: 1, total: 3 },
+	"wildlife/reptiles": { done: 0, total: 2 },
+}
+
+function setup(pressed: string[] = []) {
+	const onToggle = vi.fn()
+	render(
+		<GroupChips
+			category="wildlife"
+			categoryLabel="Wildlife"
+			groups={["birds", "reptiles"]}
+			pressed={pressed}
+			counts={counts}
+			groupLabel={(id) => seedLabel(t, "group", id)}
+			onToggle={onToggle}
+			t={t}
+		/>
+	)
+	return onToggle
+}
+
+describe("GroupChips (tracker refresh spec §14.1)", () => {
+	it("is a group named after its category, with a chip per group in list order", () => {
+		setup()
+		const row = screen.getByRole("group", { name: "Groups: Wildlife" })
+		expect(within(row).getAllByRole("button").map((b) => b.getAttribute("aria-label"))).toEqual([
+			"Birds, 1 of 3",
+			"Reptiles, 0 of 2",
+		])
+	})
+
+	it("marks pressed chips with aria-pressed and a hidden ✓, and only those", () => {
+		setup(["wildlife/birds"])
+		const birds = screen.getByRole("button", { name: "Birds, 1 of 3" })
+		const reptiles = screen.getByRole("button", { name: "Reptiles, 0 of 2" })
+		expect(birds).toHaveAttribute("aria-pressed", "true")
+		expect(reptiles).toHaveAttribute("aria-pressed", "false")
+		expect(birds.querySelector(".chip-check")).toHaveAttribute("aria-hidden", "true")
+		expect(birds).toHaveTextContent("✓")
+		expect(reptiles).not.toHaveTextContent("✓")
+	})
+
+	it("shows the whole group's count as done/total", () => {
+		setup()
+		expect(screen.getByRole("button", { name: "Birds, 1 of 3" })).toHaveTextContent("Birds1/3")
+	})
+
+	it("hands the group key to onToggle", () => {
+		const onToggle = setup()
+		fireEvent.click(screen.getByRole("button", { name: "Reptiles, 0 of 2" }))
+		expect(onToggle).toHaveBeenCalledWith("wildlife/reptiles")
+	})
+})
+```
+
+Append to `src/styles/tracker-refresh.test.ts` (top level, after the existing `describe`):
+
+```ts
+describe("group chips (spec §14.1)", () => {
+	it("makes chips 44 px pills in a row that wraps at every width", () => {
+		expect(rule(".group-chips")).toMatch(/flex-wrap:\s*wrap/)
+		expect(rule(".group-chips")).toMatch(/min-inline-size:\s*0/)
+		expect(rule(".group-chips button")).toMatch(/min-height:\s*var\(--tap\)/)
+		expect(rule(".group-chips button")).toMatch(/border-radius:\s*999px/)
+	})
+
+	it("keeps a chip's width when the ✓ appears (R19)", () => {
+		expect(rule(".group-chips button")).toMatch(/padding:\s*4px calc\(13px \+ 0\.4375em\)/)
+		expect(rule('.group-chips button[aria-pressed="true"]')).toMatch(/padding-inline:\s*10px/)
+		expect(rule(".group-chips .chip-check")).toMatch(/width:\s*0\.875em/)
+	})
+
+	it("gives a pressed chip the white focus ring and the forced-colours Highlight", () => {
+		expect(css).toMatch(
+			/\.group-chips button\[aria-pressed="true"\]:focus-visible\s*\{\s*outline-color:\s*var\(--text\)/
+		)
+		expect(css).toMatch(
+			/\.group-chips button\[aria-pressed="true"\],\s*\.tiles button\[aria-pressed="true"\],[^{]*\{[^}]*background:\s*Highlight/
+		)
+	})
+
+	it("guards every unpressed chip state with :not([aria-pressed=\"true\"])", () => {
+		const states = css.match(/\.group-chips button[^,{\s]*:(hover|active|focus-visible)/g) ?? []
+		const unpressed = states.filter((s) => !s.includes('button[aria-pressed="true"]:'))
+		expect(unpressed.length).toBeGreaterThanOrEqual(3)
+		for (const s of unpressed) expect(s).toContain(':not([aria-pressed="true"])')
+	})
+})
+```
+
+In `src/i18n/copy.test.ts`, append:
+
+```ts
+describe("group chips copy (tracker refresh spec §14.1)", () => {
+	it("names the chip row after its category", () => {
+		expect(en["tracker.groupChips"]).toBe("Groups: {category}")
+		expect(nb["tracker.groupChips"]).toBe("Grupper: {category}")
+	})
+})
+```
+
+- [ ] **Step 2: Run to see them fail**
+
+Run: `npx vitest run src/islands/tracker/GroupChips.test.tsx src/styles/tracker-refresh.test.ts src/i18n/copy.test.ts`
+Expected: FAIL, no `GroupChips` module, no `.group-chips` rules, no `tracker.groupChips`.
+
+- [ ] **Step 3: The copy**
+
+In `src/locales/en.json`, after `"tracker.categories": "Categories",` add `"tracker.groupChips": "Groups: {category}",`. In `src/locales/nb.json`, after `"tracker.categories": "Kategorier",` add `"tracker.groupChips": "Grupper: {category}",`. Then `grep -n '\\u00' src/locales/nb.json` (expect no output).
+
+- [ ] **Step 4: Implement `src/islands/tracker/GroupChips.tsx`**
+
+```tsx
+import type { Translate } from "../../i18n"
+import { type Count, groupKey } from "../../model/stats"
+
+const none: Count = { done: 0, total: 0 }
+
+interface Props {
+	category: string
+	/** The category's label, for the row's name. */
+	categoryLabel: string
+	/** This category's chip groups in list order (`chipGroups`). */
+	groups: string[]
+	/** Every pressed chip as a `groupKey`. */
+	pressed: string[]
+	/** Keyed by `groupKey`, over every item, never the filtered view (spec §2 Counts). */
+	counts: Record<string, Count>
+	groupLabel: (id: string) => string
+	onToggle: (key: string) => void
+	t: Translate
+}
+
+/**
+ * The chips under a pressed category's title (tracker refresh spec §14.1): multi-select toggles,
+ * none pressed shows the whole category. The name carries the count in words, as a tile's does,
+ * so the digits are hidden. A fieldset is the group role Biome accepts (R18).
+ */
+export function GroupChips({
+	category,
+	categoryLabel,
+	groups,
+	pressed,
+	counts,
+	groupLabel,
+	onToggle,
+	t,
+}: Props) {
+	return (
+		<fieldset
+			className="group-chips"
+			aria-label={t("tracker.groupChips", { category: categoryLabel })}
+		>
+			{groups.map((group) => {
+				const key = groupKey(category, group)
+				const on = pressed.includes(key)
+				const count = counts[key] ?? none
+				const label = groupLabel(group)
+				return (
+					<button
+						key={key}
+						type="button"
+						aria-pressed={on}
+						aria-label={`${label}, ${t("tracker.count", { done: count.done, total: count.total })}`}
+						onClick={() => onToggle(key)}
+					>
+						{/* Pressed is never told by colour alone. */}
+						{on && (
+							<span className="chip-check" aria-hidden="true">
+								✓
+							</span>
+						)}
+						<span className="chip-name">{label}</span>
+						<span className="chip-count" aria-hidden="true">
+							{count.done}/{count.total}
+						</span>
+					</button>
+				)
+			})}
+		</fieldset>
+	)
+}
+```
+
+- [ ] **Step 5: The CSS**
+
+In `src/styles/global.css`, after the `.cat-rule` block and before `.item-groups`:
+
+```css
+/* Group chips (tracker refresh spec §14.1): under a pressed category's title, wrapping onto more
+   lines at every width. .cat-head's 28 px sits above; 24 px below, before the first group. The
+   row is a fieldset for its group role (R18), so I reset the UA box, including the min-content
+   width that would stop a long label from wrapping. */
+.group-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+	min-inline-size: 0;
+	margin: 0 0 24px;
+	padding: 0;
+	border: 0;
+}
+
+/* An unpressed chip carries the ✓'s width (0.875em plus the 6 px gap) as extra inline padding,
+   so a press never changes a chip's width and the row never reflows under the finger (R19). */
+.group-chips button {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	max-width: 100%;
+	min-height: var(--tap);
+	padding: 4px calc(13px + 0.4375em);
+	border: 1px solid var(--border);
+	border-radius: 999px;
+	background: var(--bg-raised);
+	color: var(--text);
+	font: inherit;
+	font-size: 0.875rem;
+	line-height: 1.25;
+	text-align: start;
+}
+
+.group-chips .chip-check {
+	flex: none;
+	width: 0.875em;
+	text-align: center;
+}
+
+/* A long Norwegian label wraps inside its chip instead of widening the row. */
+.group-chips .chip-name {
+	min-width: 0;
+	overflow-wrap: break-word;
+}
+
+.group-chips .chip-count {
+	flex: none;
+	color: var(--text-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.group-chips button[aria-pressed="true"] {
+	padding-inline: 10px;
+	border-color: var(--accent);
+	background: var(--accent);
+	color: var(--accent-text);
+}
+
+.group-chips button[aria-pressed="true"] .chip-count {
+	color: inherit;
+}
+```
+
+Then add the chip to the shared state lists, each as its own line (Biome keeps one selector per line):
+
+- Transition list at the top of the hover section: `.group-chips button,` after `.tiles a,`.
+- `(hover: hover)` lift list: `.group-chips button:not([aria-pressed="true"]):hover,` after `.tiles button:not([aria-pressed="true"]):hover,`.
+- `(hover: hover)` "Preview" border list: `.group-chips button:not([aria-pressed="true"]):hover,` before `.tiles button:not([aria-pressed="true"]):hover,`.
+- `(hover: none)` press list: `.group-chips button:not([aria-pressed="true"]):active,` after `.tiles button:not([aria-pressed="true"]):active,`.
+- Focus lift list ("Focus is the hover lift plus the pink outline"): `.group-chips button:not([aria-pressed="true"]):focus-visible,` after `.tiles button:not([aria-pressed="true"]):focus-visible,`.
+- Pink-surface ring list ("Pink is focus everywhere except on the three pink surfaces"): append `.group-chips button[aria-pressed="true"]:focus-visible` as the **last** selector, and change "three" to "four" in its comment.
+- Forced colours, the pressed rule and its focus rule: add `.group-chips button[aria-pressed="true"],` and `.group-chips button[aria-pressed="true"]:focus-visible,` as the **first** selector of each. `src/styles/search.test.ts` matches `.tiles ...` followed by `.tracker .search-toggle ...` in those two rules, so nothing may go between them.
+
+- [ ] **Step 6: Run to see them pass**
+
+Run: `npx vitest run src/islands/tracker/GroupChips.test.tsx src/styles src/i18n/copy.test.ts`
+Expected: PASS, including `hover.test.ts` and `search.test.ts`.
+
+- [ ] **Step 7: Commit**
+
+```bash
+F="src/islands/tracker/GroupChips.tsx src/islands/tracker/GroupChips.test.tsx src/styles/global.css src/styles/tracker-refresh.test.ts src/locales/en.json src/locales/nb.json src/i18n/copy.test.ts"
+npx biome check --write $F && sed -i 's/\r$//' $F && git add $F
+git commit -m "Add the group chip row with whole-group counts and a pressed tick"
+```
+
+### Task 17: Chips in the list and the island
+
+**Files:**
+- Modify: `src/islands/tracker/ItemList.tsx`, `src/islands/Tracker.tsx`, `src/islands/useTracker.ts`, `src/locales/en.json`, `src/locales/nb.json`
+- Test: `src/islands/Tracker.groups.test.tsx` (new), `src/islands/Tracker.search.test.tsx`
+
+**Interfaces:**
+- Consumes: `chipGroups`, `parseGroups`, `groupParam`, `Tracker.toggleGroup`, `TrackerState.groups` (Task 14); `SearchChange.groups` (Task 15); `GroupChips` (Task 16); PR 2's `LastFound` and `jumpable`.
+- Produces: `ItemList` props gain `order: string[]`, `chips: Map<string, string[]>`, `groups: string[]`, `onToggleGroup: (key: string) => void`. `useGroupParam(groups: string[]): void` in `useTracker.ts`. `Tracker.tsx`'s `showAllCategories` becomes `clearFilters`.
+
+- [ ] **Step 1: Write the failing island tests**
+
+`src/islands/Tracker.groups.test.tsx`:
+
+```tsx
+// @vitest-environment jsdom
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { renderReady, resetBrowser } from "../test/tracker-fixtures"
+import { Tracker } from "./Tracker"
+
+vi.mock("../model/seed", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("../model/seed")>()
+	const { fixtures } = await import("../test/tracker-fixtures")
+	return { ...actual, seedItems: fixtures }
+})
+
+beforeEach(resetBrowser)
+
+// Vehicles has one group (Bikes), so it never gets chips. Wildlife has Birds (Pelican) and
+// Reptiles (American alligator); birds sort first, so the Pelican's card comes first.
+const ready = () => renderReady(<Tracker locale="en" />)
+const names = () => screen.queryAllByRole("checkbox").map((box) => box.getAttribute("id"))
+const button = (name: RegExp | string) => screen.getByRole("button", { name })
+const press = (name: RegExp | string) => fireEvent.click(button(name))
+const chipRow = () => screen.queryByRole("group", { name: "Groups: Wildlife" })
+const groupParam = () => new URLSearchParams(window.location.search).get("group")
+const type = (value: string) =>
+	fireEvent.change(screen.getByRole("searchbox"), { target: { value } })
+const status = () => screen.getByRole("status")
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+describe("Group chips (tracker refresh spec §14.1)", () => {
+	it("shows chips under a pressed category with more than one group, never under All", async () => {
+		await ready()
+		expect(screen.queryByRole("group", { name: /^Groups:/ })).toBeNull()
+		press(/^Wildlife,/)
+		press(/^Vehicles,/)
+		const row = chipRow() as HTMLElement
+		expect(within(row).getAllByRole("button").map((b) => b.getAttribute("aria-label"))).toEqual([
+			"Birds, 0 of 1",
+			"Reptiles, 0 of 1",
+		])
+		expect(screen.queryByRole("group", { name: "Groups: Vehicles" })).toBeNull()
+	})
+
+	it("narrows only its own category and mirrors the chips to ?group=", async () => {
+		await ready()
+		press(/^Wildlife,/)
+		press(/^Birds,/)
+		expect(names()).toEqual(["item-wildlife/pelican"])
+		expect(button(/^Birds,/)).toHaveAttribute("aria-pressed", "true")
+		expect(groupParam()).toBe("wildlife/birds")
+		press(/^Vehicles,/)
+		expect(names()).toEqual(["item-vehicles/bike", "item-wildlife/pelican"])
+	})
+
+	it("drops a category's chips when it is unpressed", async () => {
+		await ready()
+		press(/^Wildlife,/)
+		press(/^Birds,/)
+		press(/^Wildlife,/)
+		expect(groupParam()).toBeNull()
+		press(/^Wildlife,/)
+		expect(button(/^Birds,/)).toHaveAttribute("aria-pressed", "false")
+		expect(names()).toEqual(["item-wildlife/pelican", "item-wildlife/american-alligator"])
+	})
+
+	it("counts whole groups on the chips while a search narrows the list", async () => {
+		await ready()
+		press(/^Wildlife,/)
+		type("peli")
+		expect(button("Reptiles, 0 of 1")).toBeInTheDocument()
+	})
+
+	it("reads ?group= on load and drops keys no chip offers", async () => {
+		window.history.replaceState(
+			null,
+			"",
+			"/en/tracker/?show=wildlife&group=wildlife/birds,vehicles/bikes,evil"
+		)
+		render(<Tracker locale="en" />)
+		const box = await screen.findByRole("checkbox", { name: "Pelican" })
+		await waitFor(() => expect(box).toBeEnabled())
+		expect(names()).toEqual(["item-wildlife/pelican"])
+		expect(groupParam()).toBe("wildlife/birds")
+	})
+
+	it("keeps the title and chips when a press empties the view, with focus on the chip (R17)", async () => {
+		await ready()
+		press(/^Wildlife,/)
+		type("zzz")
+		expect(chipRow()).not.toBeNull()
+		expect(screen.getByText('No match for "zzz".')).toBeInTheDocument()
+		const birds = button(/^Birds,/)
+		birds.focus()
+		fireEvent.click(birds)
+		fireEvent.click(birds)
+		// Unpressing the last chip under a search with no match: the row stays, the node is the same.
+		expect(chipRow()).not.toBeNull()
+		expect(screen.getByRole("heading", { name: "Wildlife" })).toBeInTheDocument()
+		expect(birds).toHaveFocus()
+	})
+
+	it("points to a match a chip hides, and Clear filters clears tiles and chips", async () => {
+		await ready()
+		press(/^Wildlife,/)
+		press(/^Birds,/)
+		type("gator")
+		expect(names()).toEqual([])
+		expect(screen.getByText("1 more outside your filters")).toBeInTheDocument()
+		press("Clear filters")
+		expect(button(/^All,/)).toHaveAttribute("aria-pressed", "true")
+		expect(groupParam()).toBeNull()
+		expect(names()).toEqual(["item-wildlife/american-alligator"])
+		expect(document.activeElement).toBe(screen.getByRole("searchbox"))
+		expect(screen.getByRole("searchbox")).toHaveValue("gator")
+		expect(status()).toHaveTextContent("1 result")
+	})
+
+	it("lets a chip toggle cancel a pending result", async () => {
+		await ready()
+		press(/^Wildlife,/)
+		type("peli")
+		press(/^Birds,/)
+		await wait(700)
+		expect(status()).not.toHaveTextContent("1 result")
+	})
+
+	it("shows Last found as plain text when a chip hides its card", async () => {
+		await ready()
+		fireEvent.click(screen.getByRole("checkbox", { name: "Pelican" }))
+		await screen.findByRole("button", { name: /^Last found Pelican/ })
+		press(/^Wildlife,/)
+		press(/^Reptiles,/)
+		expect(screen.queryByRole("button", { name: /^Last found/ })).toBeNull()
+		expect(document.querySelector(".last-found")?.tagName).toBe("P")
+	})
+})
+```
+
+In `src/islands/Tracker.search.test.tsx`, rewrite the old copy (spec §14.1):
+
+- The test "points to other categories and shows them all on request" becomes "points to matches outside the filters and clears them on request"; its text is `"1 more outside your filters"` and its button `"Clear filters"`.
+- The test "announces the other categories when the chips hold no match" becomes "announces the matches outside the filters"; its text is `"No results inside your filters. 1 outside them."`.
+
+- [ ] **Step 2: Run to see them fail**
+
+Run: `npx vitest run src/islands/Tracker.groups.test.tsx src/islands/Tracker.search.test.tsx`
+Expected: FAIL, no chip row and the old copy.
+
+- [ ] **Step 3: The reworded copy**
+
+`src/locales/en.json`:
+
+```json
+	"tracker.search.elsewhere.one": "1 more outside your filters",
+	"tracker.search.elsewhere.other": "{count} more outside your filters",
+	"tracker.search.showAll": "Clear filters",
+```
+
+```json
+	"tracker.search.resultsElsewhere": "No results inside your filters. {count} outside them.",
+```
+
+`src/locales/nb.json`:
+
+```json
+	"tracker.search.elsewhere.one": "1 til utenfor filtrene dine",
+	"tracker.search.elsewhere.other": "{count} til utenfor filtrene dine",
+	"tracker.search.showAll": "Fjern filtrene",
+```
+
+```json
+	"tracker.search.resultsElsewhere": "Ingen treff innenfor filtrene dine. {count} utenfor.",
+```
+
+- [ ] **Step 4: `useGroupParam` in `src/islands/useTracker.ts`**
+
+Replace `useShowParam` with a shared hook and the two callers (R21):
+
+```ts
+import { useEffect, useSyncExternalStore } from "react"
+import { groupParam, showParam, type Tracker, type TrackerState } from "../model/tracker"
+```
+
+```ts
+// Always re-serialised from state; the raw parameter is never echoed back. Keyed on the string,
+// so a new array with the same content writes nothing.
+function useSearchParam(name: string, value: string | null): void {
+	useEffect(() => {
+		const url = new URL(window.location.href)
+		if (value) url.searchParams.set(name, value)
+		else url.searchParams.delete(name)
+		window.history.replaceState(null, "", url)
+	}, [name, value])
+}
+
+/** Mirrors the category selection to `?show=`. Tracker page only. */
+export function useShowParam(selected: string[]): void {
+	useSearchParam("show", showParam(selected))
+}
+
+/** Mirrors the group chips to `?group=`, beside `?show=` (spec §14.1). Tracker page only. */
+export function useGroupParam(groups: string[]): void {
+	useSearchParam("group", groupParam(groups))
+}
+```
+
+- [ ] **Step 5: `ItemList` renders the chips**
+
+In `src/islands/tracker/ItemList.tsx`, add `import { GroupChips } from "./GroupChips"`, and to `Props`:
+
+```ts
+	/** Every category id in seed order, so a category with no card left keeps its place. */
+	order: string[]
+	/** Per pressed category, its chip groups (`chipGroups`); empty under All. */
+	chips: Map<string, string[]>
+	/** Pressed chips as `groupKey`s. */
+	groups: string[]
+	onToggleGroup: (key: string) => void
+```
+
+Destructure the four. Replace the `live` / early-return lines with:
+
+```tsx
+	const live = items.filter((item) => !item.retired)
+	const withCards = new Set(categoryIds(live))
+	// A category with a chip row keeps its title and chips when no card is left (R17), so a chip
+	// press never unmounts the chip that has focus.
+	const sections = order.filter((id) => withCards.has(id) || chips.has(id))
+	if (sections.length === 0) return <p className="item-empty">{t("tracker.empty")}</p>
+```
+
+Change `{categoryIds(live).map((category) => {` to `{sections.map((category) => {`, and add `const chipRow = chips.get(category)` beside `const Icon = ...`. After the closing `</div>` of `.cat-head`:
+
+```tsx
+						{chipRow && (
+							<GroupChips
+								category={category}
+								categoryLabel={categoryLabel(category)}
+								groups={chipRow}
+								pressed={groups}
+								counts={groupCounts}
+								groupLabel={groupLabel}
+								onToggle={onToggleGroup}
+								t={t}
+							/>
+						)}
+```
+
+Wrap the existing `<div className="item-groups">...</div>` in `{withCards.has(category) && (...)}`, so a category with no card renders only its title and chips.
+
+- [ ] **Step 6: Wire `Tracker.tsx`**
+
+Imports:
+
+```ts
+import { chipGroups, parseGroups, parseShow } from "../model/tracker"
+```
+
+```ts
+import { useGroupParam, useShowParam, useTrackerState } from "./useTracker"
+```
+
+The tracker, reading `?group=` after `?show=`:
+
+```tsx
+	const [tracker] = useState(() => {
+		const selected = parseShow(window.location.search, categoryIds(seedItems))
+		return buildTracker(
+			t("profile.defaultName"),
+			selected,
+			parseGroups(window.location.search, chipGroups(seedItems, selected))
+		)
+	})
+	const state = useTrackerState(tracker)
+	useShowParam(state.selected)
+	useGroupParam(state.groups)
+```
+
+After `selectCategories`:
+
+```tsx
+	// A chip toggle cancels a pending typing result, as a tile does. The list change itself is not
+	// announced: aria-pressed carries the state (spec §14.1).
+	function toggleGroup(key: string) {
+		live.cancel()
+		tracker.toggleGroup(key)
+	}
+```
+
+Replace `showAllCategories` with:
+
+```tsx
+	// Clears the tiles and the chips together (the model drops chips with their category); Hide
+	// found and the query stay. The button disappears with its line, so focus goes to the field
+	// rather than to <body>.
+	function clearFilters() {
+		tracker.selectCategories([])
+		searchField.current?.focus()
+		live.say(resultsText(search.viewFor({ selected: [], groups: [] }), search.query))
+	}
+```
+
+In the `emptyText` comment, "the other-categories line" becomes "the outside-your-filters line". Beside `const empty = ...`, add `const chips = chipGroups(state.items, state.selected)`. Change the list's condition and props:
+
+```tsx
+					{/* A chip row keeps its category on screen when no card is left (R17). */}
+					{(empty === "none" || chips.size > 0) && (
+						<ItemList
+```
+
+and add, after `groupCounts={...}`:
+
+```tsx
+							order={categories.map((c) => c.id)}
+							chips={chips}
+							groups={state.groups}
+							onToggleGroup={toggleGroup}
+```
+
+The elsewhere button's `onClick={showAllCategories}` becomes `onClick={clearFilters}`.
+
+- [ ] **Step 7: Run every test**
+
+Run: `npm test`
+Expected: all green, including `Tracker.tick.test.tsx` (its `ItemList` mock passes props through).
+
+- [ ] **Step 8: Commit**
+
+```bash
+F="src/islands/tracker/ItemList.tsx src/islands/Tracker.tsx src/islands/useTracker.ts src/locales/en.json src/locales/nb.json src/islands/Tracker.groups.test.tsx src/islands/Tracker.search.test.tsx"
+npx biome check --write $F && sed -i 's/\r$//' $F && grep -n '\\u00' src/locales/nb.json; git add $F
+git commit -m "Show group chips under pressed categories and let Clear filters reset them"
+```
+
+### Task 18: Verify and ship PR 3
+
+- [ ] **Step 1: Full checks**
+
+```bash
+npm test && npx biome ci . && npm run check && npm run build
+```
+
+Expected: all green.
+
+- [ ] **Step 2: Serve and measure, one batched round** (built site as in Task 6 Step 2, pointed at this worktree; 320, 768, 1024, 1280, 1600 and 1920 px; `en` and `nb`; then 320 px with 200 % text). Open `/en/tracker/?show=vehicles,wildlife&group=vehicles/cars` so Vehicles shows its full row with one chip pressed.
+
+```js
+const chips = [...document.querySelectorAll(".group-chips button")]
+const box = (el) => el.getBoundingClientRect()
+const lines = Object.values(Object.groupBy(chips, (c) => Math.round(box(c).top)))
+const row = document.querySelector(".group-chips")
+const head = row.closest(".item-category").querySelector(".cat-head")
+const firstGroup = row.closest(".item-category").querySelector(".group-head")
+;({
+	minHeight: Math.min(...chips.map((c) => box(c).height)),
+	oneHeightPerLine: lines.every((l) => new Set(l.map((c) => Math.round(box(c).height))).size === 1),
+	pageOverflow: document.documentElement.scrollWidth - innerWidth,
+	rowOverflow: row.scrollWidth - row.clientWidth,
+	aboveRow: Math.round(box(row).top - box(head).bottom),
+	belowRow: firstGroup ? Math.round(box(firstGroup).top - box(row).bottom) : null,
+})
+```
+
+Expected: `minHeight` 44 or more; `oneHeightPerLine` true; both overflows 0; `aboveRow` 28; `belowRow` 24.
+
+Equal width (R19, Review Focus PR 3 item 2): read every chip's `box(c).width`, click an unpressed chip, read again. Every width matches within 0.5 px and no chip changes line (`top` unchanged).
+
+Long labels: on `/nb/tracker/?show=vehicles,wildlife` at 320 px with 200 % text, no chip is wider than its row and `pageOverflow` stays 0.
+
+- [ ] **Step 3: Forced colours, keyboard, layout shift**
+
+As Task 6 Steps 4 and 5, plus: in forced colours a pressed chip shows `Highlight` with its ✓ and an unpressed one keeps a visible border; Tab runs tiles, Last found, then the chips in order, then the cards; Space toggles a chip and focus stays on it. CLS 0 at all six widths on a load with `?show=` and `?group=`, and none on a chip press (a shift right after input is excluded, but the width check above should show none anyway).
+
+- [ ] **Step 4: Push and open**
+
+```bash
+git push -u origin feat/tracker-refresh-chips
+gh pr create --title "Add group chips under pressed tracker categories" --body-file -
+```
+
+PR body:
+
+```markdown
+Group chips for the tracker (spec `docs/superpowers/specs/2026-11-03-tracker-refresh-design.md`, §14.1).
+
+Vehicles holds 148 items in 7 groups, so an open category still meant a long scroll. Now every pressed category shows a row of chips under its title, one per group, with the whole group's count.
+
+- Chips are multi-select toggles like the tiles. None pressed shows the whole category; pressing Cars shows only cars there and leaves the other pressed categories alone.
+- Pressed chips are pink with a ✓, so the state is never told by colour alone. A chip keeps its width when pressed, so the row never jumps under the finger.
+- The selection lives in `?group=` beside `?show=`, so a shared link opens the same view. Unknown keys are dropped.
+- A search match hidden by a chip counts in the line under the list, which now reads "1 more outside your filters" with a Clear filters button that resets tiles and chips together.
+- Hide found, the Last found row and the announcements all respect the chips.
+
+Checked: tests, Biome, astro check and the build; chip height, wrapping and spacing at 320, 768, 1024, 1280, 1600 and 1920 px in English and Norwegian and at 320 px with 200 % text; equal chip width pressed and unpressed; forced colours; keyboard order; CLS 0 at all six widths.
 ```
 
 - [ ] **Step 5: Merge when green, before Tuesday 10.11.2026**

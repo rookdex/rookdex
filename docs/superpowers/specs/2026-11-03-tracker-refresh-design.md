@@ -321,7 +321,7 @@ Two asks after PR 1 merged, settled in the brainstorm of 04.11 with mockups in t
 - A category with one group (none today) shows no chip row; one chip would filter nothing.
 - A press that empties the view keeps the category's title and chip row, and focus stays on the chip (tested).
 - A `?group=` key for a group that has since lost every item is dropped on parse.
-- Long Norwegian group labels: the phone row scrolls; from 768 px a chip may wrap its label onto two lines rather than overflow.
+- Long Norwegian group labels: the row wraps at every width, and a chip may wrap its label onto two lines rather than overflow.
 - Switching profile keeps the selection, as the tile selection already does.
 
 ### 14.2 Wide screens (PR 2)
