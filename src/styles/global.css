@@ -597,6 +597,7 @@ p {
 .search-toggle,
 .search-clear,
 .tracker .search-elsewhere-btn,
+.tracker button.last-found,
 .history button,
 .lang summary,
 .picker-row,
@@ -645,7 +646,8 @@ p {
 	.tiles button:not([aria-pressed="true"]):hover,
 	.tracker .search-toggle:not([aria-pressed="true"]):hover,
 	.tracker .search-clear:hover,
-	.tracker .search-elsewhere-btn:hover {
+	.tracker .search-elsewhere-btn:hover,
+	.tracker button.last-found:hover {
 		background: var(--bg-hover);
 		color: var(--text);
 	}
@@ -711,6 +713,7 @@ p {
 	.tracker .search-toggle:not([aria-pressed="true"]):active,
 	.tracker .search-clear:active,
 	.tracker .search-elsewhere-btn:active,
+	.tracker button.last-found:active,
 	.tiles a:active,
 	.go-link:active {
 		background: var(--bg-hover);
@@ -733,7 +736,8 @@ p {
 .tiles button:not([aria-pressed="true"]):focus-visible,
 .tracker .search-toggle:not([aria-pressed="true"]):focus-visible,
 .tracker .search-clear:focus-visible,
-.tracker .search-elsewhere-btn:focus-visible {
+.tracker .search-elsewhere-btn:focus-visible,
+.tracker button.last-found:focus-visible {
 	background: var(--bg-hover);
 	color: var(--text);
 }
@@ -1309,15 +1313,9 @@ p {
 	/* minmax(0, 1fr), not auto: the card grid's minimum must not stretch the page at 200 % text. */
 	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-4);
-	grid-template-areas:
-		"top"
-		"stats"
-		"nav"
-		"list";
 }
 
 .tracker-top {
-	grid-area: top;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -1339,12 +1337,7 @@ p {
 	max-width: none;
 }
 
-.cat-nav {
-	grid-area: nav;
-}
-
 .tracker-results {
-	grid-area: list;
 	min-width: 0;
 }
 
@@ -1359,8 +1352,56 @@ p {
 	overflow-wrap: anywhere;
 }
 
+/* An empty fallback: the profile button lives in the title row (spec §5.5). */
+.tracker-top:empty {
+	display: none;
+}
+
+/* Phones and tablets (spec §5.3). The rail shows the same from 1024 px. */
+.last-found {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	width: 100%;
+	min-height: var(--tap);
+	margin: 0;
+	padding: var(--space-1) 10px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: none;
+	color: var(--text);
+	text-align: start;
+	max-width: none;
+}
+
+/* Beats `.tracker button { font: inherit }`, so the row keeps one size as button or plain text. */
+.tracker .last-found {
+	font: inherit;
+	font-size: 0.75rem;
+}
+
+.last-found-text {
+	flex: 1;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+/* A label beside its value: muted and lighter than the name. */
+.last-found-label {
+	color: var(--text-muted);
+}
+
+.last-found-name {
+	font-weight: 600;
+}
+
+.last-found time {
+	flex: none;
+	color: var(--text-muted);
+}
+
 .stats {
-	grid-area: stats;
+	display: none;
 	padding: var(--space-3);
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
@@ -1414,7 +1455,8 @@ p {
 	font-size: 0.8125rem;
 }
 
-.stats .find-icon {
+.stats .find-icon,
+.last-found-icon {
 	display: grid;
 	place-items: center;
 	flex: none;
@@ -1425,7 +1467,8 @@ p {
 	color: var(--accent);
 }
 
-.stats .find-icon svg {
+.stats .find-icon svg,
+.last-found-icon svg {
 	width: 15px;
 	height: 15px;
 }
@@ -2997,16 +3040,6 @@ html:has(.search-row) {
 		font-size: 3.5rem;
 	}
 
-	/* One column (spec §3.2): the tiles across the top, then the list. The rail stays under the
-	   list until PR 2 hides it below 1024 px. */
-	.tracker-layout {
-		grid-template-areas:
-			"top"
-			"nav"
-			"list"
-			"stats";
-	}
-
 	.tiles {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
@@ -3333,12 +3366,26 @@ html:has(.search-row) {
 
 	.tracker-layout {
 		grid-template-columns: 200px minmax(0, 1fr) 200px;
-		grid-template-rows: auto 1fr;
 		column-gap: 48px;
-		grid-template-areas:
-			"top list stats"
-			"nav list stats";
+		grid-template-areas: "nav list stats";
 		align-items: start;
+	}
+
+	.cat-nav {
+		grid-area: nav;
+	}
+
+	.tracker-results {
+		grid-area: list;
+	}
+
+	.stats {
+		grid-area: stats;
+		display: block;
+	}
+
+	.tracker .last-found {
+		display: none;
 	}
 
 	/* Every tile is wide here, stacked in one column. */

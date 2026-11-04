@@ -14,6 +14,7 @@ import { DeletedDialog } from "./tracker/DeletedDialog"
 import { hashItemId, hashTarget } from "./tracker/hash"
 import { ImportDialog } from "./tracker/ImportDialog"
 import { ItemList } from "./tracker/ItemList"
+import { jumpable, LastFound } from "./tracker/LastFound"
 import { NameDialog } from "./tracker/NameDialog"
 import { ProfileMenu } from "./tracker/ProfileMenu"
 import { SearchBar } from "./tracker/SearchBar"
@@ -52,6 +53,15 @@ function scrollToStart(element: HTMLElement) {
 }
 
 /** Island root. `client:only`: the first render reads the URL and IndexedDB. */
+// Draws the card's ring where the browser skips :focus-visible (after a click or a page load, in
+// Chromium); the mark goes when the checkbox loses focus.
+function markCard(box: HTMLElement) {
+	const card = box.closest(".item")
+	if (!card) return
+	card.setAttribute("data-arrived", "")
+	box.addEventListener("blur", () => card.removeAttribute("data-arrived"), { once: true })
+}
+
 export function Tracker({ locale }: Props) {
 	const { t, plural } = translator(locale)
 	const [tracker] = useState(() =>
@@ -92,17 +102,24 @@ export function Tracker({ locale }: Props) {
 		try {
 			const box = hashTarget(window.location.hash, document)
 			if (!box) return
-			const card = box.closest(".item")
-			if (card) {
-				card.setAttribute("data-arrived", "")
-				box.addEventListener("blur", () => card.removeAttribute("data-arrived"), { once: true })
-			}
+			markCard(box)
 			box.focus({ preventScroll: true, focusVisible: true })
 			box.scrollIntoView({ block: "center" })
 		} catch {
 			// A browser without scrollIntoView options still got the focus.
 		}
 	}, [state.status])
+
+	// The Last found row (spec §5.3). The card scrolls, not the checkbox: the checkbox sits 22 px
+	// below the card's top, so a focus scroll would tuck the card under the sticky search row.
+	// scroll-padding-top still clears the row for scrollIntoView. Instant: a focus move, not motion.
+	function jumpTo(id: string) {
+		const box = document.getElementById(`item-${id}`)
+		if (!(box instanceof HTMLInputElement)) return
+		markCard(box)
+		box.focus({ preventScroll: true, focusVisible: true })
+		box.closest(".item")?.scrollIntoView({ block: "start", behavior: "instant" })
+	}
 
 	function openDialog(kind: "new" | "rename" | "delete" | "deleted") {
 		setOpening((n) => n + 1)
@@ -316,6 +333,13 @@ export function Tracker({ locale }: Props) {
 					allLabel={t("tracker.all")}
 					navLabel={t("tracker.categories")}
 					sources={{ href: sourcesHref, label: t("tracker.sources") }}
+					t={t}
+				/>
+				<LastFound
+					find={recent[0]}
+					canJump={jumpable(recent[0], view.visible, state.status === "ready")}
+					onJump={jumpTo}
+					locale={locale}
 					t={t}
 				/>
 				<div className="tracker-results" ref={results} tabIndex={-1}>

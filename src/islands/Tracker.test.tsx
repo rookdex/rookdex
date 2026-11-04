@@ -268,3 +268,59 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 		await waitFor(() => expect(card("Pelican")).toHaveClass("found"))
 	})
 })
+
+describe("Last found row (tracker refresh spec §5.3)", () => {
+	const row = () => document.querySelector(".last-found")
+	const jump = () => screen.queryByRole("button", { name: /^Last found/ })
+	const tickPelican = async () => {
+		fireEvent.click(screen.getByRole("checkbox", { name: "Pelican" }))
+		await screen.findByRole("button", { name: /^Last found Pelican/ })
+	}
+
+	beforeEach(() => {
+		Element.prototype.scrollIntoView = vi.fn()
+	})
+
+	it("is absent with no finds", async () => {
+		await ready()
+		expect(row()).toBeNull()
+	})
+
+	it("moves focus to the card's checkbox and marks the card", async () => {
+		await ready()
+		await tickPelican()
+		fireEvent.click(jump() as HTMLElement)
+		const box = screen.getByRole("checkbox", { name: "Pelican" })
+		expect(box).toHaveFocus()
+		expect(box.closest(".item")).toHaveAttribute("data-arrived")
+		expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({
+			block: "start",
+			behavior: "instant",
+		})
+	})
+
+	it("is plain text when a search hides the card", async () => {
+		await ready()
+		await tickPelican()
+		fireEvent.change(screen.getByRole("searchbox"), { target: { value: "bike" } })
+		expect(jump()).toBeNull()
+		expect(row()?.tagName).toBe("P")
+		expect(row()).toHaveTextContent("Pelican")
+	})
+
+	it("is plain text when a category filter hides the card", async () => {
+		await ready()
+		await tickPelican()
+		fireEvent.click(screen.getByRole("button", { name: /^Vehicles,/ }))
+		expect(jump()).toBeNull()
+		expect(row()?.tagName).toBe("P")
+	})
+
+	it("is plain text when Hide found hides the card", async () => {
+		await ready()
+		await tickPelican()
+		fireEvent.click(screen.getByRole("button", { name: "Hide found" }))
+		expect(jump()).toBeNull()
+		expect(row()?.tagName).toBe("P")
+	})
+})

@@ -47,15 +47,15 @@ describe("search row CSS (tracker search spec §5)", () => {
 		expect(css).toMatch(/\n\.tracker\s*\{[^}]*display:\s*flex[^}]*flex-direction:\s*column/)
 	})
 
-	// Layout B: the search spans the full width and the profile, list and stats share one top line.
-	// Tablet is one column (tracker refresh spec §3.2): tiles across the top, then the list.
-	it("stacks the tiles over the list from 768 px and puts the profile on top of the tile column from 1024 px", () => {
+	// The search spans the full width. Tablet is one column in DOM order (tracker refresh spec §3.2),
+	// so 768 px needs no layout rule; from 1024 px the tiles, list and rail sit side by side.
+	it("keeps one column at 768 px and places tiles, list and rail side by side from 1024 px", () => {
 		const layout = (query: string) =>
 			mediaBlocks(query)
 				.map((block) => block.match(/\.tracker-layout\s*\{[^}]*\}/)?.[0] ?? "")
 				.join("")
-		expect(layout("(min-width: 768px)")).toMatch(/"top"\s*"nav"\s*"list"\s*"stats"/)
-		expect(layout("(min-width: 1024px)")).toMatch(/"top list stats"\s*"nav list stats"/)
+		expect(layout("(min-width: 768px)")).toBe("")
+		expect(layout("(min-width: 1024px)")).toMatch(/"nav list stats"/)
 	})
 
 	it("lifts the profile menu above the sticky row", () => {

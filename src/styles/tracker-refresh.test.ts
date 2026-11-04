@@ -95,3 +95,12 @@ describe("icon-lead card (spec §5.1)", () => {
 		expect(rule(".item.found .item-tile")).toMatch(/color:\s*var\(--accent\)/)
 	})
 })
+
+describe("layout without the rail below 1024 px (spec §3, §5.3)", () => {
+	it("hides the rail below 1024 px and the Last found row from there", () => {
+		expect(rule(".stats")).toMatch(/display:\s*none/)
+		const desktop = css.slice(css.indexOf("@media (min-width: 1024px)"))
+		expect(desktop).toMatch(/\.last-found\s*\{\s*display:\s*none/)
+		expect(desktop).toMatch(/\.stats\s*\{[^}]*display:\s*block/)
+	})
+})
