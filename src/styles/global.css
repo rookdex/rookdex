@@ -3519,8 +3519,23 @@ html:has(.search-row) {
 	}
 }
 
+/* Wide steps (tracker refresh spec §14.2). Each step adds a whole card column at the 280 px card
+   minimum: 90rem gives the list 880 px (3 cards), 120rem gives 1360 px (4). Lifting
+   --tracker-max-w lets the tracker, its title row and the Browse row fill main together. Above
+   120rem the page stays centred; more than four columns is harder to scan. */
 @media (min-width: 1600px) {
 	.wrap.wide {
 		max-width: 85rem;
+	}
+
+	.wrap.tracker-wide {
+		max-width: 90rem;
+		--tracker-max-w: none;
+	}
+}
+
+@media (min-width: 1920px) {
+	.wrap.tracker-wide {
+		max-width: 120rem;
 	}
 }

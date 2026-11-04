@@ -111,3 +111,15 @@ describe("profile in the title row (spec §5.5)", () => {
 		expect(rule("#tracker-profile .menu")).toMatch(/right:\s*0/)
 	})
 })
+
+describe("wide steps (spec §14.2)", () => {
+	it("widens the tracker page in two steps that each add a card column", () => {
+		const step = (px: number) =>
+			css.match(new RegExp(`@media \\(min-width: ${px}px\\) \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? ""
+		expect(step(1600)).toMatch(/\.wrap\.tracker-wide\s*\{[^}]*max-width:\s*90rem/)
+		expect(step(1600)).toMatch(/\.wrap\.tracker-wide\s*\{[^}]*--tracker-max-w:\s*none/)
+		expect(step(1920)).toMatch(/\.wrap\.tracker-wide\s*\{[^}]*max-width:\s*120rem/)
+		// The hub keeps its own cap.
+		expect(step(1600)).toMatch(/\.wrap\.wide\s*\{[^}]*max-width:\s*85rem/)
+	})
+})

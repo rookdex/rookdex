@@ -42,4 +42,12 @@ describe("Tracker page", () => {
 		expect(head?.lastElementChild?.id).toBe("tracker-profile")
 		expect(head?.lastElementChild?.childElementCount).toBe(0)
 	})
+
+	describe("wide steps (spec §14.2)", () => {
+		it("gives main the tracker's wide steps, not the hub's", async () => {
+			const main = (await renderPage(Tracker)).querySelector("main")
+			expect(main?.classList.contains("tracker-wide")).toBe(true)
+			expect(main?.classList.contains("wide")).toBe(false)
+		})
+	})
 })
