@@ -52,7 +52,6 @@ function scrollToStart(element: HTMLElement) {
 	for (const type of USER_SCROLL) window.addEventListener(type, stop, { passive: true })
 }
 
-/** Island root. `client:only`: the first render reads the URL and IndexedDB. */
 // Draws the card's ring where the browser skips :focus-visible (after a click or a page load, in
 // Chromium); the mark goes when the checkbox loses focus.
 function markCard(box: HTMLElement) {
@@ -62,6 +61,7 @@ function markCard(box: HTMLElement) {
 	box.addEventListener("blur", () => card.removeAttribute("data-arrived"), { once: true })
 }
 
+/** Island root. `client:only`: the first render reads the URL and IndexedDB. */
 export function Tracker({ locale }: Props) {
 	const { t, plural } = translator(locale)
 	const [tracker] = useState(() =>
@@ -78,7 +78,7 @@ export function Tracker({ locale }: Props) {
 	const live = useLiveStatus()
 	const searchField = useRef<HTMLInputElement>(null)
 	const results = useRef<HTMLDivElement>(null)
-	// From launch on the hub is the dashboard, so Progress links there (dashboard spec §4).
+	// From launch on the hub is the dashboard, so Overall links there (dashboard spec §4).
 	const [hubHref] = useState(() => (hubPhase(new Date()) === "after" ? `/${locale}/` : undefined))
 	const [dialog, setDialog] = useState<"new" | "rename" | "delete" | "deleted" | null>(null)
 	// Bumped per opening: the NameDialog keys on this alone, so its field resets on each opening
@@ -311,20 +311,22 @@ export function Tracker({ locale }: Props) {
 			)}
 			<div className="tracker-layout">
 				<div className="tracker-top">
-					<ProfileMenu
-						triggerRef={menuButton}
-						slotId="tracker-profile"
-						profiles={activeProfiles(state.profiles)}
-						current={current}
-						onSwitch={tracker.switchProfile}
-						onNew={() => openDialog("new")}
-						onRename={() => openDialog("rename")}
-						onExport={exportNow}
-						onImport={() => fileInput.current?.click()}
-						onDelete={() => openDialog("delete")}
-						onDeleted={() => openDialog("deleted")}
-						t={t}
-					/>
+					{current && (
+						<ProfileMenu
+							triggerRef={menuButton}
+							slotId="tracker-profile"
+							profiles={activeProfiles(state.profiles)}
+							current={current}
+							onSwitch={tracker.switchProfile}
+							onNew={() => openDialog("new")}
+							onRename={() => openDialog("rename")}
+							onExport={exportNow}
+							onImport={() => fileInput.current?.click()}
+							onDelete={() => openDialog("delete")}
+							onDeleted={() => openDialog("deleted")}
+							t={t}
+						/>
+					)}
 				</div>
 				<CategoryNav
 					categories={categories}

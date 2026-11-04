@@ -16,6 +16,15 @@ beforeEach(resetBrowser)
 
 const ready = (locale: "en" | "nb" = "en") => renderReady(<Tracker locale={locale} />)
 
+describe("Profile button while loading (final review E2)", () => {
+	it("paints no name-less trigger before the profile is known", async () => {
+		render(<Tracker locale="en" />)
+		expect(screen.queryByRole("button", { name: /^Profile:/ })).toBeNull()
+		expect(document.querySelector(".avatar")).toBeNull()
+		expect(await screen.findByRole("button", { name: "Profile: Player 1" })).toBeInTheDocument()
+	})
+})
+
 describe("Tracker list", () => {
 	it("renders one card per item, with a book link and a flag instead of source links", async () => {
 		await ready()
@@ -297,6 +306,7 @@ describe("Last found row (tracker refresh spec §5.3)", () => {
 			block: "start",
 			behavior: "instant",
 		})
+		expect(vi.mocked(Element.prototype.scrollIntoView).mock.contexts[0]).toBe(box.closest(".item"))
 	})
 
 	it("is plain text when a search hides the card", async () => {

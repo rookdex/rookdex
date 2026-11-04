@@ -67,8 +67,12 @@ const browse = categoryIds(seedItems.filter((item) => !item.retired)).map((id) =
 	}
 
 	.tracker-head h1 {
-		min-width: 0;
+		flex: none;
 		margin: 0;
+	}
+
+	#tracker-profile {
+		min-width: 0;
 	}
 
 	/* Centred at the tracker's own cap (global.css), so the title shares the search row's left edge.

@@ -123,3 +123,22 @@ describe("wide steps (spec §14.2)", () => {
 		expect(step(1600)).toMatch(/\.wrap\.wide\s*\{[^}]*max-width:\s*85rem/)
 	})
 })
+
+describe("profile button size and the title row (final review E1, E3)", () => {
+	const page = readFileSync(
+		new URL("../pages/[locale]/tracker/index.astro", import.meta.url),
+		"utf8"
+	)
+
+	it("holds the profile button at the tap height with no vertical padding", () => {
+		expect(rule(".profile-menu > button")).toMatch(/padding-block:\s*0/)
+	})
+
+	it("keeps the title whole and lets the profile name ellipsise instead", () => {
+		const h1 = page.match(/\.tracker-head h1\s*\{([^}]*)\}/)?.[1] ?? ""
+		expect(h1).toMatch(/flex:\s*none/)
+		expect(h1).not.toMatch(/min-width:\s*0/)
+		expect(page).toMatch(/#tracker-profile\s*\{[^}]*min-width:\s*0/)
+		expect(rule("#tracker-profile .profile-menu > button")).toMatch(/max-width:\s*100%/)
+	})
+})

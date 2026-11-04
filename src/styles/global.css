@@ -1306,8 +1306,8 @@ p {
 	min-width: 0;
 }
 
-/* Everything under the search row. From 768 px the profile tops the chip column, so the profile,
-   the list and (from 1024 px) the stats all start on one line under the search. */
+/* Everything under the search row. From 1024 px the list and the stats rail start on one line
+   under the search. */
 .tracker-layout {
 	display: grid;
 	/* minmax(0, 1fr), not auto: the card grid's minimum must not stretch the page at 200 % text. */
@@ -1983,7 +1983,7 @@ html:has(.search-row) {
 .item-main label {
 	font-size: 0.9375rem;
 	font-weight: 600;
-	/* A long word breaks instead of running under the book icon or out of the card. */
+	/* A long word breaks instead of running under the check or out of the card. */
 	overflow-wrap: anywhere;
 	cursor: pointer;
 }
@@ -2038,8 +2038,9 @@ html:has(.search-row) {
 	line-height: 1.5;
 }
 
-/* In the flow, pushed to the bottom: the flag can never overlap the book. The negative right
-   margin puts its box 13 px from the card's bottom edge and 7 px from its right edge (spec §4). */
+/* The footer row, in the flow and pushed to the bottom. It starts 46 px in (the 36 px tile plus the
+   10 px gap), so the flag never runs under the tile. The negative right margin puts the flag's
+   box 7 px from the card's right edge (spec §4). */
 .item-foot {
 	display: flex;
 	justify-content: flex-end;
@@ -2220,6 +2221,7 @@ html:has(.search-row) {
 	display: inline-flex;
 	align-items: center;
 	gap: var(--space-2);
+	padding-block: 0;
 	padding-inline-start: var(--space-2);
 }
 
@@ -2251,6 +2253,15 @@ html:has(.search-row) {
 #tracker-profile .menu {
 	left: auto;
 	right: 0;
+}
+
+/* A long name ellipses inside the slot instead of squeezing the title (scoped: the hub is untouched). */
+#tracker-profile .profile-menu {
+	max-width: 100%;
+}
+
+#tracker-profile .profile-menu > button {
+	max-width: 100%;
 }
 
 .menu {
@@ -3393,7 +3404,7 @@ html:has(.search-row) {
 	}
 
 	/* Tiles 200 px, the list, the rail 200 px, 48 px between (spec §3.3). The cap sits on the whole
-	   tracker, so the search row spans the three columns; the tracker page's h1 reads the same
+	   tracker, so the search row spans the three columns; `.tracker-head` reads the same
 	   width. .wrap caps main at 72rem, so at full width this resolves to 1088 px and the list to
 	   592 px, still two 280 px cards across. */
 	main {
