@@ -252,6 +252,7 @@ export function Tracker({ locale }: Props) {
 	}))
 	const overall = countItems(state.items, state.records)
 	const categoryCounts = Object.fromEntries(categories.map((c) => [c.id, c]))
+	const recent = recentFinds(state.items, state.records)
 	const error = state.error ? t(`tracker.errors.${state.error}`) : ""
 	const nameError = state.error === "name" ? error : ""
 	const pageError = state.error === "name" ? "" : error
@@ -342,13 +343,7 @@ export function Tracker({ locale }: Props) {
 						</p>
 					)}
 				</div>
-				<StatsRail
-					overall={overall}
-					categories={categories}
-					recent={recentFinds(state.items, state.records)}
-					hubHref={hubHref}
-					t={t}
-				/>
+				<StatsRail overall={overall} recent={recent} hubHref={hubHref} locale={locale} t={t} />
 			</div>
 			<p className="visually-hidden" role="status" aria-live="polite">
 				{live.message}

@@ -1,12 +1,15 @@
-import type { Translate } from "../../i18n"
-import type { CategoryCount, Count, RecentFind } from "../../model/stats"
+import type { Locale, Translate } from "../../i18n"
+import { relativeTime } from "../../model/relativeTime"
+import type { Count, RecentFind } from "../../model/stats"
+import { categoryIcon } from "./icons"
+import { useNow } from "./useNow"
 
 interface Props {
 	overall: Count
-	categories: (CategoryCount & { label: string })[]
 	recent: RecentFind[]
-	/** From launch on, Progress links to the hub (dashboard spec §4). */
+	/** From launch on, Overall links to the hub (dashboard spec §4). */
 	hubHref?: string
+	locale: Locale
 	t: Translate
 }
 
@@ -41,44 +44,60 @@ export function Bar({ id, label, count, countText }: BarProps) {
 	)
 }
 
-export function StatsRail({ overall, categories, recent, hubHref, t }: Props) {
-	const text = (count: Count) => t("tracker.count", { done: count.done, total: count.total })
+/** Desktop only (spec §5.2). Not a live region, so the changing times are never announced. */
+export function StatsRail({ overall, recent, hubHref, locale, t }: Props) {
+	const now = useNow()
+	// Rounded down, so 214 of 215 reads 99 %, never 100 % before everything is found.
+	const percent = overall.total === 0 ? 0 : Math.floor((overall.done / overall.total) * 100)
+	const countText = t("tracker.count", { done: overall.done, total: overall.total })
 	return (
 		<section className="stats" aria-labelledby="stats-heading">
 			<h2 id="stats-heading">
 				{hubHref ? (
 					<a className="go-link" href={hubHref}>
-						{t("tracker.progress")}
+						{t("tracker.overall")}
 					</a>
 				) : (
-					t("tracker.progress")
+					t("tracker.overall")
 				)}
 			</h2>
-			<div className="stats-grid">
-				<Bar
-					id="progress-overall"
-					label={t("tracker.overall")}
-					count={overall}
-					countText={text(overall)}
-				/>
-				{categories.map((c) => (
-					<Bar
-						key={c.category}
-						id={`progress-${c.category}`}
-						label={c.label}
-						count={c}
-						countText={text(c)}
-					/>
-				))}
+			<p className="stats-percent">
+				{percent}
+				<small>%</small>
+			</p>
+			<div
+				className="bar"
+				role="progressbar"
+				aria-labelledby="stats-heading"
+				aria-valuemin={0}
+				aria-valuemax={overall.total}
+				aria-valuenow={overall.done}
+				aria-valuetext={countText}
+			>
+				{/* React writes this through the CSSOM, which the CSP allows. */}
+				<span className="bar-fill" style={{ width: `${percent}%` }} />
 			</div>
 			<h3 id="recent-heading">{t("tracker.recent")}</h3>
 			{recent.length === 0 ? (
 				<p className="stats-empty">{t("tracker.noRecent")}</p>
 			) : (
 				<ul className="recent" aria-labelledby="recent-heading">
-					{recent.map((find) => (
-						<li key={find.item.id}>{find.item.name}</li>
-					))}
+					{recent.map((find) => {
+						const Icon = categoryIcon(find.item.category)
+						return (
+							<li key={find.item.id}>
+								<span className="find-icon" aria-hidden="true">
+									<Icon />
+								</span>
+								<span className="find-text">
+									<span className="find-name">{find.item.name}</span>{" "}
+									<time className="find-when" dateTime={find.updated_at}>
+										{relativeTime(find.updated_at, now, locale)}
+									</time>
+								</span>
+							</li>
+						)
+					})}
 				</ul>
 			)}
 		</section>

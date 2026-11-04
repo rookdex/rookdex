@@ -1382,6 +1382,69 @@ p {
 	margin-top: var(--space-3);
 }
 
+.stats-percent {
+	margin: 0 0 var(--space-2);
+	font-family: var(--font-display);
+	font-weight: 400;
+	font-size: 3rem;
+	line-height: 0.9;
+	letter-spacing: 0.02em;
+}
+
+.stats-percent small {
+	font-size: 0.5em;
+	color: var(--text-muted);
+}
+
+/* The glow moves here from the old overall bar. */
+.stats .bar {
+	box-shadow: var(--glow);
+}
+
+.stats .recent {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--space-2);
+}
+
+.stats .recent li {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 0.8125rem;
+}
+
+.stats .find-icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 28px;
+	height: 28px;
+	border-radius: var(--radius);
+	background: color-mix(in srgb, var(--accent) 22%, transparent);
+	color: var(--accent);
+}
+
+.stats .find-icon svg {
+	width: 15px;
+	height: 15px;
+}
+
+.stats .find-text {
+	display: grid;
+	min-width: 0;
+	line-height: 1.25;
+}
+
+.stats .find-name {
+	overflow-wrap: anywhere;
+}
+
+.stats .find-when {
+	font-size: 0.75rem;
+	color: var(--text-muted);
+}
+
 /* Shared button reset; each kind below sets only what differs. */
 .tracker button {
 	font: inherit;
@@ -2068,11 +2131,6 @@ html:has(.search-row) {
 	border-radius: 999px;
 	background: var(--border);
 	overflow: hidden;
-}
-
-/* Second glow site: only the overall bar, and on the wrapper, because `.bar` clips the fill. */
-.progress:has(> .progress-label > #progress-overall) .bar {
-	box-shadow: var(--glow);
 }
 
 .bar-fill {
@@ -2952,12 +3010,6 @@ html:has(.search-row) {
 	.tiles {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
-
-	.stats-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: var(--space-3);
-	}
 }
 
 @media (min-width: 1024px) {
@@ -3324,10 +3376,6 @@ html:has(.search-row) {
 
 	.cat-head h2 {
 		font-size: 2.5rem;
-	}
-
-	.stats-grid {
-		grid-template-columns: 1fr;
 	}
 
 	/* One row: the disclaimer takes the free space, the strip sits at the right. */

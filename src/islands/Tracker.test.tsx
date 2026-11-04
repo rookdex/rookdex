@@ -183,7 +183,7 @@ describe("Arriving from the Sources page (feedback spec §4)", () => {
 	)
 })
 
-describe("Progress heading (dashboard spec §4)", () => {
+describe("Overall heading (dashboard spec §4, refresh spec §5.2)", () => {
 	afterEach(() => {
 		vi.useRealTimers()
 	})
@@ -193,14 +193,14 @@ describe("Progress heading (dashboard spec §4)", () => {
 		vi.useFakeTimers({ toFake: ["Date"] })
 		vi.setSystemTime(new Date("2026-11-18T12:00:00Z"))
 		await renderReady(<Tracker locale="en" />)
-		expect(screen.queryByRole("link", { name: "Progress" })).toBeNull()
+		expect(screen.queryByRole("link", { name: "Overall" })).toBeNull()
 	})
 
 	it("links to the hub from launch on", async () => {
 		vi.useFakeTimers({ toFake: ["Date"] })
 		vi.setSystemTime(new Date("2026-11-19T00:00:00+01:00"))
 		await renderReady(<Tracker locale="en" />)
-		expect(screen.getByRole("link", { name: "Progress" })).toHaveAttribute("href", "/en/")
+		expect(screen.getByRole("link", { name: "Overall" })).toHaveAttribute("href", "/en/")
 	})
 })
 
