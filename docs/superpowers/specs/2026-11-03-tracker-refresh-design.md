@@ -7,14 +7,15 @@ GTA VI launches Thursday 19.11.2026. The freeze is Thursday 12.11.2026, so both 
 ## 1. What this spec covers
 
 - **PR 1, the look:** category tiles, section and group titles with counts, spacing and page width, a round check with a ✓.
-- **PR 2, the structure:** the icon-lead card, the slim stats rail with relative times, the phone "Last found" row and the profile button in the title row.
+- **PR 2, the structure:** the icon-lead card, the slim stats rail with relative times, the phone "Last found" row and the profile button in the title row. Since 04.11 it also takes the wide-screen steps (§14.2).
+- **PR 3, group chips (added 04.11):** toggle chips under each pressed category's title that filter the list by group (§14.1).
 
-PR 1 changes styling and markup only. Card behaviour, the rail and profiles work exactly as today. If PR 2 is not green by 10.11, it waits until after launch week and PR 1 ships alone.
+PR 1 changes styling and markup only. Card behaviour, the rail and profiles work exactly as today. If PR 2 is not green by 10.11, it waits until after launch week and PR 1 ships alone. PR 3 follows the same rule: cut from main after PR 2 merges, merged by 10.11 or held until after launch week.
 
 ### Non-goals
 
 - No change to the tracker model, records, storage, export format or progress maths.
-- No change to search, Hide found, the category filter logic or the hub (dashboard). The hub's `RecentFinds` and its `Bar` import keep working as they are.
+- No change to search, Hide found, the category filter logic or the hub (dashboard). PR 3 is the one exception: it adds a group filter inside the category filter (§14.1). The hub's `RecentFinds` and its `Bar` import keep working as they are.
 - No Dex entry link, no favourites star, no profile picture and no site-header profile. Those are December work (§13). This spec only keeps room for them.
 - No per-category colours. The brand keeps one accent (pink) and cyan for links and Expected. Category identity comes from icons.
 
@@ -33,7 +34,7 @@ PR 1 changes styling and markup only. Card behaviour, the rail and profiles work
 | Titles | Category title in Bebas Neue 40 px with icon, count and a gradient line to the edge; group title 14 px bold uppercase white with its own count and a 1 px line above | Borrowed from the trackers she sent |
 | Found state | Icon tile and card border turn pink, the check shows a ✓ | Never colour alone (her feedback on S3) |
 | Counts | Always the whole category or group, never the filtered view | Numbers must not jump while typing |
-| Delivery | One spec, two PRs | The look can ship alone if PR 2 slips |
+| Delivery | One spec, three PRs (PR 3 added 04.11, §14) | The look can ship alone if PR 2 slips |
 
 ## 3. Layout per breakpoint
 
@@ -211,6 +212,10 @@ Everything else reuses existing keys: `tracker.count`, `tracker.overall`, `track
 | `src/model/stats.ts` | 1 | New `perGroup(items, records)` beside `perCategory`, both over `countable` items |
 | `src/pages/[locale]/tracker/index.astro` | 2 | `.tracker-head` and the profile slot |
 | `src/locales/en.json`, `nb.json` | 2 | `tracker.lastFound` |
+| `src/layouts/Base.astro` | 2 | `trackerWide` prop (§14.2) |
+| `src/model/tracker.ts`, `src/model/search.ts`, `src/islands/tracker/useSearch.ts`, `src/islands/useTracker.ts` | 3 | Group selection, `?group=` (§14.1) |
+| `src/islands/tracker/GroupChips.tsx` | 3 | New: the chip row (§14.1) |
+| `src/locales/en.json`, `nb.json` | 3 | `tracker.groupChips`, reworded elsewhere copy (§14.1) |
 
 ## 11. Tests
 
@@ -257,4 +262,94 @@ Everything else reuses existing keys: `tracker.count`, `tracker.overall`, `track
 - **Favourites:** a star in the card footer, its own field and timestamp in the record, export v2.
 - **Profile in the site header,** with an own profile picture (local-only, size-capped, in export and import) replacing the letter avatar.
 
-> Stress-tested 2026-11-03 (skill b9705f6): 7 applied, 1 adapted, 0 decided by me.
+> Stress-tested 2026-11-03 (skill b9705f6): 7 applied, 1 adapted, 0 decided by me. §14 stress-tested 2026-11-04: 13 findings, 11 applied, 2 decided by me (chips wrap at every width; the wide search field is accepted).
+
+## 14. Addendum (04.11.2026): group chips and wide screens
+
+Two asks after PR 1 merged, settled in the brainstorm of 04.11 with mockups in the visual companion. Vehicles holds 148 items in 7 groups (86 of them cars), so an open category still means a long scroll. On a 2000 px window the tracker sits in a 1088 px column with 424 px of black on each side. Both break the standard set the same day: every screen size, professional, from the start.
+
+### 14.1 Group chips (PR 3)
+
+**Locked:**
+
+| Decision | Choice | Why |
+| --- | --- | --- |
+| When chips show | Under every pressed category, none under All | Her pick: chips appear where a category is actually pressed |
+| Where | A row right under the category title, above its first group (mockup A) | The chips sit with the title they belong to; nothing sticky grows |
+| Behaviour | Multi-select toggles with `aria-pressed`; none pressed shows the whole category | The same rule as the tiles above them |
+
+**Behaviour:**
+
+- A pressed category renders a chip per group that has at least one countable item (built from `countable(state.items)`, never from the filtered view), in the list's group order (`groupItems` sorts by group id). Under All no chip row renders.
+- **A pressed category with a chip row always renders its title and chip row, even when no card is left** (a search with no match there, or Hide found emptying the group), whether or not a chip is pressed (plan R17). The empty or elsewhere message renders under it. Without this the list unmounts and the focused chip takes focus with it.
+- A chip shows the group label and the count in the tile's "done/total" form, for the whole group, never the filtered view (§2 Counts). Its accessible name is the label and the count in words (`tracker.count`), as the tiles do.
+- Pressing chips narrows that category only: an item shows when its category is pressed and either none of that category's chips are pressed or its own group's chip is. Vehicles with Cars pressed and Wildlife with none pressed shows every car and all of Wildlife.
+- Unpressing a category drops its pressed chips. Pressing it again starts with none pressed.
+- The group selection lives in the tracker model beside `selected` (`groups: string[]`, `toggleGroup(key)`), so `searchView` takes it as one more input. `selectCategories` drops groups whose category is no longer pressed; `toggleGroup` ignores unknown keys. `useSearch` adds `groups` to its source, its snapshot key and `viewFor`, so a chip toggle retakes the Hide found snapshot as a tile does and every announced count respects the chips. Group ids are unique across categories in today's seed. The model keys them by `groupKey(category, group)` anyway, so a future seed cannot collide.
+- `?group=` mirrors the selection beside `?show=`: `groupKey`s, comma-joined, in `groupItems` order, re-serialised from state the way `useShowParam` does it. It is parsed after `parseShow`; parsing keeps only known keys whose category is pressed, and the raw value is never echoed.
+- A chip toggle cancels a pending typing announcement, the way a tile toggle does (`live.cancel()`). The list change itself is not announced; `aria-pressed` carries the state.
+- The pressed groups keep their group titles, so the reader keeps their place. Unpressed groups (titles and cards) are not rendered.
+
+**Search, Hide found and Last found:**
+
+- A search match hidden by a chip counts toward the elsewhere line, the same as a match in an unpressed category.
+- **My call:** that line said "in other categories", which is wrong once a match can sit in a pressed category. It becomes "{count} more outside your filters" / "{count} til utenfor filtrene dine", and its button "Clear filters" / "Fjern filtrene". `tracker.search.resultsElsewhere` changes the same way. The button clears categories and chips together; Hide found and the query stay, and focus moves to the search field as today. Rewrite the copy assertions in `Tracker.search.test.tsx` (about lines 72-73 and 195-201).
+- Hide found is unchanged. `hiddenCount` counts only items inside the pressed chips, like `elsewhere`. A group whose items are all found and hidden keeps its chip and its full count, like a tile.
+- The "Last found" row shows plain text when its card is hidden by a chip, as it already does for any other filter.
+
+**Layout and look:**
+
+- Chips are at least 44 px tall (`min-height`, so a long label can take two lines), pill-shaped, with the group label and the count; 8 px between chips. The title's existing 28 px gap (`.cat-head`) sits above the row; 24 px below it, before the first group title.
+- **My call (stress test 04.11): the chips wrap onto more lines at every width.** Mockup A showed a sideways-scrolling row on phones, but with a hidden scrollbar a mouse user has no cue, and at 320 px with 200 % text it becomes two-dimensional scrolling (WCAG 1.4.10). Vehicles takes about 4 rows at 320 px; that is the price.
+- Pressed chips get the pink fill with `--accent-text`, plus a ✓ before the label, so pressed is never told by colour alone. As a pink surface they join the `outline-color: var(--text)` focus-ring list, and every hover, active and focus rule on chips carries the `:not([aria-pressed="true"])` guard the tiles use. In forced colours they join the pressed-tile rule (`Highlight`, `HighlightText`).
+- The row is a `<fieldset>` (its implicit group role; Biome rejects `role="group"` on a div, plan R18) named "Groups: {category}" / "Grupper: {category}" (the `tracker.announce` "{category}: ..." form, because nb category labels are capitalised).
+
+**Copy:**
+
+| Key | English | Norwegian |
+| --- | --- | --- |
+| `tracker.groupChips` | Groups: {category} | Grupper: {category} |
+| `tracker.search.elsewhere.one` | 1 more outside your filters | 1 til utenfor filtrene dine |
+| `tracker.search.elsewhere.other` | {count} more outside your filters | {count} til utenfor filtrene dine |
+| `tracker.search.showAll` | Clear filters | Fjern filtrene |
+| `tracker.search.resultsElsewhere` | No results inside your filters. {count} outside them. | Ingen treff innenfor filtrene dine. {count} utenfor. |
+
+**Units touched:** `src/model/tracker.ts` (groups, `toggleGroup`, `parseGroups`, `groupParam`), `src/model/search.ts` (`groups` input), `src/islands/tracker/useSearch.ts` (`groups` in source, key and `viewFor`), `src/islands/useTracker.ts` (`useGroupParam`), `src/islands/tracker/GroupChips.tsx` (new), `src/islands/tracker/ItemList.tsx` (renders the row), `src/islands/Tracker.tsx` (wiring, Clear filters), `src/styles/global.css`, both locale bundles.
+
+**Edge cases:**
+
+- A category with one group (none today) shows no chip row; one chip would filter nothing.
+- A press that empties the view keeps the category's title and chip row, and focus stays on the chip (tested).
+- A `?group=` key for a group that has since lost every item is dropped on parse.
+- Long Norwegian group labels: the row wraps at every width, and a chip may wrap its label onto two lines rather than overflow.
+- Switching profile keeps the selection, as the tile selection already does.
+
+### 14.2 Wide screens (PR 2)
+
+**Locked: option C, two steps.** The tracker page grows in steps that each add a card column; the tiles and the rail stay 200 px. Measured in the companion with the real card rule (280 px minimum, 12 px gap), on a 2000 px window:
+
+| Viewport | Page cap | Tracker | List | Cards across |
+| --- | --- | --- | --- | --- |
+| 1024 to 1599 px | 72rem (today) | up to 1088 px | up to 592 px | 1 to 2 |
+| 1600 to 1919 px | 90rem | up to 1376 px | up to 880 px | 3 |
+| 1920 px and up | 120rem | up to 1856 px | up to 1360 px | 4 |
+
+- The tracker page's `main` gets its own server-rendered modifier (`Base.astro` prop `trackerWide`, class `tracker-wide`; the hub's `.wrap.wide` stays 85rem). The modifier sets `--tracker-max-w: none` at the steps, so `.tracker`, the title row, the h1 and `.dex-browse` all fill `main` together. Never a `.tracker` or `:has()` rule: those match only after the island mounts and would shift the title.
+- At a 1920 px viewport with a 17 px scrollbar the list is about 1343 px, still four cards. The search field spans the tracker's width (about 1800 px); accepted.
+- Above 120rem the page stays centred and the sides stay empty on purpose; more than four columns is harder to scan.
+- **Accepted:** the hub (85rem) and the tracker differ in width from 1600 px.
+- Breakpoints read the viewport width, so a 1920 px wide browser window with borders lands just under 1920 and shows three cards. That is fine; the measure set emulates exact widths.
+- Phones, tablet and 1024 to 1599 px do not change.
+
+### 14.3 Tests and measures added
+
+**PR 2:** a CSS test (as `tracker-refresh.test.ts` does) checks both wide steps; the PR 2 measure set adds 1600 and 1920 px: card columns 3 and 4, no overflow, h1 still on the search row's left edge, layout shift 0. This includes the nb desktop rail at 200 % text, parked from PR 1.
+
+**PR 3:**
+
+- `parseGroups` / `groupParam`: round trip, unknown keys dropped, keys of unpressed categories dropped.
+- Tracker model: `toggleGroup` on and off; unpressing a category drops its groups.
+- `searchView` with groups: visible, elsewhere and hiddenCount for chips pressed in one of two categories.
+- `GroupChips`: renders only under pressed categories, `aria-pressed`, accessible names with whole-group counts, ✓ only when pressed, the group's name.
+- `Tracker`: `?group=` mirrored; Clear filters clears categories and groups and moves focus to the field; a chip toggle cancels a pending announcement; Last found is plain text when a chip hides its card.
+- Measured at 320, 768, 1024, 1280, 1600 and 1920 px in English and Norwegian, and at 320 px with 200 % text: chips 44 px tall, one height per row, the page never scrolls sideways, layout shift 0. Forced colours: pressed chips show `Highlight`. Keyboard only: Tab reaches every chip in order.
