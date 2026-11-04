@@ -15,7 +15,7 @@
 - Code, identifiers, comments and commit messages in English. Comments in first person where they speak about decisions ("I measured", not "the developer measured").
 - No em dashes anywhere: code, comments, copy, commits, PR text.
 - Times take a colon, dates take periods in prose (`10.11.2026`). ISO dates stay in filenames and code constants.
-- Mobile-first CSS: base styles target 320 px; changes only inside `min-width` queries (768 px tablet, 1024 px desktop).
+- Mobile-first CSS: base styles target 320 px; changes only inside `min-width` queries (768 px tablet, 1024 px desktop, and the wide steps at 1600 and 1920 px from spec §14.2).
 - Controls on one row share one height (44 px, `var(--tap)`) and one bottom edge. Tiles in one row share one height.
 - No raw hex in `global.css` (the tokens test scans for it). Use tokens and `color-mix`.
 - Bebas Neue (`var(--font-display)`) is always `font-weight: 400`. It ships one weight; a bold would be faked.
@@ -2699,6 +2699,124 @@ npx biome check --write $F && sed -i 's/\r$//' $F && git add $F
 git commit -m "Move the profile button into the tracker title row with an initial avatar"
 ```
 
+### Task 12b: Wide steps (spec §14.2, added 04.11.2026)
+
+The tracker page grows to 90rem from 1600 px (3 cards across) and 120rem from 1920 px (4 cards). The hub keeps `.wrap.wide` at 85rem. Every user of `--tracker-max-w` (`.tracker`, `.tracker-head`, the page's `h1` and `.dex-browse`) is a `max-width`, so lifting the variable to `none` at the steps lets all of them fill `main` together and the title keeps the search row's left edge.
+
+**Files:**
+- Modify: `src/layouts/Base.astro` (new `trackerWide` prop)
+- Modify: `src/pages/[locale]/tracker/index.astro` (pass it)
+- Modify: `src/styles/global.css` (the two steps, after the `.wrap.wide` block)
+- Test: `src/styles/tracker-refresh.test.ts`, `src/test/tracker-page.test.ts`
+
+**Interfaces:**
+- Consumes: `--tracker-max-w` on `main` (global.css, 1024 px query); Task 12's `.tracker-head` cap.
+- Produces: `main.wrap.tracker-wide`; nothing later depends on it except the Task 13 measures and PR 3's chip rows, which sit inside the list column.
+
+- [ ] **Step 1: Write the failing tests**
+
+Append to `src/styles/tracker-refresh.test.ts`, inside the top-level `describe`:
+
+```ts
+	it("widens the tracker page in two steps that each add a card column (spec §14.2)", () => {
+		const step = (px: number) =>
+			css.match(new RegExp(`@media \\(min-width: ${px}px\\) \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? ""
+		expect(step(1600)).toMatch(/\.wrap\.tracker-wide\s*\{[^}]*max-width:\s*90rem/)
+		expect(step(1600)).toMatch(/\.wrap\.tracker-wide\s*\{[^}]*--tracker-max-w:\s*none/)
+		expect(step(1920)).toMatch(/\.wrap\.tracker-wide\s*\{[^}]*max-width:\s*120rem/)
+		// The hub keeps its own cap.
+		expect(step(1600)).toMatch(/\.wrap\.wide\s*\{[^}]*max-width:\s*85rem/)
+	})
+```
+
+Append to `src/test/tracker-page.test.ts`, inside `describe("Tracker page")`:
+
+```ts
+	it("gives main the tracker's wide steps, not the hub's", async () => {
+		const main = (await renderPage(Tracker)).querySelector("main")
+		expect(main?.classList.contains("tracker-wide")).toBe(true)
+		expect(main?.classList.contains("wide")).toBe(false)
+	})
+```
+
+- [ ] **Step 2: Run to see them fail**
+
+Run: `npx vitest run src/styles/tracker-refresh.test.ts src/test/tracker-page.test.ts`
+Expected: FAIL on the two new tests (no `.tracker-wide` rule, no class on `main`).
+
+- [ ] **Step 3: The prop and the page**
+
+In `src/layouts/Base.astro`, beside the `wide` prop:
+
+```ts
+	/** The tracker's wider page: 90rem from 1600 px, 120rem from 1920 px (tracker refresh spec §14.2). */
+	trackerWide?: boolean
+```
+
+Destructure it with `trackerWide = false` next to `wide = false`, and change the `main` line to:
+
+```astro
+		<main id="main" class:list={["wrap", { wide, "tracker-wide": trackerWide }]}>
+```
+
+In `src/pages/[locale]/tracker/index.astro`, add `trackerWide` to the `<Base ...>` call:
+
+```astro
+<Base locale={locale} title={t("seo.titles.tracker")} description={t("tracker.description")} path="tracker" trackerWide>
+```
+
+- [ ] **Step 4: The CSS**
+
+In `src/styles/global.css`, replace the existing block
+
+```css
+@media (min-width: 1600px) {
+	.wrap.wide {
+		max-width: 85rem;
+	}
+}
+```
+
+with:
+
+```css
+/* Wide steps (tracker refresh spec §14.2). Each step adds a whole card column at the 280 px card
+   minimum: 90rem gives the list 880 px (3 cards), 120rem gives 1360 px (4). Lifting
+   --tracker-max-w lets the tracker, its title row and the Browse row fill main together. Above
+   120rem the page stays centred; more than four columns is harder to scan. */
+@media (min-width: 1600px) {
+	.wrap.wide {
+		max-width: 85rem;
+	}
+
+	.wrap.tracker-wide {
+		max-width: 90rem;
+		--tracker-max-w: none;
+	}
+}
+
+@media (min-width: 1920px) {
+	.wrap.tracker-wide {
+		max-width: 120rem;
+	}
+}
+```
+
+`main` sets `--tracker-max-w` inside the 1024 px query, earlier in the file; `.wrap.tracker-wide` is more specific than `main`, so its `none` wins at both steps.
+
+- [ ] **Step 5: Run every test**
+
+Run: `npm test`
+Expected: all green.
+
+- [ ] **Step 6: Commit**
+
+```bash
+F="src/layouts/Base.astro src/pages/[locale]/tracker/index.astro src/styles/global.css src/styles/tracker-refresh.test.ts src/test/tracker-page.test.ts"
+npx biome check --write $F && sed -i 's/\r$//' $F && git add $F
+git commit -m "Widen the tracker page in two steps so wide screens get three and four card columns"
+```
+
 ### Task 13: Verify and ship PR 2
 
 - [ ] **Step 1: Full checks**
@@ -2709,7 +2827,7 @@ npm test && npx biome ci . && npm run check && npm run build
 
 Expected: all green.
 
-- [ ] **Step 2: Serve and measure, one batched round** (built site as in Task 6 Step 2, pointed at this worktree; 320, 768, 1024 and 1280 px; `en` and `nb`; tick three items first)
+- [ ] **Step 2: Serve and measure, one batched round** (built site as in Task 6 Step 2, pointed at this worktree; 320, 768, 1024, 1280, 1600 and 1920 px; `en` and `nb`; tick three items first)
 
 Card height and hit testing (Review Focus 4):
 
@@ -2737,11 +2855,13 @@ Last found: at 320 px tap the row; the card's top sits just under the sticky sea
 
 Rail at 1280 px: the percentage reads `Math.floor`; times update after a minute; the rail and the list share a top edge.
 
+Wide steps (Task 12b, spec §14.2): at 1600 and 1920 px read the card column count with `getComputedStyle(document.querySelector(".item-group ul")).gridTemplateColumns.split(" ").length` (expect 3, then 4), `document.documentElement.scrollWidth === innerWidth`, and the h1's left edge equal to `.search-row`'s. At 1599 px it is still 2. Then the parked PR 1 item: the nb desktop rail at 200 % text at 1280 and 1600 px, no horizontal overflow from `.stats` (PR 1 measured 8 to 16 px).
+
 The hub (Review Focus 5): open `/en/` at 320 and 1280 px; the dashboard's profile button shows the avatar on one line with the day text, and Recent finds looks as on production (compare a screenshot).
 
 - [ ] **Step 3: Forced colours, keyboard, layout shift**
 
-As Task 6 Steps 4 and 5, plus: in forced colours a found card keeps its ✓; Tab order on the page is profile button, search field, Hide found, tiles, Last found, then the cards (checkbox, book, flag). CLS 0 at all four widths, including the profile button's arrival.
+As Task 6 Steps 4 and 5, plus: in forced colours a found card keeps its ✓; Tab order on the page is profile button, search field, Hide found, tiles, Last found, then the cards (checkbox, book, flag). CLS 0 at all six widths, including the profile button's arrival.
 
 - [ ] **Step 4: Push and open**
 
@@ -2762,7 +2882,9 @@ The second half of the tracker refresh (spec `docs/superpowers/specs/2026-11-03-
 
 Times update once a minute and when the tab is shown again. The tick re-renders only the rail and the row, never the list.
 
-Checked: tests, Biome, astro check and the build; card hit testing with elementFromPoint; a 40-character profile name and the open menu at 320 px; the hub at 320 and 1280 px; forced colours, keyboard order, reduced motion; CLS 0 at 320, 768, 1024 and 1280 px.
+On wide screens the tracker now grows in two steps: three cards across from 1600 px and four from 1920 px, instead of two in a narrow column. The hub keeps its own width.
+
+Checked: tests, Biome, astro check and the build; card hit testing with elementFromPoint; a 40-character profile name and the open menu at 320 px; the hub at 320 and 1280 px; forced colours, keyboard order, reduced motion; card columns at 1600 and 1920 px; CLS 0 at 320, 768, 1024, 1280, 1600 and 1920 px.
 ```
 
 - [ ] **Step 5: Merge when green, before Tuesday 10.11.2026**
