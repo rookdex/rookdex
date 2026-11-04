@@ -142,4 +142,11 @@ describe("profile button size and the title row (final review E1, E3)", () => {
 		expect(page).toMatch(/#tracker-profile\s*\{[^}]*flex:\s*1 1 0[^}]*min-width:\s*62px/)
 		expect(rule("#tracker-profile .profile-menu > button")).toMatch(/max-width:\s*100%/)
 	})
+
+	it("reserves the button's full height before it arrives, also at 200 % text", () => {
+		// The button is one 1.5em line plus its 1 px borders, or 44 px, whichever is taller.
+		expect(page).toMatch(
+			/#tracker-profile\s*\{[^}]*min-height:\s*max\(var\(--tap\),\s*calc\(1\.5em \+ 2px\)\)/
+		)
+	})
 })

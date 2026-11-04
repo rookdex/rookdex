@@ -74,13 +74,15 @@ const browse = categoryIds(seedItems.filter((item) => !item.retired)).map((id) =
 	}
 
 	/* 62 px holds the avatar-only button (8 + 28 + 8 + 12 + 2 border). When the title and that floor
-	   do not fit on one line (320 px at 200 % text), the slot wraps under the title, right-aligned. */
+	   do not fit on one line (320 px at 200 % text), the slot wraps under the title, right-aligned.
+	   The height is the button's: one 1.5em line plus 2 px of border, or 44 px, whichever is taller,
+	   so the button's arrival moves nothing at any text size. */
 	#tracker-profile {
 		display: flex;
 		flex: 1 1 0;
 		justify-content: flex-end;
 		min-width: 62px;
-		min-height: var(--tap);
+		min-height: max(var(--tap), calc(1.5em + 2px));
 	}
 
 	/* Centred at the tracker's own cap (global.css), so the title shares the search row's left edge.
