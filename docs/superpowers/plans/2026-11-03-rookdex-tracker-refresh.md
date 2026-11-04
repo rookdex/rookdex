@@ -48,7 +48,7 @@
 - **R14. `initial()` reads the page language from `<html lang>`**, so the hub needs no new prop.
 - **R15. The PR 2 check is a 24 px circle at `top: 22px; right: 16px`**, the centre of the spec's 44 px box at `top: 12px; right: 6px`. The hit area is the whole card (the label's `::after`), as today.
 - **R16. `chipGroups` returns a Map,** not a plain object, so a category id such as "constructor" can never read `Object.prototype` (the trap Review Focus 2 guards for icons).
-- **R17. A pressed category with a chip row always renders its title and chips,** not only while one of its chips is pressed. With spec §14.1's narrower rule, unpressing the last chip under a search with no match there would unmount the focused chip, the very loss the rule exists to prevent. The cost: a pressed category with no match shows its title and chips above the empty message. §8's "hidden categories" are the unpressed ones, and they still do not render.
+- **R17. A pressed category with a chip row always renders its title and chips,** not only while one of its chips is pressed. With spec §14.1's narrower rule, unpressing the last chip under a search with no match there would unmount the focused chip, the very loss the rule exists to prevent. The cost: a pressed category with no match shows its title and chips above the empty message. When another pressed category does match, the empty one shows its title and chips with nothing under them and no message (Vehicles and Wildlife pressed, "bike" typed); the title's whole-category count still tells the reader where they are, and Task 17 tests it. §8's "hidden categories" are the unpressed ones, and they still do not render.
 - **R18. The chip row is a `<fieldset aria-label>`.** Biome's `useSemanticElements` rejects `role="group"` on a div (probed 04.11.2026). The fieldset's UA margin, padding, border and `min-inline-size: min-content` are reset.
 - **R19. A chip is as wide pressed as unpressed.** The unpressed chip carries the ✓'s width (0.875em plus the 6 px gap) as extra inline padding, so a press never reflows the wrapping row under the finger.
 - **R20. The model keeps `groups` in list order and drops any key no chip offers on every change** (`keepChips`), so `groupParam` only joins, `?group=` follows the list, and a chip never stays pressed under an unpressed category.
@@ -2911,7 +2911,7 @@ Bind the PR with the ccd_pr tools, read CI, merge once green. If it is not green
 
 Cut from `main` **after PR 2 has merged**: these tasks edit the PR 2 versions of `Tracker.tsx` and `ItemList.tsx` (the Last found row, the icon-lead card) and the CSS hover lists PR 2 extended. Line references below are by anchor text, not number. If PR 2 is held past 10.11, PR 3 is held with it (spec §1).
 
-The fixtures in `src/test/tracker-fixtures.ts` drive every island test here: Vehicles has one group (Bikes), so it never gets chips; Wildlife has Birds (Pelican) and Reptiles (American alligator), so it gets two.
+The fixtures in `src/test/tracker-fixtures.tsx` drive every island test here: Vehicles has one group (Bikes), so it never gets chips; Wildlife has Birds (Pelican) and Reptiles (American alligator), so it gets two.
 
 ### Task 14: The group selection in the tracker model
 
@@ -3263,7 +3263,7 @@ Change the stats import to `import { groupKey, type Records } from "./stats"`. I
 	groups: string[]
 ```
 
-In `SearchView`, reword the two "chips" comments (they meant the category tiles): `/** Inside the pressed tiles and chips, matching, not hidden, in seed order. */`, `/** Matching and not hidden outside the filters; 0 with no query. */` and `/** Matching and hidden inside the filters. */`.
+In `SearchView`, reword the three comments that say "chips" or "other categories" (they meant the category tiles): `/** Inside the pressed tiles and chips, matching, not hidden, in seed order. */`, `/** Matching and not hidden outside the filters; 0 with no query. */` and `/** Matching and hidden inside the filters. */`.
 
 Replace the head of `searchView` and its `inside` line:
 
@@ -3783,6 +3783,17 @@ describe("Group chips (tracker refresh spec §14.1)", () => {
 		expect(birds).toHaveFocus()
 	})
 
+	it("keeps an unmatched chip category on screen while another pressed category matches (R17)", async () => {
+		await ready()
+		press(/^Vehicles,/)
+		press(/^Wildlife,/)
+		type("bike")
+		expect(names()).toEqual(["item-vehicles/bike"])
+		expect(screen.getByRole("heading", { name: "Wildlife" })).toBeInTheDocument()
+		expect(chipRow()).not.toBeNull()
+		expect(screen.queryByText(/outside your filters/)).toBeNull()
+	})
+
 	it("points to a match a chip hides, and Clear filters clears tiles and chips", async () => {
 		await ready()
 		press(/^Wildlife,/)
@@ -4034,7 +4045,9 @@ const box = (el) => el.getBoundingClientRect()
 const lines = Object.values(Object.groupBy(chips, (c) => Math.round(box(c).top)))
 const row = document.querySelector(".group-chips")
 const head = row.closest(".item-category").querySelector(".cat-head")
-const firstGroup = row.closest(".item-category").querySelector(".group-head")
+// The group's top rule, not its title: .item-group has a 1 px border and 20 px padding above
+// .group-head, so measuring to the title would read 45.
+const firstGroup = row.closest(".item-category").querySelector(".item-group")
 ;({
 	minHeight: Math.min(...chips.map((c) => box(c).height)),
 	oneHeightPerLine: lines.every((l) => new Set(l.map((c) => Math.round(box(c).height))).size === 1),
@@ -4053,7 +4066,7 @@ Long labels: on `/nb/tracker/?show=vehicles,wildlife` at 320 px with 200 % text,
 
 - [ ] **Step 3: Forced colours, keyboard, layout shift**
 
-As Task 6 Steps 4 and 5, plus: in forced colours a pressed chip shows `Highlight` with its ✓ and an unpressed one keeps a visible border; Tab runs tiles, Last found, then the chips in order, then the cards; Space toggles a chip and focus stays on it. CLS 0 at all six widths on a load with `?show=` and `?group=`, and none on a chip press (a shift right after input is excluded, but the width check above should show none anyway).
+As Task 6 Steps 4 and 5, plus: in forced colours a pressed chip shows `Highlight` with its ✓ and an unpressed one keeps a visible border; Tab runs tiles, Last found (below 1024 px only; from 1024 px it is `display: none`), then the chips in order, then the cards; Space toggles a chip and focus stays on it. CLS 0 at all six widths on a load with `?show=` and `?group=`, and none on a chip press (a shift right after input is excluded, but the width check above should show none anyway).
 
 - [ ] **Step 4: Push and open**
 
@@ -4093,4 +4106,13 @@ Bind the PR with the ccd_pr tools, read CI, merge once green. If it is not green
 - **Phones lose the rail's link to the hub.** The tab bar's Dashboard tab reaches the hub on every page, and the spec removes the rail below 1024 px on purpose (§3.1).
 - **The Last found row turning from a button into text while focused.** Only the search field, the tiles and Hide found change what is visible, and each holds focus itself; there is no cross-tab sync that could change it under the row.
 
-> Stress-tested 2026-11-03 (skill b9705f6): 2 applied, 1 adapted, 0 decided by me.
+## Considered and rejected (stress test of PR 3, 04.11.2026)
+
+- **A chip toggle announces nothing, even with a query typed.** A tile toggle does the same; the screen reader reads the pressed state change on the focused chip, and the spec locks this (§14.1).
+- **The chip's name says "1 of 3" where the screen shows "1/3".** The name starts with the visible label, so voice control ("click Birds") works (WCAG 2.5.3). The tiles use the same form.
+- **The unpressed chip's border (`--border` on black) is faint.** The text identifies the control, so WCAG 1.4.11 asks for no boundary, and the tiles use the same edge.
+- **`chipGroups` runs on every render and every toggle.** That is about 215 items; caching it adds state for no visible gain.
+- **`?group=` travels in the Referer to outbound source links.** A group selection is not personal data.
+- **The ✓ may come from a fallback font.** The 44 px `min-height` fixes the chip's height and the 0.875em box fixes its width, so a fallback glyph moves nothing.
+
+> Stress-tested 2026-11-03 (skill b9705f6): 2 applied, 1 adapted, 0 decided by me. Tasks 14-18 stress-tested 2026-11-04 (skill a217382): 5 applied, 0 adapted, 0 decided by me.

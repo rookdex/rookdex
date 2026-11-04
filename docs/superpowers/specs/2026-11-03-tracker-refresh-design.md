@@ -281,7 +281,7 @@ Two asks after PR 1 merged, settled in the brainstorm of 04.11 with mockups in t
 **Behaviour:**
 
 - A pressed category renders a chip per group that has at least one countable item (built from `countable(state.items)`, never from the filtered view), in the list's group order (`groupItems` sorts by group id). Under All no chip row renders.
-- **A pressed category with any chip pressed always renders its title and chip row, even when no card is left** (a search with no match there, or Hide found emptying the group). The empty or elsewhere message renders under it. Without this the list unmounts and the focused chip takes focus with it.
+- **A pressed category with a chip row always renders its title and chip row, even when no card is left** (a search with no match there, or Hide found emptying the group), whether or not a chip is pressed (plan R17). The empty or elsewhere message renders under it. Without this the list unmounts and the focused chip takes focus with it.
 - A chip shows the group label and the count in the tile's "done/total" form, for the whole group, never the filtered view (§2 Counts). Its accessible name is the label and the count in words (`tracker.count`), as the tiles do.
 - Pressing chips narrows that category only: an item shows when its category is pressed and either none of that category's chips are pressed or its own group's chip is. Vehicles with Cars pressed and Wildlife with none pressed shows every car and all of Wildlife.
 - Unpressing a category drops its pressed chips. Pressing it again starts with none pressed.
@@ -302,7 +302,7 @@ Two asks after PR 1 merged, settled in the brainstorm of 04.11 with mockups in t
 - Chips are at least 44 px tall (`min-height`, so a long label can take two lines), pill-shaped, with the group label and the count; 8 px between chips. The title's existing 28 px gap (`.cat-head`) sits above the row; 24 px below it, before the first group title.
 - **My call (stress test 04.11): the chips wrap onto more lines at every width.** Mockup A showed a sideways-scrolling row on phones, but with a hidden scrollbar a mouse user has no cue, and at 320 px with 200 % text it becomes two-dimensional scrolling (WCAG 1.4.10). Vehicles takes about 4 rows at 320 px; that is the price.
 - Pressed chips get the pink fill with `--accent-text`, plus a ✓ before the label, so pressed is never told by colour alone. As a pink surface they join the `outline-color: var(--text)` focus-ring list, and every hover, active and focus rule on chips carries the `:not([aria-pressed="true"])` guard the tiles use. In forced colours they join the pressed-tile rule (`Highlight`, `HighlightText`).
-- The row is a `role="group"` named "Groups: {category}" / "Grupper: {category}" (the `tracker.announce` "{category}: ..." form, because nb category labels are capitalised).
+- The row is a `<fieldset>` (its implicit group role; Biome rejects `role="group"` on a div, plan R18) named "Groups: {category}" / "Grupper: {category}" (the `tracker.announce` "{category}: ..." form, because nb category labels are capitalised).
 
 **Copy:**
 
