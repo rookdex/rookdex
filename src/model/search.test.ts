@@ -36,7 +36,7 @@ const terms = {
 const none: ReadonlySet<string> = new Set()
 const ids = (list: SeedItem[]) => list.map((i) => i.id)
 const view = (patch: Partial<Parameters<typeof searchView>[0]>) =>
-	searchView({ items, selected: [], query: "", hidden: none, terms, ...patch })
+	searchView({ items, selected: [], groups: [], query: "", hidden: none, terms, ...patch })
 
 describe("normalize (spec §3.1)", () => {
 	it("folds accents and case, keeps ø and æ as letters", () => {
@@ -90,7 +90,7 @@ describe("foundIds", () => {
 })
 
 describe("searchView (spec §3.1)", () => {
-	it("is today's chip view with no query", () => {
+	it("is today's tile view with no query", () => {
 		expect(ids(view({}).visible)).toEqual([
 			"vehicles/albany-primo",
 			"vehicles/ubermacht-sentinel",
@@ -114,7 +114,7 @@ describe("searchView (spec §3.1)", () => {
 		expect(ids(view({ query: "seashark" }).visible)).toEqual(["vehicles/speedophile"])
 	})
 
-	it("runs inside the chips and counts the matches elsewhere", () => {
+	it("runs inside the tiles and counts the matches elsewhere", () => {
 		const v = view({ selected: ["wildlife"], query: "car" })
 		expect(v.visible).toEqual([])
 		expect(v.elsewhere).toBe(2)
@@ -125,12 +125,12 @@ describe("searchView (spec §3.1)", () => {
 		expect(view({ query: "car" }).elsewhere).toBe(0)
 	})
 
-	it("hides the snapshot and counts it inside the chips only", () => {
+	it("hides the snapshot and counts it inside the tiles only", () => {
 		const hidden = new Set(["wildlife/pelican", "vehicles/albany-primo"])
 		const v = view({ selected: ["wildlife"], query: "animal", hidden })
 		expect(ids(v.visible)).toEqual(["wildlife/alligator"])
 		expect(v.hiddenCount).toBe(1)
-		// A hidden match outside the chips is not "elsewhere": Show all would not show it.
+		// A hidden match outside the tiles is not "elsewhere": Show all would not show it.
 		expect(view({ selected: ["wildlife"], query: "primo", hidden }).elsewhere).toBe(0)
 	})
 
@@ -161,5 +161,38 @@ describe("emptyState (spec §4)", () => {
 
 	it("leaves an empty list with no query to the list's own message", () => {
 		expect(emptyState(empty, "  ")).toBe("none")
+	})
+})
+
+describe("searchView with group chips (tracker refresh spec §14.1)", () => {
+	const both = { selected: ["vehicles", "wildlife"], groups: ["vehicles/cars"] }
+
+	it("narrows only the category whose chips are pressed", () => {
+		expect(ids(view(both).visible)).toEqual([
+			"vehicles/albany-primo",
+			"vehicles/ubermacht-sentinel",
+			"wildlife/pelican",
+			"wildlife/alligator",
+		])
+	})
+
+	it("counts a match a chip hides as outside the filters", () => {
+		const v = view({ ...both, query: "seashark" })
+		expect(v.visible).toEqual([])
+		expect(v.elsewhere).toBe(1)
+	})
+
+	it("counts hidden finds inside the pressed chips only", () => {
+		const hidden = new Set(["vehicles/albany-primo", "vehicles/speedophile", "wildlife/pelican"])
+		const v = view({ ...both, hidden })
+		expect(ids(v.visible)).toEqual(["vehicles/ubermacht-sentinel", "wildlife/alligator"])
+		// The Primo and the Pelican are inside; the Seashark sits behind an unpressed chip.
+		expect(v.hiddenCount).toBe(2)
+	})
+
+	it("never narrows a category under All", () => {
+		const v = view({ selected: [], groups: ["vehicles/cars"], query: "seashark" })
+		expect(ids(v.visible)).toEqual(["vehicles/speedophile"])
+		expect(v.elsewhere).toBe(0)
 	})
 })

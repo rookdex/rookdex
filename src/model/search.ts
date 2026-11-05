@@ -1,15 +1,17 @@
 // Tracker search (tracker search spec §3.1). Pure: no React, no DOM. The functions take plain
 // text fields, so a later site-wide search can reuse normalize and matches.
 import type { SeedItem } from "./schema"
-import type { Records } from "./stats"
+import { groupKey, type Records } from "./stats"
 
 /** Group id to search words in both languages (searchTerms.ts). */
 export type SearchTerms = Readonly<Record<string, readonly string[]>>
 
 export interface SearchInput {
 	items: SeedItem[]
-	/** Chip ids; empty means All. */
+	/** Category tile ids; empty means All. */
 	selected: string[]
+	/** Pressed group chips as `groupKey`s. A category with none pressed shows every group. */
+	groups: string[]
 	query: string
 	/** The snapshot of found ids; empty while Hide found is off. */
 	hidden: ReadonlySet<string>
@@ -17,11 +19,11 @@ export interface SearchInput {
 }
 
 export interface SearchView {
-	/** Inside the chips, matching, not hidden, in seed order. */
+	/** Inside the pressed tiles and chips, matching, not hidden, in seed order. */
 	visible: SeedItem[]
-	/** Matching and not hidden outside the chips; 0 with no query or with All. */
+	/** Matching and not hidden outside the filters; 0 with no query or with All. */
 	elsewhere: number
-	/** Matching and hidden inside the chips. */
+	/** Matching and hidden inside the filters. */
 	hiddenCount: number
 }
 
@@ -57,9 +59,23 @@ export function foundIds(records: Records): Set<string> {
 	)
 }
 
-export function searchView({ items, selected, query, hidden, terms }: SearchInput): SearchView {
+export function searchView({
+	items,
+	selected,
+	groups,
+	query,
+	hidden,
+	terms,
+}: SearchInput): SearchView {
 	const queryWords = words(query)
 	const all = selected.length === 0
+	const pressed = new Set(groups)
+	// The categories a chip narrows: there, only the pressed groups are inside (spec §14.1).
+	const narrowed = new Set(
+		items
+			.filter((item) => pressed.has(groupKey(item.category, item.group)))
+			.map((item) => item.category)
+	)
 	const visible: SeedItem[] = []
 	let elsewhere = 0
 	let hiddenCount = 0
@@ -68,7 +84,11 @@ export function searchView({ items, selected, query, hidden, terms }: SearchInpu
 		if (item.retired) continue
 		if (queryWords.length > 0 && !hasAll(queryWords, [item.name, ...(terms[item.group] ?? [])]))
 			continue
-		const inside = all || selected.includes(item.category)
+		// A category under All is never narrowed by chips.
+		const inside =
+			all ||
+			(selected.includes(item.category) &&
+				(!narrowed.has(item.category) || pressed.has(groupKey(item.category, item.group))))
 		if (!inside) {
 			if (queryWords.length > 0 && !hidden.has(item.id)) elsewhere++
 		} else if (hidden.has(item.id)) hiddenCount++
