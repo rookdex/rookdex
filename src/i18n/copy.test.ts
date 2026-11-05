@@ -200,13 +200,6 @@ describe("Dex copy (category pages spec §8, §12)", () => {
 	})
 })
 
-describe("group chips copy (tracker refresh spec §14.1)", () => {
-	it("names the chip row after its category", () => {
-		expect(en["tracker.groupChips"]).toBe("Groups: {category}")
-		expect(nb["tracker.groupChips"]).toBe("Grupper: {category}")
-	})
-})
-
 describe("filter copy (tracker refresh spec §14.1)", () => {
 	it.each([
 		["tracker.groupChips", "Groups: {category}", "Grupper: {category}"],
@@ -222,7 +215,7 @@ describe("filter copy (tracker refresh spec §14.1)", () => {
 			"No results inside your filters. {count} outside them.",
 			"Ingen treff innenfor filtrene dine. {count} utenfor.",
 		],
-	] as const)("%s reads the same in both languages", (key, english, norwegian) => {
+	] as const)("%s reads as the spec says in English and Norwegian", (key, english, norwegian) => {
 		expect(en[key]).toBe(english)
 		expect(nb[key]).toBe(norwegian)
 	})

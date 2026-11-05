@@ -130,7 +130,7 @@ describe("searchView (spec §3.1)", () => {
 		const v = view({ selected: ["wildlife"], query: "animal", hidden })
 		expect(ids(v.visible)).toEqual(["wildlife/alligator"])
 		expect(v.hiddenCount).toBe(1)
-		// A hidden match outside the tiles is not "elsewhere": Show all would not show it.
+		// A hidden match outside the tiles is not "elsewhere": Clear filters would not show it.
 		expect(view({ selected: ["wildlife"], query: "primo", hidden }).elsewhere).toBe(0)
 	})
 
