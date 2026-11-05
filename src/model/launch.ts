@@ -6,8 +6,8 @@ const DAY_MS = 86_400_000
 /** GTA VI release: 19 November 2026, 00:00 CET (UTC+1). */
 export const LAUNCH_AT = new Date("2026-11-19T00:00:00+01:00")
 
-/** Preload opens 12 November 2026. */
-export const PRELOAD_AT = new Date("2026-11-12T00:00:00+01:00")
+/** Preload opens 10 November 2026: local midnight on PS5, 00:00 GMT on Xbox (Newswire 03.11). */
+export const PRELOAD_AT = new Date("2026-11-10T00:00:00+01:00")
 
 export type HubPhase = "before" | "after"
 

@@ -15,7 +15,7 @@ sources:
 
 ## Før midnatt
 
-Sjekk at forhåndsnedlastingen er ferdig. Den åpnet 12. november, så spillet skal ligge installert og bare vente på å låses opp. En fysisk utgave har en nedlastingskode, ikke en plate, så den trenger samme nedlasting. Rockstar har ikke oppgitt et nøyaktig klokkeslett for opplåsingen, og verken installasjonsstørrelse eller en oppdatering på lanseringsdagen er kunngjort. La konsollen stå på og være koblet til nett i tilfelle en oppdatering kommer ved lansering.
+Sjekk at forhåndsnedlastingen er ferdig. Den åpnet 10. november, så spillet skal ligge installert og bare vente på å låses opp. En fysisk utgave har en nedlastingskode, ikke en plate, så den trenger samme nedlasting. Rockstar har ikke oppgitt et nøyaktig klokkeslett for opplåsingen, og ingen oppdatering på lanseringsdagen er kunngjort. La konsollen stå på og være koblet til nett i tilfelle en oppdatering kommer ved lansering.
 
 ## Hvis spillet ikke starter
 
