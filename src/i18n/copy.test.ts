@@ -206,3 +206,24 @@ describe("group chips copy (tracker refresh spec §14.1)", () => {
 		expect(nb["tracker.groupChips"]).toBe("Grupper: {category}")
 	})
 })
+
+describe("filter copy (tracker refresh spec §14.1)", () => {
+	it.each([
+		["tracker.groupChips", "Groups: {category}", "Grupper: {category}"],
+		["tracker.search.elsewhere.one", "1 more outside your filters", "1 til utenfor filtrene dine"],
+		[
+			"tracker.search.elsewhere.other",
+			"{count} more outside your filters",
+			"{count} til utenfor filtrene dine",
+		],
+		["tracker.search.showAll", "Clear filters", "Fjern filtrene"],
+		[
+			"tracker.search.resultsElsewhere",
+			"No results inside your filters. {count} outside them.",
+			"Ingen treff innenfor filtrene dine. {count} utenfor.",
+		],
+	] as const)("%s reads the same in both languages", (key, english, norwegian) => {
+		expect(en[key]).toBe(english)
+		expect(nb[key]).toBe(norwegian)
+	})
+})

@@ -64,13 +64,13 @@ describe("Tracker search (tracker search spec §4)", () => {
 		expect(localStorage.getItem(HIDE_FOUND_KEY)).toBe("1")
 	})
 
-	it("points to other categories and shows them all on request", async () => {
+	it("points to matches outside the filters and clears them on request", async () => {
 		await ready()
 		fireEvent.click(screen.getByRole("button", { name: /^Vehicles,/ }))
 		type("pelican")
 		expect(names()).toEqual([])
-		expect(screen.getByText("1 more in other categories")).toBeInTheDocument()
-		fireEvent.click(screen.getByRole("button", { name: "Show all categories" }))
+		expect(screen.getByText("1 more outside your filters")).toBeInTheDocument()
+		fireEvent.click(screen.getByRole("button", { name: "Clear filters" }))
 		expect(screen.getByRole("button", { name: /^All,/ })).toHaveAttribute("aria-pressed", "true")
 		expect(names()).toEqual(["item-wildlife/pelican"])
 		expect(document.activeElement).toBe(field())
@@ -192,14 +192,12 @@ describe("Tracker search announcements (tracker search spec §5)", () => {
 		await waitFor(() => expect(status()).toHaveTextContent("1 result"))
 	})
 
-	it("announces the other categories when the chips hold no match", async () => {
+	it("announces the matches outside the filters", async () => {
 		await ready()
 		fireEvent.click(screen.getByRole("button", { name: /^Vehicles,/ }))
 		type("pelican")
 		await waitFor(() =>
-			expect(status()).toHaveTextContent(
-				"No results in the selected categories. 1 in other categories."
-			)
+			expect(status()).toHaveTextContent("No results inside your filters. 1 outside them.")
 		)
 	})
 
@@ -223,7 +221,7 @@ describe("Tracker search announcements (tracker search spec §5)", () => {
 		expect(status()).not.toHaveTextContent("0 results")
 	})
 
-	it("drops a pending result when the chips change", async () => {
+	it("drops a pending result when the tiles change", async () => {
 		await ready()
 		type("peli")
 		fireEvent.click(screen.getByRole("button", { name: /^Vehicles,/ }))

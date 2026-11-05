@@ -5,7 +5,7 @@ import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { type EmptyState, emptyState, type SearchView } from "../model/search"
 import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, perGroup, recentFinds } from "../model/stats"
-import { parseShow } from "../model/tracker"
+import { chipGroups, parseGroups, parseShow } from "../model/tracker"
 import { buildTracker } from "./buildTracker"
 import { HINT_SEEN_KEY, writeFlag } from "./seenFlag"
 import { CategoryNav } from "./tracker/CategoryNav"
@@ -21,7 +21,7 @@ import { SearchBar } from "./tracker/SearchBar"
 import { StatsRail } from "./tracker/StatsRail"
 import { useLiveStatus } from "./tracker/useLiveStatus"
 import { useSearch } from "./tracker/useSearch"
-import { useShowParam, useTrackerState } from "./useTracker"
+import { useGroupParam, useShowParam, useTrackerState } from "./useTracker"
 
 export const HINT_KEY = HINT_SEEN_KEY
 
@@ -64,14 +64,17 @@ function markCard(box: HTMLElement) {
 /** Island root. `client:only`: the first render reads the URL and IndexedDB. */
 export function Tracker({ locale }: Props) {
 	const { t, plural } = translator(locale)
-	const [tracker] = useState(() =>
-		buildTracker(
+	const [tracker] = useState(() => {
+		const selected = parseShow(window.location.search, categoryIds(seedItems))
+		return buildTracker(
 			t("profile.defaultName"),
-			parseShow(window.location.search, categoryIds(seedItems))
+			selected,
+			parseGroups(window.location.search, chipGroups(seedItems, selected))
 		)
-	)
+	})
 	const state = useTrackerState(tracker)
 	useShowParam(state.selected)
+	useGroupParam(state.groups)
 	// The item a Sources back link points at stays visible on arrival, even if found (Task 4).
 	const [arrival] = useState(() => hashItemId(window.location.hash) ?? undefined)
 	const search = useSearch(state, arrival)
@@ -168,7 +171,7 @@ export function Tracker({ locale }: Props) {
 	}
 
 	// The text that stands in for the list when it is empty (spec §4). "elsewhere" has none: the
-	// list area shows only the other-categories line then.
+	// list area shows only the outside-your-filters line, under any chip rows (R17).
 	function emptyText(kind: EmptyState, query: string): string | undefined {
 		if (kind === "no-match") return t("tracker.search.noMatch", { query: query.trim() })
 		if (kind === "all-found") return t("tracker.search.allFound")
@@ -183,10 +186,17 @@ export function Tracker({ locale }: Props) {
 		return emptyText(kind, query) ?? plural("tracker.search.results", view.visible.length)
 	}
 
-	// A typing result still pending would describe the old chips.
+	// A typing result still pending would describe the old tiles.
 	function selectCategories(ids: string[]) {
 		live.cancel()
 		tracker.selectCategories(ids)
+	}
+
+	// A chip toggle cancels a pending typing result, as a tile does. The list change itself is not
+	// announced: aria-pressed carries the state (spec §14.1).
+	function toggleGroup(key: string) {
+		live.cancel()
+		tracker.toggleGroup(key)
 	}
 
 	function onQuery(query: string) {
@@ -228,11 +238,13 @@ export function Tracker({ locale }: Props) {
 		)
 	}
 
-	// The button disappears with the hint, so focus goes to the field rather than to <body>.
-	function showAllCategories() {
+	// Clears the tiles and the chips together (the model drops chips with their category); Hide
+	// found and the query stay. The button disappears with its line, so focus goes to the field
+	// rather than to <body>.
+	function clearFilters() {
 		tracker.selectCategories([])
 		searchField.current?.focus()
-		live.say(resultsText(search.viewFor({ selected: [] }), search.query))
+		live.say(resultsText(search.viewFor({ selected: [], groups: [] }), search.query))
 	}
 
 	// A tick is announced as before, and it cancels a pending typing result (spec §5).
@@ -277,6 +289,7 @@ export function Tracker({ locale }: Props) {
 	const sourcesHref = `/${locale}/tracker/sources/`
 	const { view } = search
 	const empty = emptyState(view, search.query)
+	const chips = chipGroups(state.items, state.selected)
 	const emptyMessage = emptyText(empty, search.query)
 
 	if (state.status === "error") {
@@ -346,7 +359,8 @@ export function Tracker({ locale }: Props) {
 					t={t}
 				/>
 				<div className="tracker-results" ref={results} tabIndex={-1}>
-					{empty === "none" && (
+					{/* A chip row keeps its category on screen when no card is left (R17). */}
+					{(empty === "none" || chips.size > 0) && (
 						<ItemList
 							items={view.visible}
 							records={state.records}
@@ -356,6 +370,10 @@ export function Tracker({ locale }: Props) {
 							categoryCounts={categoryCounts}
 							groupCounts={perGroup(state.items, state.records)}
 							onToggle={toggleItem}
+							order={categories.map((c) => c.id)}
+							chips={chips}
+							groups={state.groups}
+							onToggleGroup={toggleGroup}
 							sourcesHref={sourcesHref}
 							t={t}
 						/>
@@ -364,7 +382,7 @@ export function Tracker({ locale }: Props) {
 					{view.elsewhere > 0 && (
 						<p className="search-elsewhere">
 							{plural("tracker.search.elsewhere", view.elsewhere)}{" "}
-							<button type="button" className="search-elsewhere-btn" onClick={showAllCategories}>
+							<button type="button" className="search-elsewhere-btn" onClick={clearFilters}>
 								{t("tracker.search.showAll")}
 							</button>
 						</p>
