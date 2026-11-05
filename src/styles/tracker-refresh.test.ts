@@ -152,3 +152,41 @@ describe("profile button size and the title row (final review E1, E3)", () => {
 		)
 	})
 })
+
+describe("group chips (spec §14.1)", () => {
+	it("makes chips 44 px pills in a row that wraps at every width", () => {
+		expect(rule(".group-chips")).toMatch(/flex-wrap:\s*wrap/)
+		expect(rule(".group-chips")).toMatch(/min-inline-size:\s*0/)
+		expect(rule(".group-chips button")).toMatch(/min-height:\s*var\(--tap\)/)
+		expect(rule(".group-chips button")).toMatch(/border-radius:\s*999px/)
+	})
+
+	it("keeps a chip's width when the ✓ appears (R19)", () => {
+		expect(rule(".group-chips button")).toMatch(/padding:\s*4px calc\(13px \+ 0\.4375em\)/)
+		expect(rule('.group-chips button[aria-pressed="true"]')).toMatch(/padding-inline:\s*10px/)
+		expect(rule(".group-chips .chip-check")).toMatch(/width:\s*0\.875em/)
+	})
+
+	it("gives a pressed chip the white focus ring and the forced-colours Highlight", () => {
+		expect(css).toMatch(
+			/\.group-chips button\[aria-pressed="true"\]:focus-visible\s*\{\s*outline-color:\s*var\(--text\)/
+		)
+		const pressed =
+			/\.group-chips button\[aria-pressed="true"\]\s*\{[^}]*background:\s*var\(--accent\)/
+		const forced =
+			/@media \(forced-colors: active\)\s*\{\s*\.group-chips button\[aria-pressed="true"\]\s*\{[^}]*background:\s*Highlight/
+		expect(css).toMatch(forced)
+		// Same specificity, so the forced-colours rule only wins if it comes after the pink one.
+		expect(css.search(forced)).toBeGreaterThan(css.search(pressed))
+		expect(css).toMatch(
+			/\.group-chips button\[aria-pressed="true"\]:focus-visible\s*\{\s*outline-color:\s*CanvasText/
+		)
+	})
+
+	it('guards every unpressed chip state with :not([aria-pressed="true"])', () => {
+		const states = css.match(/\.group-chips button[^,{\s]*:(hover|active|focus-visible)/g) ?? []
+		const unpressed = states.filter((s) => !s.includes('button[aria-pressed="true"]:'))
+		expect(unpressed.length).toBeGreaterThanOrEqual(3)
+		for (const s of unpressed) expect(s).toContain(':not([aria-pressed="true"])')
+	})
+})

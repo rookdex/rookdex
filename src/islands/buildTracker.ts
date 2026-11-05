@@ -7,12 +7,17 @@ import { activeProfileStorage, HINT_SEEN_KEY, readFlag } from "./seenFlag"
  * Both islands build their tracker here, so the hub and the tracker page open the same database,
  * the same seed and the same remembered profile in the same way (dashboard spec §3).
  */
-export function buildTracker(defaultProfileName: string, selected: string[] = []): Tracker {
+export function buildTracker(
+	defaultProfileName: string,
+	selected: string[] = [],
+	groups: string[] = []
+): Tracker {
 	return createTracker({
 		openStore: () => openStore(indexedDB),
 		items: seedItems,
 		defaultProfileName,
 		selected,
+		groups,
 		persist:
 			typeof navigator.storage?.persist === "function"
 				? () => navigator.storage.persist()

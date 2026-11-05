@@ -12,8 +12,8 @@ import {
 } from "./profiles"
 import { listRecords, setDone } from "./progress"
 import { type ExportFile, type Profile, type SeedItem, TEXT } from "./schema"
-import { categoryIds } from "./seed"
-import { countItems, type Records } from "./stats"
+import { categoryIds, groupItems } from "./seed"
+import { countable, countItems, groupKey, type Records } from "./stats"
 import type { Store } from "./store"
 import {
 	buildExport,
@@ -46,6 +46,8 @@ export interface TrackerState {
 	items: SeedItem[]
 	records: Records
 	selected: string[]
+	/** Pressed group chips as `groupKey`s, in list order, only under pressed categories (spec §14.1). */
+	groups: string[]
 	pendingImport?: ExportFile
 	persistHint: boolean
 	announcement?: Announcement
@@ -56,6 +58,7 @@ export interface TrackerDeps {
 	items: SeedItem[]
 	defaultProfileName: string
 	selected?: string[]
+	groups?: string[]
 	now?: () => Date
 	newId?: () => string
 	/** `navigator.storage.persist`; leave undefined when unsupported. */
@@ -78,6 +81,7 @@ export interface Tracker {
 	tick(itemId: string): Promise<void>
 	untick(itemId: string): Promise<void>
 	selectCategories(ids: string[]): void
+	toggleGroup(key: string): void
 	switchProfile(id: string): Promise<void>
 	createProfile(name: string): Promise<void>
 	renameProfile(id: string, name: string): Promise<void>
@@ -102,6 +106,45 @@ export function showParam(selected: string[]): string | null {
 	return selected.length > 0 ? selected.join(",") : null
 }
 
+/**
+ * Per pressed category, the groups its chips offer (tracker refresh spec §14.1): every group with
+ * a countable item, in the list's group order. A category with one group gets no chips, because
+ * one chip would filter nothing. Categories come in seed order. A Map, so a category id such as
+ * "constructor" can never read Object.prototype (R16).
+ */
+export function chipGroups(items: SeedItem[], selected: string[]): Map<string, string[]> {
+	const live = countable(items)
+	const chips = new Map<string, string[]>()
+	for (const category of categoryIds(live)) {
+		if (!selected.includes(category)) continue
+		const groups = [...groupItems(live.filter((item) => item.category === category)).keys()]
+		if (groups.length > 1) chips.set(category, groups)
+	}
+	return chips
+}
+
+/** The keys in `keys` that a chip offers, in list order (R20). */
+function keepChips(keys: Iterable<string>, chips: Map<string, string[]>): string[] {
+	const wanted = new Set(keys)
+	return [...chips].flatMap(([category, groups]) =>
+		groups.map((group) => groupKey(category, group)).filter((key) => wanted.has(key))
+	)
+}
+
+/** Group keys named in `?group=`, read after `?show=`: only chips the pressed categories offer,
+ *  in list order. Anything else is dropped, so the raw value is never echoed. */
+export function parseGroups(search: string, chips: Map<string, string[]>): string[] {
+	const raw = new URLSearchParams(search).get("group") ?? ""
+	return keepChips(
+		raw.split(",").map((s) => s.trim()),
+		chips
+	)
+}
+
+export function groupParam(groups: string[]): string | null {
+	return groups.length > 0 ? groups.join(",") : null
+}
+
 function validName(name: string): boolean {
 	const trimmed = name.trim()
 	return trimmed.length > 0 && trimmed.length <= TEXT.profileName
@@ -114,13 +157,15 @@ export function createTracker(deps: TrackerDeps): Tracker {
 	let store: Store | undefined
 	// Set when another tab deletes the database under us; writes stop until the page reloads.
 	let closed = false
+	const selected = (deps.selected ?? []).filter((id) => known.has(id))
 	let state: TrackerState = {
 		status: "loading",
 		profiles: [],
 		profileId: "",
 		items: deps.items,
 		records: {},
-		selected: (deps.selected ?? []).filter((id) => known.has(id)),
+		selected,
+		groups: keepChips(deps.groups ?? [], chipGroups(deps.items, selected)),
 		persistHint: false,
 	}
 
@@ -268,8 +313,18 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		},
 		tick: (itemId) => setDoneFor(itemId, true),
 		untick: (itemId) => setDoneFor(itemId, false),
+		// Unpressing a category drops its chips, so pressing it again starts with none (spec §14.1).
 		selectCategories(ids) {
-			set({ selected: ids.filter((id) => known.has(id)) })
+			const selected = ids.filter((id) => known.has(id))
+			set({ selected, groups: keepChips(state.groups, chipGroups(deps.items, selected)) })
+		},
+		toggleGroup(key) {
+			const chips = chipGroups(deps.items, state.selected)
+			if (keepChips([key], chips).length === 0) return
+			const next = new Set(state.groups)
+			if (next.has(key)) next.delete(key)
+			else next.add(key)
+			set({ groups: keepChips(next, chips) })
 		},
 		switchProfile: (id) =>
 			guard(async () => {

@@ -2,6 +2,7 @@ import type { Translate } from "../../i18n"
 import type { SeedItem } from "../../model/schema"
 import { categoryIds, groupItems } from "../../model/seed"
 import { type Count, groupKey, type Records } from "../../model/stats"
+import { GroupChips } from "./GroupChips"
 import { BookIcon, categoryIcon, FlagIcon } from "./icons"
 
 const none: Count = { done: 0, total: 0 }
@@ -17,6 +18,13 @@ interface Props {
 	/** Keyed by `groupKey`, also over every item. */
 	groupCounts: Record<string, Count>
 	onToggle: (id: string, done: boolean) => void
+	/** Every category id in seed order, so a category with no card left keeps its place. */
+	order: string[]
+	/** Per pressed category, its chip groups (`chipGroups`); empty under All. */
+	chips: Map<string, string[]>
+	/** Pressed chips as `groupKey`s. */
+	groups: string[]
+	onToggleGroup: (key: string) => void
 	/** The Sources page; each book link adds "#<item id>". */
 	sourcesHref: string
 	t: Translate
@@ -32,19 +40,28 @@ export function ItemList({
 	categoryCounts,
 	groupCounts,
 	onToggle,
+	order,
+	chips,
+	groups,
+	onToggleGroup,
 	sourcesHref,
 	t,
 }: Props) {
 	const live = items.filter((item) => !item.retired)
-	if (live.length === 0) return <p className="item-empty">{t("tracker.empty")}</p>
+	const withCards = new Set(categoryIds(live))
+	// A category with a chip row keeps its title and chips when no card is left (R17), so a chip
+	// press never unmounts the chip that has focus.
+	const sections = order.filter((id) => withCards.has(id) || chips.has(id))
+	if (sections.length === 0) return <p className="item-empty">{t("tracker.empty")}</p>
 
 	const countText = (count: Count = none) =>
 		t("tracker.count", { done: count.done, total: count.total })
 
 	return (
 		<div className="item-list">
-			{categoryIds(live).map((category) => {
+			{sections.map((category) => {
 				const Icon = categoryIcon(category)
+				const chipRow = chips.get(category)
 				return (
 					<section key={category} className="item-category" aria-labelledby={`cat-${category}`}>
 						{/* The count is the heading's sibling, so the heading's name is the label alone. */}
@@ -56,39 +73,53 @@ export function ItemList({
 							<span className="cat-count">{countText(categoryCounts[category])}</span>
 							<span className="cat-rule" aria-hidden="true" />
 						</div>
-						<div className="item-groups">
-							{[...groupItems(live.filter((item) => item.category === category))].map(
-								([group, groupList]) => (
-									<section
-										key={group}
-										className="item-group"
-										aria-labelledby={`group-${category}/${group}`}
-									>
-										<div className="group-head">
-											{/* A slash is valid in an HTML id and cannot appear in a slug, so no two ids collide. */}
-											<h3 id={`group-${category}/${group}`}>{groupLabel(group)}</h3>
-											<span className="group-count">
-												{countText(groupCounts[groupKey(category, group)])}
-											</span>
-										</div>
-										<ul>
-											{groupList.map((item) => (
-												<ItemRow
-													key={item.id}
-													item={item}
-													done={records[item.id]?.done ?? false}
-													disabled={disabled}
-													groupName={groupLabel(group)}
-													onToggle={onToggle}
-													sourcesHref={sourcesHref}
-													t={t}
-												/>
-											))}
-										</ul>
-									</section>
-								)
-							)}
-						</div>
+						{chipRow && (
+							<GroupChips
+								category={category}
+								categoryLabel={categoryLabel(category)}
+								groups={chipRow}
+								pressed={groups}
+								counts={groupCounts}
+								groupLabel={groupLabel}
+								onToggle={onToggleGroup}
+								t={t}
+							/>
+						)}
+						{withCards.has(category) && (
+							<div className="item-groups">
+								{[...groupItems(live.filter((item) => item.category === category))].map(
+									([group, groupList]) => (
+										<section
+											key={group}
+											className="item-group"
+											aria-labelledby={`group-${category}/${group}`}
+										>
+											<div className="group-head">
+												{/* A slash is valid in an HTML id and cannot appear in a slug, so no two ids collide. */}
+												<h3 id={`group-${category}/${group}`}>{groupLabel(group)}</h3>
+												<span className="group-count">
+													{countText(groupCounts[groupKey(category, group)])}
+												</span>
+											</div>
+											<ul>
+												{groupList.map((item) => (
+													<ItemRow
+														key={item.id}
+														item={item}
+														done={records[item.id]?.done ?? false}
+														disabled={disabled}
+														groupName={groupLabel(group)}
+														onToggle={onToggle}
+														sourcesHref={sourcesHref}
+														t={t}
+													/>
+												))}
+											</ul>
+										</section>
+									)
+								)}
+							</div>
+						)}
 					</section>
 				)
 			})}

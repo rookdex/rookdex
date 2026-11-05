@@ -21,6 +21,7 @@ const base: SearchSource = {
 	items: fixtures,
 	records: {},
 	selected: [],
+	groups: [],
 }
 
 function setup(source: Partial<SearchSource> = {}) {
@@ -75,12 +76,35 @@ describe("useSearch (tracker search spec §3.4)", () => {
 		expect(visibleIds(result)).not.toContain(PELICAN)
 	})
 
-	it("takes a new snapshot when the chips change", () => {
+	it("takes a new snapshot when the tiles change", () => {
 		localStorage.setItem(HIDE_FOUND_KEY, "1")
 		const { result, rerender } = setup()
 		rerender({ ...base, records: found(PELICAN) })
 		rerender({ ...base, records: found(PELICAN), selected: ["wildlife"] })
 		expect(visibleIds(result)).toEqual([GATOR])
+	})
+
+	it("takes a new snapshot when the group chips change (tracker refresh spec §14.1)", () => {
+		localStorage.setItem(HIDE_FOUND_KEY, "1")
+		const { result, rerender } = setup({ selected: ["wildlife"] })
+		rerender({ ...base, selected: ["wildlife"], records: found(PELICAN) })
+		expect(visibleIds(result)).toContain(PELICAN)
+		rerender({
+			...base,
+			selected: ["wildlife"],
+			groups: ["wildlife/birds"],
+			records: found(PELICAN),
+		})
+		expect(visibleIds(result)).toEqual([])
+		expect(result.current.view.hiddenCount).toBe(1)
+	})
+
+	it("previews a change of chips with viewFor", () => {
+		const { result } = setup({ selected: ["wildlife"], groups: ["wildlife/birds"] })
+		expect(result.current.viewFor({ query: "gator" }).elsewhere).toBe(1)
+		expect(
+			result.current.viewFor({ query: "gator", groups: [] }).visible.map((item) => item.id)
+		).toEqual([GATOR])
 	})
 
 	it("takes a new snapshot when Hide found is switched on", () => {

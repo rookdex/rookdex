@@ -6,12 +6,13 @@ import { clearFlag, HIDE_FOUND_KEY, readFlag, writeFlag } from "../seenFlag"
 
 export type SearchSource = Pick<
 	TrackerState,
-	"status" | "profileId" | "items" | "records" | "selected"
+	"status" | "profileId" | "items" | "records" | "selected" | "groups"
 >
 
 export interface SearchChange {
 	query?: string
 	selected?: string[]
+	groups?: string[]
 	hideFound?: boolean
 }
 
@@ -51,7 +52,15 @@ export function useSearch(source: SearchSource, arrival?: string): Search {
 
 	// Every snapshot trigger is in this key and the records are not, so a tick alone keeps the
 	// snapshot it had. The first one waits for ready: ticks load after mount.
-	const key = JSON.stringify([ready, source.profileId, source.selected, query, hideFound, imports])
+	const key = JSON.stringify([
+		ready,
+		source.profileId,
+		source.selected,
+		source.groups,
+		query,
+		hideFound,
+		imports,
+	])
 	const [snap, setSnap] = useState(() => ({ key, ready, hidden: snapshot(hideFound, arrival) }))
 	let hidden = snap.hidden
 	if (snap.key !== key) {
@@ -63,10 +72,16 @@ export function useSearch(source: SearchSource, arrival?: string): Search {
 		setSnap({ key, ready, hidden })
 	}
 
-	function viewOf(selected: string[], q: string, hide: ReadonlySet<string>): SearchView {
+	function viewOf(
+		selected: string[],
+		groups: string[],
+		q: string,
+		hide: ReadonlySet<string>
+	): SearchView {
 		return searchView({
 			items: source.items,
 			selected,
+			groups,
 			query: q,
 			hidden: hide,
 			terms: SEARCH_TERMS,
@@ -76,7 +91,7 @@ export function useSearch(source: SearchSource, arrival?: string): Search {
 	return {
 		query,
 		hideFound,
-		view: viewOf(source.selected, query, hidden),
+		view: viewOf(source.selected, source.groups, query, hidden),
 		setQuery,
 		clearQuery: () => setQuery(""),
 		toggleHideFound() {
@@ -89,6 +104,7 @@ export function useSearch(source: SearchSource, arrival?: string): Search {
 		viewFor: (change) =>
 			viewOf(
 				change.selected ?? source.selected,
+				change.groups ?? source.groups,
 				change.query ?? query,
 				snapshot(change.hideFound ?? hideFound)
 			),

@@ -199,3 +199,24 @@ describe("Dex copy (category pages spec §8, §12)", () => {
 		}
 	})
 })
+
+describe("filter copy (tracker refresh spec §14.1)", () => {
+	it.each([
+		["tracker.groupChips", "Groups: {category}", "Grupper: {category}"],
+		["tracker.search.elsewhere.one", "1 more outside your filters", "1 til utenfor filtrene dine"],
+		[
+			"tracker.search.elsewhere.other",
+			"{count} more outside your filters",
+			"{count} til utenfor filtrene dine",
+		],
+		["tracker.search.showAll", "Clear filters", "Fjern filtrene"],
+		[
+			"tracker.search.resultsElsewhere",
+			"No results inside your filters. {count} outside them.",
+			"Ingen treff innenfor filtrene dine. {count} utenfor.",
+		],
+	] as const)("%s reads as the spec says in English and Norwegian", (key, english, norwegian) => {
+		expect(en[key]).toBe(english)
+		expect(nb[key]).toBe(norwegian)
+	})
+})
