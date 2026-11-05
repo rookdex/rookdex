@@ -139,6 +139,7 @@
 	"tracker.storageError": "Nettleseren blokkerer lokal lagring, så fremgang kan ikke lagres her.",
 	"tracker.all": "Alle",
 	"tracker.categories": "Kategorier",
+	"tracker.groupChips": "Grupper: {category}",
 	"tracker.count": "{done} av {total}",
 	"tracker.announce": "{category}: {done} av {total}",
 	"tracker.progress": "Fremgang",

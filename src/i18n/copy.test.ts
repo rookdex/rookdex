@@ -199,3 +199,10 @@ describe("Dex copy (category pages spec §8, §12)", () => {
 		}
 	})
 })
+
+describe("group chips copy (tracker refresh spec §14.1)", () => {
+	it("names the chip row after its category", () => {
+		expect(en["tracker.groupChips"]).toBe("Groups: {category}")
+		expect(nb["tracker.groupChips"]).toBe("Grupper: {category}")
+	})
+})

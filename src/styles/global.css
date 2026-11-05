@@ -117,10 +117,11 @@ a {
 	outline-offset: 2px;
 }
 
-/* Pink is focus everywhere except on the three pink surfaces (spec §12). */
+/* Pink is focus everywhere except on the four pink surfaces (spec §12). */
 .skip:focus-visible,
 .actions .primary:focus-visible,
-.tracker .search-toggle[aria-pressed="true"]:focus-visible {
+.tracker .search-toggle[aria-pressed="true"]:focus-visible,
+.group-chips button[aria-pressed="true"]:focus-visible {
 	outline-color: var(--text);
 }
 
@@ -594,6 +595,7 @@ p {
 .tabbar a,
 .tiles button,
 .tiles a,
+.group-chips button,
 .search-toggle,
 .search-clear,
 .tracker .search-elsewhere-btn,
@@ -644,6 +646,7 @@ p {
 	.deleted-list button:hover,
 	.icon-link:hover,
 	.tiles button:not([aria-pressed="true"]):hover,
+	.group-chips button:not([aria-pressed="true"]):hover,
 	.tracker .search-toggle:not([aria-pressed="true"]):hover,
 	.tracker .search-clear:hover,
 	.tracker .search-elsewhere-btn:hover,
@@ -657,6 +660,7 @@ p {
 	}
 
 	/* Preview: a faint copy of the selected marker. */
+	.group-chips button:not([aria-pressed="true"]):hover,
 	.tiles button:not([aria-pressed="true"]):hover,
 	.tracker .search-toggle:not([aria-pressed="true"]):hover {
 		border-color: color-mix(in srgb, var(--accent) 50%, transparent);
@@ -710,6 +714,7 @@ p {
 	.deleted-list button:active,
 	.icon-link:active,
 	.tiles button:not([aria-pressed="true"]):active,
+	.group-chips button:not([aria-pressed="true"]):active,
 	.tracker .search-toggle:not([aria-pressed="true"]):active,
 	.tracker .search-clear:active,
 	.tracker .search-elsewhere-btn:active,
@@ -734,6 +739,7 @@ p {
 .deleted-list button:focus-visible,
 .icon-link:focus-visible,
 .tiles button:not([aria-pressed="true"]):focus-visible,
+.group-chips button:not([aria-pressed="true"]):focus-visible,
 .tracker .search-toggle:not([aria-pressed="true"]):focus-visible,
 .tracker .search-clear:focus-visible,
 .tracker .search-elsewhere-btn:focus-visible,
@@ -1766,6 +1772,7 @@ html:has(.search-row) {
 
 /* Forced colours drop backgrounds, which would make pressed and unpressed look the same. */
 @media (forced-colors: active) {
+	.group-chips button[aria-pressed="true"],
 	.tiles button[aria-pressed="true"],
 	.tracker .search-toggle[aria-pressed="true"] {
 		forced-color-adjust: none;
@@ -1775,6 +1782,7 @@ html:has(.search-row) {
 	}
 
 	/* The opt-out above also keeps the light focus outline, which a light theme would hide. */
+	.group-chips button[aria-pressed="true"]:focus-visible,
 	.tiles button[aria-pressed="true"]:focus-visible,
 	.tracker .search-toggle[aria-pressed="true"]:focus-visible {
 		outline-color: CanvasText;
@@ -1861,6 +1869,68 @@ html:has(.search-row) {
 	flex: 1 1 2rem;
 	height: 2px;
 	background: linear-gradient(90deg, var(--accent), var(--accent-2) 40%, transparent);
+}
+
+/* Group chips (tracker refresh spec §14.1): under a pressed category's title, wrapping onto more
+   lines at every width. .cat-head's 28 px sits above; 24 px below, before the first group. The
+   row is a fieldset for its group role (R18), so I reset the UA box, including the min-content
+   width that would stop a long label from wrapping. */
+.group-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+	min-inline-size: 0;
+	margin: 0 0 24px;
+	padding: 0;
+	border: 0;
+}
+
+/* An unpressed chip carries the ✓'s width (0.875em plus the 6 px gap) as extra inline padding,
+   so a press never changes a chip's width and the row never reflows under the finger (R19). */
+.group-chips button {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	max-width: 100%;
+	min-height: var(--tap);
+	padding: 4px calc(13px + 0.4375em);
+	border: 1px solid var(--border);
+	border-radius: 999px;
+	background: var(--bg-raised);
+	color: var(--text);
+	font: inherit;
+	font-size: 0.875rem;
+	line-height: 1.25;
+	text-align: start;
+}
+
+.group-chips .chip-check {
+	flex: none;
+	width: 0.875em;
+	text-align: center;
+}
+
+/* A long Norwegian label wraps inside its chip instead of widening the row. */
+.group-chips .chip-name {
+	min-width: 0;
+	overflow-wrap: break-word;
+}
+
+.group-chips .chip-count {
+	flex: none;
+	color: var(--text-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.group-chips button[aria-pressed="true"] {
+	padding-inline: 10px;
+	border-color: var(--accent);
+	background: var(--accent);
+	color: var(--accent-text);
+}
+
+.group-chips button[aria-pressed="true"] .chip-count {
+	color: inherit;
 }
 
 .item-groups {

@@ -139,6 +139,7 @@
 	"tracker.storageError": "Your browser is blocking local storage, so progress cannot be saved here.",
 	"tracker.all": "All",
 	"tracker.categories": "Categories",
+	"tracker.groupChips": "Groups: {category}",
 	"tracker.count": "{done} of {total}",
 	"tracker.announce": "{category}: {done} of {total}",
 	"tracker.progress": "Progress",
