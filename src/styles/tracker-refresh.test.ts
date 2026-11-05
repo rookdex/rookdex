@@ -171,8 +171,15 @@ describe("group chips (spec §14.1)", () => {
 		expect(css).toMatch(
 			/\.group-chips button\[aria-pressed="true"\]:focus-visible\s*\{\s*outline-color:\s*var\(--text\)/
 		)
+		const pressed =
+			/\.group-chips button\[aria-pressed="true"\]\s*\{[^}]*background:\s*var\(--accent\)/
+		const forced =
+			/@media \(forced-colors: active\)\s*\{\s*\.group-chips button\[aria-pressed="true"\]\s*\{[^}]*background:\s*Highlight/
+		expect(css).toMatch(forced)
+		// Same specificity, so the forced-colours rule only wins if it comes after the pink one.
+		expect(css.search(forced)).toBeGreaterThan(css.search(pressed))
 		expect(css).toMatch(
-			/\.group-chips button\[aria-pressed="true"\],\s*\.tiles button\[aria-pressed="true"\],[^{]*\{[^}]*background:\s*Highlight/
+			/\.group-chips button\[aria-pressed="true"\]:focus-visible\s*\{\s*outline-color:\s*CanvasText/
 		)
 	})
 

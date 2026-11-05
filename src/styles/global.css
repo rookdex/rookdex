@@ -1772,7 +1772,6 @@ html:has(.search-row) {
 
 /* Forced colours drop backgrounds, which would make pressed and unpressed look the same. */
 @media (forced-colors: active) {
-	.group-chips button[aria-pressed="true"],
 	.tiles button[aria-pressed="true"],
 	.tracker .search-toggle[aria-pressed="true"] {
 		forced-color-adjust: none;
@@ -1782,7 +1781,6 @@ html:has(.search-row) {
 	}
 
 	/* The opt-out above also keeps the light focus outline, which a light theme would hide. */
-	.group-chips button[aria-pressed="true"]:focus-visible,
 	.tiles button[aria-pressed="true"]:focus-visible,
 	.tracker .search-toggle[aria-pressed="true"]:focus-visible {
 		outline-color: CanvasText;
@@ -1931,6 +1929,21 @@ html:has(.search-row) {
 
 .group-chips button[aria-pressed="true"] .chip-count {
 	color: inherit;
+}
+
+/* As the tiles' forced-colours block, but here: the pink rule above has the same specificity
+   and would win if this came first. */
+@media (forced-colors: active) {
+	.group-chips button[aria-pressed="true"] {
+		forced-color-adjust: none;
+		background: Highlight;
+		color: HighlightText;
+		border-color: Highlight;
+	}
+
+	.group-chips button[aria-pressed="true"]:focus-visible {
+		outline-color: CanvasText;
+	}
 }
 
 .item-groups {
