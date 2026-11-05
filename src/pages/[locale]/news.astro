@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content"
 import { getRelativeLocaleUrl } from "astro:i18n"
+import AllSources from "../../components/AllSources.astro"
 import ExternalLink from "../../components/ExternalLink.astro"
 import { defaultLocale, isLocale, type Locale, locales, translator } from "../../i18n"
 import Base from "../../layouts/Base.astro"
@@ -61,6 +62,11 @@ const guides = guideSlugs(guideEntries)
 											{t("facts.announcedOn", { outlet: outletOf(official.url) })}
 										</ExternalLink>
 									</p>
+									<AllSources
+										sources={fact.sources}
+										label={t("news.allSources", { count: String(fact.sources.length) })}
+										locale={lang}
+									/>
 								</li>
 							)
 						})}
@@ -88,6 +94,11 @@ const guides = guideSlugs(guideEntries)
 											{t("rumours.reportedBy", { outlet: outletOf(press.url) })}
 										</ExternalLink>
 									</p>
+									<AllSources
+										sources={rumour.sources}
+										label={t("news.allSources", { count: String(rumour.sources.length) })}
+										locale={locale as Locale}
+									/>
 								</li>
 							)
 						})}
