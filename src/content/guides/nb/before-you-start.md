@@ -2,7 +2,7 @@
 title: Før du begynner
 searchTitle: "GTA 6 pris og lanseringsdato i Norge: sjekkliste · Rookdex"
 summary: Det du bør ordne før lanseringskvelden, så du kan spille med en gang det låses opp.
-searchDescription: "GTA 6 kommer 19. november 2026 på PS5 og Xbox Series X|S. Forhåndsnedlasting fra 12. november, utgaver, bonus ved forhåndsbestilling, GTA+ og priser i Norge."
+searchDescription: "GTA 6 kommer 19. november 2026 på PS5 og Xbox Series X|S. Forhåndsnedlasting fra 10. november, utgaver, bonus ved forhåndsbestilling, GTA+ og priser i Norge."
 updated: 2026-10-27
 sources:
   - https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions
@@ -12,7 +12,7 @@ sources:
 
 ## Datoen
 
-Spillet slippes **19. november 2026** på PlayStation 5 og Xbox Series X|S. Rockstar har ikke bekreftet når spillet låses opp ennå. Forhåndsnedlastingen starter ved midnatt lokal tid 12. november, så midnatt på lanseringsdagen er sannsynlig. Det kommer ingen PC-versjon ved lansering, og spillet er enspiller ved lansering.
+Spillet slippes **19. november 2026** på PlayStation 5 og Xbox Series X|S. Rockstar har ikke bekreftet når spillet låses opp ennå. Forhåndsnedlastingen starter ved midnatt lokal tid 10. november på PS5, så midnatt på lanseringsdagen er sannsynlig. Det kommer ingen PC-versjon ved lansering, og spillet er enspiller ved lansering.
 
 ## Utgaver
 
@@ -28,7 +28,7 @@ En digital forhåndsbestilling gir én måned med GTA+. På PlayStation fornyes 
 
 ## Forhåndsnedlasting
 
-Forhåndsnedlasting åpner **12. november**. Start den samme dag: nedlastingen er stor, og serverne er trege på lanseringskvelden. En fysisk utgave sparer deg ikke for nedlastingen. Esken inneholder en nedlastingskode, og fysiske utgaver selges fra 12. november.
+Forhåndsnedlasting åpner **10. november**: ved midnatt lokal tid på PS5 og kl. 01:00 norsk tid på Xbox. Start den samme dag: nedlastingen er på opptil 212 GB, og serverne er trege på lanseringskvelden. En fysisk utgave sparer deg ikke for nedlastingen. Esken inneholder en nedlastingskode, og fysiske utgaver selges fra 12. november.
 
 ## Kjøp i Norge
 

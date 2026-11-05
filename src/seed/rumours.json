@@ -56,11 +56,15 @@
 	},
 	{
 		"id": "rumours/preorder-estimate",
-		"name": "Record Pre-Order Estimates",
+		"name": "Pre-Orders Estimated at 7.7 Million",
 		"claim_key": "preorder-estimate-us-digital",
-		"summary": "Analytics firm Sensor Tower estimates 6.45 million digital pre-orders in the US alone, 148% ahead of Call of Duty: Modern Warfare 2 at the same point before launch; these are outside estimates, and Rockstar and Take-Two have not shared sales figures.",
-		"added": "2026-10-21",
+		"summary": "Sensor Tower estimates 7.71 million pre-purchases worth about $751 million, 74% of them on PS5, and projects up to 25 million by launch. These are outside estimates. Rockstar and Take-Two have not shared sales figures.",
+		"added": "2026-11-04",
 		"sources": [
+			{
+				"url": "https://www.gamespot.com/articles/gta-6-has-sold-almost-8-million-copies-so-far-and-ps5-is-dominating-the-split-of-course/",
+				"title": "GTA 6 Has Sold Almost 8 Million Copies So Far, And PS5 Is Dominating The Split"
+			},
 			{
 				"url": "https://rockstarintel.com/gta-6-pre-order-numbers-are-146-more-than-any-other-game/",
 				"title": "GTA 6 Pre-Orders Are 148% More Than Any Other Game"
@@ -81,6 +85,23 @@
 			{
 				"url": "https://www.gamespot.com/articles/gta-6-reviews-when-they-could-be-released/",
 				"title": "GTA 6 Reviews: Here's When The Scores Might Come In"
+			}
+		]
+	},
+	{
+		"id": "rumours/npc-tech-patents",
+		"name": "Rockstar Patents Hint at Smarter NPCs",
+		"claim_key": "npc-tech-patents",
+		"summary": "Take-Two holds patents by Rockstar developers for NPC route planning on large road networks and for data-driven character movement, plus a pending one that fits animations to different body types. None names GTA 6. Press links them to it through the inventors and the examples.",
+		"added": "2026-11-05",
+		"sources": [
+			{
+				"url": "https://www.gamesradar.com/a-new-system-designed-by-rockstar-devs-could-improve-npcs-in-gta-6/",
+				"title": "A new system designed by Rockstar devs could improve NPCs in GTA 6"
+			},
+			{
+				"url": "https://patents.google.com/?assignee=Take-Two+Interactive+Software&after=priority:20190101&sort=new",
+				"title": "Every Take-Two patent since 2019 on Google Patents"
 			}
 		]
 	}

@@ -1,0 +1,95 @@
+---
+import type { Locale } from "../i18n"
+import { outletOf } from "../model/outlet"
+import ExternalLink from "./ExternalLink.astro"
+
+interface Props {
+	sources: { url: string; title: string }[]
+	label: string
+	locale: Locale
+}
+
+// Every source behind one News item, folded away under a native <details> so the page stays
+// quiet. Zero JavaScript: the browser handles open, close, keyboard and the expanded state.
+// Items with a single source render nothing, because their one link is already shown.
+const { sources, label, locale } = Astro.props
+---
+
+{
+	sources.length > 1 && (
+		<details class="all-sources">
+			<summary>{label}</summary>
+			<ul>
+				{sources.map((source) => (
+					<li>
+						<ExternalLink href={source.url} locale={locale}>
+							{source.title}
+						</ExternalLink>
+						<span class="outlet">{outletOf(source.url)}</span>
+					</li>
+				))}
+			</ul>
+		</details>
+	)
+}
+
+<style>
+	.all-sources {
+		font-size: 0.875rem;
+	}
+
+	.all-sources summary {
+		display: flex;
+		align-items: center;
+		min-height: var(--tap);
+		width: fit-content;
+		gap: var(--space-2);
+		color: var(--text-muted);
+		cursor: pointer;
+	}
+
+	/* display: flex drops the native marker, so draw one that turns when the list is open. */
+	.all-sources summary::before {
+		content: "▸";
+		transition: transform 150ms;
+	}
+
+	.all-sources[open] summary::before {
+		transform: rotate(90deg);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.all-sources summary::before {
+			transition: none;
+		}
+	}
+
+	.all-sources ul {
+		display: grid;
+		gap: var(--space-2);
+		margin: 0 0 var(--space-2);
+		padding: 0;
+		list-style: none;
+	}
+
+	/* The title is the link; the outlet sits under it as a muted label. */
+	/* ul > li outranks the News list's `.rumour-list li` separators and padding. */
+	.all-sources ul > li {
+		display: grid;
+		padding: 0;
+		border-bottom: 0;
+	}
+
+	.all-sources :global(a) {
+		justify-self: start;
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tap);
+		overflow-wrap: anywhere;
+	}
+
+	.outlet {
+		font-size: 0.75rem;
+		color: var(--text-muted);
+	}
+</style>

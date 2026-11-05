@@ -15,7 +15,7 @@ sources:
 
 ## Before midnight
 
-Check that the preload finished. Preload opened on 12 November, so the game should be installed and only waiting to unlock. A boxed copy holds a download code, not a disc, so it needs the same download. Rockstar hasn't published an exact unlock time, and neither the install size nor a day-one patch has been announced. Leave the console on and connected in case an update lands at launch.
+Check that the preload finished. Preload opened on 10 November, so the game should be installed and only waiting to unlock. A boxed copy holds a download code, not a disc, so it needs the same download. Rockstar hasn't published an exact unlock time, and no day-one patch has been announced. Leave the console on and connected in case an update lands at launch.
 
 ## If it won't start
 

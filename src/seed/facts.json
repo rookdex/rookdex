@@ -26,22 +26,22 @@
 		"id": "facts/preload",
 		"claim_key": "preload-date",
 		"name": {
-			"en": "Preload Opens 12 November",
-			"nb": "Forhåndsnedlasting fra 12. november"
+			"en": "Preload Opens 10 November, Up to 212 GB",
+			"nb": "Forhåndsnedlasting fra 10. november, opptil 212 GB"
 		},
 		"summary": {
-			"en": "Preload starts at local midnight on 12 November, a week before launch. Boxed copies hold a download code instead of a disc, and they reach shops from 12 November so they can preload too.",
-			"nb": "Forhåndsnedlastingen starter ved midnatt lokal tid 12. november, en uke før lansering. Fysiske eksemplarer har en nedlastingskode i stedet for en plate, og de kommer i butikk fra 12. november så også de kan lastes ned på forhånd."
+			"en": "Preload starts on 10 November: at local midnight on PS5 and at midnight GMT on Xbox, which is 01:00 in Norway. It needs up to 212 GB. Boxed copies hold a download code instead of a disc and reach shops from 12 November.",
+			"nb": "Forhåndsnedlastingen starter 10. november: ved midnatt lokal tid på PS5 og kl. 01:00 norsk tid på Xbox. Den krever opptil 212 GB. Fysiske utgaver har en nedlastingskode i stedet for en plate og kommer i butikk fra 12. november."
 		},
-		"announced": "2026-06-24",
+		"announced": "2026-11-03",
 		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/k4ak9okk485712/grand-theft-auto-vi-pre-load-begins-on-november-10",
+				"title": "Grand Theft Auto VI Pre-Load Begins on November 10"
+			},
 			{
 				"url": "https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions",
 				"title": "Grand Theft Auto VI Platforms, Editions, and Versions"
-			},
-			{
-				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-pre-loads-open-exactly-1-week-before-rockstars-long-awaited-sequel-comes-out-take-two-finally-confirms/",
-				"title": "GTA 6 pre-loads open exactly 1 week before Rockstar's long-awaited sequel comes out"
 			}
 		]
 	},
@@ -107,6 +107,25 @@
 			{
 				"url": "https://www.rockstargames.com/newswire/article/7599a881942544/announcing-grand-theft-auto-vi-the-album-coming-november-19",
 				"title": "Announcing Grand Theft Auto VI: The Album, Coming November 19"
+			}
+		]
+	},
+	{
+		"id": "facts/map-poster",
+		"claim_key": "map-poster",
+		"name": {
+			"en": "Free Leonida Map on Launch Day",
+			"nb": "Gratis kart over Leonida på lanseringsdagen"
+		},
+		"summary": {
+			"en": "On 19 November Rockstar adds a free printable cover art poster and map of Leonida to the official site. A double-sided printed version follows from the Rockstar Store shortly after launch, for $0.99 or free with any order.",
+			"nb": "19. november legger Rockstar ut en gratis plakat med coverbildet og et kart over Leonida på den offisielle nettsiden, klar til utskrift. En tosidig trykt versjon kommer i Rockstar Store kort tid etter lansering, til 0,99 dollar eller gratis ved et kjøp."
+		},
+		"announced": "2026-11-03",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/k4ak9okk485712/grand-theft-auto-vi-pre-load-begins-on-november-10",
+				"title": "Grand Theft Auto VI Pre-Load Begins on November 10"
 			}
 		]
 	}
