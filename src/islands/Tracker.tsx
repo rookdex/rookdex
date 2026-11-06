@@ -201,7 +201,9 @@ export function Tracker({ locale }: Props) {
 
 	function onQuery(query: string) {
 		search.setQuery(query)
-		if (query.trim() === "") live.cancel()
+		// An emptied box empties the region too: a polite region does not repeat identical text, so
+		// the same query typed again would otherwise be silent.
+		if (query.trim() === "") live.say("")
 		else live.sayLater(resultsText(search.viewFor({ query }), query))
 	}
 

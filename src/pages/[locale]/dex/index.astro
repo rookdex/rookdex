@@ -1,50 +1,120 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n"
 import { isLocale, type Locale, locales, seedLabel, translator } from "../../../i18n"
+import { CloseIcon } from "../../../islands/tracker/icons"
 import Base from "../../../layouts/Base.astro"
-import { dexIndex } from "../../../model/dex"
+import { dexIndex, dexSearchRows } from "../../../model/dex"
 import { seedItems } from "../../../model/seed"
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale }, props: {} }))
 }
 
-// The Dex's front page (category pages spec §6): one whole-card link per category.
+// The Dex's front page (category pages spec §6): one whole-card link per category, and a search
+// across every category (Dex search spec §4). The rows are all here, hidden; the script only
+// toggles them.
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const { t } = translator(locale as Locale)
-const categories = dexIndex(seedItems.filter((item) => !item.retired))
+const live = seedItems.filter((item) => !item.retired)
+const categories = dexIndex(live)
+const rows = dexSearchRows(
+	t,
+	(category) => getRelativeLocaleUrl(locale as Locale, `dex/${category}`),
+	live
+)
+// Seed text is English; nb pages say so (category pages spec §10).
+const itemLang = locale === "en" ? undefined : "en"
 ---
 
 <Base locale={locale} title={t("seo.titles.dexIndex")} description={t("dex.indexDescription")} path="dex">
 	<h1>{t("dex.title")}</h1>
 	<p class="lede">{t("dex.indexLede")}</p>
-	<ul class="dex-index">
-		{
-			categories.map((c) => (
-				<li>
-					<a class="dex-tile" href={getRelativeLocaleUrl(locale as Locale, `dex/${c.id}`)}>
-						<span class="name">{seedLabel(t, "category", c.id)}</span>
-						<span class="counts">
-							<span class="dot confirmed" aria-hidden="true" />
-							{t("dex.confirmedCount", { count: c.confirmed })}
-							<span class="visually-hidden">, </span>
-							<span class="sep" aria-hidden="true">·</span>
-							<span class="dot expected" aria-hidden="true" />
-							{t("dex.expectedCount", { count: c.expected })}
-						</span>
-						<span class="groups">{c.groups.map((g) => seedLabel(t, "group", g.id)).join(" · ")}</span>
-					</a>
-				</li>
-			))
-		}
-	</ul>
+	<div
+		data-dex-search
+		data-one={t("tracker.search.results.one")}
+		data-other={t("tracker.search.results.other")}
+		data-no-match={t("tracker.search.noMatch")}
+		data-cleared={t("tracker.search.cleared")}
+	>
+		{/* A div with the role, not <search>: Testing Library cannot find <search> (tracker SearchBar). */}
+		<div class="dex-search" role="search">
+			<label for="dex-search" class="visually-hidden">{t("dex.search.label")}</label>
+			{/* No form: Enter hands focus to the results instead of submitting anything. */}
+			<div class="search-field">
+				<input
+					id="dex-search"
+					type="search"
+					maxlength="100"
+					autocomplete="off"
+					enterkeyhint="search"
+					placeholder={t("dex.search.placeholder")}
+					data-dex-input
+				/>
+				<button type="button" class="search-clear" hidden data-dex-clear>
+					<CloseIcon />
+					<span class="visually-hidden">{t("tracker.search.clear")}</span>
+				</button>
+			</div>
+			<p class="dex-search-count" hidden aria-hidden="true" data-dex-count></p>
+			<p class="visually-hidden" role="status" data-dex-status></p>
+		</div>
+		<ul class="dex-index" data-dex-tiles>
+			{
+				categories.map((c) => (
+					<li>
+						<a class="dex-tile" href={getRelativeLocaleUrl(locale as Locale, `dex/${c.id}`)}>
+							<span class="name">{seedLabel(t, "category", c.id)}</span>
+							<span class="counts">
+								<span class="dot confirmed" aria-hidden="true" />
+								{t("dex.confirmedCount", { count: c.confirmed })}
+								<span class="visually-hidden">, </span>
+								<span class="sep" aria-hidden="true">·</span>
+								<span class="dot expected" aria-hidden="true" />
+								{t("dex.expectedCount", { count: c.expected })}
+							</span>
+							<span class="groups">{c.groups.map((g) => seedLabel(t, "group", g.id)).join(" · ")}</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+		<ul class="dex-results" hidden tabindex="-1" aria-label={t("dex.search.resultsLabel")} data-dex-results>
+			{
+				rows.map((row) => (
+					<li hidden data-search={row.search}>
+						<a class="dex-row" href={row.href}>
+							<span class="row-name" lang={itemLang}>{row.name}</span>
+							<span class="row-meta">
+								<span class:list={["dot", row.status]} aria-hidden="true" />
+								{row.statusWord}
+								<span class="visually-hidden">, </span>
+								<span class="sep" aria-hidden="true">·</span>
+								{row.place}
+							</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+		<div class="dex-no-match" hidden data-dex-empty>
+			<p data-dex-empty-text></p>
+			<button type="button" data-dex-clear>{t("tracker.search.clear")}</button>
+		</div>
+	</div>
 	<p>
 		<a class="go-link sources-link" href={getRelativeLocaleUrl(locale as Locale, "tracker/sources")}>
 			{t("sources.title")}
 		</a>
 	</p>
 </Base>
+
+<script>
+	import { wireDexSearch } from "../../../scripts/dex-search"
+
+	const root = document.querySelector<HTMLElement>("[data-dex-search]")
+	if (root) wireDexSearch(root, window)
+</script>
 
 <style>
 	h1 {
@@ -73,6 +143,98 @@ const categories = dexIndex(seedItems.filter((item) => !item.retired))
 		}
 	}
 
+	.dex-search {
+		display: grid;
+		gap: var(--space-2);
+		margin-block: var(--space-3);
+	}
+
+	.dex-search-count {
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 0.875rem;
+	}
+
+	.dex-results {
+		display: grid;
+		gap: 12px;
+		margin: 0 0 var(--space-4);
+		padding: 0;
+		list-style: none;
+	}
+
+	/* Enter lands here. A ring round the whole list reads as a fault; the next Tab reaches the first
+	   row, which carries its own ring. */
+	.dex-results:focus {
+		outline: none;
+	}
+
+	@media (min-width: 768px) {
+		.dex-results {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (min-width: 1600px) {
+		.dex-results {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+
+	.dex-row {
+		display: grid;
+		align-content: center;
+		gap: 2px;
+		height: 100%;
+		min-height: var(--tap);
+		padding: var(--space-2) var(--space-3);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg-raised);
+		color: var(--text);
+		text-decoration: none;
+		transition: background-color 120ms, border-color 120ms;
+	}
+
+	.row-name {
+		font-weight: 600;
+		overflow-wrap: anywhere;
+	}
+
+	.row-meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-1) var(--space-2);
+		color: var(--text-muted);
+		font-size: 0.8125rem;
+	}
+
+	.dex-no-match {
+		display: grid;
+		justify-items: start;
+		gap: var(--space-2);
+		margin: 0 0 var(--space-4);
+		color: var(--text-muted);
+		font-size: 0.875rem;
+	}
+
+	/* A 100-character query with no spaces still wraps inside 320 px. */
+	.dex-no-match p {
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.dex-no-match button {
+		min-height: var(--tap);
+		padding: var(--space-2) var(--space-3);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg-raised);
+		color: var(--text);
+		font: inherit;
+	}
+
 	.dex-tile {
 		display: grid;
 		gap: var(--space-1);
@@ -88,20 +250,26 @@ const categories = dexIndex(seedItems.filter((item) => !item.retired))
 	}
 
 	@media (hover: hover) {
-		.dex-tile:hover {
+		.dex-tile:hover,
+		.dex-row:hover,
+		.dex-no-match button:hover {
 			background: var(--bg-hover);
 			border-color: color-mix(in srgb, var(--accent) 50%, transparent);
 		}
 	}
 
 	@media (hover: none) {
-		.dex-tile:active {
+		.dex-tile:active,
+		.dex-row:active,
+		.dex-no-match button:active {
 			background: var(--bg-hover);
 		}
 	}
 
 	/* Same lift as the chips: the global ring alone is thin on a large card. */
-	.dex-tile:focus-visible {
+	.dex-tile:focus-visible,
+	.dex-row:focus-visible,
+	.dex-no-match button:focus-visible {
 		background: var(--bg-hover);
 	}
 

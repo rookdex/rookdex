@@ -650,7 +650,7 @@ p {
 	.tiles button:not([aria-pressed="true"]):hover,
 	.group-chips button:not([aria-pressed="true"]):hover,
 	.tracker .search-toggle:not([aria-pressed="true"]):hover,
-	.tracker .search-clear:hover,
+	:is(.tracker, .dex-search) .search-clear:hover,
 	.tracker .search-elsewhere-btn:hover,
 	.tracker button.last-found:hover {
 		background: var(--bg-hover);
@@ -718,7 +718,7 @@ p {
 	.tiles button:not([aria-pressed="true"]):active,
 	.group-chips button:not([aria-pressed="true"]):active,
 	.tracker .search-toggle:not([aria-pressed="true"]):active,
-	.tracker .search-clear:active,
+	:is(.tracker, .dex-search) .search-clear:active,
 	.tracker .search-elsewhere-btn:active,
 	.tracker button.last-found:active,
 	.tiles a:active,
@@ -743,7 +743,7 @@ p {
 .tiles button:not([aria-pressed="true"]):focus-visible,
 .group-chips button:not([aria-pressed="true"]):focus-visible,
 .tracker .search-toggle:not([aria-pressed="true"]):focus-visible,
-.tracker .search-clear:focus-visible,
+:is(.tracker, .dex-search) .search-clear:focus-visible,
 .tracker .search-elsewhere-btn:focus-visible,
 .tracker button.last-found:focus-visible {
 	background: var(--bg-hover);
@@ -1529,7 +1529,10 @@ html:has(.search-row) {
 	min-width: 0;
 }
 
+/* A block, not inline: an inline input sits on a line box, which at 200 % text grows the field
+   past the input and leaves the × 4 px taller than it. */
 .search-field input {
+	display: block;
 	width: 100%;
 	height: var(--tap);
 	margin: 0;
@@ -1555,7 +1558,7 @@ html:has(.search-row) {
 	appearance: none;
 }
 
-.tracker .search-clear {
+:is(.tracker, .dex-search) .search-clear {
 	position: absolute;
 	inset-block: 0;
 	inset-inline-end: 0;

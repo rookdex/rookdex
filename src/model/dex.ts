@@ -1,7 +1,16 @@
 // Page data for the Dex (category pages spec §4). Pure: it shapes live seed items, so the pages
 // and the tests share one source of truth and the tracker's group order.
-import { hasKey, type Key, type PluralKey, type Translate, type Translator } from "../i18n"
+import {
+	hasKey,
+	type Key,
+	type PluralKey,
+	seedLabel,
+	type Translate,
+	type Translator,
+} from "../i18n"
 import type { SeedItem } from "./schema"
+import { normalize, type SearchTerms } from "./search"
+import { SEARCH_TERMS } from "./searchTerms"
 import { categoryIds, groupItems } from "./seed"
 
 export interface DexGroup {
@@ -41,6 +50,45 @@ export function dexCategory(items: SeedItem[], category: string): DexCategory {
 export function dexIndex(items: SeedItem[]): DexCategory[] {
 	assertLive(items)
 	return categoryIds(items).map((category) => dexCategory(items, category))
+}
+
+/** One result row on the Dex front page (Dex search spec §4, §5.1). */
+export interface DexSearchRow {
+	id: string
+	name: string
+	/** The category page with the item's card as the fragment. */
+	href: string
+	status: SeedItem["status"]
+	/** The short word only: the precedent text is too long for a row and lives on the card. */
+	statusWord: string
+	/** "<category> · <group>" in the page language. */
+	place: string
+	/** The name and the group's search words, normalized. One string is enough: a query word never
+	 *  holds a space after normalize, so it cannot match across two fields. */
+	search: string
+}
+
+/** Every live item as a search row, in the order the Dex pages list them. `urlFor` builds a
+ *  category page URL, so this module stays free of astro:i18n. */
+export function dexSearchRows(
+	t: Translate,
+	urlFor: (category: string) => string,
+	items: SeedItem[],
+	terms: SearchTerms = SEARCH_TERMS
+): DexSearchRow[] {
+	return dexIndex(items).flatMap((category) =>
+		category.groups.flatMap((group) =>
+			group.items.map((item) => ({
+				id: item.id,
+				name: item.name,
+				href: `${urlFor(category.id)}#${item.id}`,
+				status: item.status,
+				statusWord: item.status === "confirmed" ? t("tracker.confirmed") : t("dex.expected"),
+				place: `${seedLabel(t, "category", category.id)} · ${seedLabel(t, "group", group.id)}`,
+				search: normalize([item.name, ...(terms[item.group] ?? [])].join(" ")),
+			}))
+		)
+	)
 }
 
 /** The copy keys a category page needs. copy.test.ts checks both bundles hold them for every live

@@ -29,6 +29,10 @@ export interface SearchView {
 
 export type EmptyState = "none" | "elsewhere" | "all-found" | "no-match"
 
+/** How long typing must pause before its result is announced (tracker search spec §5). Shared by
+ *  the tracker and the Dex search, so it lives here and not in a React module. */
+export const SETTLE_MS = 500
+
 /** NFD with combining marks removed, lowercase, trimmed, inner whitespace collapsed. ø and æ
  *  are letters, not accents, so they stay. */
 export function normalize(text: string): string {
@@ -41,14 +45,23 @@ function words(query: string): string[] {
 }
 
 // includes(), never a RegExp built from the query, so "(" or "*" is plain text.
-function hasAll(queryWords: string[], fields: string[]): boolean {
-	const normalized = fields.map(normalize)
+function hasAllNormalized(queryWords: string[], normalized: string[]): boolean {
 	return queryWords.every((word) => normalized.some((field) => field.includes(word)))
+}
+
+function hasAll(queryWords: string[], fields: string[]): boolean {
+	return hasAllNormalized(queryWords, fields.map(normalize))
 }
 
 /** Every word of the query appears in at least one field. An empty query matches everything. */
 export function matches(query: string, fields: string[]): boolean {
 	return hasAll(words(query), fields)
+}
+
+/** As `matches`, for fields that are already normalized, such as the Dex rows' search text, which
+ *  the server normalizes once. Skips normalizing every field on every keystroke. */
+export function matchesNormalized(query: string, fields: string[]): boolean {
+	return hasAllNormalized(words(query), fields)
 }
 
 export function foundIds(records: Records): Set<string> {
