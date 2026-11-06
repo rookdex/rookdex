@@ -142,6 +142,15 @@ describe("wireDexSearch (Dex search spec §3)", () => {
 		expect(page.status.textContent).toBe("1 result")
 	})
 
+	it("empties the status when the box is emptied by typing, so the same query is heard again", () => {
+		const page = setup()
+		page.type("bil")
+		vi.advanceTimersByTime(SETTLE_MS)
+		expect(page.status.textContent).toBe("1 result")
+		page.type("")
+		expect(page.status.textContent).toBe("")
+	})
+
 	it("clears with the ×, focuses the field and lets the clear win over a pending result", () => {
 		const page = setup()
 		page.type("bil")

@@ -192,6 +192,14 @@ describe("Tracker search announcements (tracker search spec §5)", () => {
 		await waitFor(() => expect(status()).toHaveTextContent("1 result"))
 	})
 
+	it("empties the status when the box is emptied by typing, so the same query is heard again", async () => {
+		await ready()
+		type("peli")
+		await waitFor(() => expect(status()).toHaveTextContent("1 result"))
+		type("")
+		expect(status()).toHaveTextContent("")
+	})
+
 	it("announces the matches outside the filters", async () => {
 		await ready()
 		fireEvent.click(screen.getByRole("button", { name: /^Vehicles,/ }))

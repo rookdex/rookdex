@@ -1,6 +1,6 @@
 // Search on the Dex front page (Dex search spec §3, §5.2). Plain DOM: the page renders every row,
 // and this only toggles `hidden`. The query is never stored and never leaves the page.
-import { matches, normalize, SETTLE_MS } from "../model/search"
+import { matchesNormalized, normalize, SETTLE_MS } from "../model/search"
 
 /** The slice of `window` the search reads. `window` satisfies it; the tests pass a fake. */
 export interface DexSearchWindow {
@@ -58,7 +58,7 @@ export function wireDexSearch(root: HTMLElement, win: DexSearchWindow): void {
 		const active = normalize(query) !== ""
 		let shown = 0
 		for (const row of rows) {
-			const hit = active && matches(query, [row.dataset.search ?? ""])
+			const hit = active && matchesNormalized(query, [row.dataset.search ?? ""])
 			row.hidden = !hit
 			if (hit) shown++
 		}
@@ -99,8 +99,10 @@ export function wireDexSearch(root: HTMLElement, win: DexSearchWindow): void {
 
 	input.addEventListener("input", () => {
 		const line = apply()
+		// An emptied box empties the region too: a polite region does not repeat identical text, so
+		// the same query typed again would otherwise be silent.
 		if (line) sayLater(line)
-		else cancel()
+		else say("")
 	})
 	input.addEventListener("keydown", (event) => {
 		// The phone keyboard's Search key arrives as Enter. An Enter that commits an input method's
