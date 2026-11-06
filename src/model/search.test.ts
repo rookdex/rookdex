@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import type { SeedItem } from "./schema"
-import { emptyState, foundIds, matches, normalize, searchView } from "./search"
+import { emptyState, foundIds, matches, matchesNormalized, normalize, searchView } from "./search"
 import type { Records } from "./stats"
 
 const src = { url: "https://www.rockstargames.com/VI", title: "Site", tier: "official" as const }
@@ -194,5 +194,18 @@ describe("searchView with group chips (tracker refresh spec §14.1)", () => {
 		const v = view({ selected: [], groups: ["vehicles/cars"], query: "seashark" })
 		expect(ids(v.visible)).toEqual(["vehicles/speedophile"])
 		expect(v.elsewhere).toBe(0)
+	})
+})
+
+describe("matchesNormalized (Dex search, rows normalized on the server)", () => {
+	it("matches like matches() when the fields are already normalized", () => {
+		const field = normalize("Declasse Tulip car bil")
+		for (const query of ["TULIP", "  bil  tulip ", "båt", "", "zzz"]) {
+			expect(matchesNormalized(query, [field])).toBe(matches(query, [field]))
+		}
+	})
+
+	it("does not normalize the fields again", () => {
+		expect(matchesNormalized("tulip", ["TULIP"])).toBe(false)
 	})
 })

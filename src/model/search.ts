@@ -45,14 +45,23 @@ function words(query: string): string[] {
 }
 
 // includes(), never a RegExp built from the query, so "(" or "*" is plain text.
-function hasAll(queryWords: string[], fields: string[]): boolean {
-	const normalized = fields.map(normalize)
+function hasAllNormalized(queryWords: string[], normalized: string[]): boolean {
 	return queryWords.every((word) => normalized.some((field) => field.includes(word)))
+}
+
+function hasAll(queryWords: string[], fields: string[]): boolean {
+	return hasAllNormalized(queryWords, fields.map(normalize))
 }
 
 /** Every word of the query appears in at least one field. An empty query matches everything. */
 export function matches(query: string, fields: string[]): boolean {
 	return hasAll(words(query), fields)
+}
+
+/** As `matches`, for fields that are already normalized, such as the Dex rows' search text, which
+ *  the server normalizes once. Skips normalizing every field on every keystroke. */
+export function matchesNormalized(query: string, fields: string[]): boolean {
+	return hasAllNormalized(words(query), fields)
 }
 
 export function foundIds(records: Records): Set<string> {
