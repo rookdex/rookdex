@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
+import { SETTLE_MS } from "../../model/search"
 
-/** How long typing must pause before its result is announced (tracker search spec §5). */
-export const SETTLE_MS = 500
+export { SETTLE_MS }
 
 export interface LiveStatus {
 	message: string
