@@ -47,11 +47,12 @@ Whitespace-only queries count as empty (`normalize` trims). The field has `maxle
 ## 4. Markup (`src/pages/[locale]/dex/index.astro`)
 
 ```astro
-<div class="dex-search" role="search" data-dex-search>
+<div data-dex-search data-one=… data-other=… data-no-match=… data-cleared=…>
+<div class="dex-search" role="search">
 	<label for="dex-search" class="visually-hidden">{t("dex.search.label")}</label>
 	<div class="search-field">
 		<input id="dex-search" type="search" maxlength="100" autocomplete="off"
-			enterkeyhint="search" placeholder={t("dex.search.placeholder")} />
+			enterkeyhint="search" placeholder={t("dex.search.placeholder")} data-dex-input />
 		<button type="button" class="search-clear" hidden data-dex-clear>
 			<CloseIcon /><span class="visually-hidden">{t("tracker.search.clear")}</span>
 		</button>
@@ -77,7 +78,10 @@ Whitespace-only queries count as empty (`normalize` trims). The field has `maxle
 	<p data-dex-empty-text></p>
 	<button type="button" data-dex-clear>{t("tracker.search.clear")}</button>
 </div>
+</div>
 ```
+
+- `data-dex-search` sits on an outer wrapper, not on `.dex-search`: the script finds the tiles, the results and the no-match block inside it, so they all have to be inside one root.
 
 - `role="search"` on a `div`, not `<search>`, for the same Testing Library reason the tracker gives.
 - No `<form>`: Enter must never submit or reload.
@@ -109,7 +113,7 @@ interface DexSearchRow {
 
 ### 5.2 `src/scripts/dex-search.ts`: `wireDexSearch(root, win)`
 
-Plain DOM, no framework, tested in jsdom like `history-buttons.ts`. It finds its elements by the `data-dex-*` hooks inside `root`, wires `input`, `keydown` (Enter, Escape), both clear buttons and `pageshow`, and owns one settle timer for the status region. It imports only `matches`, `normalize` and the settle constant, never React. The page calls it from a bundled `<script>`, the same pattern as `settings.astro`.
+Plain DOM, no framework, tested in jsdom like `history-buttons.ts`. It finds its elements by the `data-dex-*` hooks inside `root`, wires `input`, `keydown` (Enter, Escape), both clear buttons and `pageshow`, and owns one settle timer for the status region. It imports only `matchesNormalized`, `normalize` and the settle constant, never React. `matchesNormalized` is `matches` without normalizing the fields again, because the server already normalized each row's search text. The page calls it from a bundled `<script>`, the same pattern as `settings.astro`.
 
 Plural copy needs the counts in the browser, so the page passes the templates as `data-*` attributes on `root` (`data-one`, `data-other`, `data-no-match`, `data-cleared`), each from `t()` on the server. The script picks "one" for a count of 1 and "other" otherwise and replaces `{count}` and `{query}`. That covers both locales' plural rules. Replacement uses a function (`text.replace("{query}", () => query)`), never a replacement string: a query such as `$&` or `$'` would otherwise be read as a replacement pattern and print the wrong text.
 
@@ -162,7 +166,7 @@ Reused as they are: `tracker.search.clear`, `tracker.search.results.one` and `.o
 
 ## 9. SEO, performance and offline
 
-- The rows add about 216 links and roughly 50 KB of HTML (well under 10 KB gzipped) to two pages. They are in the HTML but `hidden`; the links point at pages that are already indexed, so nothing new is exposed.
+- The rows add about 216 links and about 126 KB of HTML to two pages, 7.6 KB gzipped (measured 06.11; Astro's scoped attribute on every row element is most of it). The whole `/en/dex/` page is 144 KB raw, 12.3 KB gzipped. They are in the HTML but `hidden`; the links point at pages that are already indexed, so nothing new is exposed.
 - The script is one small module (target under 3 KB gzipped), loaded only on `/xx/dex/`. Category pages ship no new bytes.
 - The service worker precaches the page and its script like any other build output; search works offline.
 - `http://localhost/en/dex/` is added to `collect.url` in `lighthouserc.json`. It is not there today, so without this line no Lighthouse check would ever see the new page. The existing budgets then apply: performance 0.9, accessibility 1, best practices 0.9, SEO 1.
