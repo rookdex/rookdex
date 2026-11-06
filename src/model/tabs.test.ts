@@ -4,6 +4,8 @@ import { currentTab } from "./tabs"
 describe("currentTab (spec §5)", () => {
 	it.each([
 		["", "dashboard"],
+		["dex", "dex"],
+		["dex/vehicles", "dex"],
 		["tracker", "tracker"],
 		["news", "news"],
 		["settings", "settings"],

@@ -12,13 +12,14 @@ html {
 	font-family: var(--font-sans);
 	line-height: 1.5;
 	-webkit-text-size-adjust: 100%;
-	/* Below 13rem of screen the four tab labels no longer fit side by side, so the phone bar becomes
-	   2 x 2 (issue #28). In rem, so a larger text size moves the switch. Positive and huge below
-	   the line, negative above it: clamp() and min() turn that into a switch without a query. */
-	--tabbar-2x2: calc((13rem - 100vw) * 999);
+	/* Below 18rem of screen the five tab labels no longer fit side by side, so the phone bar wraps
+	   to 3 + 2 (issue #28). 18rem is the measured sum of the widest labels (nb) with their padding.
+	   In rem, so a larger text size moves the switch. Positive and huge below the line, negative
+	   above it: clamp() and min() turn that into a switch without a query. */
+	--tabbar-wrap: calc((18rem - 100vw) * 999);
 	/* The phone tab bar's measured two-line height (spec §5), in rem so it follows the text size.
-	   As 2 x 2 it is two one-line rows: 2 x (padding, icon, gap, label) plus the 1 px border. */
-	--tabbar-h: max(4.25rem, min(var(--tabbar-2x2), 3rem + 49px));
+	   As 3 + 2 it is two one-line rows: 2 x (padding, icon, gap, label) plus the 1 px border. */
+	--tabbar-h: max(4.25rem, min(var(--tabbar-wrap), 3rem + 49px));
 	/* Keeps a focused control from scrolling in behind the fixed bar (WCAG 2.4.11), plus the update
 	   notice and the undo toast while they show. */
 	scroll-padding-bottom: calc(
@@ -503,11 +504,12 @@ p {
 	list-style: none;
 }
 
-/* A quarter each, or half each once the labels stop fitting (--tabbar-2x2). */
+/* A fifth each, or 3 + 2 once the labels stop fitting (--tabbar-wrap): a 26% basis fits three on
+   a row, never four. The automatic min-width keeps every label inside its cell, so a long label
+   ("Dashboard" at 320 px) widens its own cell and the others share what is left. */
 .tabbar li {
 	display: flex;
-	flex: 1 1 clamp(25%, var(--tabbar-2x2), 50%);
-	min-width: 0;
+	flex: 1 1 clamp(0%, var(--tabbar-wrap), 26%);
 }
 
 /* No white-space: nowrap here: it would also suppress the soft hyphen in "Inn-stillinger". */
@@ -520,7 +522,7 @@ p {
 	justify-content: center;
 	gap: var(--space-1);
 	min-height: 56px;
-	padding: var(--space-1) 2px;
+	padding: var(--space-1) 6px;
 	color: var(--text-muted);
 	font-size: 0.75rem;
 	font-weight: 500;

@@ -16,7 +16,7 @@ const { t } = translator(locale as Locale)
 const categories = dexIndex(seedItems.filter((item) => !item.retired))
 ---
 
-<Base locale={locale} title={t("seo.titles.dexIndex")} description={t("dex.indexDescription")} path="dex" tab="tracker">
+<Base locale={locale} title={t("seo.titles.dexIndex")} description={t("dex.indexDescription")} path="dex">
 	<h1>{t("dex.title")}</h1>
 	<p class="lede">{t("dex.indexLede")}</p>
 	<ul class="dex-index">
