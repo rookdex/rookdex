@@ -9,11 +9,13 @@ const page = (locale: "en" | "nb") => renderDoc(Page, { params: { locale } })
 const text = (el: Element | null | undefined) => el?.textContent?.replace(/\s+/g, " ").trim()
 
 describe("Dex index page (category pages spec §6)", () => {
-	it("is titled Dex under the Tracker tab", async () => {
+	it("is titled Dex and is the Dex tab's own page", async () => {
 		const doc = await page("en")
 		expect(text(doc.querySelector("h1"))).toBe("Dex")
 		expect(doc.title).toBe("GTA 6 Dex: every animal, car, place and collectible · Rookdex")
-		expect(text(doc.querySelector('nav[aria-label="Main"] [aria-current]'))).toBe("Tracker")
+		const lit = doc.querySelector('nav[aria-label="Main"] [aria-current]')
+		expect(text(lit)).toBe("Dex")
+		expect(lit?.getAttribute("aria-current")).toBe("page")
 		expect(doc.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe(
 			"https://rookdex.app/en/dex/"
 		)

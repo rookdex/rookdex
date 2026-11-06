@@ -23,6 +23,14 @@ describe("main navigation (spec §5, §12)", () => {
 		expect(lit[0].getAttribute("aria-current")).toBe("true")
 	})
 
+	it("keeps the Dex tab lit on a category page, without claiming to be that page", async () => {
+		const doc = await page("dex/vehicles")
+		const lit = doc.querySelectorAll('nav[aria-label="Main"] [aria-current]')
+		expect(lit).toHaveLength(1)
+		expect(lit[0].textContent?.trim()).toBe("Dex")
+		expect(lit[0].getAttribute("aria-current")).toBe("true")
+	})
+
 	it("puts one Main nav between the header and main", async () => {
 		const doc = await page("")
 		expect(doc.querySelectorAll('nav[aria-label="Main"]')).toHaveLength(1)
@@ -32,6 +40,7 @@ describe("main navigation (spec §5, §12)", () => {
 
 	it.each([
 		["", "Dashboard"],
+		["dex", "Dex"],
 		["tracker", "Tracker"],
 		["news", "News"],
 		["settings", "Settings"],
@@ -53,17 +62,18 @@ describe("main navigation (spec §5, §12)", () => {
 		const links = [...doc.querySelectorAll('nav[aria-label="Hoved"] a')]
 		expect(links.map((a) => a.getAttribute("href"))).toEqual([
 			"/nb/",
+			"/nb/dex/",
 			"/nb/tracker/",
 			"/nb/news/",
 			"/nb/settings/",
 		])
-		expect(links[3].textContent?.trim()).toBe("Inn­stillinger")
+		expect(links[4].textContent?.trim()).toBe("Inn­stillinger")
 	})
 
 	it("hides every tab icon from assistive tech", async () => {
 		const doc = await page("")
 		const icons = [...doc.querySelectorAll('nav[aria-label="Main"] svg')]
-		expect(icons).toHaveLength(4)
+		expect(icons).toHaveLength(5)
 		for (const icon of icons) expect(icon.getAttribute("aria-hidden")).toBe("true")
 	})
 

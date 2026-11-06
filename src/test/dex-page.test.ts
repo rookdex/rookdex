@@ -11,7 +11,7 @@ const page = (locale: "en" | "nb", category: string) =>
 const text = (el: Element | null | undefined) => el?.textContent?.replace(/\s+/g, " ").trim()
 
 describe("Dex category page (category pages spec §5)", () => {
-	it("is a titled sub page under the Tracker tab, with its counts in the lede", async () => {
+	it("is a titled sub page under the Dex tab, with its counts in the lede", async () => {
 		const doc = await page("en", "wildlife")
 		const dex = dexCategory(live, "wildlife")
 		expect(doc.querySelectorAll("h1")).toHaveLength(1)
@@ -21,7 +21,8 @@ describe("Dex category page (category pages spec §5)", () => {
 		)
 		expect(doc.title).toBe("GTA 6 animals: every species confirmed so far · Rookdex")
 		const lit = doc.querySelector('nav[aria-label="Main"] [aria-current]')
-		expect(text(lit)).toBe("Tracker")
+		expect(text(lit)).toBe("Dex")
+		expect(lit?.getAttribute("aria-current")).toBe("true")
 		expect(doc.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe(
 			"https://rookdex.app/en/dex/wildlife/"
 		)
