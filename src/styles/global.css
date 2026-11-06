@@ -1529,7 +1529,10 @@ html:has(.search-row) {
 	min-width: 0;
 }
 
+/* A block, not inline: an inline input sits on a line box, which at 200 % text grows the field
+   past the input and leaves the × 4 px taller than it. */
 .search-field input {
+	display: block;
 	width: 100%;
 	height: var(--tap);
 	margin: 0;

@@ -111,3 +111,11 @@ describe("clear button CSS (Dex search spec §6.1)", () => {
 		}
 	})
 })
+
+describe("search field box (Dex search spec §11)", () => {
+	it("makes the input a block, so 200 % text cannot grow the field past the ×", () => {
+		// An inline input sits on a line box; at 32 px text that box is 48 px tall, and the ×, which
+		// fills the field, came out 4 px taller than the 44 px input.
+		expect(css).toMatch(/\.search-field input\s*\{[^}]*display:\s*block/)
+	})
+})
