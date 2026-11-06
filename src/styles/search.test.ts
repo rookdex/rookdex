@@ -99,3 +99,15 @@ describe("search row CSS (tracker search spec §5)", () => {
 		expect(css).not.toMatch(/@media[^{]*max-width[^{]*\{[^}]*search/)
 	})
 })
+
+describe("clear button CSS (Dex search spec §6.1)", () => {
+	it("shares the tracker's clear button rules instead of copying them", () => {
+		expect(css).not.toContain(".tracker .search-clear")
+		expect(css).toMatch(
+			/:is\(\.tracker, \.dex-search\) \.search-clear\s*\{[^}]*position:\s*absolute/
+		)
+		for (const state of ["hover", "active", "focus-visible"]) {
+			expect(css).toContain(`:is(.tracker, .dex-search) .search-clear:${state}`)
+		}
+	})
+})
