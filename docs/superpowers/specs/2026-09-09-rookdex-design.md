@@ -9,7 +9,7 @@ A companion for GTA VI that is useful the night the game launches and stays usef
 Three lanes, one product, built in phases:
 
 1. **Tracker and stats** — checklists for wildlife, vehicles, weapons, people, locations and missions, with per-category and overall completion. Local-first, no login, export and import.
-2. **Live facts** — a fully automated pipeline that reads an allowlist of sources, writes short original summaries, labels confidence by rules, and feeds confirmed facts straight into the checklists.
+2. **Live facts** — a fully automated pipeline that reads an allowlist of sources, writes short original summaries, labels confidence by rules, and feeds confirmed facts straight into the checklists. Dropped on 06.11.2026: see §7.
 3. **Guides and launch hub** — hand-written pages, the Norwegian launch-night page, and later the interactive map.
 
 Family and friends come first. Everything else is built on top of what works for them on 19 November.
@@ -44,8 +44,8 @@ Family and friends come first. Everything else is built on top of what works for
 | Progress storage | IndexedDB in the browser, export and import as JSON | No account needed; nothing lost |
 | Accounts (phase 2) | Better Auth with passkeys, optional email | No passwords to leak; MIT; works with Astro and Neon |
 | Content pipeline for guides | Markdown in the repo, one folder per language | Contributions are pull requests; preview URL per PR |
-| Automated facts | Cloudflare Worker cron → Claude API → Neon | Nobody has time to review; rules decide confidence |
-| AI model for the pipeline | `claude-opus-5`, structured outputs, Batch API (direct requests for the Rockstar tier) | Quality matters for public text; Batch halves cost; hourly cadence tolerates the delay |
+| Automated facts | Cloudflare Worker cron → Claude API → Neon | Nobody has time to review; rules decide confidence. Dropped on 06.11.2026 (§7) |
+| AI model for the pipeline | `claude-opus-5`, structured outputs, Batch API (direct requests for the Rockstar tier) | Quality matters for public text; Batch halves cost; hourly cadence tolerates the delay. Dropped on 06.11.2026 (§7) |
 | Payments (phase 2) | Lemon Squeezy or Paddle as merchant of record | VAT handled, no company required |
 | Analytics | Cloudflare Web Analytics at launch (cookieless, same origin); Plausible in phase 2 if longer retention matters | No consent banner, no third-party script |
 | Fonts | Self-hosted from the site's origin | No third-party requests; strict CSP |
@@ -75,7 +75,7 @@ repo (public)
 - **Worker.** One Cloudflare Worker with two jobs: a cron trigger that runs the pipeline, and a tiny JSON API (`/api/feed`, `/api/facts`, `/api/seed-delta`, `/api/report`) that islands read. API responses are cached at the edge for 5 minutes, so a spike hits Cloudflare's cache, not Neon. The API answers only the site's own origin and the preview domain. Every endpoint is `GET` except `/api/report`.
 - **Database.** Neon Postgres. Tables: `feed_items` (with `extraction_status`), `facts`, `fact_sources`, `checklist_items` (the live delta on top of the seed), `reports`, `switches` (kill-switch, per-source pause, budget cap). Phase 2 adds `users`, `profiles`, `progress`.
 - **Progress.** IndexedDB per local profile. The export file is versioned JSON. Phase 2 syncs the same record shape to Neon; nothing in the tracker changes.
-- **Deploy.** Merge to `main` builds and deploys the site and the Worker. Pull requests get a preview URL. Two extra workflows: `flip-switch` (manual, see §7) and `launch-rebuild` (scheduled once, 19 Nov 00:05 CET). As built, the launch rebuild is a cron in `deploy.yml` (`5 23 18 11 *`, gated to 2026), not its own workflow. `flip-switch` and the phase 1c pipeline are not built yet.
+- **Deploy.** Merge to `main` builds and deploys the site and the Worker. Pull requests get a preview URL. Two extra workflows: `flip-switch` (manual, see §7) and `launch-rebuild` (scheduled once, 19 Nov 00:05 CET). As built, the launch rebuild is a cron in `deploy.yml` (`5 23 18 11 *`, gated to 2026), not its own workflow. `flip-switch` and the phase 1c pipeline were never built: I dropped them on 06.11.2026 (§7).
 
 Cloudflare has no hard spend cap. Mitigation: Workers Paid is only enabled if the free 100k requests per day are exceeded, the AI budget cap lives in the pipeline, and a Cloudflare notification is set at $10.
 
@@ -143,6 +143,8 @@ Languages:
 - Automated fact summaries: English, Norwegian, Spanish and German from day one. This is my own text, produced by the pipeline, so translating it is one extra instruction, not a translation project.
 
 ## 7. The pipeline
+
+**Dropped on 06.11.2026. Nothing in this section was built; the rest of it stays as a record of the original plan.** Every version that runs without me costs money each month: Workers Paid ($5) for enough cron CPU, plus the Claude API. And real News load is a few items a week, not the 50 a day assumed below. So News stays hand-curated in `src/seed/facts.json` and `src/seed/rumours.json`. Once a week a scheduled Claude Code session on my own machine checks the official channels and the allowed press in `allowlist.json`. It opens a pull request that changes only those two files, and I review and merge it myself. The rules in §4 still hold: facts need an official source, rumours need a press source, and leaks are never used. If the pipeline ever comes back, a brainstorm on 06.11 had already settled four questions: News only, the static JSON as the base with Neon on top, press feeds to find Newswire posts, and English and Norwegian for every item.
 
 A Cloudflare Worker cron. Hourly. During launch week (12–26 Nov) the Rockstar tier runs every 15 minutes.
 
@@ -222,7 +224,7 @@ All valves are rows in `switches`. They are flipped by a GitHub Actions `workflo
 | 0 · Setup | by 15 Sep | brand decision, GitHub org, `.app` domain at Cloudflare Registrar, Cloudflare and Neon projects, repo scaffold, CI green, Discord webhook |
 | 1a · Foundation | 15–28 Sep | Astro site, i18n routing, hub in EN and NO, PWA install and offline, deploy to a preview domain. Exam 23 Sep sits inside this window; the week is light. |
 | 1b · Tracker | 29 Sep–12 Oct | model with tests, tracker island, profiles with the deleted bin, export and import, stats |
-| 1c · Pipeline | 13–26 Oct | Worker, allowlist, feed, blocklist, facts with confidence, switches and `flip-switch`, digest |
+| 1c · Pipeline | 13–26 Oct | Worker, allowlist, feed, blocklist, facts with confidence, switches and `flip-switch`, digest. Dropped on 06.11.2026 (§7) |
 | 1d · Polish | 27 Oct–1 Nov | Lighthouse and axe to the bar, smoke test, seed content, family test install, `launch-rebuild` scheduled |
 | Freeze | 1–11 Nov | content only. Exam 11 Nov. |
 | Launch | 12–19 Nov | preload-day content, family installs, watch the digest |
