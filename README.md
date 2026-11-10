@@ -6,18 +6,19 @@ Leonida is waiting, and you'll want somewhere to keep score. Rookdex gives you a
 
 **[Open rookdex.app](https://rookdex.app)** · English and Norsk · free · no account
 
-<a href="https://rookdex.app"><img src="docs/readme/screens.png" alt="Rookdex on desktop and phone: the tracker with progress bars per category, the launch countdown, and the tracker on a phone." width="100%"></a>
+<a href="https://rookdex.app"><img src="docs/readme/screens.png" alt="Rookdex on desktop and phone: the tracker with search and progress per category, the launch countdown, and the Dex wildlife page." width="100%"></a>
 
 ## <img src="docs/readme/map.svg" width="22" height="22" alt=""> What you get
 
-- **A countdown** to 19 November 2026, ticking down to the minute. At midnight on launch night the home page turns into your dashboard.
-- **A tracker** for wildlife, vehicles, places and collectibles. Spot a gator, tick a box, watch the bar fill up.
-- **Confirmed, expected or rumour.** Every tracker item shows its tier and its sources. Rumours live on the News page with a label on them, so you can tell a trailer frame from somebody's cousin's friend.
+- **A countdown, then a dashboard.** Days, hours and minutes to 19 November 2026. At midnight on launch night the home page turns into your dashboard: overall progress, the category you're closest to finishing, what's next, your finds by day and the latest news.
+- **A tracker** with over 200 animals, vehicles, places and collectibles. Search by name or type, filter by category and group, hide what you've found. Spot a gator, tick a box, watch the bar fill up.
+- **The Dex.** Every animal, vehicle, place and collectible on one page per category, each with its status and a link to the trailer or report that shows it. Search it the same way as the tracker.
+- **Confirmed, expected or rumour.** Every item shows its tier and its sources. The News page keeps what Rockstar and Take-Two have confirmed apart from what the press reports, so you can tell a trailer frame from somebody's cousin's friend.
 - **Two short guides.** Before you start covers editions and what to sort out before launch night. Your first hour covers what to check, claim and skip once the game unlocks.
 
 ## <img src="docs/readme/save.svg" width="22" height="22" alt=""> Your save file stays with you
 
-Your progress lives in your browser, not on a server. No account, no password, no "please verify your email". Install it to your home screen and it keeps working offline, even in a basement with zero bars. Switching phones? Export your profile and take it with you.
+Your progress lives in your browser, not on a server. No account, no password, no "please verify your email". Install it to your home screen and it keeps working offline, even in a basement with zero bars. Sharing a console? Give each player their own profile. Switching phones? Export your profile and take it with you.
 
 ## <img src="docs/readme/print.svg" width="22" height="22" alt=""> The small print
 

@@ -18,7 +18,7 @@ const here = fileURLToPath(new URL(".", import.meta.url))
 const tickIndexes = [0, 1, 3, 4, 6, 8, 10, 12, 15]
 const shots = [
 	{ id: "phone-hub", path: "/en/", width: 390, height: 844 },
-	{ id: "phone-tracker", path: "/en/tracker/", width: 390, height: 844 },
+	{ id: "phone-dex", path: "/en/dex/wildlife/", width: 390, height: 844 },
 	{ id: "desktop-tracker", path: "/en/tracker/", width: 1280, height: 800 },
 ]
 
