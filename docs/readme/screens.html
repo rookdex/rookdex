@@ -52,10 +52,15 @@
 				display: flex;
 				gap: 24px;
 			}
+			/* A bezel keeps the rounded corner off the screenshot, so the tab bar labels stay whole. */
 			.phone {
 				width: 196px;
 				aspect-ratio: 390 / 844;
+				padding: 7px;
 				border-radius: 28px;
+			}
+			.phone img {
+				border-radius: 12px;
 			}
 			.stripe {
 				position: absolute;
@@ -72,7 +77,7 @@
 			<div class="frame desktop"><img id="desktop-tracker" alt="" /></div>
 			<div class="phones">
 				<div class="frame phone"><img id="phone-hub" alt="" /></div>
-				<div class="frame phone"><img id="phone-tracker" alt="" /></div>
+				<div class="frame phone"><img id="phone-dex" alt="" /></div>
 			</div>
 			<div class="stripe"></div>
 		</div>
