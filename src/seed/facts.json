@@ -7,8 +7,8 @@
 			"nb": "To utgaver, fra 79,99 dollar"
 		},
 		"summary": {
-			"en": "Pre-orders opened on 25 June. The Standard Edition costs $79.99 and the digital-only Ultimate Edition $99.99, and Standard owners can buy the upgrade later. Purchases before 20 November include the Vintage Vice City Pack.",
-			"nb": "Forhåndsbestillingen åpnet 25. juni. Standardutgaven koster 79,99 dollar og Ultimate Edition, som bare finnes digitalt, 99,99 dollar. Standard kan oppgraderes senere. Kjøp før 20. november får med Vintage Vice City Pack."
+			"en": "Pre-orders opened on 25 June. The Standard Edition costs $79.99 and the digital-only Ultimate Edition $99.99, and Standard owners can buy the upgrade later. Digital purchases before 20 November include the Vintage Vice City Pack with one month of GTA+.",
+			"nb": "Forhåndsbestillingen åpnet 25. juni. Standardutgaven koster 79,99 dollar og Ultimate Edition, som bare finnes digitalt, 99,99 dollar. Standard kan oppgraderes senere. Digitale kjøp før 20. november får med Vintage Vice City Pack med én måneds GTA+."
 		},
 		"announced": "2026-06-24",
 		"sources": [
@@ -26,12 +26,12 @@
 		"id": "facts/preload",
 		"claim_key": "preload-date",
 		"name": {
-			"en": "Preload Opens 10 November, Up to 212 GB",
-			"nb": "Forhåndsnedlasting fra 10. november, opptil 212 GB"
+			"en": "Preload Open Since 10 November, Up to 212 GB",
+			"nb": "Forhåndsnedlasting åpen siden 10. november, opptil 212 GB"
 		},
 		"summary": {
-			"en": "Preload starts on 10 November: at local midnight on PS5 and at midnight GMT on Xbox, which is 01:00 in Norway. It needs up to 212 GB. Boxed copies hold a download code instead of a disc and reach shops from 12 November.",
-			"nb": "Forhåndsnedlastingen starter 10. november: ved midnatt lokal tid på PS5 og kl. 01:00 norsk tid på Xbox. Den krever opptil 212 GB. Fysiske utgaver har en nedlastingskode i stedet for en plate og kommer i butikk fra 12. november."
+			"en": "Preload started on 10 November: at local midnight on PS5 and at midnight GMT on Xbox, which is 01:00 in Norway. It needs up to 212 GB. Boxed copies hold a download code instead of a disc and reach shops from 12 November.",
+			"nb": "Forhåndsnedlastingen startet 10. november: ved midnatt lokal tid på PS5 og kl. 01:00 norsk tid på Xbox. Den krever opptil 212 GB. Fysiske utgaver har en nedlastingskode i stedet for en plate og kommer i butikk fra 12. november."
 		},
 		"announced": "2026-11-03",
 		"sources": [
@@ -126,6 +126,44 @@
 			{
 				"url": "https://www.rockstargames.com/newswire/article/k4ak9okk485712/grand-theft-auto-vi-pre-load-begins-on-november-10",
 				"title": "Grand Theft Auto VI Pre-Load Begins on November 10"
+			}
+		]
+	},
+	{
+		"id": "facts/launch-unlock-time",
+		"claim_key": "launch-unlock-time",
+		"name": {
+			"en": "Unlocks at Midnight Local Time on 19 November",
+			"nb": "Låses opp ved midnatt lokal tid 19. november"
+		},
+		"summary": {
+			"en": "Rockstar says the game releases at midnight local time on 19 November in every region, on both PS5 and Xbox Series X|S. In Norway that is 00:00 on Thursday 19 November.",
+			"nb": "Rockstar sier at spillet slippes ved midnatt lokal tid 19. november i alle regioner, både på PS5 og Xbox Series X|S. I Norge er det kl. 00:00 torsdag 19. november."
+		},
+		"announced": "2026-11-03",
+		"sources": [
+			{
+				"url": "https://support.rockstargames.com/articles/29jV3Cv2cCgvwM1XgtMO5o/grand-theft-auto-vi-regional-pre-load-and-release-times-on-playstation-5-and-xbox-series-x-or-s",
+				"title": "Grand Theft Auto VI regional pre-load and release times on PlayStation 5 and XBOX Series X|S"
+			}
+		]
+	},
+	{
+		"id": "facts/performance",
+		"claim_key": "console-frame-rate-launch",
+		"name": {
+			"en": "30 fps on Console, Ray-Traced Shadows on PS5 Pro",
+			"nb": "30 fps på konsoll, strålesporede skygger på PS5 Pro"
+		},
+		"summary": {
+			"en": "Rockstar says the game targets 30 frames per second on PS5 and Xbox Series X|S. PS5 Pro adds sharper visuals through PSSR and ray-traced shadows. You can also stream it with Xbox Cloud Gaming, Xbox One included, and Remote Play works on both consoles.",
+			"nb": "Rockstar sier at spillet sikter mot 30 bilder i sekundet på PS5 og Xbox Series X|S. PS5 Pro gir skarpere bilde med PSSR og strålesporede skygger. Du kan også strømme spillet med Xbox Cloud Gaming, også på Xbox One, og Remote Play virker på begge konsollene."
+		},
+		"announced": "2026-11-10",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/89834o94713o21/pre-load-grand-theft-auto-vi-now",
+				"title": "Pre-Load Grand Theft Auto VI Now"
 			}
 		]
 	}
