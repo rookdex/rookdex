@@ -164,7 +164,7 @@ const sha = process.env.GITHUB_SHA
 			</div>
 			{/* Shown and wired by update-notice.ts once the service worker is registered. */}
 			<div
-				class="row"
+				class="row row-long"
 				data-update-check
 				data-checking={t("settings.checking")}
 				data-current={t("settings.upToDate")}
@@ -175,9 +175,11 @@ const sha = process.env.GITHUB_SHA
 				<dt>{t("settings.updates")}</dt>
 				<dd class="row-actions">
 					<span class="row-status" role="status" data-update-check-status></span>
-					<button type="button" class="row-button" data-update-check-button>
-						{t("settings.checkUpdates")}
-					</button>
+					<span class="row-buttons">
+						<button type="button" class="row-button" data-update-check-button>
+							{t("settings.checkUpdates")}
+						</button>
+					</span>
 				</dd>
 			</div>
 			<div
