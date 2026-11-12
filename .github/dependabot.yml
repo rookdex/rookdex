@@ -4,6 +4,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      semver-major-days: 21
     groups:
       minor-and-patch:
         update-types: ["minor", "patch"]
@@ -11,3 +13,9 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      semver-major-days: 21
+    groups:
+      ward:
+        patterns:
+          - "malinfossum/ward*"
