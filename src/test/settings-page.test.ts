@@ -187,6 +187,15 @@ describe("Settings page (spec §7)", () => {
 		expect(row?.hasAttribute("hidden")).toBe(false)
 	})
 
+	it("stacks rows with long buttons on a phone, so no label wraps inside its button", async () => {
+		const doc = await settings("nb")
+		for (const selector of ["[data-update-check]", "[data-backup-row]"]) {
+			const row = doc.querySelector(selector)
+			expect(row?.classList.contains("row-long"), selector).toBe(true)
+			expect(row?.querySelector(".row-buttons > button.row-button"), selector).not.toBeNull()
+		}
+	})
+
 	it("gives the update check a button and an empty status line with its messages", async () => {
 		const doc = await settings("nb")
 		const row = doc.querySelector<HTMLElement>("[data-update-check]")
