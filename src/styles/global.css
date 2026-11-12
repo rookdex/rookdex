@@ -946,6 +946,12 @@ p {
 	display: contents;
 }
 
+/* Set by the home page's pre-paint script while the static hub is the wrong phase for this
+   device (model/hub-prepaint.ts). Visibility only: the space stays, so nothing shifts. */
+[data-hub-pending] .hub-live {
+	visibility: hidden;
+}
+
 /* Tighter side padding at 320 px, so a tile label like "Samleobjekter" fits without breaking
    mid-word. The shared .hub-state padding returns from 768 px. */
 .hub-dashboard {

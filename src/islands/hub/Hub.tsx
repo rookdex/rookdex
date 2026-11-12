@@ -2,6 +2,7 @@ import { type ComponentType, useCallback, useEffect, useRef, useState } from "re
 import { type Locale, translator } from "../../i18n"
 import type { CategoryRow } from "../../model/dashboard"
 import { dateLocale, localDayKey } from "../../model/days"
+import { HUB_PENDING_ATTR } from "../../model/hub-prepaint"
 import { LAUNCH_AT } from "../../model/launch"
 import type { ChecklistId } from "../seenFlag"
 import { CategoryBars } from "./CategoryBars"
@@ -119,6 +120,11 @@ export function Hub({
 		? daysSinceText(t, state.daysSince)
 		: plural("hub.daysToGo", state.daysToGo)
 	const synced = state.now !== start
+	// The page's pre-paint script hides the hub while its static phase is wrong for this device.
+	// This render already shows the device's own phase, so the hub can be seen again.
+	useEffect(() => {
+		if (synced) document.documentElement.removeAttribute(HUB_PENDING_ATTR)
+	}, [synced])
 	const heard = useRef<string | null>(null)
 	useEffect(() => {
 		if (!synced) return
