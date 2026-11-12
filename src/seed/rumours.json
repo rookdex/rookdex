@@ -1,22 +1,5 @@
 [
 	{
-		"id": "rumours/console-frame-rate",
-		"name": "30 fps on Console at Launch",
-		"claim_key": "console-frame-rate-launch",
-		"summary": "Rockstar North's Rob Nelson told Flow Games that GTA 6 runs at 30 fps on PS5 and Xbox Series X for now and that more options may be added later; Rockstar has not published a launch frame rate, and Digital Foundry calls 60 fps on console extremely unlikely.",
-		"added": "2026-08-28",
-		"sources": [
-			{
-				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-will-run-at-30fps-across-ps5-and-xbox-series-x-and-rockstar-is-reportedly-undecided-about-adding-a-performance-mode-to-better-that/",
-				"title": "GTA 6 will run at 30fps across PS5 and Xbox Series X"
-			},
-			{
-				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-at-60fps-is-unlikely-on-console-and-will-be-genuinely-challenging-on-pc-tech-analysts-say/",
-				"title": "GTA 6 at 60fps is \"unlikely\" on console and will be \"genuinely challenging\" on PC, tech analysts say"
-			}
-		]
-	},
-	{
 		"id": "rumours/online-2027-launch",
 		"name": "Online Mode Reported for 2027",
 		"claim_key": "online-2027-launch",

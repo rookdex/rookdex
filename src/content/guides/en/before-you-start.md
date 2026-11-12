@@ -3,7 +3,7 @@ title: Before you start
 searchTitle: "GTA 6 release date, price and preload: launch checklist · Rookdex"
 summary: What to sort out before launch night so you can play the moment it unlocks.
 searchDescription: "GTA 6 comes out on 19 November 2026 on PS5 and Xbox Series X|S. Preload from 10 November, editions, the pre-order bonus, GTA+ and prices in Norway."
-updated: 2026-10-27
+updated: 2026-11-12
 sources:
   - https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions
   - https://www.rockstargames.com/newswire/article/5171972o3ak5oa/pre-order-grand-theft-auto-vi-on-june-25
@@ -12,7 +12,7 @@ sources:
 
 ## The date
 
-The game releases on **19 November 2026** on PlayStation 5 and Xbox Series X|S. Rockstar hasn't confirmed the unlock time yet. Preload starts at local midnight on 10 November on PS5, so midnight on launch day is likely. There is no PC version at launch, and it is single-player at launch.
+The game releases at midnight local time on **19 November 2026** on PlayStation 5 and Xbox Series X|S. There is no PC version at launch, and it is single-player at launch.
 
 ## Editions
 
@@ -28,7 +28,7 @@ A digital pre-order includes one month of GTA+. On PlayStation the membership re
 
 ## Preload
 
-Preload opens on **10 November**: at local midnight on PS5 and at 01:00 Norwegian time on Xbox. Start it the day it opens: the download is up to 212 GB, and launch-night servers are slow. A physical copy doesn't save you the download. The box holds a download code, and physical copies go on sale on 12 November.
+Preload opened on **10 November**: at local midnight on PS5 and at 01:00 Norwegian time on Xbox. Start it now if you haven't: the download is up to 212 GB, and launch-night servers are slow. A physical copy doesn't save you the download. The box holds a download code, and physical copies go on sale on 12 November.
 
 ## Buying in Norway
 
