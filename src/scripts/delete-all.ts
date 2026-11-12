@@ -1,5 +1,5 @@
 import { LANG_KEY } from "../i18n/locales"
-import { ACTIVE_PROFILE_KEY, CHECKLIST_KEY, HIDE_FOUND_KEY } from "../islands/seenFlag"
+import { ACTIVE_PROFILE_KEY, BACKUP_KEY, CHECKLIST_KEY, HIDE_FOUND_KEY } from "../islands/seenFlag"
 import { DB_NAME } from "../model/store"
 
 export type DeleteResult = "deleted" | "failed" | "unsupported"
@@ -17,8 +17,9 @@ function forget(key: string): void {
  * Deletes every profile and all progress on this device (spec §7.2). `blocked` is not a failure:
  * the request stays pending and fires `success` once other tabs close their connections, so this
  * reports it once and keeps waiting. It never sends a second request. The language choice (`lang`),
- * the remembered profile, the before-launch list and Hide found go too, because all data means all
- * (locale spec D9, dashboard spec §5, desktop dashboard spec §5, tracker search spec §8). The
+ * the remembered profile, the before-launch list, Hide found and the backup log go too, because all
+ * data means all (locale spec D9, dashboard spec §5, desktop dashboard spec §5, tracker search
+ * spec §8). The
  * install and hint flags stay, so the prompt and the hint don't come back (feedback spec §7.3).
  * The service worker cache stays too, so the app still opens offline.
  */
@@ -47,6 +48,7 @@ export function deleteAllData(
 			forget(ACTIVE_PROFILE_KEY)
 			forget(CHECKLIST_KEY)
 			forget(HIDE_FOUND_KEY)
+			forget(BACKUP_KEY)
 			resolve("deleted")
 		}
 	})

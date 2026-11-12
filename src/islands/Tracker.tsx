@@ -6,8 +6,19 @@ import { type EmptyState, emptyState, type SearchView } from "../model/search"
 import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, perGroup, recentFinds } from "../model/stats"
 import { chipGroups, parseGroups, parseShow } from "../model/tracker"
+import type { ImportResult } from "../model/transfer"
+import { downloadJson } from "../scripts/download"
 import { buildTracker } from "./buildTracker"
-import { HINT_SEEN_KEY, writeFlag } from "./seenFlag"
+import {
+	BACKUP_REMINDER_TICKS,
+	type BackupLog,
+	backupDue,
+	HINT_SEEN_KEY,
+	readBackupLog,
+	recordBackup,
+	snoozeBackupReminder,
+	writeFlag,
+} from "./seenFlag"
 import { CategoryNav } from "./tracker/CategoryNav"
 import { DeleteDialog } from "./tracker/DeleteDialog"
 import { DeletedDialog } from "./tracker/DeletedDialog"
@@ -90,6 +101,12 @@ export function Tracker({ locale }: Props) {
 	// Owned here so dialogs opened from the menu can return focus to its button.
 	const menuButton = useRef<HTMLButtonElement>(null)
 	const fileInput = useRef<HTMLInputElement>(null)
+	// The backup reminder (shown while set) and the last import's result, both in plain view.
+	const [nudge, setNudge] = useState<BackupLog | null>(() => {
+		const log = readBackupLog()
+		return backupDue(log) ? log : null
+	})
+	const [importNote, setImportNote] = useState("")
 	const current = state.profiles.find((p) => p.id === state.profileId)
 	const currentName = current?.name ?? ""
 
@@ -134,17 +151,45 @@ export function Tracker({ locale }: Props) {
 		setDialog(null)
 	}
 
+	// Any export that produced a file counts as a backup: it stamps the date Settings shows and
+	// starts the reminder's tick count again.
+	function save(result: { filename: string; json: string }) {
+		downloadJson(result.filename, result.json)
+		recordBackup(new Date())
+		setNudge(null)
+	}
+
 	function exportNow() {
 		const result = tracker.exportProfile()
+		if (result) save(result)
+	}
+
+	function nudgeText(log: BackupLog): string {
+		return t(log.at ? "tracker.backupNudge" : "tracker.backupNudgeFirst", { count: log.ticks })
+	}
+
+	// The reminder's buttons leave with it, so focus moves to the profile menu button, the next
+	// control in reading order and the home of Export, instead of falling back to <body>.
+	async function backUpAll() {
+		const result = await tracker.exportAll()
 		if (!result) return
-		const blob = new Blob([result.json], { type: "application/json" })
-		const url = URL.createObjectURL(blob)
-		const anchor = document.createElement("a")
-		anchor.href = url
-		anchor.download = result.filename
-		anchor.click()
-		// Revoking synchronously can cancel the download in some browsers.
-		window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+		save(result)
+		menuButton.current?.focus()
+		live.say(t("tracker.backupSaved", { file: result.filename }))
+	}
+
+	function snoozeBackup() {
+		snoozeBackupReminder()
+		setNudge(null)
+		menuButton.current?.focus()
+		live.say(t("tracker.backupSnoozed", { count: BACKUP_REMINDER_TICKS }))
+	}
+
+	function importText(results: ImportResult[]): string {
+		const count = results.reduce((sum, r) => sum + r.count, 0)
+		if (results.length === 1) return plural("tracker.imported", count, { name: results[0].name })
+		const names = results.map((r) => r.name).join(", ")
+		return plural("tracker.restored", count, { profiles: results.length, names })
 	}
 
 	async function saveName(name: string) {
@@ -162,6 +207,7 @@ export function Tracker({ locale }: Props) {
 		const file = event.target.files?.[0]
 		// Cleared first so picking the same file again still fires `change`.
 		event.target.value = ""
+		setImportNote("")
 		if (file) await tracker.readImport(file)
 	}
 
@@ -249,25 +295,35 @@ export function Tracker({ locale }: Props) {
 		live.say(resultsText(search.viewFor({ selected: [], groups: [] }), search.query))
 	}
 
-	// A tick is announced as before, and it cancels a pending typing result (spec §5).
+	// A tick is announced as before, and it cancels a pending typing result (spec §5). The tick
+	// that makes a backup due adds the reminder to the same polite line; focus stays on the box.
 	async function toggleItem(id: string, done: boolean) {
 		live.cancel()
+		setImportNote("")
 		const before = tracker.getState().announcement
 		await (done ? tracker.tick(id) : tracker.untick(id))
 		const after = tracker.getState().announcement
-		if (after && after !== before)
-			live.say(
-				t("tracker.announce", {
-					category: seedLabel(t, "category", after.category),
-					done: after.done,
-					total: after.total,
-				})
-			)
+		if (!after || after === before) return
+		let text = t("tracker.announce", {
+			category: seedLabel(t, "category", after.category),
+			done: after.done,
+			total: after.total,
+		})
+		const log = readBackupLog()
+		if (done && !nudge && backupDue(log)) {
+			setNudge(log)
+			text = `${text}. ${nudgeText(log)}`
+		}
+		live.say(text)
 	}
 
-	async function confirmImport(target: "current" | "new") {
-		await tracker.confirmImport(target)
+	async function confirmImport(target: "current" | "new" | "all") {
+		const results = await tracker.confirmImport(target)
 		search.resnapshot()
+		if (!results) return
+		const text = importText(results)
+		setImportNote(text)
+		live.say(text)
 	}
 
 	// A restore keeps the current profile, but the list can change under a new snapshot (F16).
@@ -321,6 +377,18 @@ export function Tracker({ locale }: Props) {
 					{t("tracker.persistHint")}{" "}
 					<button type="button" onClick={dismissHint}>
 						{t("tracker.dismiss")}
+					</button>
+				</p>
+			)}
+			{/* Not a live region: the tick that brings it speaks it once through the status line. */}
+			{nudge && (
+				<p className="hint backup-nudge">
+					{nudgeText(nudge)}{" "}
+					<button type="button" onClick={backUpAll}>
+						{t("tracker.backupNow")}
+					</button>{" "}
+					<button type="button" onClick={snoozeBackup}>
+						{t("tracker.backupLater")}
 					</button>
 				</p>
 			)}
@@ -395,6 +463,7 @@ export function Tracker({ locale }: Props) {
 			<p className="visually-hidden" role="status" aria-live="polite">
 				{live.message}
 			</p>
+			{importNote && <p className="tracker-note">{importNote}</p>}
 			<p className="tracker-alert" role="alert">
 				{pageError}
 			</p>
@@ -433,6 +502,7 @@ export function Tracker({ locale }: Props) {
 				t={t}
 				onInto={() => confirmImport("current")}
 				onCreate={() => confirmImport("new")}
+				onRestore={() => confirmImport("all")}
 				onCancel={tracker.cancelImport}
 				returnTo={menuButton}
 			/>

@@ -16,6 +16,12 @@ export function localDayKey(date: Date): string {
 	return `${date.getFullYear()}-${month}-${day}`
 }
 
+/** `DD.MM.YYYY` on the device's calendar, in every language (en-GB would give slashes). */
+export function dottedDate(date: Date): string {
+	const [year, month, day] = localDayKey(date).split("-")
+	return `${day}.${month}.${year}`
+}
+
 /** Local noon on the day `key` names: a moment safely inside that day. */
 export function dayFromKey(key: string): Date {
 	const [year, month, day] = key.split("-").map(Number)

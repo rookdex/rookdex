@@ -12,7 +12,19 @@ import {
 	showParam,
 	type TrackerDeps,
 } from "./tracker"
-import { buildExport } from "./transfer"
+import { buildBackup, buildExport } from "./transfer"
+
+describe("onTick (backup reminder)", () => {
+	it("is called after each saved tick, never for an untick", async () => {
+		const onTick = vi.fn()
+		const { tracker } = make({ onTick })
+		await tracker.init()
+		await tracker.tick("wildlife/a")
+		await tracker.untick("wildlife/a")
+		await tracker.tick("wildlife/b")
+		expect(onTick).toHaveBeenCalledTimes(2)
+	})
+})
 
 const src = { url: "https://www.rockstargames.com/VI", title: "Site", tier: "official" as const }
 function item(id: string, category: string): SeedItem {
@@ -197,9 +209,67 @@ describe("export and import", () => {
 		expect(tracker.getState().error).toBe("too-large")
 		await tracker.readImport(fileOf("{oops"))
 		expect(tracker.getState().error).toBe("not-json")
-		await tracker.readImport(fileOf(JSON.stringify({ version: 3 })))
+		await tracker.readImport(fileOf(JSON.stringify({ version: 1 })))
 		expect(tracker.getState().error).toBe("not-export")
+		await tracker.readImport(fileOf(JSON.stringify({ version: 3 })))
+		expect(tracker.getState().error).toBe("newer-version")
 		expect(tracker.getState().pendingImport).toBeUndefined()
+	})
+	it("says how many records came in and where", async () => {
+		const { tracker } = make()
+		await tracker.init()
+		const { file } = buildExport(
+			{ id: "x", name: "Dad", created_at: now().toISOString() },
+			[{ item_id: "wildlife/b", done: true, updated_at: now().toISOString(), origin: "manual" }],
+			now()
+		)
+		await tracker.readImport(fileOf(JSON.stringify(file)))
+		expect(await tracker.confirmImport("current")).toEqual([
+			{ profileId: tracker.getState().profileId, name: "Player 1", count: 1, created: false },
+		])
+		await tracker.readImport(fileOf(JSON.stringify(file)))
+		const [created] = (await tracker.confirmImport("new")) ?? []
+		expect(created).toMatchObject({ name: "Dad", count: 1, created: true })
+	})
+	it("restores every profile in a backup and shows the current one's new records", async () => {
+		const { tracker } = make()
+		await tracker.init()
+		const record = (item_id: string) => ({
+			item_id,
+			done: true,
+			updated_at: now().toISOString(),
+			origin: "manual" as const,
+		})
+		const { file } = buildBackup(
+			[
+				{ name: "Player 1", records: [record("wildlife/a")] },
+				{ name: "Dad", records: [record("wildlife/b"), record("vehicles/c")] },
+			],
+			now()
+		)
+		await tracker.readImport(fileOf(JSON.stringify(file)))
+		expect(tracker.getState().pendingImport?.version).toBe(2)
+		const results = await tracker.confirmImport("all")
+		expect(results?.map((r) => [r.name, r.count, r.created])).toEqual([
+			["Player 1", 1, false],
+			["Dad", 2, true],
+		])
+		const state = tracker.getState()
+		expect(state.pendingImport).toBeUndefined()
+		expect(state.profiles.map((p) => p.name).sort()).toEqual(["Dad", "Player 1"])
+		expect(state.records["wildlife/a"]?.done).toBe(true)
+	})
+	it("exports every profile as one backup", async () => {
+		const { tracker } = make()
+		await tracker.init()
+		await tracker.tick("wildlife/a")
+		await tracker.createProfile("Dad")
+		const result = await tracker.exportAll()
+		expect(result?.filename).toBe("rookdex-backup-2026-09-16.json")
+		const file = JSON.parse(result?.json ?? "")
+		expect(file.version).toBe(2)
+		expect(file.profiles.map((p: { name: string }) => p.name)).toEqual(["Player 1", "Dad"])
+		expect(file.profiles[0].records).toHaveLength(1)
 	})
 	it("stages a valid file, then imports into the current profile", async () => {
 		const { tracker } = make()
@@ -211,7 +281,7 @@ describe("export and import", () => {
 			now()
 		)
 		await tracker.readImport(fileOf(JSON.stringify(file)))
-		expect(tracker.getState().pendingImport?.profile_name).toBe("Dad")
+		expect(tracker.getState().pendingImport).toMatchObject({ version: 1, profile_name: "Dad" })
 		await tracker.confirmImport("current")
 		const state = tracker.getState()
 		expect(state.pendingImport).toBeUndefined()

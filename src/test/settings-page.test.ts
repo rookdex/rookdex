@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs"
+import { createRequire } from "node:module"
+import { JSDOM, VirtualConsole } from "jsdom"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import pkg from "../../package.json"
 import Settings from "../pages/[locale]/settings.astro"
@@ -6,6 +9,26 @@ import { renderDoc } from "./render"
 const settings = (locale: "en" | "nb") => renderDoc(Settings, { params: { locale } })
 
 afterEach(() => vi.unstubAllEnvs())
+
+// As on the privacy page: axe-core in its own JSDOM window, colour contrast left to Lighthouse.
+// Resolved through Node, so a worktree without its own node_modules finds the shared one.
+type Axe = { run(context: Document, options?: object): Promise<{ violations: { id: string }[] }> }
+const axeSource = readFileSync(
+	createRequire(import.meta.url).resolve("axe-core/axe.min.js"),
+	"utf8"
+)
+async function axeViolations(html: string): Promise<string[]> {
+	const { window } = new JSDOM(html, {
+		runScripts: "outside-only",
+		virtualConsole: new VirtualConsole(),
+	})
+	window.eval(axeSource)
+	const axe = (window as unknown as { axe: Axe }).axe
+	const results = await axe.run(window.document, {
+		rules: { "color-contrast": { enabled: false } },
+	})
+	return results.violations.map((v) => v.id)
+}
 
 describe("Settings page (spec §7)", () => {
 	it("is the Settings tab, with three groups", async () => {
@@ -64,6 +87,104 @@ describe("Settings page (spec §7)", () => {
 		expect(doc.querySelector("[data-install-row]")?.hasAttribute("hidden")).toBe(true)
 		expect(doc.querySelector("[data-update-check]")?.hasAttribute("hidden")).toBe(true)
 		expect(doc.querySelector("[data-share-row]")?.hasAttribute("hidden")).toBe(true)
+		expect(doc.querySelector("[data-usage-row]")?.hasAttribute("hidden")).toBe(true)
+		expect(doc.querySelector("[data-backup-date]")?.hasAttribute("hidden")).toBe(true)
+		expect(doc.querySelector("[data-backup-row]")?.hasAttribute("hidden")).toBe(true)
+	})
+
+	const dataTerms = (doc: Document) =>
+		[...doc.querySelectorAll('section[aria-labelledby="settings-data"] dl > .row > dt')].map((dt) =>
+			dt.textContent?.trim()
+		)
+
+	it("lists the backup rows before the one-profile link", async () => {
+		expect(dataTerms(await settings("en"))).toEqual([
+			"Stored",
+			"Language choice",
+			"Protected from clearing",
+			"Space used",
+			"Last backup",
+			"All profiles",
+			"One profile at a time",
+			"Privacy",
+		])
+		expect(dataTerms(await settings("nb"))).toEqual([
+			"Lagret",
+			"Språkvalg",
+			"Beskyttet mot sletting",
+			"Plass brukt",
+			"Siste sikkerhetskopi",
+			"Alle profiler",
+			"Én profil om gangen",
+			"Personvern",
+		])
+	})
+
+	it("ships the Protect button hidden, described by the note that says what it does", async () => {
+		const doc = await settings("en")
+		const row = doc.querySelector<HTMLElement>("[data-storage-row]")
+		const button = row?.querySelector("button[data-persist-button]")
+		expect(button?.textContent?.trim()).toBe("Protect")
+		expect(button?.hasAttribute("hidden")).toBe(true)
+		const note = doc.getElementById(button?.getAttribute("aria-describedby") ?? "")
+		expect(note?.closest("[data-storage-row]")).toBe(row)
+		expect(note?.hasAttribute("hidden")).toBe(true)
+		expect(note?.textContent).toBe(
+			"Asks your browser not to clear your progress when the device runs low on space. Installed apps usually get a yes."
+		)
+		expect(row?.querySelector('[role="status"]')?.textContent).toBe("")
+		expect(row?.dataset.granted).toBe("Protected. Your browser will keep your data.")
+		expect(row?.dataset.refused).toBe("Your browser said no. Install Rookdex or back up often.")
+	})
+
+	it("ships Back up and Restore with an empty status and every message", async () => {
+		const doc = await settings("nb")
+		const root = doc.querySelector<HTMLElement>("[data-backup]")
+		const row = root?.querySelector("[data-backup-row]")
+		expect(row?.querySelector("[data-backup-button]")?.textContent?.trim()).toBe("Ta kopi")
+		expect(row?.querySelector("[data-restore-button]")?.textContent?.trim()).toBe("Gjenopprett")
+		expect(row?.querySelector('[role="status"]')?.textContent).toBe("")
+		expect(row?.querySelector('input[type="file"]')?.getAttribute("accept")).toBe(
+			".json,application/json"
+		)
+		expect(root?.dataset.never).toBe("Aldri")
+		expect(root?.dataset.saved).toBe("Sikkerhetskopien er lagret som {file}.")
+		expect(root?.dataset.errorNewerVersion).toBe(
+			"Filen kommer fra en nyere Rookdex. Last inn siden på nytt for å oppdatere, og prøv igjen."
+		)
+		for (const key of [
+			"nothing",
+			"errorStorage",
+			"errorTooLarge",
+			"errorNotJson",
+			"errorNotExport",
+			"errorTooMany",
+			"importedOne",
+			"importedOther",
+			"restoredOne",
+			"restoredOther",
+		]) {
+			expect(root?.dataset[key], key).toBeTruthy()
+		}
+	})
+
+	it.each([
+		[
+			"en",
+			"Android app",
+			"Coming to Google Play soon. Until then, install Rookdex from your browser.",
+		],
+		[
+			"nb",
+			"Android-app",
+			"Kommer snart på Google Play. Til da kan du installere Rookdex fra nettleseren.",
+		],
+	] as const)("says the Android app is coming to Google Play in %s", async (locale, term, note) => {
+		const doc = await settings(locale)
+		const row = [...doc.querySelectorAll("#about dl > div")][1]
+		expect(row?.querySelector("dt")?.textContent).toBe(term)
+		expect(row?.querySelector("dd")?.textContent?.trim()).toBe(note)
+		expect(row?.hasAttribute("hidden")).toBe(false)
 	})
 
 	it("gives the update check a button and an empty status line with its messages", async () => {
@@ -169,6 +290,7 @@ describe("Settings page (spec §7)", () => {
 		)
 		expect(rowsOf(doc).map(label)).toEqual([
 			"Install",
+			"Android app",
 			"Version",
 			"Updates",
 			"Share",
@@ -188,12 +310,12 @@ describe("Settings page (spec §7)", () => {
 		const doc = await settings("nb")
 		const rows = rowsOf(doc)
 		const href = (i: number) => rows[i].querySelector("dd a")?.getAttribute("href")
-		expect(href(4)).toBe("mailto:feedback@rookdex.app")
-		expect(href(5)).toBe("https://github.com/rookdex/rookdex")
-		expect(rows[6].querySelector("dd")?.textContent?.trim()).toBe("MIT")
-		expect(href(7)).toBe("https://creativecommons.org/licenses/by-sa/4.0/")
-		expect(href(8)).toBe("mailto:legal@rookdex.app")
-		expect(rows.map(label).slice(2)).toEqual([
+		expect(href(5)).toBe("mailto:feedback@rookdex.app")
+		expect(href(6)).toBe("https://github.com/rookdex/rookdex")
+		expect(rows[7].querySelector("dd")?.textContent?.trim()).toBe("MIT")
+		expect(href(8)).toBe("https://creativecommons.org/licenses/by-sa/4.0/")
+		expect(href(9)).toBe("mailto:legal@rookdex.app")
+		expect(rows.map(label).slice(3)).toEqual([
 			"Oppdateringer",
 			"Del",
 			"Tilbakemelding",
@@ -208,7 +330,7 @@ describe("Settings page (spec §7)", () => {
 		const sha = "0123456789abcdef0123456789abcdef01234567"
 		vi.stubEnv("GITHUB_SHA", sha)
 		const doc = await settings("en")
-		const dd = rowsOf(doc)[1].querySelector("dd")
+		const dd = rowsOf(doc)[2].querySelector("dd")
 		expect(dd?.textContent?.replace(/\s+/g, " ").trim()).toBe(
 			`${pkg.version} · 0123456 (opens in a new tab)`
 		)
@@ -220,7 +342,7 @@ describe("Settings page (spec §7)", () => {
 	it("keeps a dev build's version as plain text", async () => {
 		vi.stubEnv("GITHUB_SHA", "")
 		const doc = await settings("en")
-		const dd = rowsOf(doc)[1].querySelector("dd")
+		const dd = rowsOf(doc)[2].querySelector("dd")
 		expect(dd?.textContent?.trim()).toBe(`${pkg.version} · dev`)
 		expect(dd?.querySelector("a")).toBeNull()
 	})
@@ -250,4 +372,15 @@ describe("Settings page (spec §7)", () => {
 			"Your choices about the install prompt and hints stay, so they do not return."
 		)
 	})
+
+	it.each(["en", "nb"] as const)(
+		"passes axe in %s with every browser-dependent row and button shown",
+		async (locale) => {
+			const doc = await settings(locale)
+			for (const el of doc.querySelectorAll("main [hidden]")) {
+				if (!el.closest("[data-picker]")) el.removeAttribute("hidden")
+			}
+			expect(await axeViolations(doc.documentElement.outerHTML)).toEqual([])
+		}
+	)
 })

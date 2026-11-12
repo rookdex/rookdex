@@ -1,7 +1,7 @@
 import { seedItems } from "../model/seed"
 import { openStore } from "../model/store"
 import { createTracker, type Tracker } from "../model/tracker"
-import { activeProfileStorage, HINT_SEEN_KEY, readFlag } from "./seenFlag"
+import { activeProfileStorage, countBackupTick, HINT_SEEN_KEY, readFlag } from "./seenFlag"
 
 /**
  * Both islands build their tracker here, so the hub and the tracker page open the same database,
@@ -25,5 +25,7 @@ export function buildTracker(
 		installed: window.matchMedia("(display-mode: standalone)").matches,
 		hintSeen: readFlag(HINT_SEEN_KEY),
 		activeProfile: activeProfileStorage,
+		// Ticks from the hub count too: the reminder is about everything since the last backup.
+		onTick: countBackupTick,
 	})
 }

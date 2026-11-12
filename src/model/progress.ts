@@ -57,6 +57,24 @@ export function setDone(
 	})
 }
 
+/**
+ * Runs inside the caller's readwrite transaction, so an import can create profiles and records
+ * together. Writes only the incoming records that win the merge; `count` is how many came in.
+ */
+export async function mergeInto(
+	progress: IDBObjectStore,
+	profileId: string,
+	incoming: ProgressRecord[]
+): Promise<{ records: ProgressRecord[]; count: number }> {
+	const stored = await request<StoredRecord[]>(progress.index("profile_id").getAll(profileId))
+	const existing = stored.map(fromStored)
+	const merged = mergeRecords(existing, incoming)
+	const kept = new Set(existing)
+	const changed = merged.filter((record) => !kept.has(record))
+	for (const record of changed) await request(progress.put(toStored(profileId, record)))
+	return { records: merged, count: changed.length }
+}
+
 /** One readwrite transaction: delete the profile's records, put `records`. A failure keeps the old set. */
 export async function replaceRecords(
 	store: Store,

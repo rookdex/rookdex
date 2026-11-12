@@ -2236,6 +2236,13 @@ html:has(.search-row) {
 	max-width: none;
 }
 
+/* The last import's result in plain view; the status line speaks it once. */
+.tracker-note {
+	margin: 0;
+	color: var(--text);
+	max-width: none;
+}
+
 .progress {
 	margin-bottom: var(--space-2);
 }
