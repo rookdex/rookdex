@@ -11,6 +11,9 @@ import Base from "../../layouts/Base.astro"
 import { buildNow } from "../../model/build-now"
 import { categoryRows, latestNews, latestRumours } from "../../model/dashboard"
 import { resolveGuide } from "../../model/guides"
+import { hubPrepaintScript } from "../../model/hub-prepaint"
+import { hubPhase, LAUNCH_AT } from "../../model/launch"
+import { scriptHash } from "../../model/root-resolver"
 import { facts, rumours, seedItems } from "../../model/seed"
 import { countable } from "../../model/stats"
 
@@ -23,6 +26,12 @@ if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
 const { t } = translator(locale as Locale)
 // Read at build time only; production never sets ROOKDEX_NOW (dashboard spec §6.4, §11).
 const initialNow = buildNow(process.env.ROOKDEX_NOW).toISOString()
+// The phase the server HTML shows: the island's first render counts to the CET instant too.
+const staticPhase = hubPhase(new Date(initialNow), LAUNCH_AT)
+// Astro's CSP hashes only the scripts it bundles, so the pre-paint script's hash goes in by hand,
+// as the root resolver's does. Its text is the same in every build; the phase is an attribute.
+const prepaint = hubPrepaintScript()
+Astro.csp?.insertScriptHash(scriptHash(prepaint))
 const latest = latestRumours(rumours, LATEST_LIMIT).map(({ id, name, added }) => ({
 	id,
 	name,
@@ -57,6 +66,7 @@ const news = latestNews(facts, rumours, NEWS_LIMIT).map(({ id, kind, date, name 
 		</header>
 		{/* The server-rendered time changes every build; the version hash skips it (precache.mjs). */}
 		<div class="build-stamp" data-build-stamp>
+			<script is:inline data-phase={staticPhase} set:html={prepaint}></script>
 			<Hub
 				client:load
 				locale={locale}

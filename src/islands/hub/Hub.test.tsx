@@ -5,6 +5,7 @@ import { renderToString } from "react-dom/server"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
 import type { CategoryRow } from "../../model/dashboard"
+import { HUB_PENDING_ATTR } from "../../model/hub-prepaint"
 import { ANNOUNCE_GAP_MS, Hub } from "./Hub"
 import type { LatestItem } from "./Latest"
 import type { NewsItem } from "./NewsTile"
@@ -292,6 +293,30 @@ describe("Hub after launch", () => {
 		await advance(0)
 		vi.useRealTimers()
 		expect(await axe(container)).toHaveNoViolations()
+	})
+})
+
+describe("Hub and the pre-paint mark", () => {
+	afterEach(() => {
+		vi.unstubAllEnvs()
+		document.documentElement.removeAttribute(HUB_PENDING_ATTR)
+	})
+
+	it("shows itself again once it shows the device's own phase", () => {
+		// A New York visitor on the rebuilt page: the server HTML is the dashboard skeleton.
+		vi.stubEnv("TZ", "America/New_York")
+		vi.setSystemTime(new Date("2026-11-18T19:00:00-05:00"))
+		document.documentElement.setAttribute(HUB_PENDING_ATTR, "")
+		hub({ initialNow: "2026-11-19T00:05:00+01:00" })
+		expect(screen.getByTestId("countdown-digits")).toBeInTheDocument()
+		expect(document.documentElement.hasAttribute(HUB_PENDING_ATTR)).toBe(false)
+	})
+
+	it("keeps the mark until the device clock has replaced the build clock", () => {
+		const html = renderToString(<Hub {...props({ initialNow: after })} />)
+		document.documentElement.setAttribute(HUB_PENDING_ATTR, "")
+		expect(html).toContain("is-skeleton")
+		expect(document.documentElement.hasAttribute(HUB_PENDING_ATTR)).toBe(true)
 	})
 })
 
