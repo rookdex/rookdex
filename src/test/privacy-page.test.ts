@@ -84,12 +84,13 @@ describe("Privacy page (Android spec §3)", () => {
 		}
 	)
 
-	it.each(["en", "nb"] as const)("has the eight sections in order in %s", async (locale) => {
+	it.each(["en", "nb"] as const)("has the nine sections in order in %s", async (locale) => {
 		const { t } = translator(locale)
 		const doc = await page(locale)
 		expect([...doc.querySelectorAll("main section > h2")].map((h) => h.textContent)).toEqual([
 			t("privacy.storedTitle"),
 			t("privacy.leavesTitle"),
+			t("privacy.securityTitle"),
 			t("privacy.hostingTitle"),
 			t("privacy.linksTitle"),
 			t("privacy.emailTitle"),

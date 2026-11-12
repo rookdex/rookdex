@@ -4,7 +4,7 @@ Android spec §6. The plan was 26 to 28 October, with the closed test live by Th
 
 **Status 31 October:** steps 1 to 8 are done. The closed test went live on 29 October at 14:02. PR 2 (Digital Asset Links) merged on 30 October, and the same day the app passed the phone check: it opens without a URL bar.
 
-The 12th tester opted in on the morning of 31 October, so the 14-day clock started that day. 15 testers are on the list and at least 12 have opted in. Play only shows "12 or more", so the exact count above 12 is unknown. The earliest date to apply for production access is 14 November, and review takes up to 7 days. The Play listing is live by launch only if review takes 5 days or less. The site launches on 19 November as a PWA either way, and the Play listing follows when Google approves it.
+The 12th tester opted in on the morning of 31 October, so the 14-day clock started that day. 17 testers are on the list and at least 12 have opted in. Play only shows "12 or more", so the exact count above 12 is unknown. Play Console counts the 14 days so that the earliest date to apply for production access is 15 November (Console on 9 and 12 November). Access review takes up to 7 days, and the first production release is reviewed after that, so the Play listing is unlikely to be live on launch day. The site launches on 19 November as a PWA either way, and the Play listing follows when Google approves it.
 
 | Day | Steps |
 |---|---|
@@ -88,5 +88,5 @@ Open https://www.pwabuilder.com, enter `https://rookdex.app`, choose Android, Go
 
 ## Later
 
-- [ ] 14 November at the earliest (14 days after the 12th tester opted in on 31 October): apply for production access. Review takes up to 7 days. Until then, keep at least 12 testers opted in: the clock only counts days with 12 or more.
+- [ ] 15 November at the earliest (the date Play Console gives): apply for production access. Review takes up to 7 days. Until then, keep at least 12 testers opted in: the clock only counts days with 12 or more.
 - [ ] After launch (19 November): the hub screenshots show the countdown, which is gone by then. Re-run `docs/android/screenshots.mjs` against a local `npm run preview` with the hub path set to `?phase=after` (works on localhost only) and replace the hub shots in Play Console.

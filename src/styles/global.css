@@ -2156,10 +2156,6 @@ html:has(.search-row) {
 	height: 22px;
 }
 
-.item .item-icon[aria-disabled="true"] {
-	cursor: default;
-}
-
 /* Found: a pink edge and a pink icon tile beside the ✓, never colour alone (spec §5.1). */
 .item.found {
 	border-color: color-mix(in srgb, var(--accent) 45%, transparent);

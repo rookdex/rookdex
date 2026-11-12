@@ -126,10 +126,12 @@ describe("News page (spec §8)", () => {
 		const links = [...doc.querySelectorAll(".channel-list a")]
 		expect(links.map((a) => a.getAttribute("href"))).toEqual([
 			"https://www.rockstargames.com/newswire",
+			"https://www.rockstargames.com/VI/media",
 			"https://www.youtube.com/@RockstarGames",
 			"https://x.com/rockstargames",
 			"https://instagram.com/rockstargames",
 		])
+		expect(links[1]?.textContent).toContain("Trailere, skjermbilder og bakgrunnsbilder")
 		for (const a of links) {
 			expect(a.getAttribute("target")).toBe("_blank")
 			expect(a.querySelector("img")).toBeNull()

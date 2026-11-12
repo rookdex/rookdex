@@ -34,7 +34,8 @@ Rookdex is a free, open-source companion for GTA VI. It counts down to launch ni
 
 What you get:
 • A countdown to launch, then a dashboard of what to do next
-• A tracker for collectibles, places, vehicles and wildlife, with progress per category
+• A tracker for collectibles, places, vehicles and wildlife, with search and progress per category
+• A Dex to browse every animal, vehicle, place and collectible, with search
 • Several profiles on one device, with export and import
 • News: what Rockstar has confirmed and press reports that are not confirmed yet, each with its source
 • A guide to what to sort out before launch night
@@ -62,7 +63,8 @@ Rookdex er en gratis følgesvenn med åpen kildekode for GTA VI. Den teller ned 
 
 Dette får du:
 • Nedtelling til lansering, deretter en oversikt over hva du kan gjøre nå
-• Sjekkliste for samleobjekter, steder, kjøretøy og dyreliv, med fremdrift per kategori
+• Sjekkliste for samleobjekter, steder, kjøretøy og dyreliv, med søk og fremdrift per kategori
+• En Dex der du kan bla gjennom alle dyr, kjøretøy, steder og samleobjekter, med søk
 • Flere profiler på én enhet, med eksport og import
 • Nyheter: det Rockstar har bekreftet og det pressen melder som ikke er bekreftet ennå, hver sak med kilde
 • En guide til hva du bør ordne før lanseringskvelden

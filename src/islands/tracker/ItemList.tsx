@@ -1,4 +1,5 @@
 import type { Translate } from "../../i18n"
+import { itemReportUrl } from "../../model/report"
 import type { SeedItem } from "../../model/schema"
 import { categoryIds, groupItems } from "../../model/seed"
 import { type Count, groupKey, type Records } from "../../model/stats"
@@ -184,14 +185,18 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 						{t("tracker.sources")}
 					</span>
 				</a>
-				{/* aria-disabled keeps it focusable, so its tooltip explains it. */}
-				<button type="button" className="item-icon has-tip tip-end" aria-disabled="true">
+				<a
+					className="item-icon has-tip tip-end"
+					href={itemReportUrl(item)}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					<FlagIcon />
-					<span className="visually-hidden">{t("tracker.reportSoon")}</span>
+					<span className="visually-hidden">{t("tracker.reportLabel", { name: item.name })}</span>
 					<span className="tip" aria-hidden="true">
-						{t("tracker.reportSoon")}
+						{t("tracker.report")}
 					</span>
-				</button>
+				</a>
 			</div>
 		</li>
 	)

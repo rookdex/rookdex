@@ -1,0 +1,42 @@
+name: Item report
+description: Something about a tracker item is wrong or missing.
+title: "Item report: "
+labels: ["item-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping. Reports are public, so please don't include personal details.
+        No spoilers in the title, please. Story details go in the description.
+  - type: input
+    id: item
+    attributes:
+      label: Item
+      description: The item id. It's filled in when you come from the Report button.
+      placeholder: wildlife/pelican
+    validations:
+      required: true
+  - type: dropdown
+    id: problem
+    attributes:
+      label: What's wrong?
+      options:
+        - The name or description is wrong
+        - The item isn't in the game
+        - It's in the wrong category or group
+        - A source link is broken
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What did you see in the game, and where?
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source (optional)
+      description: A link that shows it, for example a screenshot or an article.
