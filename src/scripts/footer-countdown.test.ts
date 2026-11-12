@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { footerStatus, wireFooterStatus } from "./footer-countdown"
 
 const templates = { one: "{count} day to launch", other: "{count} days to launch", out: "Out now" }
@@ -28,6 +28,23 @@ describe("footerStatus (feedback spec §6, locale spec §5.2)", () => {
 	it("says out now from launch day on", () => {
 		expect(footerStatus(at("2026-11-19T00:00:00+01:00"), templates, "en")).toBe("Out now")
 		expect(footerStatus(at("2027-01-01T12:00:00+01:00"), templates, "en")).toBe("Out now")
+	})
+})
+
+describe("footerStatus on the visitor's own clock", () => {
+	afterEach(() => {
+		vi.unstubAllEnvs()
+	})
+
+	it("still counts down in New York after the 00:05 CET launch rebuild", () => {
+		vi.stubEnv("TZ", "America/New_York")
+		expect(footerStatus(at("2026-11-18T23:05:00Z"), templates, "en")).toBe("1 day to launch")
+		expect(footerStatus(at("2026-11-19T05:00:00Z"), templates, "en")).toBe("Out now")
+	})
+
+	it("says out now in Tokyo before Oslo reaches midnight", () => {
+		vi.stubEnv("TZ", "Asia/Tokyo")
+		expect(footerStatus(at("2026-11-18T15:00:00Z"), templates, "en")).toBe("Out now")
 	})
 })
 
