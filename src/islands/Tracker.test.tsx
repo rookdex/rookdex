@@ -2,7 +2,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
-import { wireTooltips } from "../scripts/tooltip"
 import { renderReady, resetBrowser } from "../test/tracker-fixtures"
 import { Tracker } from "./Tracker"
 
@@ -40,25 +39,27 @@ describe("Tracker list", () => {
 		expect(book.querySelector(".tip")).toHaveAttribute("aria-hidden", "true")
 		expect(book.querySelector(".tip")).toHaveTextContent("Sources")
 
-		const flags = screen.getAllByRole("button", { name: "Report: coming soon" })
-		expect(flags).toHaveLength(3)
-		expect(flags[0]).toHaveAttribute("aria-disabled", "true")
-		// aria-disabled, not disabled: it stays focusable so its tooltip is reachable.
-		expect(flags[0]).not.toBeDisabled()
+		const flag = screen.getByRole("link", {
+			name: "Report a problem with Pelican on GitHub (opens in a new tab)",
+		})
+		expect(flag).toHaveAttribute("target", "_blank")
+		expect(flag).toHaveAttribute("rel", "noopener noreferrer")
+		expect(new URL(flag.getAttribute("href") ?? "").searchParams.get("item")).toBe(
+			"wildlife/pelican"
+		)
+		expect(flag.querySelector(".tip")).toHaveTextContent("Report")
+		expect(screen.getAllByRole("link", { name: /^Report a problem with/ })).toHaveLength(3)
 	})
 
-	it("toggles an item from its label, and a flag tap shows the tooltip without toggling", async () => {
+	it("toggles an item from its label, and a flag tap doesn't toggle it", async () => {
 		await ready()
 		fireEvent.click(screen.getByText("Pelican"))
 		// The tick goes through IndexedDB before the controlled checkbox re-renders.
 		await waitFor(() => expect(screen.getByRole("checkbox", { name: "Pelican" })).toBeChecked())
 
-		const unwire = wireTooltips(document)
-		const flag = screen.getAllByRole("button", { name: "Report: coming soon" })[0]
+		const flag = screen.getByRole("link", { name: /^Report a problem with Bike/ })
 		fireEvent.click(flag)
-		expect(flag).toHaveAttribute("data-tip-open")
 		expect(screen.getByRole("checkbox", { name: "Bike" })).not.toBeChecked()
-		unwire()
 	})
 
 	it("ticking announces the category count in the live region", async () => {
@@ -258,7 +259,7 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 		expect([...gator.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
 			"INPUT",
 			"A",
-			"BUTTON",
+			"A",
 		])
 		expect(gator.querySelector(".item-foot .item-book")).not.toBeNull()
 	})
