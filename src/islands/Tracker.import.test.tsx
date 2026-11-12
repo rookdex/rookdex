@@ -185,7 +185,7 @@ describe("backup reminder", () => {
 		const text =
 			"25 ticks and no backup yet. A backup file keeps them safe if this browser is cleared."
 		const nudge = (
-			await screen.findByText(text, { exact: false, selector: ".backup-nudge" })
+			await screen.findByText(text, { exact: false, selector: ".backup-nudge > span" })
 		).closest("p") as HTMLElement
 		await waitFor(() => expect(liveText()).toHaveTextContent(text))
 		expect(nudge.getAttribute("role")).toBeNull()
@@ -194,7 +194,7 @@ describe("backup reminder", () => {
 		)
 		fireEvent.click(within(nudge).getByRole("button", { name: "Not now" }))
 		expect(
-			screen.queryByText(text, { exact: false, selector: ".backup-nudge" })
+			screen.queryByText(text, { exact: false, selector: ".backup-nudge > span" })
 		).not.toBeInTheDocument()
 		expect(JSON.parse(localStorage.getItem(BACKUP_KEY) ?? "").ticks).toBe(0)
 		expect(liveText()).toHaveTextContent("Reminder hidden until 25 more ticks.")
@@ -205,7 +205,9 @@ describe("backup reminder", () => {
 		localStorage.setItem(BACKUP_KEY, JSON.stringify({ at: "2026-11-01T10:00:00.000Z", ticks: 30 }))
 		await ready()
 		const nudge = (
-			await screen.findByText(/30 new ticks since your last backup/, { selector: ".backup-nudge" })
+			await screen.findByText(/30 new ticks since your last backup/, {
+				selector: ".backup-nudge > span",
+			})
 		).closest("p") as HTMLElement
 		fireEvent.click(within(nudge).getByRole("button", { name: "Back up now" }))
 		await waitFor(() => expect(click).toHaveBeenCalled())
@@ -216,7 +218,7 @@ describe("backup reminder", () => {
 		expect(log.at).not.toBe("2026-11-01T10:00:00.000Z")
 		await waitFor(() => expect(liveText()).toHaveTextContent(`Backup saved as ${anchor.download}.`))
 		expect(
-			screen.queryByText(/new ticks since/, { selector: ".backup-nudge" })
+			screen.queryByText(/new ticks since/, { selector: ".backup-nudge > span" })
 		).not.toBeInTheDocument()
 		click.mockRestore()
 	})
@@ -224,7 +226,7 @@ describe("backup reminder", () => {
 	it("passes axe with the reminder and the restore dialog showing", async () => {
 		localStorage.setItem(BACKUP_KEY, JSON.stringify({ at: null, ticks: 30 }))
 		const { container } = await ready()
-		await screen.findByText(/ticks and no backup yet/, { selector: ".backup-nudge" })
+		await screen.findByText(/ticks and no backup yet/, { selector: ".backup-nudge > span" })
 		pickFile(
 			container,
 			JSON.stringify({

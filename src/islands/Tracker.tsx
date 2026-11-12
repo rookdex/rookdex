@@ -383,7 +383,7 @@ export function Tracker({ locale }: Props) {
 			{/* Not a live region: the tick that brings it speaks it once through the status line. */}
 			{nudge && (
 				<p className="hint backup-nudge">
-					{nudgeText(nudge)}{" "}
+					<span>{nudgeText(nudge)}</span>{" "}
 					<button type="button" onClick={backUpAll}>
 						{t("tracker.backupNow")}
 					</button>{" "}

@@ -105,7 +105,7 @@ describe("Settings page (spec §7)", () => {
 			"Space used",
 			"Last backup",
 			"All profiles",
-			"One profile at a time",
+			"One profile",
 			"Privacy",
 		])
 		expect(dataTerms(await settings("nb"))).toEqual([
@@ -115,7 +115,7 @@ describe("Settings page (spec §7)", () => {
 			"Plass brukt",
 			"Siste sikkerhetskopi",
 			"Alle profiler",
-			"Én profil om gangen",
+			"Én profil",
 			"Personvern",
 		])
 	})

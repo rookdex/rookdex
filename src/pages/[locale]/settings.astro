@@ -96,7 +96,7 @@ const sha = process.env.GITHUB_SHA
 				<dt>{t("settings.lastBackup")}</dt>
 				<dd data-value></dd>
 			</div>
-			<div class="row" data-backup-row hidden>
+			<div class="row row-long" data-backup-row hidden>
 				<dt>{t("settings.backup")}</dt>
 				<dd class="row-actions">
 					<span class="row-status" role="status" data-backup-status></span>
@@ -430,10 +430,12 @@ const sha = process.env.GITHUB_SHA
 		text-align: left;
 	}
 
-	/* The Android line is a sentence, so it reads left to right under its label on a phone. */
+	/* On a phone a long value goes under its label: the Android sentence reads left to right, and
+	   Back up and Restore split the width evenly with their status line below them, so a message
+	   never pushes the buttons down under a finger. */
 	dl .row-long {
 		grid-template-columns: 1fr;
-		row-gap: var(--space-1);
+		row-gap: var(--space-2);
 		padding-block: var(--space-3);
 	}
 
@@ -441,13 +443,53 @@ const sha = process.env.GITHUB_SHA
 		text-align: left;
 	}
 
+	.row-long .row-actions {
+		justify-content: flex-start;
+		row-gap: var(--space-2);
+	}
+
+	.row-long .row-buttons {
+		flex: 1 1 100%;
+		flex-wrap: nowrap;
+	}
+
+	.row-long .row-buttons > .row-button {
+		flex: 1 1 0;
+		justify-content: center;
+		margin-block: 0;
+	}
+
+	.row-long .row-status {
+		order: 1;
+		flex-basis: 100%;
+	}
+
 	@media (min-width: 768px) {
 		dl .row-long {
 			grid-template-columns: minmax(min-content, 1fr) auto;
+			padding-block: 0;
 		}
 
 		.row-long dd {
 			text-align: right;
+		}
+
+		.row-long .row-actions {
+			justify-content: flex-end;
+		}
+
+		.row-long .row-buttons {
+			flex: none;
+		}
+
+		.row-long .row-buttons > .row-button {
+			flex: none;
+			margin-block: var(--space-1);
+		}
+
+		.row-long .row-status {
+			order: 0;
+			flex-basis: auto;
 		}
 	}
 

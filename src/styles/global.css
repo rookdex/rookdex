@@ -2243,6 +2243,16 @@ html:has(.search-row) {
 	max-width: none;
 }
 
+/* The backup reminder: the sentence takes the line, the two buttons stay whole beside or under it. */
+.hint.backup-nudge > span {
+	flex: 1 1 16rem;
+}
+
+.hint.backup-nudge > button {
+	flex: none;
+	white-space: nowrap;
+}
+
 .progress {
 	margin-bottom: var(--space-2);
 }
