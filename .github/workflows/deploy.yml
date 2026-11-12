@@ -7,6 +7,8 @@ on:
   workflow_dispatch:
   # launch-rebuild (dashboard spec §12): 23:05 UTC on 18 Nov is 00:05 CET on 19 Nov. The hub's
   # server HTML is built with the build time, so this rebuild is what makes it the dashboard.
+  # The game unlocks at each player's own midnight, so the browser corrects the static page
+  # either way: dashboard early in Asia and Australia, countdown until midnight in the Americas.
   schedule:
     - cron: "5 23 18 11 *"
 

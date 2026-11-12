@@ -84,7 +84,8 @@ export function Hub({
 		"first-hour": { href: firstHourHref, page: firstHourTitle },
 		install: { href: settingsHref, page: t("nav.settings") },
 	}
-	// The launch date only, never a time: Rockstar hasn't confirmed the unlock time (#73).
+	// The launch date only, never a time: the game unlocks at each visitor's own midnight, so the
+	// date is the same everywhere and a clock time would be wrong for most of them.
 	// Day first, as the privacy page does: plain `en` would give "Thu, Nov 19".
 	const launchDate = new Intl.DateTimeFormat(dateLocale(locale), {
 		weekday: "short",

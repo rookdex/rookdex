@@ -58,3 +58,45 @@ describe("useCountdown", () => {
 		}
 	})
 })
+
+// The page is built against the CET instant; the device then counts to its own midnight.
+describe("useCountdown across time zones", () => {
+	afterEach(() => {
+		vi.unstubAllEnvs()
+	})
+
+	it("matches the server on the first render, then shows Tokyo's launch before the CET rebuild", () => {
+		vi.stubEnv("TZ", "Asia/Tokyo")
+		// Built at noon UTC on 18 November: a "before" page. 16:00 UTC is 01:00 in Tokyo.
+		const built = new Date("2026-11-18T12:00:00Z")
+		vi.setSystemTime(new Date("2026-11-18T16:00:00Z"))
+		const seen: string[] = []
+		const { result } = renderHook(() => {
+			const state = useCountdown(built)
+			seen.push(state.phase)
+			return state
+		})
+		expect(seen[0]).toBe("before")
+		expect(result.current.phase).toBe("after")
+		expect(result.current.daysSince).toBe(0)
+	})
+
+	it("matches the rebuilt page on the first render, then counts to New York's midnight", () => {
+		vi.stubEnv("TZ", "America/New_York")
+		const rebuilt = new Date("2026-11-18T23:05:00Z")
+		vi.setSystemTime(new Date("2026-11-19T04:59:58Z"))
+		const seen: string[] = []
+		const { result } = renderHook(() => {
+			const state = useCountdown(rebuilt)
+			seen.push(state.phase)
+			return state
+		})
+		expect(seen[0]).toBe("after")
+		expect(result.current.phase).toBe("before")
+		expect(result.current.parts).toEqual({ days: 0, hours: 0, minutes: 0, seconds: 2 })
+		expect(result.current.daysToGo).toBe(1)
+		act(() => vi.advanceTimersByTime(2_000))
+		expect(result.current.phase).toBe("after")
+		expect(result.current.daysSince).toBe(0)
+	})
+})

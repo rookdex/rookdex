@@ -6,6 +6,8 @@ import {
 	daysToGo,
 	type HubPhase,
 	hubPhase,
+	LAUNCH_AT,
+	localLaunchAt,
 } from "../model/launch"
 
 export interface CountdownState {
@@ -17,27 +19,29 @@ export interface CountdownState {
 	daysSince: number
 }
 
-function compute(now: Date): CountdownState {
+function compute(now: Date, launchAt: Date): CountdownState {
 	return {
 		now,
-		phase: hubPhase(now),
-		parts: countdownParts(now),
-		daysToGo: daysToGo(now),
-		daysSince: daysSince(now),
+		phase: hubPhase(now, launchAt),
+		parts: countdownParts(now, launchAt),
+		daysToGo: daysToGo(now, launchAt),
+		daysSince: daysSince(now, launchAt),
 	}
 }
 
 /**
  * Ticks every second, or once a minute under prefers-reduced-motion (CSS hides the seconds then).
- * `initialNow` is the build-time clock so the server HTML and the first client render match;
- * the effect then switches to the device clock, which is what flips the page at midnight.
+ * `initialNow` is the build-time clock, and the first render counts to the build's CET instant,
+ * so the server HTML and the first client render match. The effect then switches to the device
+ * clock and the device's own midnight, which is what flips the page at the visitor's launch,
+ * earlier or later than the static page says.
  */
 export function useCountdown(initialNow: Date): CountdownState {
-	const [state, setState] = useState(() => compute(initialNow))
+	const [state, setState] = useState(() => compute(initialNow, LAUNCH_AT))
 
 	useEffect(() => {
 		const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-		const tick = () => setState(compute(new Date()))
+		const tick = () => setState(compute(new Date(), localLaunchAt()))
 		tick()
 		const id = window.setInterval(tick, reduced ? 60_000 : 1_000)
 		return () => window.clearInterval(id)

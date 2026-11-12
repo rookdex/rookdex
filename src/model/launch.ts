@@ -3,11 +3,23 @@
 
 const DAY_MS = 86_400_000
 
-/** GTA VI release: 19 November 2026, 00:00 CET (UTC+1). */
+/**
+ * GTA VI release as one instant: 19 November 2026, 00:00 CET (UTC+1). The build uses this, so the
+ * server HTML and the 00:05 CET launch rebuild don't depend on the build machine's time zone.
+ */
 export const LAUNCH_AT = new Date("2026-11-19T00:00:00+01:00")
 
 /** Preload opens 10 November 2026: local midnight on PS5, 00:00 GMT on Xbox (Newswire 03.11). */
 export const PRELOAD_AT = new Date("2026-11-10T00:00:00+01:00")
+
+/**
+ * The launch on this device: midnight on 19 November on its own clock. Rockstar unlocks the game
+ * at midnight local time in every region (Rockstar Support, 03.11). Every helper below defaults
+ * to it, so a visitor in New York counts to their own midnight, not to 18:00.
+ */
+export function localLaunchAt(): Date {
+	return new Date(2026, 10, 19)
+}
 
 export type HubPhase = "before" | "after"
 
@@ -18,11 +30,18 @@ export interface CountdownParts {
 	seconds: number
 }
 
-export function hubPhase(now: Date, launchAt = LAUNCH_AT): HubPhase {
+/** `date` moved `n` days on this device's calendar, keeping its wall-clock time. */
+function shiftDays(date: Date, n: number): Date {
+	const moved = new Date(date.getTime())
+	moved.setDate(moved.getDate() + n)
+	return moved
+}
+
+export function hubPhase(now: Date, launchAt = localLaunchAt()): HubPhase {
 	return now.getTime() < launchAt.getTime() ? "before" : "after"
 }
 
-export function countdownParts(now: Date, launchAt = LAUNCH_AT): CountdownParts {
+export function countdownParts(now: Date, launchAt = localLaunchAt()): CountdownParts {
 	const total = Math.max(0, Math.floor((launchAt.getTime() - now.getTime()) / 1000))
 	return {
 		days: Math.floor(total / 86_400),
@@ -32,14 +51,26 @@ export function countdownParts(now: Date, launchAt = LAUNCH_AT): CountdownParts 
 	}
 }
 
-/** Whole days left, rounded up: the evening before still says "1 day". */
-export function daysToGo(now: Date, launchAt = LAUNCH_AT): number {
-	const ms = launchAt.getTime() - now.getTime()
-	return ms <= 0 ? 0 : Math.ceil(ms / DAY_MS)
+/**
+ * Whole days left, rounded up: the evening before still says "1 day". Counted in calendar days,
+ * so a daylight-saving change between now and launch can't shift when the number drops.
+ */
+export function daysToGo(now: Date, launchAt = localLaunchAt()): number {
+	if (now.getTime() >= launchAt.getTime()) return 0
+	let n = Math.ceil((launchAt.getTime() - now.getTime()) / DAY_MS)
+	while (n > 1 && shiftDays(launchAt, 1 - n).getTime() <= now.getTime()) n--
+	while (shiftDays(launchAt, -n).getTime() > now.getTime()) n++
+	return n
 }
 
-/** Whole days since launch, rounded down: launch night itself is day 0. */
-export function daysSince(now: Date, launchAt = LAUNCH_AT): number {
-	const ms = now.getTime() - launchAt.getTime()
-	return ms < 0 ? 0 : Math.floor(ms / DAY_MS)
+/**
+ * Whole days since launch, rounded down: launch night itself is day 0. Each new day starts at
+ * midnight on this device's calendar, also after a daylight-saving change.
+ */
+export function daysSince(now: Date, launchAt = localLaunchAt()): number {
+	if (now.getTime() < launchAt.getTime()) return 0
+	let n = Math.floor((now.getTime() - launchAt.getTime()) / DAY_MS)
+	while (n > 0 && shiftDays(launchAt, n).getTime() > now.getTime()) n--
+	while (shiftDays(launchAt, n + 1).getTime() <= now.getTime()) n++
+	return n
 }

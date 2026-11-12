@@ -12,6 +12,11 @@ declare module "vitest" {
 
 expect.extend(axeMatchers)
 
+// The launch is midnight on the device's own clock (model/launch.ts), so every test needs a known
+// zone. Oslo matches my machine; CI runs in UTC. Tests about other zones stub TZ themselves, and
+// vi.unstubAllEnvs() restores this value.
+process.env.TZ = "Europe/Oslo"
+
 // jsdom has no matchMedia and no <dialog> methods; stub the parts the islands call.
 if (typeof window !== "undefined") {
 	// Testing Library only auto-cleans with `globals: true`, which this project does not use.
