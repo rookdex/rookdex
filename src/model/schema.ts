@@ -17,6 +17,8 @@ export const TEXT = {
 } as const
 
 export const MAX_RECORDS = 10_000
+/** Far above any real household; it only stops a crafted file from creating thousands. */
+export const MAX_BACKUP_PROFILES = 100
 /** Exactly `<category>/<kebab-name>`: one slash, so an id can also serve as a DOM id. */
 export const ID_PATTERN = /^[a-z0-9-]+\/[a-z0-9-]+$/
 const FORBIDDEN = /[<>]|http/i
@@ -101,12 +103,36 @@ export const profileSchema = z.strictObject({
 	deleted_at: z.iso.datetime().optional(),
 })
 
-export const exportFileSchema = z.strictObject({
+const profileNameSchema = z.string().trim().min(1).max(TEXT.profileName)
+
+/** Version 1: one profile, from the Tracker's profile menu. Still read unchanged. */
+export const exportFileV1Schema = z.strictObject({
 	version: z.literal(1),
 	exported_at: z.iso.datetime(),
-	profile_name: z.string().trim().min(1).max(TEXT.profileName),
+	profile_name: profileNameSchema,
 	records: z.array(progressRecordSchema).max(MAX_RECORDS),
 })
+
+/** Version 2: every profile, from Back up in Settings. MAX_RECORDS caps the whole file. */
+export const backupFileSchema = z
+	.strictObject({
+		version: z.literal(2),
+		exported_at: z.iso.datetime(),
+		profiles: z
+			.array(z.strictObject({ name: profileNameSchema, records: z.array(progressRecordSchema) }))
+			.min(1)
+			.max(MAX_BACKUP_PROFILES),
+	})
+	.refine((file) => recordCount(file.profiles) <= MAX_RECORDS, { message: "too many records" })
+
+export const exportFileSchema = z.discriminatedUnion("version", [
+	exportFileV1Schema,
+	backupFileSchema,
+])
+
+export function recordCount(profiles: { records: unknown[] }[]): number {
+	return profiles.reduce((sum, p) => sum + p.records.length, 0)
+}
 
 export const allowlistSchema = z.strictObject({
 	official: z.array(z.string().min(1)),
@@ -125,5 +151,7 @@ export type FactInput = z.infer<typeof factInputSchema>
 export type Fact = z.infer<typeof factSchema>
 export type ProgressRecord = z.infer<typeof progressRecordSchema>
 export type Profile = z.infer<typeof profileSchema>
+export type ExportFileV1 = z.infer<typeof exportFileV1Schema>
+export type BackupFile = z.infer<typeof backupFileSchema>
 export type ExportFile = z.infer<typeof exportFileSchema>
 export type Allowlist = z.infer<typeof allowlistSchema>

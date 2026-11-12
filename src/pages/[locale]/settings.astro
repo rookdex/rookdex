@@ -40,7 +40,25 @@ const sha = process.env.GITHUB_SHA
 		</div>
 	</section>
 
-	<section class="settings-group" aria-labelledby="settings-data">
+	{/* Every message the backup script can show ships here, so the script needs no copy bundle. */}
+	<section
+		class="settings-group"
+		aria-labelledby="settings-data"
+		data-backup
+		data-never={t("settings.never")}
+		data-saved={t("tracker.backupSaved")}
+		data-nothing={t("settings.nothingToBackUp")}
+		data-error-storage={t("tracker.errors.storage")}
+		data-error-too-large={t("tracker.errors.too-large")}
+		data-error-not-json={t("tracker.errors.not-json")}
+		data-error-not-export={t("tracker.errors.not-export")}
+		data-error-newer-version={t("tracker.errors.newer-version")}
+		data-error-too-many={t("tracker.errors.too-many")}
+		data-imported-one={t("tracker.imported.one")}
+		data-imported-other={t("tracker.imported.other")}
+		data-restored-one={t("tracker.restored.one")}
+		data-restored-other={t("tracker.restored.other")}
+	>
 		<h2 id="settings-data">{t("settings.data")}</h2>
 		<dl class="rows">
 			<div class="row">
@@ -51,9 +69,50 @@ const sha = process.env.GITHUB_SHA
 				<dt>{t("settings.languageChoice")}</dt>
 				<dd>{t("settings.languageChoiceValue")}</dd>
 			</div>
-			<div class="row" data-storage-row data-yes={t("settings.yes")} data-no={t("settings.no")} hidden>
+			<div
+				class="row"
+				data-storage-row
+				data-yes={t("settings.yes")}
+				data-no={t("settings.no")}
+				data-granted={t("settings.persistGranted")}
+				data-refused={t("settings.persistRefused")}
+				hidden
+			>
 				<dt>{t("settings.persisted")}</dt>
+				<dd class="row-actions">
+					<span class="row-status" role="status" data-persist-status></span>
+					<span class="row-answer" data-value></span>
+					<button type="button" class="row-button" data-persist-button aria-describedby="persist-note" hidden>
+						{t("settings.persistButton")}
+					</button>
+				</dd>
+				<dd class="row-note" id="persist-note" data-persist-note hidden>{t("settings.persistNote")}</dd>
+			</div>
+			<div class="row" data-usage-row hidden>
+				<dt>{t("settings.usage")}</dt>
 				<dd data-value></dd>
+			</div>
+			<div class="row" data-backup-date hidden>
+				<dt>{t("settings.lastBackup")}</dt>
+				<dd data-value></dd>
+			</div>
+			<div class="row row-long" data-backup-row hidden>
+				<dt>{t("settings.backup")}</dt>
+				<dd class="row-actions">
+					<span class="row-status" role="status" data-backup-status></span>
+					<span class="row-buttons">
+						<button type="button" class="row-button" data-backup-button>{t("settings.backupButton")}</button>
+						<button type="button" class="row-button" data-restore-button>{t("settings.restoreButton")}</button>
+					</span>
+					<input
+						type="file"
+						accept=".json,application/json"
+						class="visually-hidden"
+						tabindex="-1"
+						aria-label={t("settings.restoreButton")}
+						data-restore-input
+					/>
+				</dd>
 			</div>
 			<div class="row row-linked">
 				<dt>{t("settings.transfer")}</dt>
@@ -78,6 +137,11 @@ const sha = process.env.GITHUB_SHA
 					<span data-install-installed hidden>{t("settings.installed")}</span>
 					<span data-install-ios hidden>{t("settings.iosHowTo")}</span>
 				</dd>
+			</div>
+			{/* One copy key, so the line can become a Google Play link once the listing is live. */}
+			<div class="row row-long">
+				<dt>{t("settings.android")}</dt>
+				<dd>{t("settings.playNote")}</dd>
 			</div>
 			<div class={sha ? "row row-linked" : "row"}>
 				<dt>{t("settings.version")}</dt>
@@ -188,8 +252,18 @@ const sha = process.env.GITHUB_SHA
 </Base>
 
 <script>
+	import { readBackupLog, recordBackup } from "../../islands/seenFlag"
+	import { openStore } from "../../model/store"
 	import { deleteAllData } from "../../scripts/delete-all"
-	import { wireDeleteDialog, wireInstallRow, wireShareRow, wireStorageRow } from "../../scripts/settings"
+	import { downloadJson } from "../../scripts/download"
+	import {
+		wireBackupRows,
+		wireDeleteDialog,
+		wireInstallRow,
+		wireShareRow,
+		wireStorageRow,
+		wireUsageRow,
+	} from "../../scripts/settings"
 
 	// Either store can be missing or throw on access (private modes, blocked site data).
 	function database(): IDBFactory | undefined {
@@ -200,8 +274,27 @@ const sha = process.env.GITHUB_SHA
 		}
 	}
 
+	const locale = document.documentElement.lang
+
 	const storageRow = document.querySelector<HTMLElement>("[data-storage-row]")
 	if (storageRow) wireStorageRow(storageRow, navigator.storage)
+
+	const usageRow = document.querySelector<HTMLElement>("[data-usage-row]")
+	if (usageRow) wireUsageRow(usageRow, navigator.storage, locale)
+
+	// Without IndexedDB there is nothing to back up or restore into, so the rows stay hidden.
+	const backup = document.querySelector<HTMLElement>("[data-backup]")
+	const idb = database()
+	if (backup && idb) {
+		wireBackupRows(backup, {
+			openStore: () => openStore(idb),
+			transfer: () => import("../../model/transfer"),
+			now: () => new Date(),
+			download: downloadJson,
+			log: { read: readBackupLog, record: recordBackup },
+			locale,
+		})
+	}
 
 	const installRow = document.querySelector<HTMLElement>("[data-install-row]")
 	if (installRow) wireInstallRow(installRow, window)
@@ -318,6 +411,86 @@ const sha = process.env.GITHUB_SHA
 
 	.row-status {
 		color: var(--text-muted);
+	}
+
+	/* Back up and Restore keep one row and one height; they wrap together under the status. */
+	.row-buttons {
+		display: inline-flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		column-gap: var(--space-2);
+	}
+
+	/* What the Protect button does: a full-width line under the label and the value. */
+	.row .row-note {
+		grid-column: 1 / -1;
+		margin-bottom: var(--space-3);
+		color: var(--text-muted);
+		font-size: 0.8125rem;
+		text-align: left;
+	}
+
+	/* On a phone a long value goes under its label: the Android sentence reads left to right, and
+	   Back up and Restore split the width evenly with their status line below them, so a message
+	   never pushes the buttons down under a finger. */
+	dl .row-long {
+		grid-template-columns: 1fr;
+		row-gap: var(--space-2);
+		padding-block: var(--space-3);
+	}
+
+	.row-long dd {
+		text-align: left;
+	}
+
+	.row-long .row-actions {
+		justify-content: flex-start;
+		row-gap: var(--space-2);
+	}
+
+	.row-long .row-buttons {
+		flex: 1 1 100%;
+		flex-wrap: nowrap;
+	}
+
+	.row-long .row-buttons > .row-button {
+		flex: 1 1 0;
+		justify-content: center;
+		margin-block: 0;
+	}
+
+	.row-long .row-status {
+		order: 1;
+		flex-basis: 100%;
+	}
+
+	@media (min-width: 768px) {
+		dl .row-long {
+			grid-template-columns: minmax(min-content, 1fr) auto;
+			padding-block: 0;
+		}
+
+		.row-long dd {
+			text-align: right;
+		}
+
+		.row-long .row-actions {
+			justify-content: flex-end;
+		}
+
+		.row-long .row-buttons {
+			flex: none;
+		}
+
+		.row-long .row-buttons > .row-button {
+			flex: none;
+			margin-block: var(--space-1);
+		}
+
+		.row-long .row-status {
+			order: 0;
+			flex-basis: auto;
+		}
 	}
 
 	.row-status:empty {

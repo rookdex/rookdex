@@ -1,12 +1,18 @@
 // @vitest-environment jsdom
+import { IDBFactory } from "fake-indexeddb"
 import { describe, expect, it, vi } from "vitest"
+import type { BackupLog } from "../islands/seenFlag"
+import { openStore } from "../model/store"
 import type { DeleteResult } from "./delete-all"
 import {
+	type BackupDeps,
 	type InstallWindow,
+	wireBackupRows,
 	wireDeleteDialog,
 	wireInstallRow,
 	wireShareRow,
 	wireStorageRow,
+	wireUsageRow,
 } from "./settings"
 
 function storageRow(): HTMLElement {
@@ -321,5 +327,278 @@ describe("wireShareRow", () => {
 		await expect(rejection).rejects.toThrow()
 		await Promise.resolve()
 		expect(row.hidden).toBe(false)
+	})
+})
+
+function protectRow(): HTMLElement {
+	document.body.innerHTML = `
+		<dl>
+			<div data-storage-row data-yes="Yes" data-no="No" data-granted="Protected." data-refused="Browser said no." hidden>
+				<dt>Protected from clearing</dt>
+				<dd>
+					<span role="status" data-persist-status></span>
+					<span data-value></span>
+					<button type="button" data-persist-button hidden>Protect</button>
+				</dd>
+				<dd data-persist-note hidden>Asks your browser not to clear.</dd>
+			</div>
+		</dl>`
+	return document.querySelector("[data-storage-row]") as HTMLElement
+}
+
+describe("wireStorageRow: Protect button", () => {
+	const parts = (row: HTMLElement) => ({
+		value: row.querySelector("[data-value]")?.textContent,
+		button: row.querySelector("[data-persist-button]") as HTMLButtonElement,
+		note: row.querySelector("[data-persist-note]") as HTMLElement,
+		status: row.querySelector("[data-persist-status]")?.textContent,
+	})
+
+	it("offers the button and its note only while the answer is No", async () => {
+		const yes = protectRow()
+		await wireStorageRow(yes, { persisted: async () => true, persist: async () => true })
+		expect(parts(yes).button.hidden).toBe(true)
+		const no = protectRow()
+		await wireStorageRow(no, { persisted: async () => false, persist: async () => true })
+		expect(parts(no).button.hidden).toBe(false)
+		expect(parts(no).note.hidden).toBe(false)
+	})
+
+	it("leaves the button out where the browser cannot ask", async () => {
+		const row = protectRow()
+		await wireStorageRow(row, { persisted: async () => false })
+		expect(parts(row).button.hidden).toBe(true)
+		expect(parts(row).value).toBe("No")
+	})
+
+	it("turns the row to Yes when the browser agrees, and says so", async () => {
+		const row = protectRow()
+		await wireStorageRow(row, { persisted: async () => false, persist: async () => true })
+		parts(row).button.click()
+		await vi.waitFor(() => expect(parts(row).value).toBe("Yes"))
+		expect(parts(row).button.hidden).toBe(true)
+		expect(parts(row).note.hidden).toBe(true)
+		expect(parts(row).status).toBe("Protected.")
+	})
+
+	it("keeps No and says why when the browser refuses or fails", async () => {
+		for (const persist of [async () => false, () => Promise.reject(new Error("x"))]) {
+			const row = protectRow()
+			await wireStorageRow(row, { persisted: async () => false, persist })
+			parts(row).button.click()
+			await vi.waitFor(() => expect(parts(row).status).toBe("Browser said no."))
+			expect(parts(row).value).toBe("No")
+			expect(parts(row).button.hidden).toBe(true)
+		}
+	})
+})
+
+function usageRow(): HTMLElement {
+	document.body.innerHTML = `
+		<dl><div data-usage-row hidden><dt>Space used</dt><dd data-value></dd></div></dl>`
+	return document.querySelector("[data-usage-row]") as HTMLElement
+}
+
+describe("wireUsageRow", () => {
+	it.each([
+		["en", 4_200_000, "4.2 MB"],
+		["nb", 4_200_000, "4,2 MB"],
+		["en", 320_000, "320 kB"],
+		["en", 0, "0 kB"],
+	])("shows %s usage of %i bytes as %s", async (locale, usage, text) => {
+		const row = usageRow()
+		await wireUsageRow(row, { estimate: async () => ({ usage }) }, locale)
+		expect(row.hidden).toBe(false)
+		expect(row.querySelector("[data-value]")?.textContent?.replace(/\s/g, " ")).toBe(text)
+	})
+
+	it("leaves the row out without the API, a number or a working call", async () => {
+		for (const storage of [
+			undefined,
+			{},
+			{ estimate: async () => ({}) },
+			{ estimate: () => Promise.reject(new Error("x")) },
+		]) {
+			const row = usageRow()
+			await wireUsageRow(row, storage, "en")
+			expect(row.isConnected).toBe(false)
+		}
+	})
+})
+
+const MESSAGES = `
+	data-never="Never"
+	data-saved="Backup saved as {file}."
+	data-nothing="Nothing to back up yet."
+	data-error-storage="Saving failed."
+	data-error-too-large="Too large."
+	data-error-not-json="Damaged."
+	data-error-not-export="Not a Rookdex file."
+	data-error-newer-version="Newer Rookdex."
+	data-error-too-many="Too many."
+	data-imported-one="Imported 1 item into {name}."
+	data-imported-other="Imported {count} items into {name}."
+	data-restored-one="Restored {profiles} profiles: {names}. 1 item came in."
+	data-restored-other="Restored {profiles} profiles: {names}. {count} items came in."`
+
+function backupSection(): HTMLElement {
+	document.body.innerHTML = `
+		<section data-backup ${MESSAGES}>
+			<dl>
+				<div data-backup-date hidden><dt>Last backup</dt><dd data-value></dd></div>
+				<div data-backup-row hidden>
+					<dt>All profiles</dt>
+					<dd>
+						<span role="status" data-backup-status></span>
+						<button type="button" data-backup-button>Back up</button>
+						<button type="button" data-restore-button>Restore</button>
+						<input type="file" data-restore-input />
+					</dd>
+				</div>
+			</dl>
+		</section>`
+	return document.querySelector("[data-backup]") as HTMLElement
+}
+
+describe("wireBackupRows", () => {
+	const now = new Date(2026, 10, 12, 13, 20)
+	const record = {
+		item_id: "wildlife/a",
+		done: true,
+		updated_at: "2026-11-12T09:00:00.000Z",
+		origin: "manual" as const,
+	}
+
+	function setup(options: { at?: string | null; profiles?: boolean; broken?: boolean } = {}) {
+		const factory = new IDBFactory()
+		let log: BackupLog = { at: options.at ?? null, ticks: 7 }
+		const download = vi.fn()
+		const deps: BackupDeps = {
+			openStore: options.broken
+				? () => Promise.reject(new Error("blocked"))
+				: () => openStore(factory),
+			transfer: () => import("../model/transfer"),
+			now: () => now,
+			download,
+			log: {
+				read: () => log,
+				record: (at) => {
+					log = { at: at.toISOString(), ticks: 0 }
+				},
+			},
+			locale: "en",
+		}
+		const root = backupSection()
+		const ready = (async () => {
+			if (options.profiles) {
+				const store = await openStore(factory)
+				await store.put("profiles", { id: "p1", name: "Malin", created_at: now.toISOString() })
+				await store.put("progress", { ...record, profile_id: "p1" })
+				store.close()
+			}
+			wireBackupRows(root, deps)
+		})()
+		const q = (selector: string) => root.querySelector(selector) as HTMLElement
+		return {
+			ready,
+			root,
+			download,
+			log: () => log,
+			date: () => q("[data-backup-date] [data-value]").textContent,
+			status: () => q("[data-backup-status]").textContent,
+			backUp: () => q("[data-backup-button]").click(),
+			pick: (contents: string) => {
+				const input = q("[data-restore-input]") as HTMLInputElement
+				const file = { size: contents.length, text: async () => contents }
+				Object.defineProperty(input, "files", { value: [file], configurable: true })
+				input.dispatchEvent(new Event("change"))
+			},
+		}
+	}
+
+	it("shows the rows, with Never before the first backup", async () => {
+		const page = setup()
+		await page.ready
+		expect(page.root.querySelector<HTMLElement>("[data-backup-date]")?.hidden).toBe(false)
+		expect(page.root.querySelector<HTMLElement>("[data-backup-row]")?.hidden).toBe(false)
+		expect(page.date()).toBe("Never")
+	})
+
+	it("shows the last backup as a dotted date", async () => {
+		const page = setup({ at: new Date(2026, 10, 10, 9, 0).toISOString() })
+		await page.ready
+		expect(page.date()).toBe("10.11.2026")
+	})
+
+	it("Back up saves every profile, stamps the date and says the file name", async () => {
+		const page = setup({ profiles: true })
+		await page.ready
+		page.backUp()
+		await vi.waitFor(() => expect(page.download).toHaveBeenCalled())
+		const [filename, json] = page.download.mock.calls[0]
+		expect(filename).toBe(`rookdex-backup-${now.toISOString().slice(0, 10)}.json`)
+		expect(JSON.parse(json)).toMatchObject({ version: 2, profiles: [{ name: "Malin" }] })
+		expect(page.log().ticks).toBe(0)
+		expect(page.date()).toBe("12.11.2026")
+		expect(page.status()).toBe(`Backup saved as ${filename}.`)
+	})
+
+	it("says there is nothing to back up on a fresh device", async () => {
+		const page = setup()
+		await page.ready
+		page.backUp()
+		await vi.waitFor(() => expect(page.status()).toBe("Nothing to back up yet."))
+		expect(page.download).not.toHaveBeenCalled()
+		expect(page.date()).toBe("Never")
+	})
+
+	it("says saving failed when the database will not open", async () => {
+		const page = setup({ broken: true })
+		await page.ready
+		page.backUp()
+		await vi.waitFor(() => expect(page.status()).toBe("Saving failed."))
+	})
+
+	it("restores a backup by name and says how many items came in", async () => {
+		const page = setup({ profiles: true })
+		await page.ready
+		page.pick(
+			JSON.stringify({
+				version: 2,
+				exported_at: now.toISOString(),
+				profiles: [
+					{ name: "Malin", records: [{ ...record, item_id: "wildlife/b" }] },
+					{ name: "Dad", records: [record, { ...record, item_id: "wildlife/c" }] },
+				],
+			})
+		)
+		await vi.waitFor(() =>
+			expect(page.status()).toBe("Restored 2 profiles: Malin, Dad. 3 items came in.")
+		)
+	})
+
+	it("restores a one-profile export into the profile of that name", async () => {
+		const page = setup({ profiles: true })
+		await page.ready
+		page.pick(
+			JSON.stringify({
+				version: 1,
+				exported_at: now.toISOString(),
+				profile_name: "Malin",
+				records: [{ ...record, item_id: "wildlife/b" }],
+			})
+		)
+		await vi.waitFor(() => expect(page.status()).toBe("Imported 1 item into Malin."))
+	})
+
+	it.each([
+		["{oops", "Damaged."],
+		[JSON.stringify({ version: 7 }), "Newer Rookdex."],
+		[JSON.stringify({ any: "thing" }), "Not a Rookdex file."],
+	])("gives the reason a file is refused", async (contents, reason) => {
+		const page = setup({ profiles: true })
+		await page.ready
+		page.pick(contents)
+		await vi.waitFor(() => expect(page.status()).toBe(reason))
 	})
 })

@@ -28,6 +28,7 @@ describe("deleteAllData (spec §7.2, feedback spec §7.3)", () => {
 			["rookdex.active-profile"],
 			[CHECKLIST_KEY],
 			[HIDE_FOUND_KEY],
+			["rookdex.backup"],
 		])
 		expect(storage.clear).not.toHaveBeenCalled()
 	})

@@ -52,6 +52,73 @@ export const activeProfileStorage: ActiveProfileStore = {
 	},
 }
 
+/** When the last export or backup ran, and how many ticks were saved since. Nothing else. */
+export const BACKUP_KEY = "rookdex.backup"
+
+/**
+ * The backup reminder shows after this many new ticks. 25 is roughly one evening's finds on
+ * launch night: enough that losing them would hurt, few enough to still remember. A lower number
+ * would nag through every session; the list has about 200 items.
+ */
+export const BACKUP_REMINDER_TICKS = 25
+
+export interface BackupLog {
+	/** ISO time of the last successful export or backup, or null when there has been none. */
+	at: string | null
+	ticks: number
+}
+
+/** Never throws. Blocked storage and garbage read as no backup and no ticks. */
+export function readBackupLog(): BackupLog {
+	let raw: string | null
+	try {
+		raw = localStorage.getItem(BACKUP_KEY)
+	} catch {
+		raw = null
+	}
+	let data: unknown
+	try {
+		data = JSON.parse(raw ?? "{}")
+	} catch {
+		data = {}
+	}
+	const { at, ticks } = (typeof data === "object" && data !== null ? data : {}) as Record<
+		string,
+		unknown
+	>
+	return {
+		at: typeof at === "string" && !Number.isNaN(Date.parse(at)) ? at : null,
+		ticks: Number.isInteger(ticks) && (ticks as number) >= 0 ? (ticks as number) : 0,
+	}
+}
+
+function writeBackupLog(log: BackupLog): void {
+	try {
+		localStorage.setItem(BACKUP_KEY, JSON.stringify(log))
+	} catch {
+		// Blocked storage: no date to show and no reminder, which is the safe side.
+	}
+}
+
+export function countBackupTick(): void {
+	const log = readBackupLog()
+	writeBackupLog({ ...log, ticks: log.ticks + 1 })
+}
+
+/** Any export that produced a file: stamps the date and starts the tick count again. */
+export function recordBackup(now: Date): void {
+	writeBackupLog({ at: now.toISOString(), ticks: 0 })
+}
+
+/** "Not now" on the reminder: it comes back after another BACKUP_REMINDER_TICKS ticks. */
+export function snoozeBackupReminder(): void {
+	writeBackupLog({ ...readBackupLog(), ticks: 0 })
+}
+
+export function backupDue(log: BackupLog): boolean {
+	return log.ticks >= BACKUP_REMINDER_TICKS
+}
+
 /** The before-launch list's ticks (desktop dashboard spec §5). Up to five fixed ids, nothing else. */
 export const CHECKLIST_KEY = "rookdex.prelaunch-checklist"
 export const CHECKLIST_IDS = ["edition", "preload", "space", "first-hour", "install"] as const

@@ -118,7 +118,7 @@ describe("Privacy page (Android spec §3)", () => {
 		const items = [...doc.querySelectorAll('section[aria-labelledby="privacy-stored"] li')]
 		expect(items.map((li) => li.textContent)).toEqual([
 			"Your profiles and what you have ticked off (IndexedDB).",
-			'Which profile is active, the language you picked, which items you ticked on the before-launch list, whether Hide found is on in the tracker, and two notes that a message was already shown: the install prompt and the storage hint (localStorage). If you choose "update later", that is kept only until you close the tab (sessionStorage).',
+			'Which profile is active, the language you picked, which items you ticked on the before-launch list, whether Hide found is on in the tracker, when you last saved a backup and how many ticks you made since (the backup reminder counts them, and "Not now" sets the count back to zero), and two notes that a message was already shown: the install prompt and the storage hint (localStorage). If you choose "update later", that is kept only until you close the tab (sessionStorage).',
 			"An offline copy of the site, so it works without a network (the service worker cache).",
 		])
 	})
@@ -154,8 +154,8 @@ describe("Privacy page (Android spec §3)", () => {
 		const section = doc.querySelector('section[aria-labelledby="privacy-delete"]')
 		expect(section?.textContent).toContain(
 			locale === "en"
-				? "It deletes your profiles and progress, which profile is active, your language choice, the before-launch list and whether Hide found is on."
-				: "Det sletter profilene og fremgangen din, hvilken profil som er aktiv, språkvalget ditt, listen før lansering og om Skjul funnet er på."
+				? "It deletes your profiles and progress, which profile is active, your language choice, the before-launch list, whether Hide found is on, and your last backup date with the reminder's tick count."
+				: "Det sletter profilene og fremgangen din, hvilken profil som er aktiv, språkvalget ditt, listen før lansering, om Skjul funnet er på, og datoen for siste sikkerhetskopi med påminnelsens telling."
 		)
 	})
 

@@ -2,6 +2,7 @@
 // Every action captures the current profile id before its first await and writes to the
 // store before touching state, so a profile switch mid-write never misfiles a tick.
 import {
+	activeProfiles,
 	createProfile as createProfileRecord,
 	ensureActiveProfile,
 	listProfiles,
@@ -16,11 +17,16 @@ import { categoryIds, groupItems } from "./seed"
 import { countable, countItems, groupKey, type Records } from "./stats"
 import type { Store } from "./store"
 import {
+	backupEntries,
 	buildExport,
+	collectBackup,
 	type ImportError,
+	type ImportResult,
+	importAsNewProfile,
 	importRecords,
 	MAX_IMPORT_BYTES,
 	parseImport,
+	restoreBackup,
 } from "./transfer"
 
 export type Status = "loading" | "ready" | "error"
@@ -67,6 +73,8 @@ export interface TrackerDeps {
 	hintSeen?: boolean
 	/** Remembers the active profile across pages and reloads. Leave undefined to always open the first. */
 	activeProfile?: ActiveProfileStore
+	/** Called after each saved tick (not an untick), so the backup reminder can count them. */
+	onTick?: () => void
 }
 
 export interface ImportFileLike {
@@ -88,9 +96,15 @@ export interface Tracker {
 	deleteProfile(id: string): Promise<void>
 	restoreProfile(id: string): Promise<void>
 	exportProfile(): { filename: string; json: string } | undefined
+	/** Every active profile in one version 2 file (Settings' Back up, the backup reminder). */
+	exportAll(): Promise<{ filename: string; json: string } | undefined>
 	readImport(file: ImportFileLike): Promise<void>
 	cancelImport(): void
-	confirmImport(target: "current" | "new"): Promise<void>
+	/**
+	 * "current" and "new" take a version 1 file; a version 2 backup always restores "all". Resolves
+	 * with what each profile got, or undefined when nothing was imported.
+	 */
+	confirmImport(target: "current" | "new" | "all"): Promise<ImportResult[] | undefined>
 	dismissPersistHint(): void
 	clearError(): void
 }
@@ -266,6 +280,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 					}
 				: undefined
 			set({ records, announcement, error: undefined })
+			if (done) deps.onTick?.()
 		} catch {
 			fail(writeError())
 		}
@@ -369,6 +384,16 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			const { filename, file } = buildExport(profile, Object.values(state.records), now())
 			return { filename, json: JSON.stringify(file, null, "\t") }
 		},
+		async exportAll() {
+			try {
+				const backup = await collectBackup(ready(), now())
+				if (!backup) return undefined
+				return { filename: backup.filename, json: JSON.stringify(backup.file, null, "\t") }
+			} catch {
+				fail(writeError())
+				return undefined
+			}
+		},
 		async readImport(file) {
 			if (file.size > MAX_IMPORT_BYTES) return fail("too-large")
 			let text: string
@@ -384,29 +409,48 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		cancelImport() {
 			set({ pendingImport: undefined })
 		},
-		confirmImport: (target) =>
-			once(async () => {
+		async confirmImport(target) {
+			let results: ImportResult[] | undefined
+			await once(async () => {
 				const file = state.pendingImport
 				if (!file) return
 				const db = ready()
+				if (file.version === 2 || target === "all") {
+					results = await restoreBackup(db, backupEntries(file), now(), deps.newId)
+					// The shown profile may have gained records; it stays the shown one.
+					const profiles = activeProfiles(await listProfiles(db))
+					const current = profiles.find((p) => p.id === state.profileId) ?? profiles[0]
+					if (current) await show(db, current, { pendingImport: undefined })
+					return
+				}
 				if (target === "new") {
-					const profile = await createProfileRecord(db, file.profile_name, now(), deps.newId)
-					await importRecords(db, profile.id, file)
+					const { profile, count } = await importAsNewProfile(
+						db,
+						file.profile_name,
+						file.records,
+						now(),
+						deps.newId
+					)
+					results = [{ profileId: profile.id, name: profile.name, count, created: true }]
 					await show(db, profile, { pendingImport: undefined })
 					return
 				}
 				const profileId = state.profileId
-				const merged = await importRecords(db, profileId, file)
+				const name = state.profiles.find((p) => p.id === profileId)?.name ?? ""
+				const { records, count } = await importRecords(db, profileId, file.records)
+				results = [{ profileId, name, count, created: false }]
 				if (state.profileId !== profileId) {
 					set({ pendingImport: undefined })
 					return
 				}
 				set({
-					records: Object.fromEntries(merged.map((r) => [r.item_id, r])),
+					records: Object.fromEntries(records.map((r) => [r.item_id, r])),
 					pendingImport: undefined,
 					error: undefined,
 				})
-			}),
+			})
+			return results
+		},
 		dismissPersistHint() {
 			set({ persistHint: false })
 		},

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { addDays, dayFromKey, daysAgo, localDayKey } from "./days"
+import { addDays, dayFromKey, daysAgo, dottedDate, localDayKey } from "./days"
 
 beforeEach(() => {
 	vi.stubEnv("TZ", "Europe/Oslo")
@@ -36,5 +36,12 @@ describe("addDays", () => {
 	it("crosses month and year ends", () => {
 		expect(addDays("2026-11-01", -1)).toBe("2026-10-31")
 		expect(addDays("2026-12-31", 1)).toBe("2027-01-01")
+	})
+})
+
+describe("dottedDate", () => {
+	it("writes the device's calendar day with periods, in both languages", () => {
+		expect(dottedDate(new Date(2026, 10, 2, 23, 30))).toBe("02.11.2026")
+		expect(dottedDate(new Date(2026, 0, 19, 0, 5))).toBe("19.01.2026")
 	})
 })
