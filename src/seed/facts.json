@@ -166,5 +166,24 @@
 				"title": "Pre-Load Grand Theft Auto VI Now"
 			}
 		]
+	},
+	{
+		"id": "facts/launch-festival",
+		"claim_key": "launch-festival",
+		"name": {
+			"en": "Launch Festival in Miami on 21 November",
+			"nb": "Lanseringsfestival i Miami 21. november"
+		},
+		"summary": {
+			"en": "Rockstar and PlayStation celebrate the launch with a music festival on 21 November at Mana Wynwood in Miami. Two stages host artists from the game and its soundtrack, among them Travis Scott, Cardi B and a Justice DJ set. Tickets went through a pre-sale lottery that closed on 10 November.",
+			"nb": "Rockstar og PlayStation feirer lanseringen med en musikkfestival 21. november på Mana Wynwood i Miami. To scener får artister fra spillet og lydsporet, blant dem Travis Scott, Cardi B og Justice med et DJ-sett. Billettene gikk via en loddtrekning som stengte 10. november."
+		},
+		"announced": "2026-11-09",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/o39o87a435a25a/grand-theft-auto-vi-the-festival",
+				"title": "Grand Theft Auto VI: The Festival"
+			}
+		]
 	}
 ]

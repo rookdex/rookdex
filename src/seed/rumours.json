@@ -41,7 +41,7 @@
 		"id": "rumours/preorder-estimate",
 		"name": "Pre-Orders Estimated at 7.7 Million",
 		"claim_key": "preorder-estimate-us-digital",
-		"summary": "Sensor Tower estimates 7.71 million pre-purchases worth about $751 million, 74% of them on PS5, and projects up to 25 million by launch. These are outside estimates. Rockstar and Take-Two have not shared sales figures, but Take-Two said on 9 November that pre-orders are far above its own forecast.",
+		"summary": "Sensor Tower estimates 7.71 million pre-purchases, 74% of them on PS5, and up to 25 million by launch. Rockstar has not shared sales figures, but Take-Two says pre-orders are far above its forecast, and Sony and Microsoft say it is the most pre-ordered game ever on their stores.",
 		"added": "2026-11-04",
 		"sources": [
 			{
@@ -55,6 +55,10 @@
 			{
 				"url": "https://ir.take2games.com/static-files/a45ff316-72c4-4255-b123-aace2e41ad1a",
 				"title": "Take-Two Q2 Fiscal 2027 Prepared Remarks"
+			},
+			{
+				"url": "https://rockstarintel.com/gta-6-is-the-most-pre-ordered-playstation-and-xbox-game-ever-and-sony-has-a-warning/",
+				"title": "GTA 6 Is The Most Pre-Ordered PlayStation and XBOX Game Ever"
 			}
 		]
 	},
