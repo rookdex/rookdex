@@ -6,6 +6,8 @@ A second spec, written after this one ships, makes the other pages adapt per scr
 
 **Feedback round 13.11.2026.** The first build (PR #124) read better but still blended together. I asked for boxes around the objects, no cyan in the panels, less cyan in the news column, the panel icons on the first line of a wrapped label, and a look closer to the Dex category cards and the dashboard tiles. Two mockups were compared on the real page: one card per item, or one tile per section. One card per item won. §1 to §4, §7 and §9 below describe the page after that round.
 
+**Feedback round 2, 13.11.2026.** On a phone the panels were too easy to miss: the only way in was a small line of text links under the h1, pointing at the bottom of a long page. I asked for clear entry points that say what they do and where they go. Three phone mockups (360 px, English and Norwegian) were compared side by side: two cards, two buttons in a row, and one tile with two rows. The one tile won, because it is compact, still says what is behind each row, and has room for more rows later. A second set of mockups settled its spacing: air and a hairline between the tile and Confirmed, so the tile does not sit between two headings. §2, §5, §6, §7 and §9 below describe the jump tile.
+
 ## 1. What this spec covers
 
 - **Layout per screen size:** one column on phones and tablets, two columns from 1024 px, three from 1600 px (§2).
@@ -19,7 +21,7 @@ A second spec, written after this one ships, makes the other pages adapt per scr
 - No change to the seed, the facts and rumours data, the hub or its News tile.
 - No other page changes. Settings gets its own redesign after this.
 - No brand logos. The channels stay plain links with neutral icons, as `news.astro` has said since #116.
-- No new colours. Orange leaves the page entirely and pink marks Confirmed. Cyan stays only on the jump line, which moves around the page. Panel rows are white, and source links are grey (§3, §4).
+- No new colours. Orange leaves the page entirely and pink marks Confirmed. Cyan is not used in the panels or the jump tile. Panel rows are white, and source links are grey (§3, §4).
 
 ## 2. Layout per screen size
 
@@ -27,14 +29,17 @@ All CSS is mobile-first with `min-width` steps. No `max-width` queries.
 
 | Width | Layout |
 |---|---|
-| 320 to 767 px | One column: h1, jump line, Confirmed, Rumours, New to GTA VI?, Official channels. |
+| 320 to 767 px | One column: h1, jump tile, Confirmed, Rumours, New to GTA VI?, Official channels. |
 | 768 to 1023 px | Same single column. The two panels sit side by side at the end. |
 | 1024 to 1599 px | Two columns: news (Confirmed above Rumours) about two thirds, the panels stacked on the right. |
 | 1600 px and up | Three columns: Confirmed, Rumours, panels. `main` takes `.wrap.wide` (85rem), centred at 1920 and 3440 px. |
 
 - **Grid:** Confirmed, Rumours and the `<aside>` are direct children of one grid. From 1024 px the areas are `"confirmed aside" "rumours aside"`, with the aside spanning both rows. From 1600 px they are `"confirmed rumours aside"`. The panel tops line up with the top of Confirmed.
 - **Why three columns at 1600 px:** text already stops at `--measure` (65ch), so a two-column layout would leave an empty strip inside the news column. A third column keeps lines short and Confirmed and Rumours visibly apart.
-- **Jump line:** below 1024 px a quiet line of text links sits under the h1, pointing at the two panels. From 1024 px it is hidden, because the panels are already in view.
+- **Jump tile:** below 1024 px (phones and tablets, where the panels sit at the end of the page) a tile under the h1 points at the two panels. From 1024 px it is hidden, because the panels are already in view.
+  - **Tile:** like the panels: 1px `--border`, `--radius`, `--bg-raised`, padding `--space-2` by `--space-4`. A visible label "On this page" in the dashboard's small uppercase `.tile-label` style names the `<nav>` through `aria-labelledby`.
+  - **Rows:** one per panel, built as panel rows (`.panel-list`): a muted 22 px icon (checklist for New to GTA VI?, newspaper for Official channels), the panel's title in white at the heading font, a muted count of what is behind it at 0.875rem ("2 guides", "5 links", counted from the panel's own list), and a muted 18 px ↓ that says the jump stays on this page. Each row is at least `--tap` high, rows are split by a hairline, and the icon and ↓ sit on the first line of a wrapped label.
+  - **Spacing:** 16 px from the h1 to the tile, then 32 px (`--space-5`) of air, a 1px `--border` hairline across the column, and 32 px more before Confirmed. The tile reads as part of the page head, and Confirmed starts a new block. From 1024 px the hairline goes with the tile.
 - **No facts:** the Confirmed section is left out when there are no facts, as today. The grid then gets the class `no-facts`, and Rumours takes the Confirmed slot, so no empty column is left at 1600 px.
 - **Spacing:** the grid and the aside use a `--space-4` (1.5rem) gap, as between the dashboard tiles. Inside a section the item cards sit `--space-3` (1rem) apart (§3).
 - **The aside at 1024 px and up** is not sticky. Both panels are short, and a sticky column would overlap the footer at 200 % text.
@@ -64,7 +69,7 @@ Both panels sit in one `<aside>`. Each panel is a tile, like the dashboard tiles
 - **Rows:** every row is a full link at least `--tap` (44 px) high. They are standalone links, set apart by their icon and arrow, so they opt out of the running-text underline that `:where(.news) a` gives (`.news-panel a { text-decoration: none }`), and underline on hover and focus instead.
 - **Row colours:** the label is `--text` (white). The icon, the › and the ↗ are `--text-muted`. No cyan anywhere in the panels.
 - **First-line alignment:** when a label wraps (the Norwegian media row at 1024 px and up), the icon, the › and the ↗ stay on its first line instead of centring on the whole label. The row aligns to the top, its block padding is `max(--space-1, (--tap - 1lh) / 2)`, and the icon and ↗ drop half the gap between their height and `1lh`. That holds at any text size, and a one-line row stays 44 px.
-- **Ids:** the panel h2s carry the ids the jump line points at (`new-to-gta` and the existing `channels`), so a jump lands on the heading.
+- **Ids:** the panel h2s carry the ids the jump tile points at (`new-to-gta` and the existing `channels`), so a jump lands on the heading.
 
 ## 5. Copy
 
@@ -72,13 +77,15 @@ Both panels sit in one `<aside>`. Each panel is a tile, like the dashboard tiles
 |---|---|---|
 | `newsGuides.title` (changed) | New to GTA VI? | Ny i GTA VI? |
 | `newsGuides.intro` (new) | Guides for your first days | Guider for de første dagene |
-| `news.jumpLabel` (new, hidden) | On this page | På denne siden |
+| `news.jumpLabel` (new; visible on the jump tile since round 2) | On this page | På denne siden |
+| `news.jumpGuides.one` / `.other` (new, round 2) | 1 guide / {count} guides | 1 guide / {count} guider |
+| `news.jumpChannels.one` / `.other` (new, round 2) | 1 link / {count} links | 1 lenke / {count} lenker |
 
-The jump line's two links reuse `newsGuides.title` and `channels.title`. No other copy changes.
+The jump tile's two rows reuse `newsGuides.title` and `channels.title`, followed by the count. No other copy changes.
 
 ## 6. Accessibility
 
-- Landmarks: the panels are an `<aside>`; the jump line is a `<nav>` labelled by `news.jumpLabel`.
+- Landmarks: the panels are an `<aside>`; the jump tile is a `<nav>` labelled by its visible `news.jumpLabel`, so the label is not read twice.
 - Heading order stays h1, h2 per section and panel, h3 per item.
 - Tier meaning is never colour alone: every item has its text label.
 - Focus rings stay visible on every link. Hover and focus states reuse the existing link styles.
@@ -99,7 +106,9 @@ Copy tests cover the new keys in both bundles.
 **Measured before it's called done**, on a `preview` build (never the dev server, whose toolbar covers the phone tab bar):
 - At 320, 768, 1024, 1280, 1600, 1920 and 3440 px: no horizontal overflow, and 1, 1, 2, 2, 3, 3, 3 columns.
 - From 1024 px, the aside's top lines up with Confirmed's top.
-- Every link in the panels and the jump line is at least 44 px tall.
+- Every link in the panels and the jump tile is at least 44 px tall.
+- Round 2, at 320, 360, 390 and 768 px and at 200 % text (320, 390, 768 px), English and Norwegian: the jump tile shows, has no horizontal overflow and no cyan, its rows are at least 44 px with the icon and ↓ within 0.5 px of the first line, the gaps are 16, 32 and 32 px (doubled at 200 % text), and a tap lands the panel heading at the top. At 360 px the tile ends at 278 px, above the fold of a 640 px phone. At 1024 px the tile and hairline are gone.
+- Round 2 found the news cards running 124 px past a 320 px phone in Norwegian at 200 % text (already so on production): `.rumour-list` had an implicit auto column that grew to the longest word. It now has `grid-template-columns: minmax(0, 1fr)`, so `overflow-wrap: break-word` breaks the word inside the card.
 - 200 % text holds at 390, 1280 and 1600 px (the three-column step).
 - The Norwegian page is measured at 1024 px too, where the aside is narrowest and the Norwegian labels run longest.
 - No cyan in the panels or on the news items, every item is a card and both panels are tiles.
@@ -112,6 +121,10 @@ Copy tests cover the new keys in both bundles.
 One PR, cut from `main`. If it merges by Saturday 14.11, the store screenshots and the README refresh are taken after it, so both show the new page before the Play production application on Sunday 15.11.
 
 ## 9. Considered and rejected
+
+- **Two cards for the jump** (round 2, option A). Each panel as its own card with an intro line. The clearest, but it pushed Confirmed about 90 px further down than the one tile, and the Official channels intro needed a shorter second wording.
+- **Two buttons in a row for the jump** (round 2, option B). The most compact, but the titles wrapped to two lines at 360 px and said nothing about what is behind them.
+- **The line of text links** (the jump line from the first build). Too small and too easy to miss on a phone, replaced by the jump tile in round 2.
 
 - **A sticky aside.** Both panels are short, and a sticky column overlaps the footer at 200 % text.
 - **Relative dates ("3 days ago").** They need a client clock and hydration, like the hub tile. Absolute dates keep the page static.
