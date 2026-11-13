@@ -62,120 +62,126 @@ const guides = guideSlugs(guideEntries)
 	})
 ---
 
-<Base locale={locale} title={t("seo.titles.news")} description={t("news.description")} path="news">
+<Base locale={locale} title={t("seo.titles.news")} description={t("news.description")} path="news" wide>
 	<article class="news">
 		<h1>{t("news.title")}</h1>
-		{
-			confirmed.length > 0 && (
-				<section aria-labelledby="confirmed">
-					<h2 id="confirmed">{t("facts.title")}</h2>
-					<p class="section-intro">{t("facts.intro")}</p>
-					<ul class="rumour-list fact-list">
-						{confirmed.map((fact, index) => {
-							const official =
-								fact.sources.find((source) => source.tier === "official") ?? fact.sources[0]
-							return (
-								<li class:list={{ "is-lead": index === 0 }}>
-									<h3>{fact.name[lang]}</h3>
-									<p class="tier-line">
-										<span class="tier-dot is-confirmed" aria-hidden="true" />
-										<span class="tier-label">{t("facts.title")}</span>
-										<time datetime={fact.announced}>
-											{newsDate(fact.announced, lang, buildYear)}
-										</time>
-									</p>
-									<p class="summary">{fact.summary[lang]}</p>
-									<p class="meta">
-										<ExternalLink href={official.url} locale={lang}>
-											{t("facts.announcedOn", { outlet: outletOf(official.url) })}
-										</ExternalLink>
-									</p>
-									<AllSources
-										sources={fact.sources}
-										label={t("news.allSources", { count: String(fact.sources.length) })}
-										locale={lang}
-									/>
-								</li>
-							)
-						})}
-					</ul>
-				</section>
-			)
-		}
-		<section aria-labelledby="rumours">
-			<h2 id="rumours">{t("rumours.title")}</h2>
-			<p class="section-intro">{t("rumours.intro")}</p>
+		<nav class="news-jump" aria-label={t("news.jumpLabel")}>
+			<a href="#new-to-gta">{t("newsGuides.title")}</a>
+			<a href="#channels">{t("channels.title")}</a>
+		</nav>
+		<div class:list={["news-grid", { "no-facts": confirmed.length === 0 }]}>
 			{
-				ordered.length === 0 ? (
-					<p>{t("rumours.empty")}</p>
-				) : (
-					<ul class="rumour-list">
-						{ordered.map((rumour) => {
-							const press =
-								rumour.sources.find((source) => source.tier === "press") ?? rumour.sources[0]
-							return (
-								<li>
-									<h3>{rumour.name}</h3>
-									<p class="tier-line">
-										<span class="tier-dot is-rumour" aria-hidden="true" />
-										<span class="tier-label">{t("hub.chipRumour")}</span>
-										<time datetime={rumour.added}>{newsDate(rumour.added, lang, buildYear)}</time>
-									</p>
-									<p class="summary">{rumour.summary}</p>
-									<p class="meta">
-										<ExternalLink href={press.url} locale={locale as Locale}>
-											{t("rumours.reportedBy", { outlet: outletOf(press.url) })}
-										</ExternalLink>
-									</p>
-									<AllSources
-										sources={rumour.sources}
-										label={t("news.allSources", { count: String(rumour.sources.length) })}
-										locale={locale as Locale}
-									/>
-								</li>
-							)
-						})}
-					</ul>
+				confirmed.length > 0 && (
+					<section class="news-confirmed" aria-labelledby="confirmed">
+						<h2 id="confirmed">{t("facts.title")}</h2>
+						<p class="section-intro">{t("facts.intro")}</p>
+						<ul class="rumour-list fact-list">
+							{confirmed.map((fact, index) => {
+								const official =
+									fact.sources.find((source) => source.tier === "official") ?? fact.sources[0]
+								return (
+									<li class:list={{ "is-lead": index === 0 }}>
+										<h3>{fact.name[lang]}</h3>
+										<p class="tier-line">
+											<span class="tier-dot is-confirmed" aria-hidden="true" />
+											<span class="tier-label">{t("facts.title")}</span>
+											<time datetime={fact.announced}>
+												{newsDate(fact.announced, lang, buildYear)}
+											</time>
+										</p>
+										<p class="summary">{fact.summary[lang]}</p>
+										<p class="meta">
+											<ExternalLink href={official.url} locale={lang}>
+												{t("facts.announcedOn", { outlet: outletOf(official.url) })}
+											</ExternalLink>
+										</p>
+										<AllSources
+											sources={fact.sources}
+											label={t("news.allSources", { count: String(fact.sources.length) })}
+											locale={lang}
+										/>
+									</li>
+								)
+							})}
+						</ul>
+					</section>
 				)
 			}
-		</section>
-		<aside class="news-aside">
-			<section class="news-panel" aria-labelledby="new-to-gta">
-				<h2 id="new-to-gta">{t("newsGuides.title")}</h2>
-				<p class="section-intro">{t("newsGuides.intro")}</p>
-				<ul class="panel-list">
-					{
-						guides.map(({ href, title, Icon }) => (
-							<li>
-								<a href={href}>
-									<Icon />
-									<span class="row-label">{title}</span>
-									<span class="row-arrow" aria-hidden="true">
-										›
-									</span>
-								</a>
-							</li>
-						))
-					}
-				</ul>
+			<section class="news-rumours" aria-labelledby="rumours">
+				<h2 id="rumours">{t("rumours.title")}</h2>
+				<p class="section-intro">{t("rumours.intro")}</p>
+				{
+					ordered.length === 0 ? (
+						<p>{t("rumours.empty")}</p>
+					) : (
+						<ul class="rumour-list">
+							{ordered.map((rumour) => {
+								const press =
+									rumour.sources.find((source) => source.tier === "press") ?? rumour.sources[0]
+								return (
+									<li>
+										<h3>{rumour.name}</h3>
+										<p class="tier-line">
+											<span class="tier-dot is-rumour" aria-hidden="true" />
+											<span class="tier-label">{t("hub.chipRumour")}</span>
+											<time datetime={rumour.added}>{newsDate(rumour.added, lang, buildYear)}</time>
+										</p>
+										<p class="summary">{rumour.summary}</p>
+										<p class="meta">
+											<ExternalLink href={press.url} locale={locale as Locale}>
+												{t("rumours.reportedBy", { outlet: outletOf(press.url) })}
+											</ExternalLink>
+										</p>
+										<AllSources
+											sources={rumour.sources}
+											label={t("news.allSources", { count: String(rumour.sources.length) })}
+											locale={locale as Locale}
+										/>
+									</li>
+								)
+							})}
+						</ul>
+					)
+				}
 			</section>
-			<section class="news-panel" aria-labelledby="channels">
-				<h2 id="channels">{t("channels.title")}</h2>
-				<p class="section-intro">{t("channels.intro")}</p>
-				<ul class="panel-list">
-					{
-						channels.map(({ name, href, Icon }) => (
-							<li>
-								<ExternalLink href={href} locale={lang}>
-									<Icon />
-									<span class="row-label">{name}</span>
-								</ExternalLink>
-							</li>
-						))
-					}
-				</ul>
-			</section>
-		</aside>
+			<aside class="news-aside">
+				<section class="news-panel" aria-labelledby="new-to-gta">
+					<h2 id="new-to-gta">{t("newsGuides.title")}</h2>
+					<p class="section-intro">{t("newsGuides.intro")}</p>
+					<ul class="panel-list">
+						{
+							guides.map(({ href, title, Icon }) => (
+								<li>
+									<a href={href}>
+										<Icon />
+										<span class="row-label">{title}</span>
+										<span class="row-arrow" aria-hidden="true">
+											›
+										</span>
+									</a>
+								</li>
+							))
+						}
+					</ul>
+				</section>
+				<section class="news-panel" aria-labelledby="channels">
+					<h2 id="channels">{t("channels.title")}</h2>
+					<p class="section-intro">{t("channels.intro")}</p>
+					<ul class="panel-list">
+						{
+							channels.map(({ name, href, Icon }) => (
+								<li>
+									<ExternalLink href={href} locale={lang}>
+										<Icon />
+										<span class="row-label">{name}</span>
+									</ExternalLink>
+								</li>
+							))
+						}
+					</ul>
+				</section>
+			</aside>
+		</div>
 	</article>
 </Base>
 
@@ -233,7 +239,93 @@ const guides = guideSlugs(guideEntries)
 		color: var(--text-muted);
 	}
 
-	section + section {
-		margin-top: var(--space-4);
+	/* Layout per screen size (News redesign spec §2). One column below 1024 px; news and panels
+	   side by side from 1024 px; Confirmed, Rumours and panels in three columns from 1600 px. */
+	.news-jump {
+		display: flex;
+		flex-wrap: wrap;
+		column-gap: var(--space-4);
+		margin: 0 0 var(--space-4);
+		font-size: 0.875rem;
+	}
+
+	.news-jump a {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tap);
+	}
+
+	.news-grid {
+		display: grid;
+		gap: var(--space-6);
+	}
+
+	.news-grid > * {
+		min-width: 0;
+	}
+
+	.news-aside {
+		display: grid;
+		gap: var(--space-6);
+		align-content: start;
+	}
+
+	/* The two panels sit side by side at the end of the single column. */
+	@media (min-width: 768px) {
+		.news-aside {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	/* Not sticky: both panels are short, and a sticky column overlaps the footer at 200 % text.
+	   The jump line goes, because the panels are in view. Extra height from the aside goes to
+	   the Rumours row, so Confirmed and Rumours never drift apart. */
+	@media (min-width: 1024px) {
+		.news-jump {
+			display: none;
+		}
+
+		.news-grid {
+			grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+			grid-template-rows: auto 1fr;
+			grid-template-areas:
+				"confirmed aside"
+				"rumours aside";
+			align-items: start;
+		}
+
+		.news-grid.no-facts {
+			grid-template-rows: auto;
+			grid-template-areas: "rumours aside";
+		}
+
+		.news-confirmed {
+			grid-area: confirmed;
+		}
+
+		.news-rumours {
+			grid-area: rumours;
+		}
+
+		.news-aside {
+			grid-area: aside;
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	/* Text stops at --measure, so a third column beats a wide news column with an empty strip. */
+	@media (min-width: 1600px) {
+		.news-grid {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.75fr);
+			grid-template-rows: auto;
+			grid-template-areas: "confirmed rumours aside";
+		}
+
+		/* No facts: Rumours takes the first slot and the page keeps two columns, so no column
+		   stands empty. */
+		.news-grid.no-facts {
+			grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+			grid-template-areas: "rumours aside";
+		}
 	}
 </style>

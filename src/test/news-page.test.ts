@@ -239,4 +239,50 @@ describe("News page (spec §8)", () => {
 		expect(leads[0]?.querySelector("h3")?.textContent).toBe("Fact newer")
 		expect(leads[0]?.parentElement?.classList.contains("fact-list")).toBe(true)
 	})
+
+	it("jumps to the two panels from a labelled line under the heading", async () => {
+		for (const [locale, label] of [
+			["en", "On this page"],
+			["nb", "På denne siden"],
+		] as const) {
+			const doc = await renderDoc(News, { params: { locale } })
+			const nav = doc.querySelector(`nav[aria-label="${label}"]`)
+			expect(nav?.previousElementSibling?.tagName).toBe("H1")
+			const targets = [...(nav?.querySelectorAll("a") ?? [])].map((a) => a.getAttribute("href"))
+			expect(targets).toEqual(["#new-to-gta", "#channels"])
+			for (const href of targets) {
+				const heading = doc.getElementById(href?.slice(1) ?? "")
+				expect(heading?.tagName).toBe("H2")
+				expect(heading?.closest("aside")).not.toBeNull()
+			}
+			expect([...(nav?.querySelectorAll("a") ?? [])].map((a) => a.textContent)).toEqual([
+				doc.getElementById("new-to-gta")?.textContent,
+				doc.getElementById("channels")?.textContent,
+			])
+		}
+	})
+
+	it("puts Confirmed, Rumours and the aside in one grid on the wide page", async () => {
+		const doc = await renderDoc(News, { params: { locale: "en" } })
+		const grid = doc.querySelector(".news-grid")
+		const parts = ["news-confirmed", "news-rumours", "news-aside"]
+		const children = [...(grid?.children ?? [])]
+		expect(children.map((el) => parts.find((c) => el.classList.contains(c)))).toEqual(parts)
+		expect(grid?.classList.contains("no-facts")).toBe(false)
+		expect(doc.querySelector("main")?.classList.contains("wide")).toBe(true)
+	})
+
+	it("drops Confirmed and the lead when there are no facts", async () => {
+		const saved = facts.splice(0)
+		try {
+			const doc = await renderDoc(News, { params: { locale: "en" } })
+			const grid = doc.querySelector(".news-grid")
+			expect(grid?.classList.contains("no-facts")).toBe(true)
+			expect(grid?.firstElementChild?.classList.contains("news-rumours")).toBe(true)
+			expect(doc.querySelector("#confirmed")).toBeNull()
+			expect(doc.querySelector(".is-lead")).toBeNull()
+		} finally {
+			facts.push(...saved)
+		}
+	})
 })
