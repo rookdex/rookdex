@@ -34,7 +34,7 @@ vi.mock("../model/seed", async (importOriginal) => {
 	})
 	return {
 		...(await importOriginal<typeof import("../model/seed")>()),
-		facts: [fact("older", "2026-06-24"), fact("newer", "2026-10-15")],
+		facts: [fact("older", "2025-06-24"), fact("newer", "2026-10-15")],
 		rumours: [
 			rumour("oldest", "2026-08-01"),
 			rumour("tie-b", "2026-09-18"),
@@ -161,5 +161,47 @@ describe("News page (spec §8)", () => {
 			expect(a.getAttribute("rel")).toBe("noopener noreferrer")
 			expect(a.querySelector(".new-tab-note")).not.toBeNull()
 		}
+	})
+
+	it("opens every item with its tier label and a dated <time>", async () => {
+		for (const locale of ["en", "nb"] as const) {
+			const doc = await renderDoc(News, { params: { locale } })
+			const labels = locale === "en" ? ["Confirmed", "Rumour"] : ["Bekreftet", "Rykte"]
+			const sections = [
+				['[aria-labelledby="confirmed"]', labels[0], "is-confirmed"],
+				['[aria-labelledby="rumours"]', labels[1], "is-rumour"],
+			] as const
+			for (const [section, label, dot] of sections) {
+				const items = [...doc.querySelectorAll(`${section} .rumour-list > li`)]
+				expect(items.length).toBeGreaterThan(0)
+				for (const item of items) {
+					// Title first in the DOM, so heading navigation hears the tier and date next.
+					expect(item.firstElementChild?.tagName).toBe("H3")
+					expect(item.children[1]?.classList.contains("tier-line")).toBe(true)
+					const line = item.querySelector(".tier-line")
+					expect(line?.querySelector(".tier-label")?.textContent).toBe(label)
+					const marker = line?.querySelector(".tier-dot")
+					expect(marker?.classList.contains(dot)).toBe(true)
+					expect(marker?.getAttribute("aria-hidden")).toBe("true")
+					const datetime = line?.querySelector("time")?.getAttribute("datetime") ?? ""
+					expect(datetime).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+					expect(Number.isNaN(Date.parse(datetime))).toBe(false)
+				}
+			}
+		}
+	})
+
+	it("shows the year on a date from another year", async () => {
+		const doc = await renderDoc(News, { params: { locale: "en" } })
+		const old = doc.querySelector('.fact-list time[datetime="2025-06-24"]')
+		expect(old?.textContent).toBe("24 Jun 2025")
+	})
+
+	it("marks the newest fact, and only it, as the lead", async () => {
+		const doc = await renderDoc(News, { params: { locale: "en" } })
+		const leads = [...doc.querySelectorAll(".is-lead")]
+		expect(leads).toHaveLength(1)
+		expect(leads[0]?.querySelector("h3")?.textContent).toBe("Fact newer")
+		expect(leads[0]?.parentElement?.classList.contains("fact-list")).toBe(true)
 	})
 })

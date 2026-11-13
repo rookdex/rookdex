@@ -6,6 +6,7 @@ import ExternalLink from "../../components/ExternalLink.astro"
 import { defaultLocale, isLocale, type Locale, locales, translator } from "../../i18n"
 import Base from "../../layouts/Base.astro"
 import { latestRumours, newestFacts } from "../../model/dashboard"
+import { newsDate } from "../../model/days"
 import { guideSlugs, resolveGuide } from "../../model/guides"
 import { outletOf } from "../../model/outlet"
 import { facts, rumours } from "../../model/seed"
@@ -23,6 +24,8 @@ const { t } = translator(locale as Locale)
 const ordered = latestRumours(rumours, rumours.length)
 const confirmed = newestFacts(facts)
 const lang = locale as Locale
+// Dates are fixed at build time; a date from another year shows its year (News redesign spec §3).
+const buildYear = new Date().getUTCFullYear()
 // Rockstar's own channels, as its site footer links them. Plain text on purpose: no logos.
 const channels = [
 	{ name: "Rockstar Newswire", href: "https://www.rockstargames.com/newswire" },
@@ -52,12 +55,19 @@ const guides = guideSlugs(guideEntries)
 					<h2 id="confirmed">{t("facts.title")}</h2>
 					<p class="section-intro">{t("facts.intro")}</p>
 					<ul class="rumour-list fact-list">
-						{confirmed.map((fact) => {
+						{confirmed.map((fact, index) => {
 							const official =
 								fact.sources.find((source) => source.tier === "official") ?? fact.sources[0]
 							return (
-								<li>
+								<li class:list={{ "is-lead": index === 0 }}>
 									<h3>{fact.name[lang]}</h3>
+									<p class="tier-line">
+										<span class="tier-dot is-confirmed" aria-hidden="true" />
+										<span class="tier-label">{t("facts.title")}</span>
+										<time datetime={fact.announced}>
+											{newsDate(fact.announced, lang, buildYear)}
+										</time>
+									</p>
 									<p class="summary">{fact.summary[lang]}</p>
 									<p class="meta">
 										<ExternalLink href={official.url} locale={lang}>
@@ -90,6 +100,11 @@ const guides = guideSlugs(guideEntries)
 							return (
 								<li>
 									<h3>{rumour.name}</h3>
+									<p class="tier-line">
+										<span class="tier-dot is-rumour" aria-hidden="true" />
+										<span class="tier-label">{t("hub.chipRumour")}</span>
+										<time datetime={rumour.added}>{newsDate(rumour.added, lang, buildYear)}</time>
+									</p>
 									<p class="summary">{rumour.summary}</p>
 									<p class="meta">
 										<ExternalLink href={press.url} locale={locale as Locale}>

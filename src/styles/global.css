@@ -2465,8 +2465,12 @@ html:has(.search-row) {
 	padding: 0;
 }
 
-.rumour-list li {
-	padding: 0.75rem 0;
+/* News items (News redesign spec §2, §3). The child combinator keeps the hairline off the
+   "All sources" list inside an item. */
+.rumour-list > li {
+	display: flex;
+	flex-direction: column;
+	padding: var(--space-3) 0;
 	border-bottom: 1px solid var(--border);
 }
 
@@ -2491,6 +2495,43 @@ html:has(.search-row) {
 	display: inline-flex;
 	align-items: center;
 	min-height: var(--tap);
+}
+
+.rumour-list > li:last-child {
+	border-bottom: 0;
+}
+
+.rumour-list > .is-lead h3 {
+	font-size: 1.25rem;
+}
+
+/* Tier, then date, in muted small text. The label carries the meaning; the dot is decorative.
+   It follows the title in the DOM (heading navigation lands on the title first) and is drawn
+   above it. */
+.tier-line {
+	order: -1;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-1) var(--space-2);
+	margin: 0 0 var(--space-1);
+	font-size: 0.75rem;
+	color: var(--text-muted);
+}
+
+.tier-dot {
+	flex: none;
+	inline-size: 0.5rem;
+	block-size: 0.5rem;
+	border-radius: 50%;
+}
+
+.tier-dot.is-confirmed {
+	background: var(--tier-confirmed);
+}
+
+.tier-dot.is-rumour {
+	border: 1.5px solid var(--text-muted);
 }
 
 /* Desktop dashboard tiles (desktop dashboard spec §4). Hidden below 1024 px by Task 10's rules. */

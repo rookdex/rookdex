@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { addDays, dayFromKey, daysAgo, dottedDate, localDayKey } from "./days"
+import { addDays, dayFromKey, daysAgo, dottedDate, localDayKey, newsDate } from "./days"
 
 beforeEach(() => {
 	vi.stubEnv("TZ", "Europe/Oslo")
@@ -43,5 +43,23 @@ describe("dottedDate", () => {
 	it("writes the device's calendar day with periods, in both languages", () => {
 		expect(dottedDate(new Date(2026, 10, 2, 23, 30))).toBe("02.11.2026")
 		expect(dottedDate(new Date(2026, 0, 19, 0, 5))).toBe("19.01.2026")
+	})
+})
+
+describe("newsDate (News redesign spec §3)", () => {
+	it("shows day and short month, day first in both languages", () => {
+		expect(newsDate("2026-11-10", "en", 2026)).toBe("10 Nov")
+		expect(newsDate("2026-11-10", "nb", 2026)).toBe("10. nov.")
+	})
+
+	it("adds the year when it differs from the build year", () => {
+		expect(newsDate("2026-06-24", "en", 2027)).toBe("24 Jun 2026")
+		expect(newsDate("2026-06-24", "nb", 2027)).toBe("24. juni 2026")
+	})
+
+	it("keeps the calendar day in a zone west of UTC", () => {
+		vi.stubEnv("TZ", "America/Los_Angeles")
+		expect(newsDate("2026-11-10", "en", 2026)).toBe("10 Nov")
+		expect(newsDate("2026-01-01", "en", 2026)).toBe("1 Jan")
 	})
 })
