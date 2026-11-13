@@ -115,3 +115,82 @@ const byCategory: Record<string, () => ReactElement> = {
 export function categoryIcon(id: string): () => ReactElement {
 	return Object.hasOwn(byCategory, id) ? byCategory[id] : AllIcon
 }
+
+// News panel icons (News redesign spec §4): muted, footer style, my own geometry. None of them
+// is a brand logo; the channel's name is the link text.
+
+export function NewspaperIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<path d="M4 4h12v15a1 1 0 0 0 1 1H6a2 2 0 0 1-2-2z" />
+			<path d="M16 8h4v11a1 1 0 0 1-1 1h-2" />
+			<path d="M8 8h4M8 12h4M8 16h4" />
+		</svg>
+	)
+}
+
+export function ImageIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<rect x="3" y="5" width="18" height="14" rx="2" />
+			<circle cx="9" cy="10" r="1.5" />
+			<path d="m21 16-5-5-9 8" />
+		</svg>
+	)
+}
+
+export function PlayIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<circle cx="12" cy="12" r="9" />
+			<path d="m10 8.5 5 3.5-5 3.5z" />
+		</svg>
+	)
+}
+
+export function AtIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<circle cx="12" cy="12" r="4" />
+			<path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8" />
+		</svg>
+	)
+}
+
+export function CameraIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<path d="M3 9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+			<circle cx="12" cy="13" r="3.5" />
+		</svg>
+	)
+}
+
+export function ChecklistIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<path d="m3 6 1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17" />
+			<path d="M11 6h10M11 12h10M11 18h10" />
+		</svg>
+	)
+}
+
+export function ClockIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<circle cx="12" cy="12" r="9" />
+			<path d="M12 7v5l3 2" />
+		</svg>
+	)
+}
+
+const byGuide: Record<string, () => ReactElement> = {
+	"before-you-start": ChecklistIcon,
+	"first-hour": ClockIcon,
+}
+
+/** The icon for a guide slug. A guide added later gets the checklist until it has its own;
+ *  hasOwn keeps "constructor" and friends from returning Object's own functions. */
+export function guideIcon(slug: string): () => ReactElement {
+	return Object.hasOwn(byGuide, slug) ? byGuide[slug] : ChecklistIcon
+}
