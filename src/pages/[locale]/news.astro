@@ -384,18 +384,42 @@ const guides = guideSlugs(guideEntries)
 			border-top: 0;
 		}
 
+		/* Each section's h2, intro and card list sit on three shared rows (subgrid), so the first
+		   cards line up across columns even when one intro wraps to two lines, and the aside starts
+		   on the card row. The row gap is 0 because the subgrids set their own spacing. */
 		.news-grid {
 			grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-			grid-template-rows: auto 1fr;
+			grid-template-rows: repeat(5, auto) 1fr;
 			grid-template-areas:
+				"confirmed ."
+				"confirmed ."
 				"confirmed aside"
+				"rumours aside"
+				"rumours aside"
 				"rumours aside";
+			row-gap: 0;
 			align-items: start;
 		}
 
 		.news-grid.no-facts {
-			grid-template-rows: auto;
-			grid-template-areas: "rumours aside";
+			grid-template-rows: auto auto 1fr;
+			grid-template-areas:
+				"rumours ."
+				"rumours ."
+				"rumours aside";
+		}
+
+		.news-confirmed,
+		.news-rumours {
+			display: grid;
+			grid-template-rows: subgrid;
+			row-gap: 0;
+			align-self: stretch;
+		}
+
+		.news-confirmed > *,
+		.news-rumours > * {
+			align-self: start;
 		}
 
 		.news-confirmed {
@@ -404,6 +428,11 @@ const guides = guideSlugs(guideEntries)
 
 		.news-rumours {
 			grid-area: rumours;
+		}
+
+		/* Stacked under Confirmed, Rumours keeps the --space-4 the grid gap gave it. */
+		.news-confirmed + .news-rumours {
+			margin-top: var(--space-4);
 		}
 
 		.news-aside {
@@ -416,15 +445,25 @@ const guides = guideSlugs(guideEntries)
 	@media (min-width: 1600px) {
 		.news-grid {
 			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.75fr);
-			grid-template-rows: auto;
-			grid-template-areas: "confirmed rumours aside";
+			grid-template-rows: auto auto 1fr;
+			grid-template-areas:
+				"confirmed rumours ."
+				"confirmed rumours ."
+				"confirmed rumours aside";
+		}
+
+		.news-confirmed + .news-rumours {
+			margin-top: 0;
 		}
 
 		/* No facts: Rumours takes the first slot and the page keeps two columns, so no column
 		   stands empty. */
 		.news-grid.no-facts {
 			grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-			grid-template-areas: "rumours aside";
+			grid-template-areas:
+				"rumours ."
+				"rumours ."
+				"rumours aside";
 		}
 	}
 </style>
