@@ -85,6 +85,7 @@ const guides = guideSlugs(guideEntries)
 										<p class="tier-line">
 											<span class="tier-dot is-confirmed" aria-hidden="true" />
 											<span class="tier-label">{t("facts.title")}</span>
+											{" "}
 											<time datetime={fact.announced}>
 												{newsDate(fact.announced, lang, buildYear)}
 											</time>
@@ -124,6 +125,7 @@ const guides = guideSlugs(guideEntries)
 										<p class="tier-line">
 											<span class="tier-dot is-rumour" aria-hidden="true" />
 											<span class="tier-label">{t("hub.chipRumour")}</span>
+											{" "}
 											<time datetime={rumour.added}>{newsDate(rumour.added, lang, buildYear)}</time>
 										</p>
 										<p class="summary">{rumour.summary}</p>

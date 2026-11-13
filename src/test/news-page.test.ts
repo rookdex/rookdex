@@ -285,4 +285,11 @@ describe("News page (spec §8)", () => {
 			facts.push(...saved)
 		}
 	})
+
+	it("keeps a space between the tier label and the date in the text", async () => {
+		const doc = await renderDoc(News, { params: { locale: "en" } })
+		const lines = [...doc.querySelectorAll(".tier-line")].map((p) => p.textContent?.trim())
+		expect(lines).toContain("Confirmed 15 Oct")
+		expect(lines).toContain("Rumour 1 Oct")
+	})
 })
