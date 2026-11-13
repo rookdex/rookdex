@@ -64,10 +64,9 @@ All CSS is mobile-first with `min-width` steps. No `max-width` queries. The page
 
 | Width | Layout |
 |---|---|
-| 320 to 767 px | One column: h1; the console pill and profile pill on one row; score cards two per row, where an odd last card (the Gamerscore card under Both) spans the row; filter chips in one horizontal scroll row; search row; grouped rows with the value under the text. |
+| 320 to 767 px | One column: h1; the console pill and profile pill on one row; score cards two per row, where an odd last card (the Gamerscore card under Both) spans the row; filter chips in one horizontal scroll row; search row; 24 px of air, then grouped rows with the value under the text. Each group heading has 32 px above it and a hairline under it. |
 | 768 to 1023 px | Same order with the text tab row on top. Rows put the value in a right-hand column. |
-| 1024 to 1599 px | Three columns: filter rail 210 px, list, score rail 230 px. Both rails are sticky. |
-| 1600 to 1919 px | Rails 230 px and 260 px. |
+| 1024 to 1919 px | Three columns, laid out like the tracker: filter rail 200 px, list, score rail 200 px, with 48 px between the columns. The search row spans all three columns. The rails and the list start on one line 32 px below it, so the All filter, the first group heading and the Earned card share a top edge. All has no heading above it, as on the tracker's rail. Both rails are sticky. In the score rail the trophy counts stack one per line. |
 | 1920 px and up | Inside each group the rows flow in two columns, so a line never runs across a 1000 px row. This matches the "more columns, not longer lines" rule. |
 
 The filter chips row at 320 px shows a partly cut chip at the right edge, so it reads as scrollable. The active chip scrolls into view when it changes.
