@@ -2491,10 +2491,13 @@ html:has(.search-row) {
 	margin: 0;
 }
 
+/* A host name like support.rockstargames.com is one long word; let it break at 200 % text on a
+   phone instead of running past the edge (News redesign spec §7). */
 .rumour-list .meta a {
 	display: inline-flex;
 	align-items: center;
 	min-height: var(--tap);
+	overflow-wrap: anywhere;
 }
 
 .rumour-list > li:last-child {
