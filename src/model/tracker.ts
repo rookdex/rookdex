@@ -86,6 +86,8 @@ export interface Tracker {
 	getState(): TrackerState
 	subscribe(listener: () => void): () => void
 	init(): Promise<void>
+	/** Re-reads profiles and ticks, for a page the browser restored from its back/forward cache. */
+	refresh(): Promise<void>
 	tick(itemId: string): Promise<void>
 	untick(itemId: string): Promise<void>
 	selectCategories(ids: string[]): void
@@ -286,18 +288,23 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		}
 	}
 
+	/** The remembered profile when it still exists; otherwise the first active one. */
+	async function pickProfile(db: Store): Promise<{ profile: Profile; saved: string | null }> {
+		const saved = deps.activeProfile?.read() ?? null
+		const remembered = saved
+			? (await listProfiles(db)).find((p) => p.id === saved && !p.deleted_at)
+			: undefined
+		const profile =
+			remembered ?? (await ensureActiveProfile(db, deps.defaultProfileName, now(), deps.newId))
+		return { profile, saved }
+	}
+
 	async function boot(): Promise<void> {
 		try {
 			const db = await deps.openStore()
 			store = db
 			await purgeDeleted(db, now())
-			// The remembered profile when it still exists; otherwise the first active one, written back.
-			const saved = deps.activeProfile?.read() ?? null
-			const remembered = saved
-				? (await listProfiles(db)).find((p) => p.id === saved && !p.deleted_at)
-				: undefined
-			const profile =
-				remembered ?? (await ensureActiveProfile(db, deps.defaultProfileName, now(), deps.newId))
+			const { profile, saved } = await pickProfile(db)
 			// Armed after the silent default-profile write: the persistence request (and Firefox's
 			// prompt for it) follows the first write the player makes.
 			db.onFirstWrite(requestPersist)
@@ -325,6 +332,16 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			// Idempotent: a second call (StrictMode, a remount) must not create a second default profile.
 			booted ??= boot()
 			return booted
+		},
+		async refresh() {
+			// Only a booted, open store: before init there is nothing on screen to bring up to date.
+			if (state.status !== "ready" || closed || !store) return
+			await guard(async () => {
+				const db = ready()
+				const { profile, saved } = await pickProfile(db)
+				set(await profilePatch(db, profile))
+				if (profile.id !== saved) deps.activeProfile?.write(profile.id)
+			})
 		},
 		tick: (itemId) => setDoneFor(itemId, true),
 		untick: (itemId) => setDoneFor(itemId, false),

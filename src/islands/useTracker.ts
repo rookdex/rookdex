@@ -9,6 +9,16 @@ export function useTrackerState(tracker: Tracker): TrackerState {
 		tracker.init()
 	}, [tracker])
 
+	// Back and Forward can restore the page from the bfcache with its old state, so a tick made on
+	// another page would look lost. Re-read the store whenever that happens.
+	useEffect(() => {
+		const onShow = (event: PageTransitionEvent) => {
+			if (event.persisted) tracker.refresh()
+		}
+		window.addEventListener("pageshow", onShow)
+		return () => window.removeEventListener("pageshow", onShow)
+	}, [tracker])
+
 	return state
 }
 
