@@ -2460,18 +2460,23 @@ html:has(.search-row) {
 }
 
 .rumour-list {
+	display: grid;
+	gap: var(--space-3);
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-/* News items (News redesign spec §2, §3). The child combinator keeps the hairline off the
-   "All sources" list inside an item. */
+/* News items (News redesign spec §2, §3): one card each, like the Dex category cards. The child
+   combinator keeps the card off the "All sources" list inside an item. The bottom padding is
+   small because the source link's 44 px target already brings its own air. */
 .rumour-list > li {
 	display: flex;
 	flex-direction: column;
-	padding: var(--space-3) 0;
-	border-bottom: 1px solid var(--border);
+	padding: var(--space-3) var(--space-4) var(--space-1);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
 }
 
 .rumour-list h3 {
@@ -2500,17 +2505,19 @@ html:has(.search-row) {
 	overflow-wrap: anywhere;
 }
 
-.rumour-list > li:last-child {
-	border-bottom: 0;
+/* Source links in grey, not cyan: cyan stays for moving around the site (News redesign spec §3).
+   The underline still marks them as links; hover turns it cyan. */
+.rumour-list .meta a {
+	color: var(--text-muted);
+	text-decoration-color: color-mix(in srgb, var(--text-muted) 45%, transparent);
 }
 
 .rumour-list > .is-lead h3 {
 	font-size: 1.25rem;
 }
 
-/* Tier, then date, in muted small text. The label carries the meaning; the dot is decorative.
-   It follows the title in the DOM (heading navigation lands on the title first) and is drawn
-   above it. */
+/* The hub's tier chip, then the date in muted small text. It follows the title in the DOM
+   (heading navigation lands on the title first) and is drawn above it. */
 .tier-line {
 	order: -1;
 	display: flex;
@@ -2520,21 +2527,6 @@ html:has(.search-row) {
 	margin: 0 0 var(--space-1);
 	font-size: 0.75rem;
 	color: var(--text-muted);
-}
-
-.tier-dot {
-	flex: none;
-	inline-size: 0.5rem;
-	block-size: 0.5rem;
-	border-radius: 50%;
-}
-
-.tier-dot.is-confirmed {
-	background: var(--tier-confirmed);
-}
-
-.tier-dot.is-rumour {
-	border: 1.5px solid var(--text-muted);
 }
 
 /* Desktop dashboard tiles (desktop dashboard spec §4). Hidden below 1024 px by Task 10's rules. */

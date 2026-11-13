@@ -80,7 +80,10 @@ const { sources, label, locale } = Astro.props
 		border-bottom: 0;
 	}
 
+	/* Grey like the item's own source link (News redesign spec §3). */
 	.all-sources :global(a) {
+		color: var(--text-muted);
+		text-decoration-color: color-mix(in srgb, var(--text-muted) 45%, transparent);
 		justify-self: start;
 		display: inline-flex;
 		align-items: center;

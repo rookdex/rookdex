@@ -198,7 +198,7 @@ describe("News page (spec §8)", () => {
 		}
 	})
 
-	it("opens every item with its tier label and a dated <time>", async () => {
+	it("opens every item with its tier chip and a dated <time>", async () => {
 		for (const locale of ["en", "nb"] as const) {
 			const doc = await renderDoc(News, { params: { locale } })
 			const labels = locale === "en" ? ["Confirmed", "Rumour"] : ["Bekreftet", "Rykte"]
@@ -206,7 +206,7 @@ describe("News page (spec §8)", () => {
 				['[aria-labelledby="confirmed"]', labels[0], "is-confirmed"],
 				['[aria-labelledby="rumours"]', labels[1], "is-rumour"],
 			] as const
-			for (const [section, label, dot] of sections) {
+			for (const [section, label, kind] of sections) {
 				const items = [...doc.querySelectorAll(`${section} .rumour-list > li`)]
 				expect(items.length).toBeGreaterThan(0)
 				for (const item of items) {
@@ -214,10 +214,11 @@ describe("News page (spec §8)", () => {
 					expect(item.firstElementChild?.tagName).toBe("H3")
 					expect(item.children[1]?.classList.contains("tier-line")).toBe(true)
 					const line = item.querySelector(".tier-line")
-					expect(line?.querySelector(".tier-label")?.textContent).toBe(label)
-					const marker = line?.querySelector(".tier-dot")
-					expect(marker?.classList.contains(dot)).toBe(true)
-					expect(marker?.getAttribute("aria-hidden")).toBe("true")
+					// The hub's News tile chip, so both pages share one look.
+					const chip = line?.querySelector(".news-chip")
+					expect(chip?.textContent).toBe(label)
+					expect(chip?.classList.contains(kind)).toBe(true)
+					expect(line?.querySelector(".tier-dot")).toBeNull()
 					const datetime = line?.querySelector("time")?.getAttribute("datetime") ?? ""
 					expect(datetime).toMatch(/^\d{4}-\d{2}-\d{2}$/)
 					expect(Number.isNaN(Date.parse(datetime))).toBe(false)
