@@ -4,6 +4,14 @@ import { getRelativeLocaleUrl } from "astro:i18n"
 import AllSources from "../../components/AllSources.astro"
 import ExternalLink from "../../components/ExternalLink.astro"
 import { defaultLocale, isLocale, type Locale, locales, translator } from "../../i18n"
+import {
+	AtIcon,
+	CameraIcon,
+	guideIcon,
+	ImageIcon,
+	NewspaperIcon,
+	PlayIcon,
+} from "../../islands/tracker/icons"
 import Base from "../../layouts/Base.astro"
 import { latestRumours, newestFacts } from "../../model/dashboard"
 import { newsDate } from "../../model/days"
@@ -26,23 +34,31 @@ const confirmed = newestFacts(facts)
 const lang = locale as Locale
 // Dates are fixed at build time; a date from another year shows its year (News redesign spec §3).
 const buildYear = new Date().getUTCFullYear()
-// Rockstar's own channels, as its site footer links them. Plain text on purpose: no logos.
+// Rockstar's own channels, as its site footer links them. Muted icons of my own, no logos.
 const channels = [
-	{ name: "Rockstar Newswire", href: "https://www.rockstargames.com/newswire" },
+	{
+		name: "Rockstar Newswire",
+		href: "https://www.rockstargames.com/newswire",
+		Icon: NewspaperIcon,
+	},
 	// Rockstar's media page, linked and never mirrored: no Rockstar art on Rookdex.
-	{ name: t("channels.media"), href: "https://www.rockstargames.com/VI/media" },
-	{ name: "YouTube", href: "https://www.youtube.com/@RockstarGames" },
-	{ name: "X", href: "https://x.com/rockstargames" },
-	{ name: "Instagram", href: "https://instagram.com/rockstargames" },
+	{ name: t("channels.media"), href: "https://www.rockstargames.com/VI/media", Icon: ImageIcon },
+	{ name: "YouTube", href: "https://www.youtube.com/@RockstarGames", Icon: PlayIcon },
+	{ name: "X", href: "https://x.com/rockstargames", Icon: AtIcon },
+	{ name: "Instagram", href: "https://instagram.com/rockstargames", Icon: CameraIcon },
 ]
-// The launch guides close the page, so a reader who came for the news finds the checklist next.
+// The launch guides head the aside, so a first-timer finds the checklist beside the news.
 const guideEntries = await getCollection("guides")
 const guides = guideSlugs(guideEntries)
 	.sort()
 	.map((slug) => {
 		const found = resolveGuide(guideEntries, locale, slug, defaultLocale)
 		if (!found) throw new Error(`Missing guide: ${slug}`)
-		return { href: getRelativeLocaleUrl(locale, `guides/${slug}`), ...found.entry.data }
+		return {
+			href: getRelativeLocaleUrl(locale, `guides/${slug}`),
+			Icon: guideIcon(slug),
+			...found.entry.data,
+		}
 	})
 ---
 
@@ -123,36 +139,43 @@ const guides = guideSlugs(guideEntries)
 				)
 			}
 		</section>
-		<section aria-labelledby="channels">
-			<h2 id="channels">{t("channels.title")}</h2>
-			<p class="section-intro">{t("channels.intro")}</p>
-			<ul class="rumour-list channel-list">
-				{
-					channels.map((channel) => (
-						<li>
-							<ExternalLink href={channel.href} locale={lang}>
-								{channel.name}
-							</ExternalLink>
-						</li>
-					))
-				}
-			</ul>
-		</section>
-		<section aria-labelledby="guides">
-			<h2 id="guides">{t("newsGuides.title")}</h2>
-			<ul class="rumour-list guide-list">
-				{
-					guides.map((guide) => (
-						<li>
-							<h3>
-								<a href={guide.href}>{guide.title}</a>
-							</h3>
-							<p class="summary">{guide.summary}</p>
-						</li>
-					))
-				}
-			</ul>
-		</section>
+		<aside class="news-aside">
+			<section class="news-panel" aria-labelledby="new-to-gta">
+				<h2 id="new-to-gta">{t("newsGuides.title")}</h2>
+				<p class="section-intro">{t("newsGuides.intro")}</p>
+				<ul class="panel-list">
+					{
+						guides.map(({ href, title, Icon }) => (
+							<li>
+								<a href={href}>
+									<Icon />
+									<span class="row-label">{title}</span>
+									<span class="row-arrow" aria-hidden="true">
+										›
+									</span>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+			<section class="news-panel" aria-labelledby="channels">
+				<h2 id="channels">{t("channels.title")}</h2>
+				<p class="section-intro">{t("channels.intro")}</p>
+				<ul class="panel-list">
+					{
+						channels.map(({ name, href, Icon }) => (
+							<li>
+								<ExternalLink href={href} locale={lang}>
+									<Icon />
+									<span class="row-label">{name}</span>
+								</ExternalLink>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+		</aside>
 	</article>
 </Base>
 
@@ -163,22 +186,51 @@ const guides = guideSlugs(guideEntries)
 		color: var(--text-muted);
 	}
 
-	/* One link per row, each a full tap target. */
-	.channel-list li {
+	/* The side panels (News redesign spec §4): rows split by hairlines, no boxes. Each row is one
+	   full-width link, set apart by its icon and arrow, so it drops the running-text underline
+	   and shows it on hover and focus instead. :global(a) reaches into ExternalLink. */
+	.panel-list {
+		margin: 0;
 		padding: 0;
+		list-style: none;
 	}
 
-	.channel-list :global(a) {
-		display: inline-flex;
-		align-items: center;
-		min-height: var(--tap);
+	.panel-list li + li {
+		border-top: 1px solid var(--border);
 	}
 
-	/* The guide title is the link, so it gets the full tap height like the channels above. */
-	.guide-list a {
-		display: inline-flex;
+	.panel-list :global(a) {
+		display: flex;
 		align-items: center;
+		gap: var(--space-3);
 		min-height: var(--tap);
+		padding-block: var(--space-1);
+		text-decoration: none;
+	}
+
+	.panel-list :global(a > svg:first-child) {
+		flex: none;
+		color: var(--text-muted);
+	}
+
+	.panel-list :global(a:focus-visible) {
+		text-decoration: underline;
+	}
+
+	@media (hover: hover) {
+		.panel-list :global(a:hover) {
+			text-decoration: underline;
+		}
+	}
+
+	.row-label {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.row-arrow {
+		color: var(--text-muted);
 	}
 
 	section + section {

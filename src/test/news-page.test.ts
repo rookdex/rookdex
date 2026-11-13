@@ -64,25 +64,52 @@ describe("News page (spec §8)", () => {
 		expect([...doc.querySelectorAll("main h2")].map((h) => h.textContent)).toEqual([
 			"Confirmed",
 			"Rumours",
+			"New to GTA VI?",
 			"Official channels",
-			"Getting ready",
 		])
 		expect(
 			doc.querySelector('nav[aria-label="Main"] [aria-current="page"]')?.textContent?.trim()
 		).toBe("News")
 	})
 
-	it("ends with the launch guides, linked in the page's language", async () => {
-		const doc = await renderDoc(News, { params: { locale: "nb" } })
-		const links = [...doc.querySelectorAll('[aria-labelledby="guides"] a')].map((a) => [
-			a.textContent,
-			a.getAttribute("href"),
+	it("puts New to GTA VI? above Official channels in the aside", async () => {
+		const doc = await renderDoc(News, { params: { locale: "en" } })
+		const heads = [...doc.querySelectorAll("aside h2")].map((h) => [h.id, h.textContent])
+		expect(heads).toEqual([
+			["new-to-gta", "New to GTA VI?"],
+			["channels", "Official channels"],
 		])
-		expect(links).toEqual([
+		expect(doc.querySelector('[aria-labelledby="new-to-gta"] .section-intro')?.textContent).toBe(
+			"Guides for your first days"
+		)
+		expect(doc.querySelector("aside")?.hasAttribute("aria-label")).toBe(false)
+	})
+
+	it("lists the guides in the page's language, each a full row with an icon", async () => {
+		const doc = await renderDoc(News, { params: { locale: "nb" } })
+		expect(doc.querySelector("#new-to-gta")?.textContent).toBe("Ny i GTA VI?")
+		expect(doc.querySelector('[aria-labelledby="new-to-gta"] .section-intro')?.textContent).toBe(
+			"Guider for de første dagene"
+		)
+		const links = [...doc.querySelectorAll('[aria-labelledby="new-to-gta"] .panel-list a')]
+		expect(
+			links.map((a) => [a.querySelector(".row-label")?.textContent, a.getAttribute("href")])
+		).toEqual([
 			["Før du begynner", "/nb/guides/before-you-start/"],
 			["Den første timen", "/nb/guides/first-hour/"],
 		])
-		expect(doc.querySelector("#guides")?.textContent).toBe("Gjør deg klar")
+		for (const a of links) {
+			expect(a.querySelector("svg")?.getAttribute("aria-hidden")).toBe("true")
+			expect(a.querySelector('.row-arrow[aria-hidden="true"]')?.textContent).toBe("›")
+		}
+		// The guide summary stays on the guide page, not in the row.
+		expect(doc.querySelector('[aria-labelledby="new-to-gta"] .summary')).toBeNull()
+	})
+
+	it("keeps the panels off the news list styles", async () => {
+		const doc = await renderDoc(News, { params: { locale: "en" } })
+		expect(doc.querySelector("aside .rumour-list")).toBeNull()
+		expect(doc.querySelectorAll("aside .news-panel")).toHaveLength(2)
 	})
 
 	it("lists each rumour under an h3, newest first (dashboard spec §6.3)", async () => {
@@ -120,21 +147,29 @@ describe("News page (spec §8)", () => {
 		}
 	})
 
-	it("lists Rockstar's official channels as plain text links in a new tab", async () => {
+	it("lists Rockstar's official channels with muted icons, never a brand logo", async () => {
 		const doc = await renderDoc(News, { params: { locale: "nb" } })
 		expect(doc.querySelector("#channels")?.textContent).toBe("Offisielle kanaler")
-		const links = [...doc.querySelectorAll(".channel-list a")]
-		expect(links.map((a) => a.getAttribute("href"))).toEqual([
-			"https://www.rockstargames.com/newswire",
-			"https://www.rockstargames.com/VI/media",
-			"https://www.youtube.com/@RockstarGames",
-			"https://x.com/rockstargames",
-			"https://instagram.com/rockstargames",
+		expect(doc.querySelector('[aria-labelledby="channels"] .section-intro')?.textContent).toBe(
+			"Rockstars egne nyheter og medier, rett fra kilden."
+		)
+		const links = [...doc.querySelectorAll('[aria-labelledby="channels"] .panel-list a')]
+		expect(
+			links.map((a) => [a.querySelector(".row-label")?.textContent, a.getAttribute("href")])
+		).toEqual([
+			["Rockstar Newswire", "https://www.rockstargames.com/newswire"],
+			["Trailere, skjermbilder og bakgrunnsbilder", "https://www.rockstargames.com/VI/media"],
+			["YouTube", "https://www.youtube.com/@RockstarGames"],
+			["X", "https://x.com/rockstargames"],
+			["Instagram", "https://instagram.com/rockstargames"],
 		])
-		expect(links[1]?.textContent).toContain("Trailere, skjermbilder og bakgrunnsbilder")
 		for (const a of links) {
 			expect(a.getAttribute("target")).toBe("_blank")
 			expect(a.querySelector("img")).toBeNull()
+			const icon = a.querySelector("svg")
+			expect(icon?.getAttribute("fill")).toBe("none")
+			expect(icon?.getAttribute("aria-hidden")).toBe("true")
+			expect(a.querySelector(".ext-icon")).not.toBeNull()
 		}
 	})
 
