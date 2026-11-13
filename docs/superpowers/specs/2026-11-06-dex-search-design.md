@@ -159,7 +159,7 @@ New keys in `src/locales/en.json` and `nb.json`, beside the other `dex.*` keys:
 | Key | en | nb |
 |---|---|---|
 | `dex.search.label` | Search the Dex | Søk i Dex-en |
-| `dex.search.placeholder` | Name or type, e.g. Tulip or boat | Navn eller type, f.eks. Tulip eller båt |
+| `dex.search.placeholder` | Name or type (shortened 13.11 to fit a 320 px phone) | Navn eller type |
 | `dex.search.resultsLabel` | Search results | Søkeresultater |
 
 Reused as they are: `tracker.search.clear`, `tracker.search.results.one` and `.other`, `tracker.search.noMatch`, `tracker.search.cleared`, `tracker.confirmed`, `dex.expected`. They are the same words in the same situation; one source keeps the two searches saying the same thing.

@@ -34,7 +34,7 @@ describe("SearchBar (tracker search spec §5)", () => {
 	it("is a search landmark with a labelled field", () => {
 		const { field, inputRef } = setup()
 		expect(screen.getByRole("search")).toContainElement(field)
-		expect(field).toHaveAttribute("placeholder", "Name or type, e.g. Tulip or boat")
+		expect(field).toHaveAttribute("placeholder", "Name or type")
 		expect(field).toHaveAttribute("maxlength", "100")
 		expect(field).toHaveAttribute("autocomplete", "off")
 		expect(field).toHaveAttribute("enterkeyhint", "search")

@@ -146,7 +146,7 @@ The sticky row: the field, its clear button and the toggle. Props carry the quer
 | Key | en | nb |
 |---|---|---|
 | `tracker.search.label` | Search the tracker | Søk i oversikten |
-| `tracker.search.placeholder` | Name or type, e.g. Tulip or boat | Navn eller type, f.eks. Tulip eller båt |
+| `tracker.search.placeholder` | Name or type (shortened 13.11 to fit a 320 px phone) | Navn eller type |
 | `tracker.search.clear` | Clear search | Tøm søket |
 | `tracker.search.hideFound` | Hide found | Skjul funnet |
 | `tracker.search.hiddenCount` | {count} hidden | {count} skjult |
