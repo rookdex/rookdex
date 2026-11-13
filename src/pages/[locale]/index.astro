@@ -14,6 +14,7 @@ import { resolveGuide } from "../../model/guides"
 import { hubPrepaintScript } from "../../model/hub-prepaint"
 import { hubPhase, LAUNCH_AT } from "../../model/launch"
 import { scriptHash } from "../../model/root-resolver"
+import { homeSeoKeys } from "../../model/seo"
 import { facts, rumours, seedItems } from "../../model/seed"
 import { countable } from "../../model/stats"
 
@@ -28,6 +29,7 @@ const { t } = translator(locale as Locale)
 const initialNow = buildNow(process.env.ROOKDEX_NOW).toISOString()
 // The phase the server HTML shows: the island's first render counts to the CET instant too.
 const staticPhase = hubPhase(new Date(initialNow), LAUNCH_AT)
+const seo = homeSeoKeys(staticPhase)
 // Astro's CSP hashes only the scripts it bundles, so the pre-paint script's hash goes in by hand,
 // as the root resolver's does. Its text is the same in every build; the phase is an attribute.
 const prepaint = hubPrepaintScript()
@@ -52,7 +54,7 @@ const news = latestNews(facts, rumours, NEWS_LIMIT).map(({ id, kind, date, name 
 }))
 ---
 
-<Base locale={locale} title={t("seo.titles.home")} description={t("seo.homeDescription")} path="" wide>
+<Base locale={locale} title={t(seo.title)} description={t(seo.description)} path="" wide>
 	<div class="hub">
 		<header class="hub-intro">
 			<h1 class="lockup" aria-label={t("siteName")}>

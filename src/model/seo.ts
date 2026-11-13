@@ -1,5 +1,6 @@
 // Indexable routes and the small helpers the sitemap, the guide pages and the JSON-LD block share.
 // Pure and free of Astro imports, so it is unit-testable (SEO spec §4.1).
+import type { HubPhase } from "./launch"
 
 /** The production origin. The Container API renders without the config's `site`, so this is the
  *  source for absolute URLs that are not locale routes (og:image, the JSON-LD url). */
@@ -32,6 +33,21 @@ export function indexablePaths(guideSlugs: string[], categoryIds: string[]): str
 		"privacy",
 		...validSlugs(guideSlugs).map((slug) => `guides/${slug}`),
 	]
+}
+
+/**
+ * The home page's title and description keys for the phase the build renders. Before launch they
+ * sell the countdown; the 19.11 launch rebuild swaps them, so search results and share cards stop
+ * advertising a countdown that is over. The after-launch copy never says the game is out, because
+ * the rebuild runs while the Americas are still counting down to their own midnight.
+ */
+export function homeSeoKeys(phase: HubPhase) {
+	return phase === "after"
+		? ({
+				title: "seo.titles.homeAfterLaunch",
+				description: "seo.homeDescriptionAfterLaunch",
+			} as const)
+		: ({ title: "seo.titles.home", description: "seo.homeDescription" } as const)
 }
 
 /** JSON for a `set:html` script block: `<` is escaped, so no value can close the tag. */

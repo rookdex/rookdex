@@ -91,8 +91,10 @@ describe("search titles and description (SEO spec §4.4)", () => {
 	it.each([
 		["en", en],
 		["nb", nb],
-	] as const)("%s home description is at most 165 characters", (_locale, bundle) => {
-		expect([...bundle["seo.homeDescription"]].length).toBeLessThanOrEqual(165)
+	] as const)("%s home descriptions are at most 165 characters", (_locale, bundle) => {
+		for (const key of ["seo.homeDescription", "seo.homeDescriptionAfterLaunch"] as const) {
+			expect([...bundle[key]].length, key).toBeLessThanOrEqual(165)
+		}
 	})
 
 	it("keeps the visible headings as they were", () => {
