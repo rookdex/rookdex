@@ -21,18 +21,24 @@ const tickIndexes = [0, 1, 3, 4, 6, 8, 10, 12, 15]
 // framing that pickScroll can make clean, within 40 px, wins.
 const pages = [
 	["1-hub", "", [{ start: "section.hub-state" }]],
-	["2-tracker", "tracker/", [{ start: "top" }, { start: "section.stats" }]],
 	[
-		"3-news",
+		"2-tracker",
+		"tracker/",
+		[{ start: "top" }, { start: "main h1" }, { start: "button.last-found" }],
+	],
+	["3-dex", "dex/wildlife/", [{ start: "top" }, { start: "main h1" }, { start: ".dex-card" }]],
+	[
+		"4-news",
 		"news/",
 		[
 			{ start: "top" },
 			{ start: "#confirmed" },
+			{ start: ".fact-list > li" },
 			{ start: '[aria-labelledby="rumours"] .rumour-list' },
 		],
 	],
 	[
-		"4-settings",
+		"5-settings",
 		"settings/",
 		[
 			{ start: "top" },
