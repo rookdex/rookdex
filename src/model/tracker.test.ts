@@ -425,6 +425,42 @@ describe("active profile (dashboard spec §5)", () => {
 		expect(box.value).toBe(player1)
 	})
 
+	describe("refresh (Back restores a page from the bfcache)", () => {
+		it("picks up ticks another page saved", async () => {
+			const open = shared()
+			const { store } = memory()
+			const hub = make({ openStore: open, activeProfile: store }).tracker
+			await hub.init()
+			const page = make({ openStore: open, activeProfile: store }).tracker
+			await page.init()
+			await page.tick("wildlife/a")
+			expect(hub.getState().records["wildlife/a"]).toBeUndefined()
+
+			await hub.refresh()
+			expect(hub.getState().records["wildlife/a"]?.done).toBe(true)
+		})
+
+		it("follows a profile switch made on another page", async () => {
+			const open = shared()
+			const { store } = memory()
+			const hub = make({ openStore: open, activeProfile: store, now: clock() }).tracker
+			await hub.init()
+			const page = make({ openStore: open, activeProfile: store, now: clock() }).tracker
+			await page.init()
+			await page.createProfile("Dad")
+
+			await hub.refresh()
+			expect(hub.getState().profileId).toBe(page.getState().profileId)
+			expect(hub.getState().profiles.map((p) => p.name)).toEqual(["Player 1", "Dad"])
+		})
+
+		it("does nothing before init", async () => {
+			const { tracker } = make()
+			await tracker.refresh()
+			expect(tracker.getState().status).toBe("loading")
+		})
+	})
+
 	it("is written on switch and on import into a new profile", async () => {
 		const { box, store } = memory()
 		const { tracker } = make({ activeProfile: store, now: clock() })
