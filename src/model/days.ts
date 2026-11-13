@@ -41,3 +41,16 @@ export function addDays(key: string, n: number): string {
 	date.setDate(date.getDate() + n)
 	return localDayKey(date)
 }
+
+/** A News date (`YYYY-MM-DD`) as "10 Nov" or "10. nov.", with the year when it is not
+ *  `buildYear`. Read and formatted in UTC, so the day never shifts with the build machine's zone. */
+export function newsDate(iso: string, locale: Locale, buildYear: number): string {
+	const date = new Date(`${iso}T00:00:00Z`)
+	const year = date.getUTCFullYear() === buildYear ? {} : { year: "numeric" as const }
+	return new Intl.DateTimeFormat(dateLocale(locale), {
+		day: "numeric",
+		month: "short",
+		timeZone: "UTC",
+		...year,
+	}).format(date)
+}

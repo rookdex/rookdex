@@ -4,11 +4,13 @@ Written 12.11.2026 from the News redesign brainstorm (session 127), with three m
 
 A second spec, written after this one ships, makes the other pages adapt per screen size the same way.
 
+**Feedback round 13.11.2026.** The first build (PR #124) read better but still blended together. I asked for boxes around the objects, no cyan in the panels, less cyan in the news column, the panel icons on the first line of a wrapped label, and a look closer to the Dex category cards and the dashboard tiles. Two mockups were compared on the real page: one card per item, or one tile per section. One card per item won. §1 to §4, §7 and §9 below describe the page after that round.
+
 ## 1. What this spec covers
 
 - **Layout per screen size:** one column on phones and tablets, two columns from 1024 px, three from 1600 px (§2).
-- **Item anatomy:** a tier line with a dot, label and date, a larger lead item, more padding (§3).
-- **Side panels:** "Getting ready" becomes "New to GTA VI?", and Official channels gets muted icons (§4).
+- **Item anatomy:** every item in its own card, a tier line with the hub's tier chip and the date, a larger lead item (§3).
+- **Side panels:** two tiles. "Getting ready" becomes "New to GTA VI?", and Official channels gets muted icons (§4).
 - **Copy:** two changed or new keys and one hidden label, in English and Norwegian (§5).
 
 ### Non-goals
@@ -17,7 +19,7 @@ A second spec, written after this one ships, makes the other pages adapt per scr
 - No change to the seed, the facts and rumours data, the hub or its News tile.
 - No other page changes. Settings gets its own redesign after this.
 - No brand logos. The channels stay plain links with neutral icons, as `news.astro` has said since #116.
-- No new colours. Orange leaves the page entirely; pink marks Confirmed and cyan stays on links.
+- No new colours. Orange leaves the page entirely and pink marks Confirmed. Cyan stays only on the jump line, which moves around the page. Panel rows are white, and source links are grey (§3, §4).
 
 ## 2. Layout per screen size
 
@@ -34,17 +36,19 @@ All CSS is mobile-first with `min-width` steps. No `max-width` queries.
 - **Why three columns at 1600 px:** text already stops at `--measure` (65ch), so a two-column layout would leave an empty strip inside the news column. A third column keeps lines short and Confirmed and Rumours visibly apart.
 - **Jump line:** below 1024 px a quiet line of text links sits under the h1, pointing at the two panels. From 1024 px it is hidden, because the panels are already in view.
 - **No facts:** the Confirmed section is left out when there are no facts, as today. The grid then gets the class `no-facts`, and Rumours takes the Confirmed slot, so no empty column is left at 1600 px.
-- **Spacing:** sections are separated by `--space-6` (3rem). Items inside a section are separated by a hairline with `var(--space-3)` padding above and below. No hairline after the last item.
+- **Spacing:** the grid and the aside use a `--space-4` (1.5rem) gap, as between the dashboard tiles. Inside a section the item cards sit `--space-3` (1rem) apart (§3).
 - **The aside at 1024 px and up** is not sticky. Both panels are short, and a sticky column would overlap the footer at 200 % text.
 
 ## 3. News items
 
-Each fact and rumour keeps everything it shows today: title, summary, source link and the "All sources" list. Only the top line and the spacing change.
+Each fact and rumour keeps everything it shows today: title, summary, source link and the "All sources" list. The frame, the top line and the link colour change.
 
-- **Tier line:** a dot, the tier label and the date, in muted text at 0.75rem.
-  - Confirmed: a filled dot in `--tier-confirmed`. Label `facts.title` ("Confirmed").
-  - Rumour: a hollow ring in `--text-muted`, matching the hub's outlined rumour chip. Label `hub.chipRumour`.
-  - The label carries the meaning; the dot is decorative (`aria-hidden`).
+- **Card:** every item is its own card, like a Dex category card: 1px `--border`, `--radius`, `--bg-raised`, padding `--space-3` on top and `--space-4` at the sides. The bottom padding is `--space-1`, because the source link's 44 px target already brings its own air.
+- **Tier line:** the hub News tile's `.news-chip`, then the date in muted text at 0.75rem. One class serves both pages.
+  - Confirmed: the filled pink chip (`is-confirmed`). Label `facts.title` ("Confirmed").
+  - Rumour: the outlined grey chip (`is-rumour`). Label `hub.chipRumour`.
+  - The chip is text, so the tier is never colour alone.
+- **Source links:** the item's source link and the links in "All sources" are `--text-muted`, with the running-text underline in muted grey. Hover turns the underline cyan, as for any running-text link. Cyan is kept for moving around the site.
 - **Date:** a `<time datetime>`. Facts use `announced`, rumours use `added` (the same fields the hub's News tile shows). Formatted at build time with `new Intl.DateTimeFormat(dateLocale(locale), { day: "numeric", month: "short", timeZone: "UTC" })`, so "10 Nov" in English and "10. nov." in Norwegian. When the date's year differs from the build year, the year is added (`year: "numeric"`), so a June item still reads right after New Year.
 - **Lead item:** the newest fact (the first of `newestFacts`) gets the class `is-lead` and a larger title, about 1.25rem. Everything else on it is the same as the other items. With no facts there is no lead.
 - **Styles:** the panels stop using `.rumour-list`. Item padding changes stay on the news lists, and the panels get their own `.news-panel` class, so the spacing change cannot leak into them (`.rumour-list` already also matches `.fact-list`).
@@ -52,12 +56,14 @@ Each fact and rumour keeps everything it shows today: title, summary, source lin
 
 ## 4. Side panels
 
-Both panels sit in one `<aside>` with a heading, a muted intro line and rows separated by hairlines. No boxes, no coloured frames.
+Both panels sit in one `<aside>`. Each panel is a tile, like the dashboard tiles: 1px `--border`, `--radius`, `--bg-raised`, `--space-4` padding. Inside are a white heading at 1.125rem, a muted intro line at 0.875rem and rows separated by hairlines. No coloured frames.
 
 - **New to GTA VI?** (replaces "Getting ready"). Rows are the existing guides, each with a muted icon, the guide title as the link and a › at the end. The guide summary is dropped from the row to keep the panel short; the guide page still shows it.
 - **Official channels.** The same five links in the same order, with `channels.intro` kept as the intro line. Each row has a muted icon and the existing external-link marker.
 - **Icons:** footer style, 22 px, `--text-muted`, no tile, `aria-hidden`. They join `src/islands/tracker/icons.tsx` in its existing style (24 viewBox, stroke 2, round caps): newspaper (Newswire), image (media), play (YouTube), at sign (X), camera (Instagram), checklist (Before you start), clock (Your first hour). Guide icons are picked by slug, with the checklist as the fallback for any future guide.
 - **Rows:** every row is a full link at least `--tap` (44 px) high. They are standalone links, set apart by their icon and arrow, so they opt out of the running-text underline that `:where(.news) a` gives (`.news-panel a { text-decoration: none }`), and underline on hover and focus instead.
+- **Row colours:** the label is `--text` (white). The icon, the › and the ↗ are `--text-muted`. No cyan anywhere in the panels.
+- **First-line alignment:** when a label wraps (the Norwegian media row at 1024 px and up), the icon, the › and the ↗ stay on its first line instead of centring on the whole label. The row aligns to the top, its block padding is `max(--space-1, (--tap - 1lh) / 2)`, and the icon and ↗ drop half the gap between their height and `1lh`. That holds at any text size, and a one-line row stays 44 px.
 - **Ids:** the panel h2s carry the ids the jump line points at (`new-to-gta` and the existing `channels`), so a jump lands on the heading.
 
 ## 5. Copy
@@ -96,6 +102,8 @@ Copy tests cover the new keys in both bundles.
 - Every link in the panels and the jump line is at least 44 px tall.
 - 200 % text holds at 390, 1280 and 1600 px (the three-column step).
 - The Norwegian page is measured at 1024 px too, where the aside is narrowest and the Norwegian labels run longest.
+- No cyan in the panels or on the news items, every item is a card and both panels are tiles.
+- The panel icon and ↗ sit within 0.5 px of the first line's centre, at 100 % and 200 % text.
 - CLS about 0, and Lighthouse CI stays green.
 - Screenshots at 390, 1280 and 1920 px for review.
 
@@ -107,7 +115,9 @@ One PR, cut from `main`. If it merges by Saturday 14.11, the store screenshots a
 
 - **A sticky aside.** Both panels are short, and a sticky column overlaps the footer at 200 % text.
 - **Relative dates ("3 days ago").** They need a client clock and hydration, like the hub tile. Absolute dates keep the page static.
-- **The tier dot in forced colours.** The filled dot can vanish when forced colours drop backgrounds. It is decorative and the text label carries the meaning, so no fix is needed.
+- **The open list with hairlines only** (the first build). Without frames the items and panels blended together, and the cyan panel rows pulled the eye away from the news. Replaced in the feedback round.
+- **One tile per section** (feedback round, option B). Confirmed and Rumours as one tile each, with hairlines between items. Fewer boxes, but the items inside a tile still share one surface, which was the original complaint.
+- **A dot and label for the tier.** Replaced by the hub's chip, so the News page and the News tile mark a tier the same way.
 - **A "New" badge.** It was dropped with the calmer direction, along with the summary line under the h1.
 
 > Stress-tested 2026-11-12 (skill 5065c26): 7 applied, 0 adapted, 0 decided by me.

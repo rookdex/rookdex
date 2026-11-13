@@ -4,8 +4,17 @@ import { getRelativeLocaleUrl } from "astro:i18n"
 import AllSources from "../../components/AllSources.astro"
 import ExternalLink from "../../components/ExternalLink.astro"
 import { defaultLocale, isLocale, type Locale, locales, translator } from "../../i18n"
+import {
+	AtIcon,
+	CameraIcon,
+	guideIcon,
+	ImageIcon,
+	NewspaperIcon,
+	PlayIcon,
+} from "../../islands/tracker/icons"
 import Base from "../../layouts/Base.astro"
 import { latestRumours, newestFacts } from "../../model/dashboard"
+import { newsDate } from "../../model/days"
 import { guideSlugs, resolveGuide } from "../../model/guides"
 import { outletOf } from "../../model/outlet"
 import { facts, rumours } from "../../model/seed"
@@ -23,121 +32,156 @@ const { t } = translator(locale as Locale)
 const ordered = latestRumours(rumours, rumours.length)
 const confirmed = newestFacts(facts)
 const lang = locale as Locale
-// Rockstar's own channels, as its site footer links them. Plain text on purpose: no logos.
+// Dates are fixed at build time; a date from another year shows its year (News redesign spec §3).
+const buildYear = new Date().getUTCFullYear()
+// Rockstar's own channels, as its site footer links them. Muted icons of my own, no logos.
 const channels = [
-	{ name: "Rockstar Newswire", href: "https://www.rockstargames.com/newswire" },
+	{
+		name: "Rockstar Newswire",
+		href: "https://www.rockstargames.com/newswire",
+		Icon: NewspaperIcon,
+	},
 	// Rockstar's media page, linked and never mirrored: no Rockstar art on Rookdex.
-	{ name: t("channels.media"), href: "https://www.rockstargames.com/VI/media" },
-	{ name: "YouTube", href: "https://www.youtube.com/@RockstarGames" },
-	{ name: "X", href: "https://x.com/rockstargames" },
-	{ name: "Instagram", href: "https://instagram.com/rockstargames" },
+	{ name: t("channels.media"), href: "https://www.rockstargames.com/VI/media", Icon: ImageIcon },
+	{ name: "YouTube", href: "https://www.youtube.com/@RockstarGames", Icon: PlayIcon },
+	{ name: "X", href: "https://x.com/rockstargames", Icon: AtIcon },
+	{ name: "Instagram", href: "https://instagram.com/rockstargames", Icon: CameraIcon },
 ]
-// The launch guides close the page, so a reader who came for the news finds the checklist next.
+// The launch guides head the aside, so a first-timer finds the checklist beside the news.
 const guideEntries = await getCollection("guides")
 const guides = guideSlugs(guideEntries)
 	.sort()
 	.map((slug) => {
 		const found = resolveGuide(guideEntries, locale, slug, defaultLocale)
 		if (!found) throw new Error(`Missing guide: ${slug}`)
-		return { href: getRelativeLocaleUrl(locale, `guides/${slug}`), ...found.entry.data }
+		return {
+			href: getRelativeLocaleUrl(locale, `guides/${slug}`),
+			Icon: guideIcon(slug),
+			...found.entry.data,
+		}
 	})
 ---
 
-<Base locale={locale} title={t("seo.titles.news")} description={t("news.description")} path="news">
+<Base locale={locale} title={t("seo.titles.news")} description={t("news.description")} path="news" wide>
 	<article class="news">
 		<h1>{t("news.title")}</h1>
-		{
-			confirmed.length > 0 && (
-				<section aria-labelledby="confirmed">
-					<h2 id="confirmed">{t("facts.title")}</h2>
-					<p class="section-intro">{t("facts.intro")}</p>
-					<ul class="rumour-list fact-list">
-						{confirmed.map((fact) => {
-							const official =
-								fact.sources.find((source) => source.tier === "official") ?? fact.sources[0]
-							return (
-								<li>
-									<h3>{fact.name[lang]}</h3>
-									<p class="summary">{fact.summary[lang]}</p>
-									<p class="meta">
-										<ExternalLink href={official.url} locale={lang}>
-											{t("facts.announcedOn", { outlet: outletOf(official.url) })}
-										</ExternalLink>
-									</p>
-									<AllSources
-										sources={fact.sources}
-										label={t("news.allSources", { count: String(fact.sources.length) })}
-										locale={lang}
-									/>
-								</li>
-							)
-						})}
-					</ul>
-				</section>
-			)
-		}
-		<section aria-labelledby="rumours">
-			<h2 id="rumours">{t("rumours.title")}</h2>
-			<p class="section-intro">{t("rumours.intro")}</p>
+		<nav class="news-jump" aria-label={t("news.jumpLabel")}>
+			<a href="#new-to-gta">{t("newsGuides.title")}</a>
+			<a href="#channels">{t("channels.title")}</a>
+		</nav>
+		<div class:list={["news-grid", { "no-facts": confirmed.length === 0 }]}>
 			{
-				ordered.length === 0 ? (
-					<p>{t("rumours.empty")}</p>
-				) : (
-					<ul class="rumour-list">
-						{ordered.map((rumour) => {
-							const press =
-								rumour.sources.find((source) => source.tier === "press") ?? rumour.sources[0]
-							return (
-								<li>
-									<h3>{rumour.name}</h3>
-									<p class="summary">{rumour.summary}</p>
-									<p class="meta">
-										<ExternalLink href={press.url} locale={locale as Locale}>
-											{t("rumours.reportedBy", { outlet: outletOf(press.url) })}
-										</ExternalLink>
-									</p>
-									<AllSources
-										sources={rumour.sources}
-										label={t("news.allSources", { count: String(rumour.sources.length) })}
-										locale={locale as Locale}
-									/>
-								</li>
-							)
-						})}
-					</ul>
+				confirmed.length > 0 && (
+					<section class="news-confirmed" aria-labelledby="confirmed">
+						<h2 id="confirmed">{t("facts.title")}</h2>
+						<p class="section-intro">{t("facts.intro")}</p>
+						<ul class="rumour-list fact-list">
+							{confirmed.map((fact, index) => {
+								const official =
+									fact.sources.find((source) => source.tier === "official") ?? fact.sources[0]
+								return (
+									<li class:list={{ "is-lead": index === 0 }}>
+										<h3>{fact.name[lang]}</h3>
+										<p class="tier-line">
+											<span class="news-chip is-confirmed">{t("facts.title")}</span>
+											{" "}
+											<time datetime={fact.announced}>
+												{newsDate(fact.announced, lang, buildYear)}
+											</time>
+										</p>
+										<p class="summary">{fact.summary[lang]}</p>
+										<p class="meta">
+											<ExternalLink href={official.url} locale={lang}>
+												{t("facts.announcedOn", { outlet: outletOf(official.url) })}
+											</ExternalLink>
+										</p>
+										<AllSources
+											sources={fact.sources}
+											label={t("news.allSources", { count: String(fact.sources.length) })}
+											locale={lang}
+										/>
+									</li>
+								)
+							})}
+						</ul>
+					</section>
 				)
 			}
-		</section>
-		<section aria-labelledby="channels">
-			<h2 id="channels">{t("channels.title")}</h2>
-			<p class="section-intro">{t("channels.intro")}</p>
-			<ul class="rumour-list channel-list">
+			<section class="news-rumours" aria-labelledby="rumours">
+				<h2 id="rumours">{t("rumours.title")}</h2>
+				<p class="section-intro">{t("rumours.intro")}</p>
 				{
-					channels.map((channel) => (
-						<li>
-							<ExternalLink href={channel.href} locale={lang}>
-								{channel.name}
-							</ExternalLink>
-						</li>
-					))
+					ordered.length === 0 ? (
+						<p>{t("rumours.empty")}</p>
+					) : (
+						<ul class="rumour-list">
+							{ordered.map((rumour) => {
+								const press =
+									rumour.sources.find((source) => source.tier === "press") ?? rumour.sources[0]
+								return (
+									<li>
+										<h3>{rumour.name}</h3>
+										<p class="tier-line">
+											<span class="news-chip is-rumour">{t("hub.chipRumour")}</span>
+											{" "}
+											<time datetime={rumour.added}>{newsDate(rumour.added, lang, buildYear)}</time>
+										</p>
+										<p class="summary">{rumour.summary}</p>
+										<p class="meta">
+											<ExternalLink href={press.url} locale={locale as Locale}>
+												{t("rumours.reportedBy", { outlet: outletOf(press.url) })}
+											</ExternalLink>
+										</p>
+										<AllSources
+											sources={rumour.sources}
+											label={t("news.allSources", { count: String(rumour.sources.length) })}
+											locale={locale as Locale}
+										/>
+									</li>
+								)
+							})}
+						</ul>
+					)
 				}
-			</ul>
-		</section>
-		<section aria-labelledby="guides">
-			<h2 id="guides">{t("newsGuides.title")}</h2>
-			<ul class="rumour-list guide-list">
-				{
-					guides.map((guide) => (
-						<li>
-							<h3>
-								<a href={guide.href}>{guide.title}</a>
-							</h3>
-							<p class="summary">{guide.summary}</p>
-						</li>
-					))
-				}
-			</ul>
-		</section>
+			</section>
+			<aside class="news-aside">
+				<section class="news-panel" aria-labelledby="new-to-gta">
+					<h2 id="new-to-gta">{t("newsGuides.title")}</h2>
+					<p class="section-intro">{t("newsGuides.intro")}</p>
+					<ul class="panel-list">
+						{
+							guides.map(({ href, title, Icon }) => (
+								<li>
+									<a href={href}>
+										<Icon />
+										<span class="row-label">{title}</span>
+										<span class="row-arrow" aria-hidden="true">
+											›
+										</span>
+									</a>
+								</li>
+							))
+						}
+					</ul>
+				</section>
+				<section class="news-panel" aria-labelledby="channels">
+					<h2 id="channels">{t("channels.title")}</h2>
+					<p class="section-intro">{t("channels.intro")}</p>
+					<ul class="panel-list">
+						{
+							channels.map(({ name, href, Icon }) => (
+								<li>
+									<ExternalLink href={href} locale={lang}>
+										<Icon />
+										<span class="row-label">{name}</span>
+									</ExternalLink>
+								</li>
+							))
+						}
+					</ul>
+				</section>
+			</aside>
+		</div>
 	</article>
 </Base>
 
@@ -148,25 +192,170 @@ const guides = guideSlugs(guideEntries)
 		color: var(--text-muted);
 	}
 
-	/* One link per row, each a full tap target. */
-	.channel-list li {
+	/* The side panels (News redesign spec §4): one tile each, like the dashboard tiles, with rows
+	   split by hairlines. */
+	.news-panel {
+		padding: var(--space-4);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg-raised);
+	}
+
+	.news-panel h2 {
+		margin-top: 0;
+		font-size: 1.125rem;
+	}
+
+	.news-panel .section-intro {
+		font-size: 0.875rem;
+	}
+
+	/* Each row is one full-width link, set apart by its icon and arrow, so it drops the
+	   running-text underline and shows it on hover and focus instead. White labels with muted
+	   marks: cyan stays for moving around the site. The icon and arrow sit on the first line of
+	   a label that wraps: the padding keeps a one-line row at 44 px, and the 22 px icon drops
+	   half the gap to its line, at any text size. :global(a) reaches into ExternalLink. */
+	.panel-list {
+		margin: 0;
 		padding: 0;
+		list-style: none;
 	}
 
-	.channel-list :global(a) {
+	.panel-list li + li {
+		border-top: 1px solid var(--border);
+	}
+
+	.panel-list :global(a) {
+		display: flex;
+		align-items: flex-start;
+		gap: var(--space-3);
+		min-height: var(--tap);
+		padding-block: max(var(--space-1), (var(--tap) - 1lh) / 2);
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	.panel-list :global(a > svg:first-child) {
+		flex: none;
+		margin-top: calc((1lh - 22px) / 2);
+		color: var(--text-muted);
+	}
+
+	/* The ↗ is 0.8em tall; the same half-gap drop puts it on the first line. */
+	.panel-list :global(.ext-icon) {
+		flex: none;
+		margin-top: calc((1lh - 0.8em) / 2);
+		color: var(--text-muted);
+	}
+
+	.panel-list :global(a:focus-visible) {
+		text-decoration: underline;
+	}
+
+	@media (hover: hover) {
+		.panel-list :global(a:hover) {
+			text-decoration: underline;
+		}
+	}
+
+	.row-label {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.row-arrow {
+		color: var(--text-muted);
+	}
+
+	/* Layout per screen size (News redesign spec §2). One column below 1024 px; news and panels
+	   side by side from 1024 px; Confirmed, Rumours and panels in three columns from 1600 px. */
+	.news-jump {
+		display: flex;
+		flex-wrap: wrap;
+		column-gap: var(--space-4);
+		margin: 0 0 var(--space-4);
+		font-size: 0.875rem;
+	}
+
+	.news-jump a {
 		display: inline-flex;
 		align-items: center;
 		min-height: var(--tap);
 	}
 
-	/* The guide title is the link, so it gets the full tap height like the channels above. */
-	.guide-list a {
-		display: inline-flex;
-		align-items: center;
-		min-height: var(--tap);
+	/* --space-4 between the boxes, as between the dashboard tiles. */
+	.news-grid {
+		display: grid;
+		gap: var(--space-4);
 	}
 
-	section + section {
-		margin-top: var(--space-4);
+	.news-grid > * {
+		min-width: 0;
+	}
+
+	.news-aside {
+		display: grid;
+		gap: var(--space-4);
+		align-content: start;
+	}
+
+	/* The two panels sit side by side at the end of the single column. */
+	@media (min-width: 768px) {
+		.news-aside {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	/* Not sticky: both panels are short, and a sticky column overlaps the footer at 200 % text.
+	   The jump line goes, because the panels are in view. Extra height from the aside goes to
+	   the Rumours row, so Confirmed and Rumours never drift apart. */
+	@media (min-width: 1024px) {
+		.news-jump {
+			display: none;
+		}
+
+		.news-grid {
+			grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+			grid-template-rows: auto 1fr;
+			grid-template-areas:
+				"confirmed aside"
+				"rumours aside";
+			align-items: start;
+		}
+
+		.news-grid.no-facts {
+			grid-template-rows: auto;
+			grid-template-areas: "rumours aside";
+		}
+
+		.news-confirmed {
+			grid-area: confirmed;
+		}
+
+		.news-rumours {
+			grid-area: rumours;
+		}
+
+		.news-aside {
+			grid-area: aside;
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	/* Text stops at --measure, so a third column beats a wide news column with an empty strip. */
+	@media (min-width: 1600px) {
+		.news-grid {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.75fr);
+			grid-template-rows: auto;
+			grid-template-areas: "confirmed rumours aside";
+		}
+
+		/* No facts: Rumours takes the first slot and the page keeps two columns, so no column
+		   stands empty. */
+		.news-grid.no-facts {
+			grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+			grid-template-areas: "rumours aside";
+		}
 	}
 </style>

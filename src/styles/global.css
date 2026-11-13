@@ -2460,14 +2460,23 @@ html:has(.search-row) {
 }
 
 .rumour-list {
+	display: grid;
+	gap: var(--space-3);
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-.rumour-list li {
-	padding: 0.75rem 0;
-	border-bottom: 1px solid var(--border);
+/* News items (News redesign spec §2, §3): one card each, like the Dex category cards. The child
+   combinator keeps the card off the "All sources" list inside an item. The bottom padding is
+   small because the source link's 44 px target already brings its own air. */
+.rumour-list > li {
+	display: flex;
+	flex-direction: column;
+	padding: var(--space-3) var(--space-4) var(--space-1);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
 }
 
 .rumour-list h3 {
@@ -2487,10 +2496,37 @@ html:has(.search-row) {
 	margin: 0;
 }
 
+/* A host name like support.rockstargames.com is one long word; let it break at 200 % text on a
+   phone instead of running past the edge (News redesign spec §7). */
 .rumour-list .meta a {
 	display: inline-flex;
 	align-items: center;
 	min-height: var(--tap);
+	overflow-wrap: anywhere;
+}
+
+/* Source links in grey, not cyan: cyan stays for moving around the site (News redesign spec §3).
+   The underline still marks them as links; hover turns it cyan. */
+.rumour-list .meta a {
+	color: var(--text-muted);
+	text-decoration-color: color-mix(in srgb, var(--text-muted) 45%, transparent);
+}
+
+.rumour-list > .is-lead h3 {
+	font-size: 1.25rem;
+}
+
+/* The hub's tier chip, then the date in muted small text. It follows the title in the DOM
+   (heading navigation lands on the title first) and is drawn above it. */
+.tier-line {
+	order: -1;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-1) var(--space-2);
+	margin: 0 0 var(--space-1);
+	font-size: 0.75rem;
+	color: var(--text-muted);
 }
 
 /* Desktop dashboard tiles (desktop dashboard spec §4). Hidden below 1024 px by Task 10's rules. */
