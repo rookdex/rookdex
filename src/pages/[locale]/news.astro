@@ -5,8 +5,10 @@ import AllSources from "../../components/AllSources.astro"
 import ExternalLink from "../../components/ExternalLink.astro"
 import { defaultLocale, isLocale, type Locale, locales, translator } from "../../i18n"
 import {
+	ArrowDownIcon,
 	AtIcon,
 	CameraIcon,
+	ChecklistIcon,
 	guideIcon,
 	ImageIcon,
 	NewspaperIcon,
@@ -27,7 +29,7 @@ export function getStaticPaths() {
 // phase 1c facts feed takes over.
 const { locale } = Astro.params
 if (!isLocale(locale)) throw new Error(`Unknown locale: ${locale}`)
-const { t } = translator(locale as Locale)
+const { t, plural } = translator(locale as Locale)
 // Newest first, the same order as Latest on the hub (dashboard spec §6.3).
 const ordered = latestRumours(rumours, rumours.length)
 const confirmed = newestFacts(facts)
@@ -65,9 +67,39 @@ const guides = guideSlugs(guideEntries)
 <Base locale={locale} title={t("seo.titles.news")} description={t("news.description")} path="news" wide>
 	<article class="news">
 		<h1>{t("news.title")}</h1>
-		<nav class="news-jump" aria-label={t("news.jumpLabel")}>
-			<a href="#new-to-gta">{t("newsGuides.title")}</a>
-			<a href="#channels">{t("channels.title")}</a>
+		<nav class="news-jump" aria-labelledby="news-jump-label">
+			<p class="tile-label" id="news-jump-label">{t("news.jumpLabel")}</p>
+			<ul class="panel-list">
+				{
+					[
+						{
+							href: "#new-to-gta",
+							Icon: ChecklistIcon,
+							title: t("newsGuides.title"),
+							count: plural("news.jumpGuides", guides.length),
+						},
+						{
+							href: "#channels",
+							Icon: NewspaperIcon,
+							title: t("channels.title"),
+							count: plural("news.jumpChannels", channels.length),
+						},
+					].map(({ href, Icon, title, count }) => (
+						<li>
+							<a href={href}>
+								<Icon />
+								<span class="row-label">
+									<span class="row-title">{title}</span>{" "}
+									<span class="row-count">{count}</span>
+								</span>
+								<span class="row-arrow">
+									<ArrowDownIcon />
+								</span>
+							</a>
+						</li>
+					))
+				}
+			</ul>
 		</nav>
 		<div class:list={["news-grid", { "no-facts": confirmed.length === 0 }]}>
 			{
@@ -268,21 +300,53 @@ const guides = guideSlugs(guideEntries)
 		color: var(--text-muted);
 	}
 
-	/* Layout per screen size (News redesign spec §2). One column below 1024 px; news and panels
-	   side by side from 1024 px; Confirmed, Rumours and panels in three columns from 1600 px. */
+	/* The jump tile (News redesign spec §2, feedback round 2): below 1024 px the panels sit at the
+	   end of the page, so a tile under the h1 names both and says how much is behind each. Its rows
+	   are panel rows (.panel-list above); the ↓ says the jump stays on this page. */
 	.news-jump {
-		display: flex;
-		flex-wrap: wrap;
-		column-gap: var(--space-4);
-		margin: 0 0 var(--space-4);
-		font-size: 0.875rem;
+		margin: 0 0 var(--space-5);
+		padding: var(--space-2) var(--space-4);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg-raised);
 	}
 
-	.news-jump a {
-		display: inline-flex;
-		align-items: center;
-		min-height: var(--tap);
+	.news-jump .tile-label {
+		margin: var(--space-2) 0 var(--space-1);
 	}
+
+	.row-title {
+		font-family: var(--font-heading);
+		font-weight: 600;
+	}
+
+	.row-count {
+		font-size: 0.875rem;
+		color: var(--text-muted);
+		white-space: nowrap;
+	}
+
+	/* 18 px, dropped onto the first line like the ↗ in the channel rows. */
+	.news-jump .row-arrow {
+		flex: none;
+		display: flex;
+		margin-top: calc((1lh - 18px) / 2);
+	}
+
+	.news-jump .row-arrow :global(svg) {
+		width: 18px;
+		height: 18px;
+	}
+
+	/* Air and a hairline between the tile and the news, so the tile reads as part of the page head
+	   and Confirmed starts a new block. */
+	.news-jump + .news-grid {
+		padding-top: var(--space-5);
+		border-top: 1px solid var(--border);
+	}
+
+	/* Layout per screen size (News redesign spec §2). One column below 1024 px; news and panels
+	   side by side from 1024 px; Confirmed, Rumours and panels in three columns from 1600 px. */
 
 	/* --space-4 between the boxes, as between the dashboard tiles. */
 	.news-grid {
@@ -308,25 +372,54 @@ const guides = guideSlugs(guideEntries)
 	}
 
 	/* Not sticky: both panels are short, and a sticky column overlaps the footer at 200 % text.
-	   The jump line goes, because the panels are in view. Extra height from the aside goes to
+	   The jump tile and its hairline go, because the panels are in view. Extra height from the aside goes to
 	   the Rumours row, so Confirmed and Rumours never drift apart. */
 	@media (min-width: 1024px) {
 		.news-jump {
 			display: none;
 		}
 
+		.news-jump + .news-grid {
+			padding-top: 0;
+			border-top: 0;
+		}
+
+		/* Each section's h2, intro and card list sit on three shared rows (subgrid), so the first
+		   cards line up across columns even when one intro wraps to two lines, and the aside starts
+		   on the card row. The row gap is 0 because the subgrids set their own spacing. */
 		.news-grid {
 			grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-			grid-template-rows: auto 1fr;
+			grid-template-rows: repeat(5, auto) 1fr;
 			grid-template-areas:
+				"confirmed ."
+				"confirmed ."
 				"confirmed aside"
+				"rumours aside"
+				"rumours aside"
 				"rumours aside";
+			row-gap: 0;
 			align-items: start;
 		}
 
 		.news-grid.no-facts {
-			grid-template-rows: auto;
-			grid-template-areas: "rumours aside";
+			grid-template-rows: auto auto 1fr;
+			grid-template-areas:
+				"rumours ."
+				"rumours ."
+				"rumours aside";
+		}
+
+		.news-confirmed,
+		.news-rumours {
+			display: grid;
+			grid-template-rows: subgrid;
+			row-gap: 0;
+			align-self: stretch;
+		}
+
+		.news-confirmed > *,
+		.news-rumours > * {
+			align-self: start;
 		}
 
 		.news-confirmed {
@@ -335,6 +428,11 @@ const guides = guideSlugs(guideEntries)
 
 		.news-rumours {
 			grid-area: rumours;
+		}
+
+		/* Stacked under Confirmed, Rumours keeps the --space-4 the grid gap gave it. */
+		.news-confirmed + .news-rumours {
+			margin-top: var(--space-4);
 		}
 
 		.news-aside {
@@ -347,15 +445,25 @@ const guides = guideSlugs(guideEntries)
 	@media (min-width: 1600px) {
 		.news-grid {
 			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.75fr);
-			grid-template-rows: auto;
-			grid-template-areas: "confirmed rumours aside";
+			grid-template-rows: auto auto 1fr;
+			grid-template-areas:
+				"confirmed rumours ."
+				"confirmed rumours ."
+				"confirmed rumours aside";
+		}
+
+		.news-confirmed + .news-rumours {
+			margin-top: 0;
 		}
 
 		/* No facts: Rumours takes the first slot and the page keeps two columns, so no column
 		   stands empty. */
 		.news-grid.no-facts {
 			grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-			grid-template-areas: "rumours aside";
+			grid-template-areas:
+				"rumours ."
+				"rumours ."
+				"rumours aside";
 		}
 	}
 </style>

@@ -220,3 +220,15 @@ describe("filter copy (tracker refresh spec §14.1)", () => {
 		expect(nb[key]).toBe(norwegian)
 	})
 })
+
+describe("News jump tile copy (News redesign spec §5, feedback round 2)", () => {
+	it.each([
+		["news.jumpGuides.one", "1 guide", "1 guide"],
+		["news.jumpGuides.other", "{count} guides", "{count} guider"],
+		["news.jumpChannels.one", "1 link", "1 lenke"],
+		["news.jumpChannels.other", "{count} links", "{count} lenker"],
+	] as const)("%s reads as the spec says in English and Norwegian", (key, english, norwegian) => {
+		expect(en[key]).toBe(english)
+		expect(nb[key]).toBe(norwegian)
+	})
+})

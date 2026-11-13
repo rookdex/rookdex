@@ -2459,8 +2459,12 @@ html:has(.search-row) {
 	color: var(--text);
 }
 
+/* An explicit minmax(0, 1fr) column: the implicit auto column grew to the longest Norwegian word
+   at 200 % text ("Forhåndsnedlasting", 330 px on a 320 px phone), so the cards ran off the edge
+   and break-word never got a narrower box to break in. */
 .rumour-list {
 	display: grid;
+	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-3);
 	list-style: none;
 	margin: 0;

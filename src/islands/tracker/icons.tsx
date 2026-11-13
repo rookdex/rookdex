@@ -184,6 +184,15 @@ export function ClockIcon() {
 	)
 }
 
+/** "Further down this page": the News jump rows point at the panels below the news. */
+export function ArrowDownIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<path d="M12 5v14M6 13l6 6 6-6" />
+		</svg>
+	)
+}
+
 const byGuide: Record<string, () => ReactElement> = {
 	"before-you-start": ChecklistIcon,
 	"first-hour": ClockIcon,

@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs"
 import { describe, expect, it, vi } from "vitest"
 import { facts, rumours } from "../model/seed"
 import News from "../pages/[locale]/news.astro"
@@ -241,25 +242,46 @@ describe("News page (spec §8)", () => {
 		expect(leads[0]?.parentElement?.classList.contains("fact-list")).toBe(true)
 	})
 
-	it("jumps to the two panels from a labelled line under the heading", async () => {
-		for (const [locale, label] of [
-			["en", "On this page"],
-			["nb", "På denne siden"],
+	it("jumps to the two panels from a labelled tile under the heading", async () => {
+		for (const [locale, label, guides, channels] of [
+			["en", "On this page", "2 guides", "5 links"],
+			["nb", "På denne siden", "2 guider", "5 lenker"],
 		] as const) {
 			const doc = await renderDoc(News, { params: { locale } })
-			const nav = doc.querySelector(`nav[aria-label="${label}"]`)
+			const nav = doc.querySelector("nav.news-jump")
 			expect(nav?.previousElementSibling?.tagName).toBe("H1")
-			const targets = [...(nav?.querySelectorAll("a") ?? [])].map((a) => a.getAttribute("href"))
+			// The visible label names the nav, so it is not said twice.
+			const labelId = nav?.getAttribute("aria-labelledby") ?? ""
+			expect(doc.getElementById(labelId)?.textContent).toBe(label)
+			expect(nav?.contains(doc.getElementById(labelId))).toBe(true)
+			expect(nav?.hasAttribute("aria-label")).toBe(false)
+			const links = [...(nav?.querySelectorAll(".panel-list a") ?? [])]
+			const targets = links.map((a) => a.getAttribute("href"))
 			expect(targets).toEqual(["#new-to-gta", "#channels"])
 			for (const href of targets) {
 				const heading = doc.getElementById(href?.slice(1) ?? "")
 				expect(heading?.tagName).toBe("H2")
 				expect(heading?.closest("aside")).not.toBeNull()
 			}
-			expect([...(nav?.querySelectorAll("a") ?? [])].map((a) => a.textContent)).toEqual([
+			// Each row: the panel's title, then how much is behind it, counted from the panel itself.
+			expect(links.map((a) => a.querySelector(".row-title")?.textContent)).toEqual([
 				doc.getElementById("new-to-gta")?.textContent,
 				doc.getElementById("channels")?.textContent,
 			])
+			expect(links.map((a) => a.querySelector(".row-count")?.textContent)).toEqual([
+				guides,
+				channels,
+			])
+			const panelRows = ["new-to-gta", "channels"].map(
+				(id) => doc.querySelectorAll(`[aria-labelledby="${id}"] .panel-list a`).length
+			)
+			expect(panelRows).toEqual([2, 5])
+			for (const a of links) {
+				for (const svg of a.querySelectorAll("svg")) {
+					expect(svg.getAttribute("aria-hidden")).toBe("true")
+				}
+				expect(a.querySelector(".row-arrow")).not.toBeNull()
+			}
 		}
 	})
 
@@ -292,5 +314,14 @@ describe("News page (spec §8)", () => {
 		const lines = [...doc.querySelectorAll(".tier-line")].map((p) => p.textContent?.trim())
 		expect(lines).toContain("Confirmed 15 Oct")
 		expect(lines).toContain("Rumour 1 Oct")
+	})
+
+	// The card list's own column, so a long Norwegian word at 200 % text breaks inside the card
+	// instead of widening the list past a 320 px phone (feedback round 2, measured 124 px over).
+	it("gives the card list a column that can shrink", () => {
+		const css = readFileSync(new URL("../styles/global.css", import.meta.url), "utf8")
+		const start = css.indexOf("\n.rumour-list {")
+		const body = css.slice(start, css.indexOf("}", start))
+		expect(body).toContain("grid-template-columns: minmax(0, 1fr);")
 	})
 })
