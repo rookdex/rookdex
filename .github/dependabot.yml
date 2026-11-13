@@ -1,9 +1,14 @@
+# Launch freeze: version updates are paused (limit 0) until the two-week no-upgrade window after
+# the 19.11 launch ends. Dependabot runs on Thursdays and auto-merges, and its merges start no
+# Deploy, so a bump would ride the first launch-weekend hotfix untested. Security updates still
+# open. Remove both `open-pull-requests-limit` lines on 03.12.2026.
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 0
     cooldown:
       semver-major-days: 21
     groups:
@@ -13,6 +18,7 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 0
     cooldown:
       semver-major-days: 21
     groups:
