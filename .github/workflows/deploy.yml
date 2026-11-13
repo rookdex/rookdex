@@ -9,8 +9,14 @@ on:
   # server HTML is built with the build time, so this rebuild is what makes it the dashboard.
   # The game unlocks at each player's own midnight, so the browser corrects the static page
   # either way: dashboard early in Asia and Australia, countdown until midnight in the Americas.
+  # GitHub can delay or drop a scheduled run, so a second one follows at 00:35 CET. Both build
+  # after the launch instant, so they give the same service worker version and players see one
+  # update, not two. Launch night by hand:
+  #   no run by 00:45 CET: gh workflow run deploy.yml -R rookdex/rookdex --ref main
+  #   bad deploy: npx wrangler rollback (or Cloudflare > Workers > rookdex > Deployments)
   schedule:
     - cron: "5 23 18 11 *"
+    - cron: "35 23 18 11 *"
 
 permissions:
   contents: read

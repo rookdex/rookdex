@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest"
-import { indexablePaths, jsonLd, SITE, sitemapXml, validSlugs } from "./seo"
+import en from "../locales/en.json"
+import nb from "../locales/nb.json"
+import { homeSeoKeys, indexablePaths, jsonLd, SITE, sitemapXml, validSlugs } from "./seo"
 
 describe("SITE", () => {
 	it("is the production origin without a trailing slash", () => {
@@ -77,4 +79,26 @@ describe("sitemapXml (SEO spec §4.2)", () => {
 		const urls = [`${SITE}/en/`, `${SITE}/en/news/`, `${SITE}/nb/`]
 		expect(sitemapXml([...urls].reverse())).toBe(sitemapXml(urls))
 	})
+})
+
+describe("homeSeoKeys (launch rebuild)", () => {
+	it("keeps the countdown copy before launch", () => {
+		expect(homeSeoKeys("before")).toEqual({
+			title: "seo.titles.home",
+			description: "seo.homeDescription",
+		})
+	})
+
+	it.each([
+		["en", en],
+		["nb", nb],
+	] as const)(
+		"%s after-launch copy drops the countdown and never says the game is out",
+		(_l, bundle) => {
+			const { title, description } = homeSeoKeys("after")
+			for (const text of [bundle[title], bundle[description]]) {
+				expect(text).not.toMatch(/countdown|nedtelling|out now|ute nå|19/i)
+			}
+		}
+	)
 })

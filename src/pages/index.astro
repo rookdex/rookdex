@@ -5,8 +5,10 @@ import "@fontsource/bebas-neue"
 import { getAbsoluteLocaleUrl, getRelativeLocaleUrl } from "astro:i18n"
 import Mark from "../components/Mark.astro"
 import { defaultLocale, LANG_KEY, locales, translator } from "../i18n"
+import { buildNow } from "../model/build-now"
+import { hubPhase, LAUNCH_AT } from "../model/launch"
 import { rootScript, scriptHash } from "../model/root-resolver"
-import { jsonLd, SITE } from "../model/seo"
+import { homeSeoKeys, jsonLd, SITE } from "../model/seo"
 import "../styles/global.css"
 
 // The language-neutral root (locale spec §6.4). With JavaScript, the inline resolver jumps to the
@@ -17,6 +19,8 @@ import "../styles/global.css"
 const { t, displayName } = translator(defaultLocale)
 const resolver = rootScript(locales, defaultLocale, LANG_KEY)
 Astro.csp?.insertScriptHash(scriptHash(resolver))
+// The same build-time phase the hub renders, so the bare domain's unfurl matches /en/ and /nb/.
+const seo = homeSeoKeys(hubPhase(buildNow(process.env.ROOKDEX_NOW), LAUNCH_AT))
 ---
 
 <!doctype html>
@@ -25,8 +29,8 @@ Astro.csp?.insertScriptHash(scriptHash(resolver))
 		<meta charset="utf-8" />
 		<script is:inline set:html={resolver}></script>
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-		<title>{t("seo.titles.home")}</title>
-		<meta name="description" content={t("seo.homeDescription")} />
+		<title>{t(seo.title)}</title>
+		<meta name="description" content={t(seo.description)} />
 		<meta name="color-scheme" content="dark" />
 		<meta name="theme-color" content="#000000" />
 		<link rel="manifest" href="/manifest.webmanifest" />
@@ -39,8 +43,8 @@ Astro.csp?.insertScriptHash(scriptHash(resolver))
 		<meta property="og:url" content={`${SITE}/`} />
 		<meta property="og:site_name" content={t("siteName")} />
 		<meta property="og:type" content="website" />
-		<meta property="og:title" content={t("seo.titles.home")} />
-		<meta property="og:description" content={t("seo.homeDescription")} />
+		<meta property="og:title" content={t(seo.title)} />
+		<meta property="og:description" content={t(seo.description)} />
 		<meta property="og:image" content={`${SITE}/og.png`} />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
