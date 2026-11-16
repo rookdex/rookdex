@@ -11,8 +11,8 @@ import { downloadJson } from "../scripts/download"
 import { buildTracker } from "./buildTracker"
 import {
 	BACKUP_REMINDER_TICKS,
-	backupDue,
 	type BackupLog,
+	backupDue,
 	HINT_SEEN_KEY,
 	readBackupLog,
 	readTrackerView,

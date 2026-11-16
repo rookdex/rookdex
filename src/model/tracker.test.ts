@@ -166,7 +166,10 @@ describe("remembered view", () => {
 	})
 
 	it("the saved view parses back to the same tiles and chips", () => {
-		const search = openingSearch({ search: "", hash: "" }, viewParams(["wildlife"], ["wildlife/birds"]))
+		const search = openingSearch(
+			{ search: "", hash: "" },
+			viewParams(["wildlife"], ["wildlife/birds"])
+		)
 		expect(parseShow(search, ["wildlife", "vehicles"])).toEqual(["wildlife"])
 		expect(parseGroups(search, new Map([["wildlife", ["birds", "reptiles"]]]))).toEqual([
 			"wildlife/birds",
