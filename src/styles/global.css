@@ -958,8 +958,11 @@ p {
 	padding: var(--space-3);
 }
 
+/* An implicit auto column grew to its widest content: at 200 % text on a 320 px phone it ran 19 px
+   (en) and 50 px (nb) past the card. minmax(0, 1fr) holds the card's width and lets text wrap. */
 .dashboard {
 	display: grid;
+	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-4);
 	margin-bottom: var(--space-4);
 }
@@ -975,9 +978,11 @@ p {
 	font-size: 1rem;
 }
 
+/* Side by side while two 7rem tiles fit; stacked when they don't (200 % text on a phone, where the
+   big numbers ran up to 34 px past the card). */
 .stat-pair {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
 	gap: var(--space-2);
 	margin: 0;
 }
@@ -1185,14 +1190,34 @@ p {
 	list-style: none;
 }
 
+/* The whole row is the tap target (name plus chip line, over 44 px), so a one-line name gets no
+   padding of its own and every row spaces its chip the same. */
 .latest-list li {
+	position: relative;
 	display: grid;
 	overflow-wrap: anywhere;
 }
 
-.latest-list time {
-	display: block;
+.latest-list a {
+	display: inline;
+	min-height: 0;
+}
+
+.latest-list a::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+}
+
+/* Chip and date share one line under the name; the date keeps its height before it is filled in. */
+.latest-meta {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
 	min-height: 1.3rem;
+}
+
+.latest-list time {
 	font-size: 0.875rem;
 	color: var(--text-muted);
 }
@@ -2586,18 +2611,22 @@ html:has(.search-row) {
 	isolation: isolate;
 }
 
+/* Plain text, so the icon rides on the last line (TileTitle keeps it with the last word). */
 .link-tile .tile-title {
-	display: inline-flex;
-	align-items: center;
-	gap: var(--space-1);
+	display: block;
 	font-family: var(--font-heading);
 	font-size: 1.125rem;
 	font-weight: 600;
 	color: var(--text);
 }
 
+.tile-title-end {
+	white-space: nowrap;
+}
+
 .link-tile .tile-title svg {
-	flex: none;
+	margin-inline-start: var(--space-1);
+	vertical-align: -0.125em;
 	color: var(--link);
 }
 
@@ -3499,7 +3528,8 @@ html:has(.search-row) {
 		color: var(--text-muted);
 	}
 
-	/* Recent finds: the first row is the Latest highlight, then up to 4 rows, or 2 with the chart.
+	/* Recent finds: the first row is the Latest highlight, then up to 4 rows, or 2 with the chart
+	   below 1200 px.
 	   The rows under it are one line each: the name, with the relative day pushed to the right. The
 	   day comes first in the DOM and moves with CSS order, so the reading order is unchanged. */
 	.dash-recent .recent li {
@@ -3671,6 +3701,12 @@ html:has(.search-row) {
 	/* No news: the tiles keep their own columns beside Recent finds instead of covering it. */
 	.hub-dashboard:not(:has(.news-tile)) .link-tiles {
 		grid-column: 5 / -1;
+	}
+
+	/* From here the link tiles make the bottom row 482 to 572 px tall (en and nb, measured 16.11).
+	   With 2 rows beside the chart, Recent finds left 91 to 163 px empty; all 4 fit. */
+	.dash-recent.has-chart .recent li:nth-child(n + 4) {
+		display: flex;
 	}
 
 	.ledger {

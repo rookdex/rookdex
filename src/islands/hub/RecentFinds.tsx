@@ -17,7 +17,7 @@ interface Props {
 /**
  * Recent finds at every width (desktop spec §4.5). Phones show names only, as before: the day,
  * category line and Latest label are hidden below 1024 px. From 1024 px the first row is the
- * Latest highlight, and CSS limits the rows under it (4, or 2 when the chart shows).
+ * Latest highlight, and CSS limits the rows under it (4, or 2 when the chart shows below 1200 px).
  */
 export function RecentFinds({ recent, days, today, locale, t }: Props) {
 	const relative = useMemo(() => new Intl.RelativeTimeFormat(locale, { numeric: "auto" }), [locale])

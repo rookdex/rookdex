@@ -1,6 +1,6 @@
 import { MAP_LINK } from "../../config/map-link"
 import type { Translate } from "../../i18n"
-import { Chev } from "./Chev"
+import { Chev, TileTitle } from "./Chev"
 import { ExternalTile } from "./ExternalTile"
 
 interface Props {
@@ -32,20 +32,18 @@ export function LinkTiles({ mapLink, guideHref, guideTitle, settingsHref, t }: P
 				<span className="tile-label" aria-hidden="true">
 					{t("hub.guideLabel")}
 				</span>
-				<span className="tile-title">
-					{guideTitle}
+				<TileTitle text={guideTitle}>
 					<Chev />
-				</span>
+				</TileTitle>
 				<span className="tile-body">{t("hub.guideBody")}</span>
 			</a>
 			<a className="tile link-tile" href={settingsHref}>
 				<span className="tile-label" aria-hidden="true">
 					{t("nav.settings")}
 				</span>
-				<span className="tile-title">
-					{t("hub.settingsTitle")}
+				<TileTitle text={t("hub.settingsTitle")}>
 					<Chev />
-				</span>
+				</TileTitle>
 				<span className="tile-body">{t("hub.settingsBody")}</span>
 			</a>
 		</div>

@@ -1,4 +1,5 @@
 import type { Translate } from "../../i18n"
+import { TileTitle } from "./Chev"
 
 interface Props {
 	href: string
@@ -27,8 +28,7 @@ export function ExternalTile({ href, label, title, body, t }: Props) {
 			<span className="tile-label" aria-hidden="true">
 				{label}
 			</span>
-			<span className="tile-title">
-				{title}
+			<TileTitle text={title}>
 				<svg
 					className="ext-icon"
 					viewBox="0 0 24 24"
@@ -43,7 +43,7 @@ export function ExternalTile({ href, label, title, body, t }: Props) {
 				>
 					<path d="M7 17 17 7M9 7h8v8" />
 				</svg>
-			</span>
+			</TileTitle>
 			<span className="tile-body">{body}</span>
 			<span className="visually-hidden new-tab-note">{` (${t("newTab")})`}</span>
 		</a>
