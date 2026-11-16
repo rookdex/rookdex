@@ -13,7 +13,7 @@ Leonida is waiting, and you'll want somewhere to keep score. Rookdex gives you a
 - **A countdown, then a dashboard.** Days, hours and minutes to 19 November 2026. At midnight on launch night the home page turns into your dashboard: overall progress, the category you're closest to finishing, what's next, your finds by day and the latest news.
 - **A tracker** with over 200 animals, vehicles, places and collectibles. Search by name or type, filter by category and group, hide what you've found. Spot a gator, tick a box, watch the bar fill up.
 - **The Dex.** Every animal, vehicle, place and collectible on one page per category, each with its status and a link to the trailer or report that shows it. Search it the same way as the tracker.
-- **Confirmed, expected or rumour.** Every item shows its tier and its sources. The News page keeps what Rockstar and Take-Two have confirmed apart from what the press reports, so you can tell a trailer frame from somebody's cousin's friend. Beside the news, one panel points newcomers to guides for their first days and another links Rockstar's official channels.
+- **Confirmed, expected or rumor.** Every item shows its tier and its sources. The News page keeps what Rockstar and Take-Two have confirmed apart from what the press reports, so you can tell a trailer frame from somebody's cousin's friend. Beside the news, one panel points newcomers to guides for their first days and another links Rockstar's official channels.
 - **Two short guides.** Before you start covers editions and what to sort out before launch night. Your first hour covers what to check, claim and skip once the game unlocks.
 
 ## <img src="docs/readme/save.svg" width="22" height="22" alt=""> Your save file stays with you
@@ -22,7 +22,7 @@ Your progress lives in your browser, not on a server. No account, no password, n
 
 ## <img src="docs/readme/print.svg" width="22" height="22" alt=""> The small print
 
-Rookdex is an unofficial fan project. It is not affiliated with or endorsed by Rockstar Games or Take-Two Interactive. Confirmed means Rockstar has shown or said it. Expected means it was in earlier games and press coverage expects it back. Anything else is a rumour, and it's labelled as one.
+Rookdex is an unofficial fan project. It is not affiliated with or endorsed by Rockstar Games or Take-Two Interactive. Confirmed means Rockstar has shown or said it. Expected means it was in earlier games and press coverage expects it back. Anything else is a rumor, and it's labeled as one.
 
 <img src="docs/readme/stripe.svg" width="100%" height="8" alt="">
 
@@ -40,7 +40,7 @@ npm run dev
 <details>
 <summary>Brand files, README art and how to rebuild them</summary>
 
-Colours and type are tokens in `src/styles/tokens.css`. Components read tokens and never write a colour of their own. The mark is `public/icon.svg` (the app icon) and `src/components/Mark.astro` (in-page, token-coloured). The social banner is rendered from `docs/brand/og.html` to `public/og.png`. The brand spec is `docs/superpowers/specs/2026-09-21-rookdex-brand-design.md`.
+Colors and type are tokens in `src/styles/tokens.css`. Components read tokens and never write a color of their own. The mark is `public/icon.svg` (the app icon) and `src/components/Mark.astro` (in-page, token-colored). The social banner is rendered from `docs/brand/og.html` to `public/og.png`. The brand spec is `docs/superpowers/specs/2026-09-21-rookdex-brand-design.md`.
 
 To rebuild the icons, run `npm run icons` for the PWA set and `npm run icons:favicon` for the favicon, which is generated separately from `assets/favicon-source.svg`. It is the same mark without the palm, which is noise at 16 px. To rebuild the banner, run `node docs/brand/serve.mjs`, open `http://localhost:4400/docs/brand/og.html` and call `render()` in the browser console. It posts the canvas back to the server, which writes `public/og.png`.
 
@@ -48,10 +48,10 @@ The README art lives in `docs/readme/`. To refresh the screenshot after a UI cha
 
 </details>
 
-## <img src="docs/readme/licence.svg" width="22" height="22" alt=""> Licence
+## <img src="docs/readme/licence.svg" width="22" height="22" alt=""> License
 
 Code is MIT (see `LICENSE`; the brand files listed there are excluded). Guide text under `src/content/` is CC BY-SA 4.0.
 
-The Rookdex name, mark and banner are not under the MIT licence. Use them to link to or talk about Rookdex, not to present another project as Rookdex.
+The Rookdex name, mark and banner are not under the MIT license. Use them to link to or talk about Rookdex, not to present another project as Rookdex.
 
 The GitHub mark in the footer comes from Octicons (MIT, © GitHub Inc.) and is used under GitHub's logo guidelines to link to this repository.
