@@ -1,6 +1,6 @@
 import { IDBFactory } from "fake-indexeddb"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { CHECKLIST_KEY, HIDE_FOUND_KEY } from "../islands/seenFlag"
+import { CHECKLIST_KEY, HIDE_FOUND_KEY, TRACKER_VIEW_KEY } from "../islands/seenFlag"
 import { DB_NAME, openStore } from "../model/store"
 import { deleteAllData } from "./delete-all"
 
@@ -16,6 +16,8 @@ describe("deleteAllData (spec §7.2, feedback spec §7.3)", () => {
 	it("deletes the rookdex database and every choice, and keeps the one-shot flags", async () => {
 		const storage = { removeItem: vi.fn(), clear: vi.fn(), setItem: vi.fn() }
 		vi.stubGlobal("localStorage", storage)
+		const session = { removeItem: vi.fn() }
+		vi.stubGlobal("sessionStorage", session)
 		const factory = new IDBFactory()
 		const store = await openStore(factory)
 		await store.put("profiles", { id: "p1", name: "A", created_at: "2026-09-23T10:00:00.000Z" })
@@ -31,6 +33,7 @@ describe("deleteAllData (spec §7.2, feedback spec §7.3)", () => {
 			["rookdex.backup"],
 		])
 		expect(storage.clear).not.toHaveBeenCalled()
+		expect(session.removeItem.mock.calls).toEqual([[TRACKER_VIEW_KEY]])
 	})
 
 	it("still reports deleted when removing the language choice throws", async () => {

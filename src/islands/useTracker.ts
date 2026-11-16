@@ -1,5 +1,12 @@
-import { useEffect, useSyncExternalStore } from "react"
-import { groupParam, showParam, type Tracker, type TrackerState } from "../model/tracker"
+import { useEffect, useRef, useSyncExternalStore } from "react"
+import {
+	groupParam,
+	showParam,
+	type Tracker,
+	type TrackerState,
+	viewParams,
+} from "../model/tracker"
+import { writeTrackerView } from "./seenFlag"
 
 /** Controller: subscribes to the model and boots it once. The tracker page and the hub both use it. */
 export function useTrackerState(tracker: Tracker): TrackerState {
@@ -41,4 +48,28 @@ export function useShowParam(selected: string[]): void {
 /** Mirrors the group chips to `?group=`, beside `?show=` (spec §14.1). Tracker page only. */
 export function useGroupParam(groups: string[]): void {
 	useSearchParam("group", groupParam(groups))
+}
+
+/**
+ * Saves the tiles, chips and search text for the session, with the scroll position, so the tracker
+ * reopens as it was left. It writes when the page is hidden (a link, the nav, a reload, the app
+ * going to the background) and on unmount, not on every scroll. Tracker page only.
+ */
+export function useRememberView(selected: string[], groups: string[], query: string): void {
+	const latest = useRef({ params: "", query: "" })
+	latest.current = { params: viewParams(selected, groups) ?? "", query }
+
+	useEffect(() => {
+		const save = () => writeTrackerView({ ...latest.current, scroll: window.scrollY })
+		const onVisibility = () => {
+			if (document.visibilityState === "hidden") save()
+		}
+		window.addEventListener("pagehide", save)
+		document.addEventListener("visibilitychange", onVisibility)
+		return () => {
+			window.removeEventListener("pagehide", save)
+			document.removeEventListener("visibilitychange", onVisibility)
+			save()
+		}
+	}, [])
 }

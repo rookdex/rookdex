@@ -160,3 +160,79 @@ describe("Group chips (tracker refresh spec §14.1)", () => {
 		expect(document.querySelector(".last-found")?.tagName).toBe("P")
 	})
 })
+
+describe("Remembered filters (leave the tracker and come back)", () => {
+	const showParam = () => new URLSearchParams(window.location.search).get("show")
+
+	it("opens a bare tracker URL with the tiles and chips pressed before", async () => {
+		const first = await ready()
+		press(/^Wildlife,/)
+		press(/^Vehicles,/)
+		press(/^Birds,/)
+		first.unmount()
+		window.history.replaceState(null, "", "/en/tracker/")
+		render(<Tracker locale="en" />)
+		const box = await screen.findByRole("checkbox", { name: "Pelican" })
+		await waitFor(() => expect(box).toBeEnabled())
+		expect(names()).toEqual(["item-vehicles/bike", "item-wildlife/pelican"])
+		expect(button(/^Wildlife,/)).toHaveAttribute("aria-pressed", "true")
+		expect(button(/^Vehicles,/)).toHaveAttribute("aria-pressed", "true")
+		expect(button(/^Birds,/)).toHaveAttribute("aria-pressed", "true")
+		expect(showParam()).toBe("vehicles,wildlife")
+		expect(groupParam()).toBe("wildlife/birds")
+	})
+
+	it("opens on All again once the filters are cleared", async () => {
+		const first = await ready()
+		press(/^Wildlife,/)
+		press(/^Wildlife,/)
+		first.unmount()
+		window.history.replaceState(null, "", "/en/tracker/")
+		await ready()
+		expect(showParam()).toBeNull()
+		expect(names()).toContain("item-vehicles/bike")
+	})
+
+	it("keeps the search text and the scroll position too", async () => {
+		const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => undefined)
+		const first = await ready()
+		press(/^Wildlife,/)
+		type("peli")
+		Object.defineProperty(window, "scrollY", { configurable: true, value: 480 })
+		first.unmount()
+		Object.defineProperty(window, "scrollY", { configurable: true, value: 0 })
+		window.history.replaceState(null, "", "/en/tracker/")
+		render(<Tracker locale="en" />)
+		const box = await screen.findByRole("checkbox", { name: "Pelican" })
+		await waitFor(() => expect(box).toBeEnabled())
+		expect(screen.getByRole("searchbox")).toHaveValue("peli")
+		expect(names()).toEqual(["item-wildlife/pelican"])
+		expect(scrollTo).toHaveBeenCalledWith({ top: 480, behavior: "instant" })
+	})
+
+	it("saves the view when the page is hidden, not only on unmount", async () => {
+		await ready()
+		press(/^Vehicles,/)
+		type("bike")
+		window.dispatchEvent(new Event("pagehide"))
+		expect(JSON.parse(sessionStorage.getItem("rookdex.tracker-view") ?? "null")).toEqual({
+			params: "show=vehicles",
+			query: "bike",
+			scroll: 0,
+		})
+	})
+
+	it("lets a link that names its own category win over the saved view", async () => {
+		const first = await ready()
+		press(/^Wildlife,/)
+		type("peli")
+		first.unmount()
+		window.history.replaceState(null, "", "/en/tracker/?show=vehicles")
+		render(<Tracker locale="en" />)
+		const box = await screen.findByRole("checkbox", { name: "Bike" })
+		await waitFor(() => expect(box).toBeEnabled())
+		expect(names()).toEqual(["item-vehicles/bike"])
+		expect(showParam()).toBe("vehicles")
+		expect(screen.getByRole("searchbox")).toHaveValue("")
+	})
+})

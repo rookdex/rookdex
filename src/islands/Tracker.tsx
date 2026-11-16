@@ -2,6 +2,7 @@ import { type ChangeEvent, useEffect, useRef, useState } from "react"
 import { type Locale, seedLabel, translator } from "../i18n"
 import { hubPhase } from "../model/launch"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
+import { openingView } from "../model/savedView"
 import { type EmptyState, emptyState, type SearchView } from "../model/search"
 import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, perGroup, recentFinds } from "../model/stats"
@@ -15,6 +16,7 @@ import {
 	backupDue,
 	HINT_SEEN_KEY,
 	readBackupLog,
+	readTrackerView,
 	recordBackup,
 	snoozeBackupReminder,
 	writeFlag,
@@ -32,7 +34,7 @@ import { SearchBar } from "./tracker/SearchBar"
 import { StatsRail } from "./tracker/StatsRail"
 import { useLiveStatus } from "./tracker/useLiveStatus"
 import { useSearch } from "./tracker/useSearch"
-import { useGroupParam, useShowParam, useTrackerState } from "./useTracker"
+import { useGroupParam, useRememberView, useShowParam, useTrackerState } from "./useTracker"
 
 export const HINT_KEY = HINT_SEEN_KEY
 
@@ -75,12 +77,14 @@ function markCard(box: HTMLElement) {
 /** Island root. `client:only`: the first render reads the URL and IndexedDB. */
 export function Tracker({ locale }: Props) {
 	const { t, plural } = translator(locale)
+	// Read once: the filters, search and scroll the tracker opens with (saved view or the URL).
+	const [startView] = useState(() => openingView(window.location, readTrackerView()))
 	const [tracker] = useState(() => {
-		const selected = parseShow(window.location.search, categoryIds(seedItems))
+		const selected = parseShow(startView.search, categoryIds(seedItems))
 		return buildTracker(
 			t("profile.defaultName"),
 			selected,
-			parseGroups(window.location.search, chipGroups(seedItems, selected))
+			parseGroups(startView.search, chipGroups(seedItems, selected))
 		)
 	})
 	const state = useTrackerState(tracker)
@@ -88,7 +92,16 @@ export function Tracker({ locale }: Props) {
 	useGroupParam(state.groups)
 	// The item a Sources back link points at stays visible on arrival, even if found (Task 4).
 	const [arrival] = useState(() => hashItemId(window.location.hash) ?? undefined)
-	const search = useSearch(state, arrival)
+	const search = useSearch(state, arrival, startView.query)
+	useRememberView(state.selected, state.groups, search.query)
+	// Back where the list was left, once it has loaded (the saved view's scroll position).
+	const scrolled = useRef(false)
+	useEffect(() => {
+		if (scrolled.current || state.status !== "ready") return
+		scrolled.current = true
+		// 0 is where a fresh page already sits, so there is nothing to restore.
+		if (startView.scroll) window.scrollTo({ top: startView.scroll, behavior: "instant" })
+	}, [state.status, startView.scroll])
 	const live = useLiveStatus()
 	const searchField = useRef<HTMLInputElement>(null)
 	const results = useRef<HTMLDivElement>(null)

@@ -1,5 +1,6 @@
 // The keys Rookdex keeps in localStorage. Here, not in the islands, so the Settings page's
 // delete script can name them without pulling React into its bundle.
+import { parseSavedView, type SavedView } from "../model/savedView"
 import type { ActiveProfileStore } from "../model/tracker"
 
 export const INSTALL_SEEN_KEY = "rookdex.install-prompt-seen"
@@ -8,6 +9,12 @@ export const HINT_SEEN_KEY = "rookdex.persist-hint-seen"
 export const HIDE_FOUND_KEY = "rookdex.hide-found"
 /** The profile the hub and the tracker open (dashboard spec §5). Holds a random id, nothing else. */
 export const ACTIVE_PROFILE_KEY = "rookdex.active-profile"
+/**
+ * The tracker's pressed tiles and chips, search text and scroll position (a `SavedView`), in
+ * sessionStorage rather than localStorage: they last while the app is open, so leaving for the Dex
+ * and coming back keeps them, and a fresh launch opens on All with an empty search.
+ */
+export const TRACKER_VIEW_KEY = "rookdex.tracker-view"
 
 /** One-shot "already shown" flags in localStorage, tolerant of private mode and blocked storage. */
 export function readFlag(key: string): boolean {
@@ -50,6 +57,25 @@ export const activeProfileStorage: ActiveProfileStore = {
 			// Blocked storage: the first active profile opens next time, as before.
 		}
 	},
+}
+
+/** The saved tracker view, or null. Blocked storage reads as null, so the tracker opens on All. */
+export function readTrackerView(): SavedView | null {
+	try {
+		return parseSavedView(sessionStorage.getItem(TRACKER_VIEW_KEY))
+	} catch {
+		return null
+	}
+}
+
+/** Saves the tracker view; null forgets it. Blocked storage saves nothing, as before. */
+export function writeTrackerView(view: SavedView | null): void {
+	try {
+		if (view) sessionStorage.setItem(TRACKER_VIEW_KEY, JSON.stringify(view))
+		else sessionStorage.removeItem(TRACKER_VIEW_KEY)
+	} catch {
+		// Blocked storage: the tracker opens on All next time.
+	}
 }
 
 /** When the last export or backup ran, and how many ticks were saved since. Nothing else. */

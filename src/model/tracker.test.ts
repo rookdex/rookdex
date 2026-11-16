@@ -1,6 +1,7 @@
 import { IDBFactory } from "fake-indexeddb"
 import { describe, expect, it, vi } from "vitest"
 import { listRecords } from "./progress"
+import { openingView } from "./savedView"
 import type { SeedItem } from "./schema"
 import { openStore, type Store } from "./store"
 import {
@@ -11,6 +12,7 @@ import {
 	parseShow,
 	showParam,
 	type TrackerDeps,
+	viewParams,
 } from "./tracker"
 import { buildBackup, buildExport } from "./transfer"
 
@@ -139,6 +141,27 @@ describe("categories", () => {
 		expect(parseShow("", ["wildlife"])).toEqual([])
 		expect(showParam(["wildlife", "vehicles"])).toBe("wildlife,vehicles")
 		expect(showParam([])).toBeNull()
+	})
+})
+
+describe("remembered view", () => {
+	const bare = { search: "", hash: "" }
+
+	it("viewParams holds the pressed tiles and chips, or nothing when both are empty", () => {
+		expect(viewParams(["wildlife", "vehicles"], ["wildlife/birds"])).toBe(
+			"show=wildlife%2Cvehicles&group=wildlife%2Fbirds"
+		)
+		expect(viewParams(["wildlife"], [])).toBe("show=wildlife")
+		expect(viewParams([], [])).toBeNull()
+	})
+
+	it("the saved filters parse back to the same tiles and chips", () => {
+		const params = viewParams(["wildlife"], ["wildlife/birds"]) ?? ""
+		const { search } = openingView(bare, { params, query: "", scroll: 0 })
+		expect(parseShow(search, ["wildlife", "vehicles"])).toEqual(["wildlife"])
+		expect(parseGroups(search, new Map([["wildlife", ["birds", "reptiles"]]]))).toEqual([
+			"wildlife/birds",
+		])
 	})
 })
 

@@ -161,6 +161,16 @@ export function groupParam(groups: string[]): string | null {
 	return groups.length > 0 ? groups.join(",") : null
 }
 
+/** The pressed tiles and chips as one query string, the form the tracker saves for the session. */
+export function viewParams(selected: string[], groups: string[]): string | null {
+	const params = new URLSearchParams()
+	const show = showParam(selected)
+	const group = groupParam(groups)
+	if (show) params.set("show", show)
+	if (group) params.set("group", group)
+	return show || group ? params.toString() : null
+}
+
 function validName(name: string): boolean {
 	const trimmed = name.trim()
 	return trimmed.length > 0 && trimmed.length <= TEXT.profileName
