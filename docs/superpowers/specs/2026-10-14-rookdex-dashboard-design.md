@@ -33,7 +33,7 @@ GTA VI launches Thursday 19 November 2026 at 00:00 CET. This ships before the 1 
 | What's next | The category closest to done; the next one takes over at 100 %; Wildlife when nothing is found | One clear goal instead of a wall of items |
 | What's next length | 3 rows. When the closest category has fewer than 3 left, the next-closest fills the rest. Each category's rows sit under a title saying how many are left | Short at 320 px with no empty slots; the tracker holds the full list |
 | Ticking on the hub | Row slides out, next fills in, Undo toast that leaves 5 s after focus leaves What's next or the player taps outside it | Fast to use, a mis-tap is cheap to fix, and screen-reader users can reach Undo (WCAG 2.2.1) |
-| Latest | 3 newest rumours by a new required `added` date | Needs a date to sort by; News uses the same order |
+| Latest | 3 newest rumours by a new required `added` date. **Changed 16.11.2026:** the 3 newest news items, Confirmed and Rumor mixed, the same list as the desktop news tile | Needs a date to sort by; News uses the same order. Rumours alone left a pre-launch rumour on phones after launch while desktop showed the confirmed facts |
 | Buying info after launch | Dropped from the hub; the guide's "Buying in Norway" already holds it | The dashboard is for players who own the game |
 | Newcomer line | "New to GTA VI? Before you start" only while the active profile has 0 found, in the strip's first half | Helps on day one, then gets out of the way; same slot, so no layout shift |
 | Phase before launch | Strictly by device clock in prod; `?phase=after` on preview hosts, `localhost` and dev only | Nobody sees the dashboard early by accident |
@@ -66,7 +66,7 @@ All new files go in `src/islands/hub/`. Top to bottom, the dashboard is:
 4. **`WhatsNext`.** Up to 3 unfound items, each a checkbox row that calls `tracker.tick`. They come from the closest category first. When it has fewer than 3 left, the next-closest category fills the rest, at most two categories in all. Each category's rows sit under a small title: "Collectibles · 1 left" for the first, "Then: Places · 6 left" for the second. The count is every unfound item in that category, not only the ones shown. When everything is found it shows "You've found everything tracked so far" instead. The block always reserves the height of 3 rows and 2 titles.
 5. **Progress.** One `Bar` per category. Overall isn't repeated; the tile shows it.
 6. **Recent finds.** `recentFinds(items, records, 5)`, as on the tracker. Reserves the height of 5 rows, also when it shows `tracker.noRecent`.
-7. **`Latest`.** The 3 newest rumours, name and relative date, then an "All news" link. Hidden when there are no rumours (known at build time, so the skeleton matches).
+7. **`Latest`.** Heading "Latest news", then the first 3 of the desktop news tile's list (Confirmed and Rumor mixed, newest first), each with its name linking to its News section and a line with its chip and relative date. The whole row is the link. Then an "All news" link. Hidden when there is no news (known at build time, so the skeleton matches). *Was the 3 newest rumours under "Latest" until 16.11.2026.*
 
 Long item and category names, emoji included, wrap and are never cut off. Norwegian runs longest; the 320 px check uses `nb`.
 
@@ -112,7 +112,7 @@ Today `init()` always opens the first active profile (`ensureActiveProfile`, `pr
 
 - `rumourInputSchema` gets a required `added` (ISO date, `YYYY-MM-DD`). The three current rumours get the date their file was first committed (2026-09-18).
 - `news.astro` sorts by `added`, newest first.
-- `index.astro` passes `latestRumours(rumours, 3)` to `Hub` as `{ name, added }[]`.
+- `index.astro` passes `latestNews(facts, rumours, 5)` to `Hub` as `news`; Latest shows its first 3. *Until 16.11.2026 it passed `latestRumours(rumours, 3)` as `latest`.*
 - The relative date ("3 days ago", "i dag") is computed in the browser from `added` with `Intl.RelativeTimeFormat` in the page's locale, so it never goes stale between builds. Dates in the future are clamped to today.
 
 ### 6.4 Phase
@@ -150,7 +150,6 @@ New keys go into both `src/locales/en.json` and `nb.json`; `copy.test.ts` checks
 | `hub.nextGroup` | {category} · {count} left | {category} · {count} igjen |
 | `hub.nextGroupThen` | Then: {category} · {count} left | Deretter: {category} · {count} igjen |
 | `hub.everythingFound` | You've found everything tracked so far. | Du har funnet alt vi følger så langt. |
-| `hub.latest` | Latest | Siste nytt |
 | `hub.allNews` | All news | Alle nyheter |
 | `hub.newHere` | New to GTA VI? Before you start | Ny i GTA VI? Før du starter |
 | `hub.manageProfiles` | Manage profiles | Administrer profiler |

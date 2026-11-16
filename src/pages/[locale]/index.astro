@@ -5,11 +5,11 @@ import Mark from "../../components/Mark.astro"
 import { MAP_LINK } from "../../config/map-link"
 import { defaultLocale, isLocale, type Locale, locales, translator } from "../../i18n"
 import { Hub } from "../../islands/hub/Hub"
-import { LATEST_LIMIT, NEWS_LIMIT } from "../../islands/hub/limits"
+import { NEWS_LIMIT } from "../../islands/hub/limits"
 import { InstallPrompt } from "../../islands/InstallPrompt"
 import Base from "../../layouts/Base.astro"
 import { buildNow } from "../../model/build-now"
-import { categoryRows, latestNews, latestRumours } from "../../model/dashboard"
+import { categoryRows, latestNews } from "../../model/dashboard"
 import { resolveGuide } from "../../model/guides"
 import { hubPrepaintScript } from "../../model/hub-prepaint"
 import { hubPhase, LAUNCH_AT } from "../../model/launch"
@@ -34,11 +34,6 @@ const seo = homeSeoKeys(staticPhase)
 // as the root resolver's does. Its text is the same in every build; the phase is an attribute.
 const prepaint = hubPrepaintScript()
 Astro.csp?.insertScriptHash(scriptHash(prepaint))
-const latest = latestRumours(rumours, LATEST_LIMIT).map(({ id, name, added }) => ({
-	id,
-	name,
-	added,
-}))
 const guides = await getCollection("guides")
 const guideTitle = (slug: string) => {
 	const found = resolveGuide(guides, locale, slug, defaultLocale)
@@ -77,7 +72,6 @@ const news = latestNews(facts, rumours, NEWS_LIMIT).map(({ id, kind, date, name 
 				trackerHref={getRelativeLocaleUrl(locale, "tracker")}
 				dexHref={getRelativeLocaleUrl(locale, "dex")}
 				newsHref={getRelativeLocaleUrl(locale, "news")}
-				latest={latest}
 				categories={categories}
 				news={news}
 				mapLink={MAP_LINK.url}

@@ -37,7 +37,7 @@ Mockups (gitignored, not product code): `.superpowers/mockups/dashboard/`. `d1-b
 | Map card | "Leonida on Rockstar's site ↗", linking to Rockstar's GTA VI site, our own art | Never a copy of Rockstar's map (Norwegian copyright law, § 29, doesn't cover a decorative full map). The URL and wording sit in one config entry, so a real official map can replace them later |
 | Closest tag | `--accent` surface, `--accent-text` letters (5.6:1) | The brand rule for text on pink. The mockup's grey letters failed contrast |
 | Profile chip | Top-right of the hero, beside "Day N since launch" | The hub must switch profiles at every width |
-| News tile | The 5 newest items, Confirmed and Rumours mixed, newest first | Desktop has room. Phones keep the 3 newest rumours |
+| News tile | The 5 newest items, Confirmed and Rumours mixed, newest first; 7 from 1200 px (16.11.2026) | Desktop has room. Phones show the first 3 of the same list (changed 16.11.2026; they showed the 3 newest rumours) |
 | Finds by day | The last 7 local days, shown only once 2 of them have finds | A chart with one bar says nothing |
 | Tab name | `home` becomes `dashboard` everywhere, label Dashboard / Dashbord | "Oversikt" already means the tracker in Norwegian |
 
@@ -86,18 +86,18 @@ Today's `WhatsNext` with ticking, Undo and the 3-row reservation, placed in the 
 
 ### 4.5 Recent finds and finds by day
 
-- From 1024 px the first find is the "Latest" highlight: its relative day, the name in Bebas at 2.25 rem, and category · group under it. Up to 4 more rows follow, or 2 when the chart shows.
+- From 1024 px the first find is the "Latest" highlight: its relative day, the name in Bebas at 2.25 rem, and category · group under it. Up to 4 more rows follow, or 2 when the chart shows below 1200 px. From 1200 px the link tiles make the row 482 to 572 px tall, so all 4 fit beside the chart (changed 16.11.2026; 2 rows left up to 163 px empty).
 - **Finds by day** (`FindsByDay`) sits under the rows when `findsByDay` has at least 2 days with finds. One bar per day for the last 7 local days, today labelled "Today", other days as a short date in the page's locale. Each bar's height is its share of the busiest day, at least 2 px.
 - The `recent`, `news` and `tiles` row has one reserved minimum height in `rem`, so the chart appearing or not never shifts anything, and text at 200 % grows the row instead of being clipped.
 - Empty states: "Nothing to find yet" before launch, "No finds yet" with "Tick your first find in What's next and it lands here." after.
 
 ### 4.6 News tile
 
-Label "Latest news" with an "All news" link. The 5 items from `latestNews`, each with its Confirmed or Rumour chip (the News page's styles), the name linking to `/news/`, and a relative date computed in the browser like `Latest`.
+Label "Latest news" with an "All news" link. The 5 items from `latestNews` (7 from 1200 px, where the link tiles make the row tall enough; 16.11.2026), each with its Confirmed or Rumour chip (the News page's styles), the name linking to `/news/`, and a relative date computed in the browser like `Latest`.
 
 ### 4.7 Link tiles
 
-A column of three tiles in the `tiles` area:
+A column of three tiles in the `tiles` area: Each title's icon (↗ or ›) stays with its last word (`TileTitle`), so a wrapped title never leaves the icon beside the whole block (16.11.2026).
 
 1. **Rockstar site card** (`ExternalTile`): label "Map", title "Leonida on Rockstar's site ↗", one line of body. Our own art (sun, stripes, compass) at 50 % strength in the corner, behind the text and never under the title. It opens in a new tab and emits the same hidden new-tab note and `new-tab-note` marker as `ExternalLink.astro`, so the build's external-link check covers it. The URL and copy keys come from `MAP_LINK` in `src/config/`. When Rockstar publishes an official map, that entry changes and nothing else does. A test fails the build unless the URL is `https://` on `rockstargames.com`, so a typo or a lookalike domain can't ship.
 2. **Guide**: "Before you start", to `guides/before-you-start/`.

@@ -10,8 +10,9 @@ import { CountdownView } from "./CountdownView"
 import type { DashboardProps } from "./Dashboard"
 import { DashboardSkeleton } from "./DashboardSkeleton"
 import { HeroArt, SegmentBar } from "./Hero"
-import { Latest, type LatestItem } from "./Latest"
+import { Latest } from "./Latest"
 import { LinkTiles } from "./LinkTiles"
+import { LATEST_LIMIT } from "./limits"
 import { type NewsItem, NewsTile } from "./NewsTile"
 import { type ChecklistLink, PrelaunchChecklist } from "./PrelaunchChecklist"
 import { daysSinceText } from "./StatStrip"
@@ -33,8 +34,6 @@ interface Props {
 	trackerHref: string
 	dexHref: string
 	newsHref: string
-	/** The newest rumours, built into the page. */
-	latest: LatestItem[]
 	/** Every category at 0 found, from the seed at build time (desktop spec §6.1). */
 	categories: CategoryRow[]
 	/** The newest facts and rumours, mixed, names in the page's language. */
@@ -62,7 +61,6 @@ export function Hub({
 	trackerHref,
 	dexHref,
 	newsHref,
-	latest,
 	categories,
 	news,
 	mapLink,
@@ -227,8 +225,14 @@ export function Hub({
 					) : (
 						<DashboardSkeleton categoryCount={categories.length} t={t} />
 					)}
-					{latest.length > 0 && (
-						<Latest latest={latest} today={today} locale={locale} newsHref={newsHref} t={t} />
+					{news.length > 0 && (
+						<Latest
+							news={news.slice(0, LATEST_LIMIT)}
+							today={today}
+							locale={locale}
+							newsHref={newsHref}
+							t={t}
+						/>
 					)}
 					{newsTile}
 					{tiles}

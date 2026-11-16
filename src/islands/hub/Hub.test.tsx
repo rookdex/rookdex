@@ -7,23 +7,28 @@ import { axe } from "vitest-axe"
 import type { CategoryRow } from "../../model/dashboard"
 import { HUB_PENDING_ATTR } from "../../model/hub-prepaint"
 import { ANNOUNCE_GAP_MS, Hub } from "./Hub"
-import type { LatestItem } from "./Latest"
 import type { NewsItem } from "./NewsTile"
 
 const before = "2026-09-10T10:00:00Z" // 70 days to go
 const after = "2026-11-22T10:00:00Z" // day 3
-const latest: LatestItem[] = [
-	{ id: "rumours/online", name: "Online in 2027", added: "2026-11-22" },
-	{ id: "rumours/pc", name: "PC timing", added: "2026-09-18" },
-]
-
 const categories: CategoryRow[] = [
 	{ id: "vehicles", done: 0, total: 8, groups: ["bikes"] },
 	{ id: "wildlife", done: 0, total: 23, groups: ["reptiles"] },
 ]
+// Newest first, as latestNews hands them over; the phone list shows the first 3.
 const news: NewsItem[] = [
-	{ id: "facts/preload", kind: "confirmed", name: "Preload on 12 November", date: "2026-09-01" },
+	{ id: "rumours/online", kind: "rumour", name: "Online in 2027", date: "2026-11-22" },
+	{ id: "facts/preload", kind: "confirmed", name: "Preload on 12 November", date: "2026-09-18" },
+	{ id: "rumours/pc", kind: "rumour", name: "PC timing", date: "2026-09-10" },
+	{ id: "facts/price", kind: "confirmed", name: "Price in Norway", date: "2026-09-01" },
 ]
+
+/** The phone's news list after launch; the desktop news tile is a separate section. */
+function latestSection(): HTMLElement {
+	const section = document.querySelector<HTMLElement>(".latest")
+	if (!section) throw new Error("No .latest section")
+	return section
+}
 
 function StubDashboard() {
 	return <p>Dashboard loaded</p>
@@ -38,7 +43,6 @@ function props(overrides: Partial<ComponentProps<typeof Hub>> = {}): ComponentPr
 		trackerHref: "/en/tracker/",
 		dexHref: "/en/dex/",
 		newsHref: "/en/news/",
-		latest,
 		categories,
 		news,
 		mapLink: "https://www.rockstargames.com/VI",
@@ -209,7 +213,7 @@ describe("desktop dashboard before launch (desktop spec §4)", () => {
 		hub({ initialNow: after, loadDashboard: () => Promise.reject(new Error("offline")) })
 		await advance(0)
 		expect(screen.getByRole("alert")).toBeInTheDocument()
-		expect(screen.getByRole("region", { name: "Latest news" })).toBeInTheDocument()
+		expect(document.querySelector(".news-tile")).toBeInTheDocument()
 		expect(screen.getByRole("link", { name: /^Leonida on Rockstar's site/ })).toBeInTheDocument()
 	})
 
@@ -226,20 +230,31 @@ describe("desktop dashboard before launch (desktop spec §4)", () => {
 })
 
 describe("Hub after launch", () => {
-	it("loads the dashboard and shows Latest with relative dates", async () => {
+	it("loads the dashboard and shows the 3 newest news items, mixed, with relative dates", async () => {
 		vi.setSystemTime(new Date(after))
 		hub()
 		await advance(0)
 		expect(screen.getByRole("heading", { name: "Your progress" })).toBeInTheDocument()
 		expect(screen.getByText("Dashboard loaded")).toBeInTheDocument()
 		expect(screen.queryByTestId("countdown-digits")).toBeNull()
-		expect(screen.getByRole("heading", { name: "Latest" })).toBeInTheDocument()
-		// After launch the news tile adds a second "All news" link, so scope to the Latest block.
-		const latestBlock = within(screen.getByRole("region", { name: "Latest" }))
+		// The desktop news tile has the same heading and links; CSS shows one per width, so scope.
+		const latestBlock = within(latestSection())
+		expect(latestBlock.getByRole("heading", { name: "Latest news" })).toBeInTheDocument()
 		expect(latestBlock.getByRole("link", { name: "All news" })).toHaveAttribute("href", "/en/news/")
 		expect(latestBlock.getByRole("link", { name: "All news" })).toHaveClass("go-link")
-		const dates = [...document.querySelectorAll(".latest time")].map((el) => el.textContent)
-		expect(dates).toEqual(["today", "65 days ago"])
+		expect(latestBlock.getByRole("link", { name: "Online in 2027" })).toHaveAttribute(
+			"href",
+			"/en/news/#rumours"
+		)
+		expect(latestBlock.getByRole("link", { name: "Preload on 12 November" })).toHaveAttribute(
+			"href",
+			"/en/news/#confirmed"
+		)
+		expect(latestBlock.queryByText("Price in Norway")).toBeNull()
+		const chips = [...latestSection().querySelectorAll(".news-chip")].map((el) => el.textContent)
+		expect(chips).toEqual(["Rumor", "Confirmed", "Rumor"])
+		const dates = [...latestSection().querySelectorAll("time")].map((el) => el.textContent)
+		expect(dates).toEqual(["today", "65 days ago", "73 days ago"])
 	})
 
 	it("writes Norwegian relative dates", async () => {
@@ -249,8 +264,12 @@ describe("Hub after launch", () => {
 		// Built from the same API: ICU decides the wording ("døgn" or "dager"), not this test.
 		const relative = new Intl.RelativeTimeFormat("nb", { numeric: "auto" })
 		expect(relative.format(0, "day")).toBe("i dag")
-		const dates = [...document.querySelectorAll(".latest time")].map((el) => el.textContent)
-		expect(dates).toEqual([relative.format(0, "day"), relative.format(-65, "day")])
+		const dates = [...latestSection().querySelectorAll("time")].map((el) => el.textContent)
+		expect(dates).toEqual([
+			relative.format(0, "day"),
+			relative.format(-65, "day"),
+			relative.format(-73, "day"),
+		])
 	})
 
 	it("shows the skeleton while the dashboard loads", async () => {
@@ -260,21 +279,23 @@ describe("Hub after launch", () => {
 		expect(container.querySelector(".is-skeleton")).not.toBeNull()
 	})
 
-	it("shows the load alert when the chunk fails, and Latest still renders", async () => {
+	it("shows the load alert when the chunk fails, and the news list still renders", async () => {
 		vi.setSystemTime(new Date(after))
 		hub({ loadDashboard: () => Promise.reject(new Error("chunk")) })
 		await advance(0)
 		expect(screen.getByRole("alert")).toHaveTextContent(
 			"Your progress couldn't load. Reload the page to try again."
 		)
-		expect(screen.getByRole("heading", { name: "Latest" })).toBeInTheDocument()
+		expect(
+			within(latestSection()).getByRole("heading", { name: "Latest news" })
+		).toBeInTheDocument()
 	})
 
-	it("hides Latest when there are no rumours", async () => {
+	it("hides the news list when there is no news", async () => {
 		vi.setSystemTime(new Date(after))
-		hub({ latest: [] })
+		hub({ news: [] })
 		await advance(0)
-		expect(screen.queryByRole("heading", { name: "Latest" })).toBeNull()
+		expect(document.querySelector(".latest")).toBeNull()
 	})
 
 	it("writes no relative date into the server HTML, so hydration never mismatches", () => {
@@ -282,7 +303,7 @@ describe("Hub after launch", () => {
 		expect(html).toContain("Online in 2027")
 		// React writes the prop name as is; HTML attribute names are case-insensitive.
 		expect(html).toContain('<time dateTime="2026-11-22"></time>')
-		expect(html).toContain('<time dateTime="2026-09-18"></time>')
+		expect(html).toContain('<time dateTime="2026-09-10"></time>')
 		expect(html).not.toMatch(/days? ago|today|yesterday/)
 		expect(html).toContain("is-skeleton")
 	})
@@ -292,6 +313,15 @@ describe("Hub after launch", () => {
 		const { container } = hub()
 		await advance(0)
 		vi.useRealTimers()
+		// The page's CSS shows one news block per width: the phone list below 1024 px, the desktop
+		// tile from 1024 px. jsdom loads no CSS, so hide each in turn as the page does.
+		const tile = container.querySelector<HTMLElement>(".news-tile")
+		const list = container.querySelector<HTMLElement>(".latest")
+		if (!tile || !list) throw new Error("Both news blocks should render")
+		tile.style.display = "none"
+		expect(await axe(container)).toHaveNoViolations()
+		tile.style.display = ""
+		list.style.display = "none"
 		expect(await axe(container)).toHaveNoViolations()
 	})
 })
