@@ -160,3 +160,48 @@ describe("Group chips (tracker refresh spec §14.1)", () => {
 		expect(document.querySelector(".last-found")?.tagName).toBe("P")
 	})
 })
+
+describe("Remembered filters (leave the tracker and come back)", () => {
+	const showParam = () => new URLSearchParams(window.location.search).get("show")
+
+	it("opens a bare tracker URL with the tiles and chips pressed before", async () => {
+		const first = await ready()
+		press(/^Wildlife,/)
+		press(/^Vehicles,/)
+		press(/^Birds,/)
+		first.unmount()
+		window.history.replaceState(null, "", "/en/tracker/")
+		render(<Tracker locale="en" />)
+		const box = await screen.findByRole("checkbox", { name: "Pelican" })
+		await waitFor(() => expect(box).toBeEnabled())
+		expect(names()).toEqual(["item-vehicles/bike", "item-wildlife/pelican"])
+		expect(button(/^Wildlife,/)).toHaveAttribute("aria-pressed", "true")
+		expect(button(/^Vehicles,/)).toHaveAttribute("aria-pressed", "true")
+		expect(button(/^Birds,/)).toHaveAttribute("aria-pressed", "true")
+		expect(showParam()).toBe("vehicles,wildlife")
+		expect(groupParam()).toBe("wildlife/birds")
+	})
+
+	it("opens on All again once the filters are cleared", async () => {
+		const first = await ready()
+		press(/^Wildlife,/)
+		press(/^Wildlife,/)
+		first.unmount()
+		window.history.replaceState(null, "", "/en/tracker/")
+		await ready()
+		expect(showParam()).toBeNull()
+		expect(names()).toContain("item-vehicles/bike")
+	})
+
+	it("lets a link that names its own category win over the saved view", async () => {
+		const first = await ready()
+		press(/^Wildlife,/)
+		first.unmount()
+		window.history.replaceState(null, "", "/en/tracker/?show=vehicles")
+		render(<Tracker locale="en" />)
+		const box = await screen.findByRole("checkbox", { name: "Bike" })
+		await waitFor(() => expect(box).toBeEnabled())
+		expect(names()).toEqual(["item-vehicles/bike"])
+		expect(showParam()).toBe("vehicles")
+	})
+})

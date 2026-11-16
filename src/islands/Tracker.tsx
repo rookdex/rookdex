@@ -5,16 +5,17 @@ import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { type EmptyState, emptyState, type SearchView } from "../model/search"
 import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, perGroup, recentFinds } from "../model/stats"
-import { chipGroups, parseGroups, parseShow } from "../model/tracker"
+import { chipGroups, openingSearch, parseGroups, parseShow } from "../model/tracker"
 import type { ImportResult } from "../model/transfer"
 import { downloadJson } from "../scripts/download"
 import { buildTracker } from "./buildTracker"
 import {
 	BACKUP_REMINDER_TICKS,
-	type BackupLog,
 	backupDue,
+	type BackupLog,
 	HINT_SEEN_KEY,
 	readBackupLog,
+	readTrackerView,
 	recordBackup,
 	snoozeBackupReminder,
 	writeFlag,
@@ -32,7 +33,7 @@ import { SearchBar } from "./tracker/SearchBar"
 import { StatsRail } from "./tracker/StatsRail"
 import { useLiveStatus } from "./tracker/useLiveStatus"
 import { useSearch } from "./tracker/useSearch"
-import { useGroupParam, useShowParam, useTrackerState } from "./useTracker"
+import { useGroupParam, useRememberView, useShowParam, useTrackerState } from "./useTracker"
 
 export const HINT_KEY = HINT_SEEN_KEY
 
@@ -76,16 +77,18 @@ function markCard(box: HTMLElement) {
 export function Tracker({ locale }: Props) {
 	const { t, plural } = translator(locale)
 	const [tracker] = useState(() => {
-		const selected = parseShow(window.location.search, categoryIds(seedItems))
+		const search = openingSearch(window.location, readTrackerView())
+		const selected = parseShow(search, categoryIds(seedItems))
 		return buildTracker(
 			t("profile.defaultName"),
 			selected,
-			parseGroups(window.location.search, chipGroups(seedItems, selected))
+			parseGroups(search, chipGroups(seedItems, selected))
 		)
 	})
 	const state = useTrackerState(tracker)
 	useShowParam(state.selected)
 	useGroupParam(state.groups)
+	useRememberView(state.selected, state.groups)
 	// The item a Sources back link points at stays visible on arrival, even if found (Task 4).
 	const [arrival] = useState(() => hashItemId(window.location.hash) ?? undefined)
 	const search = useSearch(state, arrival)

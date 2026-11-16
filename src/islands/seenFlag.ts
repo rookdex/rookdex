@@ -8,6 +8,12 @@ export const HINT_SEEN_KEY = "rookdex.persist-hint-seen"
 export const HIDE_FOUND_KEY = "rookdex.hide-found"
 /** The profile the hub and the tracker open (dashboard spec §5). Holds a random id, nothing else. */
 export const ACTIVE_PROFILE_KEY = "rookdex.active-profile"
+/**
+ * The tracker's pressed tiles and chips, in sessionStorage rather than localStorage: they last
+ * while the app is open, so leaving for the Dex and coming back keeps them, and a fresh launch
+ * opens on All. Holds category and group ids, nothing else.
+ */
+export const TRACKER_VIEW_KEY = "rookdex.tracker-view"
 
 /** One-shot "already shown" flags in localStorage, tolerant of private mode and blocked storage. */
 export function readFlag(key: string): boolean {
@@ -50,6 +56,25 @@ export const activeProfileStorage: ActiveProfileStore = {
 			// Blocked storage: the first active profile opens next time, as before.
 		}
 	},
+}
+
+/** The saved tracker view, or null. Blocked storage reads as null, so the tracker opens on All. */
+export function readTrackerView(): string | null {
+	try {
+		return sessionStorage.getItem(TRACKER_VIEW_KEY)
+	} catch {
+		return null
+	}
+}
+
+/** Saves the tracker view; null forgets it. Blocked storage saves nothing, as before. */
+export function writeTrackerView(value: string | null): void {
+	try {
+		if (value) sessionStorage.setItem(TRACKER_VIEW_KEY, value)
+		else sessionStorage.removeItem(TRACKER_VIEW_KEY)
+	} catch {
+		// Blocked storage: the tracker opens on All next time.
+	}
 }
 
 /** When the last export or backup ran, and how many ticks were saved since. Nothing else. */

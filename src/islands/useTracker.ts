@@ -1,5 +1,12 @@
 import { useEffect, useSyncExternalStore } from "react"
-import { groupParam, showParam, type Tracker, type TrackerState } from "../model/tracker"
+import {
+	groupParam,
+	showParam,
+	type Tracker,
+	type TrackerState,
+	viewParams,
+} from "../model/tracker"
+import { writeTrackerView } from "./seenFlag"
 
 /** Controller: subscribes to the model and boots it once. The tracker page and the hub both use it. */
 export function useTrackerState(tracker: Tracker): TrackerState {
@@ -41,4 +48,12 @@ export function useShowParam(selected: string[]): void {
 /** Mirrors the group chips to `?group=`, beside `?show=` (spec §14.1). Tracker page only. */
 export function useGroupParam(groups: string[]): void {
 	useSearchParam("group", groupParam(groups))
+}
+
+/** Saves the tiles and chips for the session, so the tracker reopens with them. Tracker page only. */
+export function useRememberView(selected: string[], groups: string[]): void {
+	const value = viewParams(selected, groups)
+	useEffect(() => {
+		writeTrackerView(value)
+	}, [value])
 }
