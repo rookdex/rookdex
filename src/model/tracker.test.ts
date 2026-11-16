@@ -1,6 +1,7 @@
 import { IDBFactory } from "fake-indexeddb"
 import { describe, expect, it, vi } from "vitest"
 import { listRecords } from "./progress"
+import { openingView } from "./savedView"
 import type { SeedItem } from "./schema"
 import { openStore, type Store } from "./store"
 import {
@@ -13,7 +14,6 @@ import {
 	type TrackerDeps,
 	viewParams,
 } from "./tracker"
-import { openingView } from "./savedView"
 import { buildBackup, buildExport } from "./transfer"
 
 describe("onTick (backup reminder)", () => {
