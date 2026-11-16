@@ -305,8 +305,8 @@ describe("Settings page (spec §7)", () => {
 			"Share",
 			"Feedback",
 			"Source code",
-			"Code licence",
-			"Guide licence",
+			"Code license",
+			"Guide license",
 			"Takedown and legal",
 		])
 		expect(rowsOf(doc)[0].hasAttribute("data-install-row")).toBe(true)

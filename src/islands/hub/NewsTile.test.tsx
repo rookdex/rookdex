@@ -19,7 +19,7 @@ describe("NewsTile (desktop dashboard spec §4.6)", () => {
 		const section = screen.getByRole("region", { name: "Latest news" })
 		const rows = within(section).getAllByRole("listitem")
 		expect(rows.map((r) => r.querySelector(".news-chip")?.textContent)).toEqual([
-			"Rumour",
+			"Rumor",
 			"Confirmed",
 		])
 		expect(within(rows[0]).getByRole("link", { name: "Online in 2027" })).toHaveAttribute(

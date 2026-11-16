@@ -64,7 +64,7 @@ describe("News page (spec §8)", () => {
 		expect(doc.querySelector("h1")?.textContent).toBe("News")
 		expect([...doc.querySelectorAll("main h2")].map((h) => h.textContent)).toEqual([
 			"Confirmed",
-			"Rumours",
+			"Rumors",
 			"New to GTA VI?",
 			"Official channels",
 		])
@@ -181,7 +181,7 @@ describe("News page (spec §8)", () => {
 
 	it("has a search title that differs from the heading", async () => {
 		expect((await renderDoc(News, { params: { locale: "en" } })).title).toBe(
-			"GTA 6 news, confirmed facts and rumours · Rookdex"
+			"GTA 6 news, confirmed facts and rumors · Rookdex"
 		)
 		expect((await renderDoc(News, { params: { locale: "nb" } })).title).toBe(
 			"GTA 6-nyheter, bekreftede fakta og rykter · Rookdex"
@@ -202,7 +202,7 @@ describe("News page (spec §8)", () => {
 	it("opens every item with its tier chip and a dated <time>", async () => {
 		for (const locale of ["en", "nb"] as const) {
 			const doc = await renderDoc(News, { params: { locale } })
-			const labels = locale === "en" ? ["Confirmed", "Rumour"] : ["Bekreftet", "Rykte"]
+			const labels = locale === "en" ? ["Confirmed", "Rumor"] : ["Bekreftet", "Rykte"]
 			const sections = [
 				['[aria-labelledby="confirmed"]', labels[0], "is-confirmed"],
 				['[aria-labelledby="rumours"]', labels[1], "is-rumour"],
@@ -313,7 +313,7 @@ describe("News page (spec §8)", () => {
 		const doc = await renderDoc(News, { params: { locale: "en" } })
 		const lines = [...doc.querySelectorAll(".tier-line")].map((p) => p.textContent?.trim())
 		expect(lines).toContain("Confirmed 15 Oct")
-		expect(lines).toContain("Rumour 1 Oct")
+		expect(lines).toContain("Rumor 1 Oct")
 	})
 
 	// The card list's own column, so a long Norwegian word at 200 % text breaks inside the card

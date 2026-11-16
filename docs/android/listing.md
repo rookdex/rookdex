@@ -22,7 +22,7 @@ Store settings (category and contact details) are a separate page. Phone stays b
 **Short description** (80 characters at most):
 
 ```text
-Launch countdown, offline progress tracker and guides. Free, no account.
+Offline progress tracker, Dex, news and guides. No account needed.
 ```
 
 **Full description** (4,000 characters at most):
@@ -43,7 +43,7 @@ What you get:
 
 Private by design: no account, no ads, no analytics and no trackers. Your progress stays on your device, and the app works offline.
 
-The app is the website rookdex.app in an app. The code is open on GitHub under the MIT licence.
+The app is the website rookdex.app in an app. The code is open on GitHub under the MIT license.
 ```
 
 ## Norsk bokmål (nb-NO)
@@ -51,7 +51,7 @@ The app is the website rookdex.app in an app. The code is open on GitHub under t
 **Kort beskrivelse** (maks 80 tegn):
 
 ```text
-Nedtelling, sjekkliste som virker uten nett, og guider. Gratis, ingen konto.
+Sjekkliste som virker uten nett, Dex, nyheter og guider. Ingen konto.
 ```
 
 **Full beskrivelse** (maks 4000 tegn):
