@@ -30,20 +30,21 @@ Offline progress tracker, Dex, news and guides. No account needed.
 ```text
 Rookdex is an unofficial fan project. It is not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.
 
-Rookdex is a free, open-source companion for GTA VI. It counts down to launch night, then helps you keep track of what you find.
+Rookdex is a free, open-source companion for GTA VI. It counts down to launch at midnight in your own time zone, then helps you keep track of what you find.
 
 What you get:
-• A countdown to launch, then a dashboard of what to do next
-• A tracker for collectibles, places, vehicles and wildlife, with search and progress per category
+• A countdown to launch, then a dashboard with your progress, what to find next and your latest finds
+• A tracker for collectibles, places, vehicles and wildlife, with search, a Hide found filter and progress per category
 • A Dex to browse every animal, vehicle, place and collectible, with search
-• Several profiles on one device, with export and import
-• News: what Rockstar has confirmed and press reports that are not confirmed yet, each with its source
-• A guide to what to sort out before launch night
+• News that keeps what Rockstar has confirmed apart from rumors in the press, each with its source
+• Guides to what to sort out before launch night and to your first hour
+• Several profiles on one device, with backup and restore
+• A report button for items that are wrong or missing
 • English and Norwegian
 
 Private by design: no account, no ads, no analytics and no trackers. Your progress stays on your device, and the app works offline.
 
-The app is the website rookdex.app in an app. The code is open on GitHub under the MIT license.
+The app is the website rookdex.app in an app, so it also works in any browser. The code is open on GitHub under the MIT license.
 ```
 
 ## Norsk bokmål (nb-NO)
@@ -59,20 +60,21 @@ Sjekkliste som virker uten nett, Dex, nyheter og guider. Ingen konto.
 ```text
 Rookdex er et uoffisielt fanprosjekt. Det er ikke tilknyttet eller godkjent av Rockstar Games eller Take-Two Interactive.
 
-Rookdex er en gratis følgesvenn med åpen kildekode for GTA VI. Den teller ned til lanseringskvelden og hjelper deg å holde oversikt over det du finner.
+Rookdex er en gratis følgesvenn med åpen kildekode for GTA VI. Den teller ned til lanseringen ved midnatt i din egen tidssone, og hjelper deg å holde oversikt over det du finner.
 
 Dette får du:
-• Nedtelling til lansering, deretter en oversikt over hva du kan gjøre nå
-• Sjekkliste for samleobjekter, steder, kjøretøy og dyreliv, med søk og fremdrift per kategori
+• Nedtelling til lansering, deretter en oversikt med fremdriften din, hva du kan finne nå og de siste funnene dine
+• Sjekkliste for samleobjekter, steder, kjøretøy og dyreliv, med søk, Skjul funnet og fremdrift per kategori
 • En Dex der du kan bla gjennom alle dyr, kjøretøy, steder og samleobjekter, med søk
-• Flere profiler på én enhet, med eksport og import
-• Nyheter: det Rockstar har bekreftet og det pressen melder som ikke er bekreftet ennå, hver sak med kilde
-• En guide til hva du bør ordne før lanseringskvelden
+• Nyheter som holder det Rockstar har bekreftet adskilt fra rykter i pressen, hver sak med kilde
+• Guider til hva du bør ordne før lanseringskvelden og til den første timen
+• Flere profiler på én enhet, med sikkerhetskopi og gjenoppretting
+• En knapp for å melde fra om feil eller manglende objekter
 • Engelsk og norsk
 
 Personvern først: ingen konto, ingen reklame, ingen analyse og ingen sporing. Fremgangen din blir på enheten din, og appen virker uten nett.
 
-Appen er nettstedet rookdex.app i en app. Koden er åpen på GitHub under MIT-lisensen.
+Appen er nettstedet rookdex.app i en app, så den virker også i alle nettlesere. Koden er åpen på GitHub under MIT-lisensen.
 ```
 
 ## Graphics
