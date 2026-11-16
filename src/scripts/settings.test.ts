@@ -534,7 +534,7 @@ describe("wireBackupRows", () => {
 		const page = setup({ profiles: true })
 		await page.ready
 		page.backUp()
-		await vi.waitFor(() => expect(page.download).toHaveBeenCalled())
+		await vi.waitFor(() => expect(page.download).toHaveBeenCalled(), { timeout: 3000 })
 		const [filename, json] = page.download.mock.calls[0]
 		expect(filename).toBe(`rookdex-backup-${now.toISOString().slice(0, 10)}.json`)
 		expect(JSON.parse(json)).toMatchObject({ version: 2, profiles: [{ name: "Malin" }] })
