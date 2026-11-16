@@ -2703,6 +2703,11 @@ html:has(.search-row) {
 	}
 }
 
+/* 5 rows below 1200 px; the wide step shows all 7 (NEWS_LIMIT), where the row has room. */
+.news-tile-list li:nth-child(n + 6) {
+	display: none;
+}
+
 .news-tile-list {
 	display: grid;
 	gap: var(--space-1);
@@ -3706,6 +3711,11 @@ html:has(.search-row) {
 	/* From here the link tiles make the bottom row 482 to 572 px tall (en and nb, measured 16.11).
 	   With 2 rows beside the chart, Recent finds left 91 to 163 px empty; all 4 fit. */
 	.dash-recent.has-chart .recent li:nth-child(n + 4) {
+		display: flex;
+	}
+
+	/* The same tall row left 183 to 215 px under the news tile's 5 rows; 2 more fill it. */
+	.news-tile-list li:nth-child(n + 6) {
 		display: flex;
 	}
 
