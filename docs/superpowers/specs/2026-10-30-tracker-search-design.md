@@ -171,14 +171,14 @@ Plural keys follow the existing `.one` / `.other` pattern (`hub.foundToday`).
 - **Storage blocked:** `readFlag` returns false, so Hide found starts off. Writes fail silently, as the other flags do.
 - **Profile switch, delete or restore:** counts as a profile change, so a new snapshot is taken.
 - **Another tab ticks** (storage-event sync): the list updates, no new snapshot.
-- **Deep links:** `?show=` keeps working. The query always starts empty.
+- **Deep links:** `?show=` keeps working. A link that names other filters than the saved view starts with an empty query; the nav tab, a reload and Back restore it (§8).
 - **Untick a found item that is visible:** it simply becomes not found and stays where it is.
 - **Very long input:** capped at 100 characters by `maxlength`.
 
 ## 8. Privacy, security and performance
 
 - No network calls. Matching runs in the browser on data the page already has.
-- The query is never stored, logged or put in the URL. The only new stored value is the flag `rookdex.hide-found`.
+- The query is never logged or put in the URL. Changed 16.11.2026: it is kept for the session only, in sessionStorage (`rookdex.tracker-view`, with the pressed tiles, chips and scroll position), so leaving the tracker for the Dex and coming back keeps it. A fresh launch starts empty. Delete all data clears it. Hide found stays the localStorage flag `rookdex.hide-found`.
 - The query is rendered as text only (React escaping). It never reaches `innerHTML`.
 - Bundle cost: about 21 short term lists plus a few small functions. I report the tracker bundle size before and after in the PR.
 

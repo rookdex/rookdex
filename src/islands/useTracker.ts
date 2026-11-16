@@ -1,4 +1,4 @@
-import { useEffect, useSyncExternalStore } from "react"
+import { useEffect, useRef, useSyncExternalStore } from "react"
 import {
 	groupParam,
 	showParam,
@@ -50,10 +50,26 @@ export function useGroupParam(groups: string[]): void {
 	useSearchParam("group", groupParam(groups))
 }
 
-/** Saves the tiles and chips for the session, so the tracker reopens with them. Tracker page only. */
-export function useRememberView(selected: string[], groups: string[]): void {
-	const value = viewParams(selected, groups)
+/**
+ * Saves the tiles, chips and search text for the session, with the scroll position, so the tracker
+ * reopens as it was left. It writes when the page is hidden (a link, the nav, a reload, the app
+ * going to the background) and on unmount, not on every scroll. Tracker page only.
+ */
+export function useRememberView(selected: string[], groups: string[], query: string): void {
+	const latest = useRef({ params: "", query: "" })
+	latest.current = { params: viewParams(selected, groups) ?? "", query }
+
 	useEffect(() => {
-		writeTrackerView(value)
-	}, [value])
+		const save = () => writeTrackerView({ ...latest.current, scroll: window.scrollY })
+		const onVisibility = () => {
+			if (document.visibilityState === "hidden") save()
+		}
+		window.addEventListener("pagehide", save)
+		document.addEventListener("visibilitychange", onVisibility)
+		return () => {
+			window.removeEventListener("pagehide", save)
+			document.removeEventListener("visibilitychange", onVisibility)
+			save()
+		}
+	}, [])
 }

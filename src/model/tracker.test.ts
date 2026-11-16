@@ -7,13 +7,13 @@ import {
 	chipGroups,
 	createTracker,
 	groupParam,
-	openingSearch,
 	parseGroups,
 	parseShow,
 	showParam,
 	type TrackerDeps,
 	viewParams,
 } from "./tracker"
+import { openingView } from "./savedView"
 import { buildBackup, buildExport } from "./transfer"
 
 describe("onTick (backup reminder)", () => {
@@ -145,6 +145,8 @@ describe("categories", () => {
 })
 
 describe("remembered view", () => {
+	const bare = { search: "", hash: "" }
+
 	it("viewParams holds the pressed tiles and chips, or nothing when both are empty", () => {
 		expect(viewParams(["wildlife", "vehicles"], ["wildlife/birds"])).toBe(
 			"show=wildlife%2Cvehicles&group=wildlife%2Fbirds"
@@ -153,23 +155,9 @@ describe("remembered view", () => {
 		expect(viewParams([], [])).toBeNull()
 	})
 
-	it("openingSearch restores the saved view only on a bare tracker URL", () => {
-		const saved = "show=wildlife&group=wildlife%2Fbirds"
-		expect(openingSearch({ search: "", hash: "" }, saved)).toBe(saved)
-		expect(openingSearch({ search: "", hash: "" }, null)).toBe("")
-		expect(openingSearch({ search: "?show=vehicles", hash: "" }, saved)).toBe("?show=vehicles")
-		expect(openingSearch({ search: "?group=wildlife/birds", hash: "" }, saved)).toBe(
-			"?group=wildlife/birds"
-		)
-		expect(openingSearch({ search: "", hash: "#item-wildlife/pelican" }, saved)).toBe("")
-		expect(openingSearch({ search: "?phase=after", hash: "" }, saved)).toBe(saved)
-	})
-
-	it("the saved view parses back to the same tiles and chips", () => {
-		const search = openingSearch(
-			{ search: "", hash: "" },
-			viewParams(["wildlife"], ["wildlife/birds"])
-		)
+	it("the saved filters parse back to the same tiles and chips", () => {
+		const params = viewParams(["wildlife"], ["wildlife/birds"]) ?? ""
+		const { search } = openingView(bare, { params, query: "", scroll: 0 })
 		expect(parseShow(search, ["wildlife", "vehicles"])).toEqual(["wildlife"])
 		expect(parseGroups(search, new Map([["wildlife", ["birds", "reptiles"]]]))).toEqual([
 			"wildlife/birds",

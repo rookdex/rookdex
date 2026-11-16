@@ -32,13 +32,14 @@ export interface Search {
 const NONE: ReadonlySet<string> = new Set()
 
 /**
- * View state for tracker search (tracker search spec §3.4). The query is never stored. Hide found
+ * View state for tracker search (tracker search spec §3.4). The query starts as `initialQuery`, the
+ * one the tracker saved for the session (spec §8); the hook itself stores nothing. Hide found
  * hides what was found at the last snapshot, so an item ticked now stays where the finger is.
  * `arrival` is the seed id a Sources back link points at (`#item-<id>`): the first snapshot spares
  * it so the arrival effect can focus it.
  */
-export function useSearch(source: SearchSource, arrival?: string): Search {
-	const [query, setQuery] = useState("")
+export function useSearch(source: SearchSource, arrival?: string, initialQuery = ""): Search {
+	const [query, setQuery] = useState(initialQuery)
 	const [hideFound, setHideFound] = useState(() => readFlag(HIDE_FOUND_KEY))
 	const [imports, setImports] = useState(0)
 	const ready = source.status === "ready"

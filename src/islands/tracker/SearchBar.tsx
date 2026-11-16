@@ -1,5 +1,6 @@
 import type { KeyboardEvent, RefObject } from "react"
 import type { Translate } from "../../i18n"
+import { MAX_QUERY } from "../../model/savedView"
 import { CloseIcon, EyeOffIcon } from "./icons"
 
 interface Props {
@@ -59,7 +60,7 @@ export function SearchBar({
 					type="search"
 					value={query}
 					placeholder={t("tracker.search.placeholder")}
-					maxLength={100}
+					maxLength={MAX_QUERY}
 					autoComplete="off"
 					enterKeyHint="search"
 					onChange={(event) => onQuery(event.target.value)}

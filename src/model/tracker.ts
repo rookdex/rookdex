@@ -171,21 +171,6 @@ export function viewParams(selected: string[], groups: string[]): string | null 
 	return show || group ? params.toString() : null
 }
 
-/**
- * The search the tracker opens with. A link that names its own view wins: `?show=` from a hub
- * bar, `?group=`, or an item hash from a Sources back link. A bare tracker URL gets the view
- * saved earlier in this session, so a trip to the Dex and back keeps the filters. Whatever comes
- * back still goes through parseShow and parseGroups, so the saved value is never echoed raw.
- */
-export function openingSearch(
-	location: { search: string; hash: string },
-	saved: string | null
-): string {
-	const params = new URLSearchParams(location.search)
-	if (params.has("show") || params.has("group") || location.hash !== "") return location.search
-	return saved ?? location.search
-}
-
 function validName(name: string): boolean {
 	const trimmed = name.trim()
 	return trimmed.length > 0 && trimmed.length <= TEXT.profileName

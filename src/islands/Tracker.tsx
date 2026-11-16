@@ -5,7 +5,8 @@ import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { type EmptyState, emptyState, type SearchView } from "../model/search"
 import { categoryIds, seedItems } from "../model/seed"
 import { countable, countItems, perCategory, perGroup, recentFinds } from "../model/stats"
-import { chipGroups, openingSearch, parseGroups, parseShow } from "../model/tracker"
+import { openingView } from "../model/savedView"
+import { chipGroups, parseGroups, parseShow } from "../model/tracker"
 import type { ImportResult } from "../model/transfer"
 import { downloadJson } from "../scripts/download"
 import { buildTracker } from "./buildTracker"
@@ -76,22 +77,30 @@ function markCard(box: HTMLElement) {
 /** Island root. `client:only`: the first render reads the URL and IndexedDB. */
 export function Tracker({ locale }: Props) {
 	const { t, plural } = translator(locale)
+	// Read once: the filters, search and scroll the tracker opens with (saved view or the URL).
+	const [startView] = useState(() => openingView(window.location, readTrackerView()))
 	const [tracker] = useState(() => {
-		const search = openingSearch(window.location, readTrackerView())
-		const selected = parseShow(search, categoryIds(seedItems))
+		const selected = parseShow(startView.search, categoryIds(seedItems))
 		return buildTracker(
 			t("profile.defaultName"),
 			selected,
-			parseGroups(search, chipGroups(seedItems, selected))
+			parseGroups(startView.search, chipGroups(seedItems, selected))
 		)
 	})
 	const state = useTrackerState(tracker)
 	useShowParam(state.selected)
 	useGroupParam(state.groups)
-	useRememberView(state.selected, state.groups)
 	// The item a Sources back link points at stays visible on arrival, even if found (Task 4).
 	const [arrival] = useState(() => hashItemId(window.location.hash) ?? undefined)
-	const search = useSearch(state, arrival)
+	const search = useSearch(state, arrival, startView.query)
+	useRememberView(state.selected, state.groups, search.query)
+	// Back where the list was left, once it has loaded (the saved view's scroll position).
+	const scrolled = useRef(false)
+	useEffect(() => {
+		if (scrolled.current || state.status !== "ready") return
+		scrolled.current = true
+		if (startView.scroll !== null) window.scrollTo({ top: startView.scroll, behavior: "instant" })
+	}, [state.status, startView.scroll])
 	const live = useLiveStatus()
 	const searchField = useRef<HTMLInputElement>(null)
 	const results = useRef<HTMLDivElement>(null)
