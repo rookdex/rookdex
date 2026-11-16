@@ -99,7 +99,8 @@ export function Tracker({ locale }: Props) {
 	useEffect(() => {
 		if (scrolled.current || state.status !== "ready") return
 		scrolled.current = true
-		if (startView.scroll !== null) window.scrollTo({ top: startView.scroll, behavior: "instant" })
+		// 0 is where a fresh page already sits, so there is nothing to restore.
+		if (startView.scroll) window.scrollTo({ top: startView.scroll, behavior: "instant" })
 	}, [state.status, startView.scroll])
 	const live = useLiveStatus()
 	const searchField = useRef<HTMLInputElement>(null)
