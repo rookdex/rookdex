@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs"
-import { describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { facts, rumours } from "../model/seed"
 import News from "../pages/[locale]/news.astro"
 import { renderDoc } from "./render"
@@ -59,6 +59,10 @@ vi.mock("astro:content", () => {
 })
 
 describe("News page (spec §8)", () => {
+	afterEach(() => {
+		vi.useRealTimers()
+	})
+
 	it("is the News tab, with Confirmed above Rumours", async () => {
 		const doc = await renderDoc(News, { params: { locale: "en" } })
 		expect(doc.querySelector("h1")?.textContent).toBe("News")
@@ -310,6 +314,9 @@ describe("News page (spec §8)", () => {
 	})
 
 	it("keeps a space between the tier label and the date in the text", async () => {
+		// A date from another year shows its year, so the build clock is pinned to the fixtures' year.
+		vi.useFakeTimers({ toFake: ["Date"] })
+		vi.setSystemTime(new Date("2026-11-19T12:00:00Z"))
 		const doc = await renderDoc(News, { params: { locale: "en" } })
 		const lines = [...doc.querySelectorAll(".tier-line")].map((p) => p.textContent?.trim())
 		expect(lines).toContain("Confirmed 15 Oct")
