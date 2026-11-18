@@ -2,7 +2,7 @@
 
 # Rookdex
 
-Leonida is waiting, and you'll want somewhere to keep score. Rookdex gives you a countdown, a tracker and a straight answer on what's actually confirmed.
+Leonida is open, and you'll want somewhere to keep score. Rookdex gives you a tracker, a dashboard and a straight answer on what's actually confirmed.
 
 **[Open rookdex.app](https://rookdex.app)** · English and Norsk · free · no account
 
@@ -10,8 +10,8 @@ Leonida is waiting, and you'll want somewhere to keep score. Rookdex gives you a
 
 ## <img src="docs/readme/map.svg" width="22" height="22" alt=""> What you get
 
-- **A countdown, then a dashboard.** Days, hours and minutes to 19 November 2026. At midnight on launch night the home page turns into your dashboard: overall progress, the category you're closest to finishing, what's next, your finds by day and the latest news.
 - **A tracker** with over 200 animals, vehicles, places and collectibles. Search by name or type, filter by category and group, hide what you've found. Spot a gator, tick a box, watch the bar fill up.
+- **A dashboard.** The home page shows your overall progress, the category you're closest to finishing, what's next, your finds by day and the latest news.
 - **The Dex.** Every animal, vehicle, place and collectible on one page per category, each with its status and a link to the trailer or report that shows it. Search it the same way as the tracker.
 - **Confirmed, expected or rumor.** Every item shows its tier and its sources. The News page keeps what Rockstar and Take-Two have confirmed apart from what the press reports, so you can tell a trailer frame from somebody's cousin's friend. Beside the news, one panel points newcomers to guides for their first days and another links Rockstar's official channels.
 - **Two short guides.** Before you start covers editions and what to sort out before launch night. Your first hour covers what to check, claim and skip once the game unlocks.
