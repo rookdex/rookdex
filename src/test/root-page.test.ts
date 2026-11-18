@@ -14,6 +14,9 @@ describe("root page (locale spec §6.4)", () => {
 		expect(doc.documentElement.lang).toBe("en")
 		expect(doc.title).toBe("Rookdex: GTA 6 companion app, countdown and tracker")
 		expect(doc.querySelector('meta[property="og:title"]')?.getAttribute("content")).toBe(doc.title)
+		expect(doc.querySelector('meta[name="description"]')?.getAttribute("content")).toMatch(
+			/^Countdown to GTA 6/
+		)
 		expect(doc.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe(
 			"https://rookdex.app/"
 		)
@@ -28,11 +31,14 @@ describe("root page (locale spec §6.4)", () => {
 		])
 	})
 
-	it("takes the after-launch title from the launch instant on, as /en/ and /nb/ do", async () => {
+	it("takes the after-launch title and description from the launch instant on, as /en/ and /nb/ do", async () => {
 		vi.stubEnv("ROOKDEX_NOW", "2026-11-19T00:00:00+01:00")
 		const doc = await renderDoc(RootPage)
 		expect(doc.title).toBe("Rookdex: GTA 6 companion app, tracker and Dex")
 		expect(doc.querySelector('meta[property="og:title"]')?.getAttribute("content")).toBe(doc.title)
+		expect(doc.querySelector('meta[name="description"]')?.getAttribute("content")).toMatch(
+			/^Track GTA 6/
+		)
 	})
 
 	it("carries the language-neutral WebSite JSON-LD", async () => {
