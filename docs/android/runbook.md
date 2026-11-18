@@ -6,6 +6,8 @@ Android spec §6. The plan was 26 to 28 October, with the closed test live by Th
 
 The 12th tester opted in on the morning of 31 October, so the 14-day clock started that day. 17 testers are on the list and at least 12 have opted in. Play only shows "12 or more", so the exact count above 12 is unknown. Play Console counts the 14 days so that the earliest date to apply for production access is 15 November (Console on 9 and 12 November). Access review takes up to 7 days, and the first production release is reviewed after that, so the Play listing is unlikely to be live on launch day. The site launches on 19 November as a PWA either way, and the Play listing follows when Google approves it.
 
+**Status 19 November:** I applied for production access on 16 November at 10:09. Google answered on 18 November at 22:56 with "More testing required": the closed test has to run for 14 more days before I can apply again. The site went live as a PWA at midnight on 19 November as planned. Round 2 is described below.
+
 | Day | Steps |
 |---|---|
 | Monday 26 | Testers, 1, 2, 3 |
@@ -35,8 +37,8 @@ Open https://www.pwabuilder.com, enter `https://rookdex.app`, choose Android, Go
 | App name | Rookdex |
 | Launcher name | Rookdex |
 | Display mode | Standalone |
-| Status bar colour | `#000000` |
-| Splash colour | `#000000` |
+| Status bar color | `#000000` |
+| Splash color | `#000000` |
 | Notification delegation | Off |
 | Location delegation | Off |
 | Google Play Billing | Off |
@@ -86,7 +88,51 @@ Open https://www.pwabuilder.com, enter `https://rookdex.app`, choose Android, Go
 - [ ] The install prompt stays hidden.
 - [ ] The in-app back and forward buttons behave next to Android's own back gesture.
 
+## Round 2 (19 November to the second application)
+
+Google's email gives two possible reasons and does not say which one applied: testers were not engaged during the closed test, or testing best practices were not followed, "which may include gathering and acting on user feedback through updates to your app". The [guidance page](https://support.google.com/googleplay/android-developer/answer/14151465) gives no thresholds, so nothing here guarantees a pass. The steps below close the gaps the email names.
+
+What Play could see in round 1 (my reading, not Google's):
+
+- One bundle, version code 1 from 29 October, for the whole test. Search, the Dex, backup and the redesigns all shipped as web deploys, and a web deploy is not a release in Play.
+- Feedback came by email and in person, so nothing landed on the Testing feedback page.
+- My answers said no tester asked for a change, so the changes I listed were not tied to feedback.
+
+### Check first
+
+- [ ] Test and release, Closed testing: count the releases on the track.
+- [ ] Ratings and reviews, Testing feedback: count the entries.
+- [ ] Dashboard: note the earliest date to apply again (about 2 December).
+
+### Testers
+
+- [ ] Send the round 2 message. Three things to try: tick finds in the tracker and use the search, look something up in the Dex, make a backup in Settings. Two places for feedback: the private feedback field on Rookdex's page in the Play Store, and the report button in the app.
+- [ ] Keep everyone opted in until production access is granted.
+- [ ] Around 26 November: one reminder with one concrete question.
+
+### Feedback log
+
+- [ ] Keep a log outside this repo: date, channel (Play, email, in person), theme, what I did about it and the release it shipped in. No names.
+- [ ] Read the Testing feedback page every few days and answer what comes in.
+- [ ] Read the pre-launch report for every new bundle and fix what it flags.
+
+### New bundles
+
+At least two new releases on the closed track before I apply again, the first by 25 November. Each one carries a real change.
+
+- [ ] Decide how to sign before the first rebuild. PWABuilder's update path (Signing key: Use mine) takes the keystore file, the key alias and both passwords on its site, where the key was generated in October. Building with Bubblewrap on my own machine keeps them local but needs a JDK and the Android SDK. An unsigned package can't be uploaded to Play.
+- [ ] Rebuild with the same values as step 2, plus App version (`1.1.0`), App version code `2` (then `3`) and the existing key. I type the passwords myself, never into a chat or an AI tool.
+- [ ] Changes that live in the wrapper: app shortcuts to Tracker, Dex and News (`shortcuts` in the web manifest, none today) and a monochrome icon (left empty in October). Fixes testers ask for ship on the web and are named in the release notes.
+- [ ] Closed testing, Create new release: upload the `.aab`, write release notes in English and Norwegian that say which feedback the release answers, send for review.
+- [ ] `assetlinks.json` stays as it is: same upload key, same app signing key.
+- [ ] When the release is live: check on a tester phone that the app still opens without a URL bar.
+
+### Apply again
+
+- [ ] Answers come from the log: the feedback, the change, the release it shipped in. Say plainly that most changes reach testers as web updates without a new bundle.
+- [ ] Engagement: what testers did after launch on 19 November, and how that differs from the countdown weeks.
+
 ## Later
 
-- [ ] 15 November at the earliest (the date Play Console gives): apply for production access. Review takes up to 7 days. Until then, keep at least 12 testers opted in: the clock only counts days with 12 or more.
+- [x] Applied for production access on 16 November. Rejected on 18 November: see Round 2.
 - [ ] After launch (19 November): the hub screenshots show the countdown, which is gone by then. Re-run `docs/android/screenshots.mjs` against a local `npm run preview` with the hub path set to `?phase=after` (works on localhost only) and replace the hub shots in Play Console.
