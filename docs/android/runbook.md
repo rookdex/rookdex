@@ -37,8 +37,8 @@ Open https://www.pwabuilder.com, enter `https://rookdex.app`, choose Android, Go
 | App name | Rookdex |
 | Launcher name | Rookdex |
 | Display mode | Standalone |
-| Status bar colour | `#000000` |
-| Splash colour | `#000000` |
+| Status bar color | `#000000` |
+| Splash color | `#000000` |
 | Notification delegation | Off |
 | Location delegation | Off |
 | Google Play Billing | Off |
