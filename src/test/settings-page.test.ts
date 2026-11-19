@@ -315,7 +315,7 @@ describe("Settings page (spec §7)", () => {
 		)
 	})
 
-	it("links the licence, the repository and the legal address", async () => {
+	it("links the license, the repository and the legal address", async () => {
 		const doc = await settings("nb")
 		const rows = rowsOf(doc)
 		const href = (i: number) => rows[i].querySelector("dd a")?.getAttribute("href")
