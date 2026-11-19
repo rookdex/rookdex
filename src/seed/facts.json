@@ -7,8 +7,8 @@
 			"nb": "To utgaver, fra 79,99 dollar"
 		},
 		"summary": {
-			"en": "Pre-orders opened on 25 June. The Standard Edition costs $79.99 and the digital-only Ultimate Edition $99.99, and Standard owners can buy the upgrade later. Digital purchases before 20 November include the Vintage Vice City Pack with one month of GTA+.",
-			"nb": "Forhåndsbestillingen åpnet 25. juni. Standardutgaven koster 79,99 dollar og Ultimate Edition, som bare finnes digitalt, 99,99 dollar. Standard kan oppgraderes senere. Digitale kjøp før 20. november får med Vintage Vice City Pack med én måneds GTA+."
+			"en": "Pre-orders opened on 25 June. The Standard Edition costs $79.99 and the digital-only Ultimate Edition $99.99; Standard owners can upgrade later. Digital copies bought before 20 November include the Vintage Vice City Pack and a month of GTA+. Boxed pre-orders include the pack.",
+			"nb": "Forhåndsbestillingen åpnet 25. juni. Standardutgaven koster 79,99 dollar og Ultimate Edition, som bare finnes digitalt, 99,99 dollar. Standard kan oppgraderes senere. Digitale kjøp før 20. november får Vintage Vice City Pack og én måned GTA+. Fysiske forhåndsbestillinger får pakken."
 		},
 		"announced": "2026-06-24",
 		"sources": [
@@ -26,12 +26,12 @@
 		"id": "facts/preload",
 		"claim_key": "preload-date",
 		"name": {
-			"en": "Preload Open Since 10 November, Up to 212 GB",
-			"nb": "Forhåndsnedlasting åpen siden 10. november, opptil 212 GB"
+			"en": "Up to 212 GB to Install, No Disc in the Box",
+			"nb": "Opptil 212 GB å installere, ingen plate i esken"
 		},
 		"summary": {
-			"en": "Preload started on 10 November: at local midnight on PS5 and at midnight GMT on Xbox, which is 01:00 in Norway. It needs up to 212 GB. Boxed copies hold a download code instead of a disc and reach shops from 12 November.",
-			"nb": "Forhåndsnedlastingen startet 10. november: ved midnatt lokal tid på PS5 og kl. 01:00 norsk tid på Xbox. Den krever opptil 212 GB. Fysiske utgaver har en nedlastingskode i stedet for en plate og kommer i butikk fra 12. november."
+			"en": "The game needs up to 212 GB. Preload opened on 10 November. Boxed copies, available from 12 November, hold a download code instead of a disc.",
+			"nb": "Spillet krever opptil 212 GB. Forhåndsnedlastingen åpnet 10. november. Fysiske utgaver, i salg fra 12. november, har en nedlastingskode i stedet for en plate."
 		},
 		"announced": "2026-11-03",
 		"sources": [
@@ -49,18 +49,22 @@
 		"id": "facts/radio-stations",
 		"claim_key": "radio-stations",
 		"name": {
-			"en": "Six Radio Stations and Podcasts",
-			"nb": "Seks radiokanaler og podkaster"
+			"en": "Six Radio Stations Previewed, Plus Podcasts",
+			"nb": "Seks radiokanaler vist fram, og podkaster"
 		},
 		"summary": {
-			"en": "Rockstar detailed six in-game radio stations, from Latin and country to metal and pop, plus on-demand podcasts. For the first time, Jason and Lucia can listen on foot through earbuds connected to their phones.",
-			"nb": "Rockstar viste fram seks radiokanaler i spillet, fra latinamerikansk musikk og country til metal og pop, og podkaster du kan høre når du vil. For første gang kan Jason og Lucia lytte til fots, med ørepropper koblet til mobilen."
+			"en": "Rockstar detailed six of the in-game radio stations, from Latin and country to metal and pop, plus on-demand podcasts. For the first time, Jason and Lucia can listen on foot through earbuds connected to their phones.",
+			"nb": "Rockstar viste fram seks av radiokanalene i spillet, fra latinamerikansk musikk og country til metal og pop, og podkaster du kan høre når du vil. For første gang kan Jason og Lucia lytte til fots, med ørepropper koblet til mobilen."
 		},
 		"announced": "2026-10-08",
 		"sources": [
 			{
 				"url": "https://www.rockstargames.com/newswire/article/o3982oa93a23k4/the-music-of-grand-theft-auto-vi-in-game-radio-stations",
 				"title": "The Music of Grand Theft Auto VI: In-Game Radio Stations"
+			},
+			{
+				"url": "https://www.rockstargames.com/VI/music",
+				"title": "The Music of Grand Theft Auto VI"
 			}
 		]
 	},
@@ -68,7 +72,7 @@
 		"id": "facts/launch-trailer",
 		"claim_key": "launch-trailer",
 		"name": {
-			"en": "Launch Trailer Out, Date Holds",
+			"en": "Launch Trailer Released on 15 October",
 			"nb": "Lanseringstraileren er ute"
 		},
 		"summary": {
@@ -133,12 +137,12 @@
 		"id": "facts/launch-unlock-time",
 		"claim_key": "launch-unlock-time",
 		"name": {
-			"en": "Unlocks at Midnight Local Time on 19 November",
-			"nb": "Låses opp ved midnatt lokal tid 19. november"
+			"en": "Out Since Midnight on 19 November",
+			"nb": "Ute siden midnatt 19. november"
 		},
 		"summary": {
-			"en": "Rockstar says the game releases at midnight local time on 19 November in every region, on both PS5 and Xbox Series X|S. In Norway that is 00:00 on Thursday 19 November.",
-			"nb": "Rockstar sier at spillet slippes ved midnatt lokal tid 19. november i alle regioner, både på PS5 og Xbox Series X|S. I Norge er det kl. 00:00 torsdag 19. november."
+			"en": "Rockstar set the release for midnight local time on 19 November, on both PS5 and Xbox Series X|S. In Norway that was 00:00 on Thursday 19 November.",
+			"nb": "Rockstar satte slippet til midnatt lokal tid 19. november, både på PS5 og Xbox Series X|S. I Norge var det kl. 00:00 torsdag 19. november."
 		},
 		"announced": "2026-11-03",
 		"sources": [
@@ -183,6 +187,44 @@
 			{
 				"url": "https://www.rockstargames.com/newswire/article/o39o87a435a25a/grand-theft-auto-vi-the-festival",
 				"title": "Grand Theft Auto VI: The Festival"
+			}
+		]
+	},
+	{
+		"id": "facts/settings-menu",
+		"claim_key": "settings-categories",
+		"name": {
+			"en": "Eight Settings Categories, with Accessibility Options",
+			"nb": "Åtte innstillingskategorier, med tilgjengelighetsvalg"
+		},
+		"summary": {
+			"en": "The Settings menu has eight categories: Control Scheme, Controller, Gameplay, Display, UI, Camera, Audio and Account. Accessibility options include high-contrast shaders, subtitles and captions, scaling and readability, and narration.",
+			"nb": "Innstillingsmenyen har åtte kategorier: Control Scheme, Controller, Gameplay, Display, UI, Camera, Audio og Account. Blant tilgjengelighetsvalgene er høykontrast-shadere, undertekster og bildetekster, skalering og lesbarhet, og opplesing."
+		},
+		"announced": "2026-11-18",
+		"sources": [
+			{
+				"url": "https://support.rockstargames.com/articles/4jUHNdP22SmaKSF8DWqhXC/how-to-change-grand-theft-auto-vi-settings",
+				"title": "How to change Grand Theft Auto VI settings"
+			}
+		]
+	},
+	{
+		"id": "facts/buckme-limits",
+		"claim_key": "buckme-account-limits",
+		"name": {
+			"en": "BuckMe Account Limits Rise with the Story",
+			"nb": "Grensene på BuckMe-kontoene øker med historien"
+		},
+		"summary": {
+			"en": "Rockstar Support says the limits on the BuckMe Checking and Family Savings accounts rise as the story progresses. A payment held up by a full Checking account goes through once the account is upgraded.",
+			"nb": "Rockstar Support sier at grensene på BuckMe-kontoene Checking og Family Savings øker etter hvert som du kommer videre i historien. En betaling som stopper fordi Checking-kontoen er full, går gjennom når kontoen er oppgradert."
+		},
+		"announced": "2026-11-19",
+		"sources": [
+			{
+				"url": "https://support.rockstargames.com/articles/5hSbxodEFeNbU1wARy1p4X/cannot-put-any-more-money-in-my-buckme-account-in-grand-theft-auto-vi",
+				"title": "Cannot put any more money in my BuckMe account in Grand Theft Auto VI"
 			}
 		]
 	}

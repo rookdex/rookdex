@@ -64,18 +64,14 @@
 	},
 	{
 		"id": "rumours/reviews-november-18",
-		"name": "Reviews Reportedly Land 18 November",
+		"name": "Reviews Are In: 99 on Metacritic",
 		"claim_key": "reviews-date-november-18",
-		"summary": "Insider NateTheHate says review copies went out in late October and that reviews can go live on 18 November, the day before launch, and Insider Gaming reports that reviews land before 19 November. Rockstar has not announced a review date.",
-		"added": "2026-10-26",
+		"summary": "Reviews went live on 18 November, the day before launch. GamesRadar reports a Metacritic score of 99 after 107 reviews, level with the highest score on the site, and no mixed or negative reviews so far. Rockstar has not commented on the scores.",
+		"added": "2026-11-19",
 		"sources": [
 			{
-				"url": "https://rockstarintel.com/gta-6-has-just-been-sent-out-early-to-reviewers/",
-				"title": "GTA 6 Has Just Been Sent Out Early To Reviewers"
-			},
-			{
-				"url": "https://www.gamespot.com/articles/gta-6-reviews-when-they-could-be-released/",
-				"title": "GTA 6 Reviews: Here's When The Scores Might Come In"
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-metacritic-score-makes-it-the-highest-rated-game-of-all-time-matching-the-og-zelda-ocarina-of-time/",
+				"title": "GTA 6 Metacritic score makes it the highest-rated game of all time"
 			}
 		]
 	},
