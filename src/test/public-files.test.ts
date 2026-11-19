@@ -11,13 +11,15 @@ const TRAINING_CRAWLERS = [
 	"meta-externalagent",
 	"Amazonbot",
 	"MistralAI-Training",
+	// Common Crawl calls itself an open web corpus. It is here because that corpus is training data.
 	"CCBot",
 	// The shared "no AI training" preference token. A wildcard group does not match it.
 	"__usage_ai-training",
 ]
 
 /** Search engines and the fetchers that answer a question and link back. No group may name them.
- *  Google-Extended is here on purpose: it also switches off citations in the Gemini app. */
+ *  Google-Extended is here on purpose: blocking it also stops Gemini from grounding answers in
+ *  the site. */
 const WELCOME_CRAWLERS = [
 	"Googlebot",
 	"Bingbot",
@@ -49,13 +51,17 @@ function robotsGroups(text: string) {
 }
 
 describe("crawler files (SEO spec §4.3, §4.6)", () => {
-	const robots = read("public/robots.txt")
-	const rulesFor = (agent: string) =>
-		robotsGroups(robots).find((group) => group.agents.includes(agent.toLowerCase()))?.rules
+	// A crawler follows every group that names it, so the rules of all of them count.
+	const groupsFor = (agent: string) =>
+		robotsGroups(read("public/robots.txt")).filter((group) =>
+			group.agents.includes(agent.toLowerCase())
+		)
+	const rulesFor = (agent: string) => groupsFor(agent).flatMap((group) => group.rules)
 
 	it("robots.txt allows every crawler it does not name and names the sitemap", () => {
 		expect(rulesFor("*")).toEqual(["Allow: /"])
-		expect(robots.split(/\r?\n/)).toContain("Sitemap: https://rookdex.app/sitemap.xml")
+		const lines = read("public/robots.txt").split(/\r?\n/)
+		expect(lines).toContain("Sitemap: https://rookdex.app/sitemap.xml")
 	})
 
 	it.each(TRAINING_CRAWLERS)("robots.txt asks the training crawler %s to stay out", (agent) => {
@@ -63,7 +69,7 @@ describe("crawler files (SEO spec §4.3, §4.6)", () => {
 	})
 
 	it.each(WELCOME_CRAWLERS)("robots.txt leaves %s to the wildcard group", (agent) => {
-		expect(rulesFor(agent)).toBeUndefined()
+		expect(groupsFor(agent)).toEqual([])
 	})
 
 	it("the IndexNow key is 32 lowercase hex characters and nothing else", () => {
