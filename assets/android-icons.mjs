@@ -1,6 +1,7 @@
 // Renders the two icon sets the Android wrapper reads from the manifest: the monochrome mark and
 // the app shortcut icons. Run with `npm run icons:android`. The sources live here in assets/, so
 // only the PNGs are served.
+import { readFile } from "node:fs/promises"
 import { fileURLToPath } from "node:url"
 import { generateTransparentAsset } from "@vite-pwa/assets-generator/api"
 
@@ -14,12 +15,16 @@ const monochrome = await generateTransparentAsset("png", source("icon-monochrome
 })
 await monochrome.toFile(target("monochrome-icon-512x512.png"))
 
-// Two PNGs per shortcut, both sizes from web.dev's "App shortcuts" list: 96 px is the smallest
-// Bubblewrap takes, 192 px covers dense screens. The SVGs are drawn on Android's 48 dp shortcut
-// grid: a 44 dp disc and a 24 dp glyph, the tab's own icon from TabIcon.astro.
-for (const tab of ["tracker", "dex", "news"]) {
-	for (const size of [96, 192]) {
+// The shortcut icons the manifest names, so the list and the sizes live in one place. Both sizes
+// are from web.dev's "App shortcuts" list: 96 px is the smallest Bubblewrap takes, 192 px covers
+// dense screens. The SVGs are drawn on Android's 48 dp shortcut grid: a 44 dp disc and a 24 dp
+// glyph, the tab's own icon from TabIcon.astro.
+const manifest = JSON.parse(await readFile(target("manifest.webmanifest"), "utf8"))
+for (const shortcut of manifest.shortcuts) {
+	const tab = new URL(shortcut.url, "https://rookdex.app").searchParams.get("tab")
+	for (const { src, sizes } of shortcut.icons) {
+		const size = Number.parseInt(sizes, 10)
 		const icon = await generateTransparentAsset("png", source(`shortcut-${tab}.svg`), size, {})
-		await icon.toFile(target(`shortcut-${tab}-${size}x${size}.png`))
+		await icon.toFile(target(src.slice(1)))
 	}
 }

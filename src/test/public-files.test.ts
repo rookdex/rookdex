@@ -82,7 +82,7 @@ describe("manifest (locale spec §6.5)", () => {
 	})
 
 	it("names only icon files that exist, at the size it gives for them", () => {
-		const shortcuts: ManifestShortcut[] = manifest.shortcuts
+		const shortcuts: ManifestShortcut[] = manifest.shortcuts ?? []
 		const icons: ManifestIcon[] = [...manifest.icons, ...shortcuts.flatMap((s) => s.icons)]
 		for (const icon of icons) {
 			expect(icon.type, icon.src).toBe("image/png")
@@ -100,7 +100,7 @@ describe("manifest (locale spec §6.5)", () => {
 })
 
 describe("manifest app shortcuts", () => {
-	const shortcuts: ManifestShortcut[] = manifest.shortcuts
+	const shortcuts: ManifestShortcut[] = manifest.shortcuts ?? []
 	const en = JSON.parse(read("src/locales/en.json"))
 
 	it("has one shortcut per shortcut tab, in order, named like the English tab", () => {
