@@ -122,7 +122,8 @@ I build the bundles with Bubblewrap on my own machine, so the keystore and both 
 
 - [x] `npm install -g @bubblewrap/cli` (1.27.0).
 - [x] JDK 17, 64-bit: the Temurin 17 zip from Adoptium, unpacked to `~/.bubblewrap/jdk`. Bubblewrap accepts version 17 only. Its own installer fetches a 32-bit build on Windows, and the Gradle project it generates asks for a 1536 MB heap, so I skipped it. The system Java is untouched.
-- [x] Android SDK: the one Android Studio installed, with build-tools 36.1.0 added (`sdkmanager --install "build-tools;36.1.0"`). Bubblewrap only accepts an SDK folder that has `tools` or `bin` at its root, so I added an empty `tools` folder.
+- [x] Android SDK in `~/.bubblewrap/android_sdk`: command-line tools, platform-tools, platforms and build-tools 36.1.0 (`sdkmanager --install "build-tools;36.1.0"`). Bubblewrap only accepts an SDK folder that has `tools` or `bin` at its root, so I added an empty `tools` folder.
+- The SDK must not live under `AppData\Local`. It was first installed there from a session inside the Claude desktop app, and Windows keeps folders created that way in the app's own private copy of `AppData\Local`. A normal terminal saw no SDK, and the build stopped with "The provided androidSdk isn't correct".
 - [x] `~/.bubblewrap/config.json` holds `jdkPath` and `androidSdkPath`. With both filled in, Bubblewrap asks nothing on first run.
 - [x] `bubblewrap doctor` confirms both paths. A test project generated from the live manifest built an unsigned `.apk` and `.aab`, with the three shortcuts in it.
 - `minSdkVersion` in `twa-manifest.json` has to be `24` (Android 7.0). Bubblewrap 1.27.0 defaults to `21`, its own helper library needs `24`, and the build fails on the default.
@@ -154,7 +155,7 @@ Steps 2 and 3 run in `rookdex-android`, with this repo on an up-to-date `main`: 
    bubblewrap update --skipVersionUpgrade --manifest=..\rookdex\docs\android\twa-manifest.json
    ```
 
-3. Build and sign, with my keystore path and alias in place of the two example values. Bubblewrap asks for the keystore password and the key password:
+3. Build and sign, with my keystore path and alias in place of the two example values. I run this in Windows Terminal, not in a terminal tab inside the Claude desktop app: that app sets `NoDefaultCurrentDirectoryInExePath`, and the build then stops after the passwords with "'gradlew.bat' is not recognized". Bubblewrap asks for the keystore password and the key password:
 
    ```powershell
    bubblewrap build --manifest=..\rookdex\docs\android\twa-manifest.json --signingKeyPath=C:\path\to\keystore-file --signingKeyAlias=key-alias
@@ -167,8 +168,8 @@ Steps 2 and 3 run in `rookdex-android`, with this repo on an up-to-date `main`: 
 - A password with a double quote or a percent sign in it can break signing: Bubblewrap passes both passwords to the signing tools through `cmd.exe`, inside double quotes. If signing fails after a good build, I check that first.
 - If `build` says "There are changes in twa-manifest.json" and offers to apply them, I stop it with Ctrl+C and run step 2 first. Yes raises the version code and rewrites the file. No builds the old project.
 - When the web manifest changes (a new shortcut, a new icon): `bubblewrap merge --skipVersionUpgrade`, run in `docs/android`, because `merge` only reads the `twa-manifest.json` in the current folder. It rewrites the file with spaces and adds an `appVersionName` line. I delete that line (Bubblewrap reads `appVersion` only), run `npx biome format --write docs/android/twa-manifest.json` from the repo root and read the diff.
-- Bundle 1 came from PWABuilder and may allow Android versions below 7.0. If Play says the new release supports fewer devices, that is `minSdkVersion` `24` and it is expected.
-- Checked on 19 November with an unsigned build from this manifest: package `app.rookdex`, version `1.1.0`, version code `2`, minimum SDK 24, target SDK 36, three shortcuts.
+- Bundle 1 from PWABuilder was API 24+ and target SDK 36 as well (Play Console, 19 November), so `minSdkVersion` `24` drops no devices.
+- Checked on 19 November on the signed build from this manifest: package `app.rookdex`, version `1.1.0`, version code `2`, minimum SDK 24, target SDK 36, three shortcuts. `jarsigner -verify` passes, and the certificate's SHA-256 is the upload key fingerprint in `assetlinks.json`. Play accepted the bundle as 2 (1.1.0), and it went to review on the closed track the same day.
 
 ### Apply again
 
