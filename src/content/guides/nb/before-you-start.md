@@ -12,7 +12,7 @@ sources:
 
 ## Datoen
 
-Spillet kom **19. november 2026** på PlayStation 5 og Xbox Series X|S. Det ble lansert uten PC-versjon, og det er enspiller.
+Spillet kom **19. november 2026** på PlayStation 5 og Xbox Series X|S. Det ble lansert uten PC-versjon og uten GTA Online.
 
 ## Utgaver
 

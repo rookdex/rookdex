@@ -12,7 +12,7 @@ sources:
 
 ## The date
 
-The game came out on **19 November 2026** on PlayStation 5 and Xbox Series X|S. It launched without a PC version, and it is single-player.
+The game came out on **19 November 2026** on PlayStation 5 and Xbox Series X|S. It launched without a PC version and without GTA Online.
 
 ## Editions
 

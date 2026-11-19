@@ -2,7 +2,7 @@
 title: Your first hour
 searchTitle: "Your first hour in GTA 6: what to check, claim and skip · Rookdex"
 summary: What to check, claim and skip in your first hour of GTA VI.
-searchDescription: "Your first hour of GTA 6: what to check before you start, what to do if it won't start, what you can skip, and playing as Jason and Lucia."
+searchDescription: "Your first hour of GTA 6: what to check before you press play, what to do if it won't start, what you can skip, and playing as Jason and Lucia."
 updated: 2026-11-19
 sources:
   - https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing
@@ -13,18 +13,18 @@ sources:
   - https://www.gamesradar.com/edge/gtavi-cover/
 ---
 
-## Before you start
+## Before you press play
 
-Check that the download finished. A boxed copy holds a download code, not a disc, so it needs the same download. Keep the console connected and install any update it offers before you start.
+Check that the download finished. A boxed copy holds a download code, not a disc, so it needs the same download. Keep the console connected and install any update it offers first.
 
 ## If it won't start
 
-Check the service status page on support.rockstargames.com first. Busy servers in launch week are normal. Problems with a purchase or a missing download go to the store you bought from (PlayStation, Xbox or the shop), not to Rockstar.
+Check the service status page on support.rockstargames.com first. Busy servers right after a launch are normal. Problems with a purchase or a missing download go to the store you bought from (PlayStation, Xbox or the shop), not to Rockstar.
 
 ## What you don't need to claim
 
 - **Ultimate Edition items** unlock chapter by chapter as you play the story. There is nothing to hunt for in the first hour.
-- **The Vintage Vice City Pack** (a '55 Vapid Stanier with a garage, outfits, hairstyles and a weapon pattern) comes with every purchase before 20 November 2026. Rockstar hasn't said where it shows up in the game.
+- **The Vintage Vice City Pack** (a '55 Vapid Stanier with a garage, outfits, hairstyles and a weapon pattern) comes with every purchase before 20 November 2026.
 - **The GTA+ month** comes with a digital copy bought before 20 November 2026. It covers GTA Online, not the story. You claim it in the PlayStation Store (by 31 March 2027) or under Offers & Credits in the Microsoft Store (within 180 days), and it renews at full price until you cancel. With no GTA Online at launch, there's no hurry.
 
 ## Playing as two
