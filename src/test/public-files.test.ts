@@ -3,12 +3,67 @@ import { describe, expect, it } from "vitest"
 
 const read = (path: string) => readFileSync(new URL(`../../${path}`, import.meta.url), "utf8")
 
+/** Crawlers that collect pages to train AI models, spelled the way each operator documents them. */
+const TRAINING_CRAWLERS = [
+	"GPTBot",
+	"ClaudeBot",
+	"Applebot-Extended",
+	"meta-externalagent",
+	"Amazonbot",
+	"MistralAI-Training",
+	"CCBot",
+	// The shared "no AI training" preference token. A wildcard group does not match it.
+	"__usage_ai-training",
+]
+
+/** Search engines and the fetchers that answer a question and link back. No group may name them.
+ *  Google-Extended is here on purpose: it also switches off citations in the Gemini app. */
+const WELCOME_CRAWLERS = [
+	"Googlebot",
+	"Bingbot",
+	"Applebot",
+	"Google-Extended",
+	"OAI-SearchBot",
+	"ChatGPT-User",
+	"Claude-SearchBot",
+	"Claude-User",
+	"PerplexityBot",
+]
+
+/** The groups of a robots.txt: the user agents each one names and the rules they share. */
+function robotsGroups(text: string) {
+	const groups: { agents: string[]; rules: string[] }[] = []
+	for (const raw of text.split(/\r?\n/)) {
+		const line = raw.replace(/#.*$/, "").trim()
+		const agent = /^user-agent:\s*(.+)$/i.exec(line)?.[1]
+		const last = groups.at(-1)
+		if (agent) {
+			// A user-agent line after a rule starts the next group; before one, it joins the group.
+			if (last && last.rules.length === 0) last.agents.push(agent.toLowerCase())
+			else groups.push({ agents: [agent.toLowerCase()], rules: [] })
+		} else if (/^(allow|disallow):/i.test(line)) {
+			last?.rules.push(line)
+		}
+	}
+	return groups
+}
+
 describe("crawler files (SEO spec §4.3, §4.6)", () => {
-	it("robots.txt allows everything and names the sitemap", () => {
-		const lines = read("public/robots.txt").split(/\r?\n/)
-		expect(lines).toContain("User-agent: *")
-		expect(lines).toContain("Allow: /")
-		expect(lines).toContain("Sitemap: https://rookdex.app/sitemap.xml")
+	const robots = read("public/robots.txt")
+	const rulesFor = (agent: string) =>
+		robotsGroups(robots).find((group) => group.agents.includes(agent.toLowerCase()))?.rules
+
+	it("robots.txt allows every crawler it does not name and names the sitemap", () => {
+		expect(rulesFor("*")).toEqual(["Allow: /"])
+		expect(robots.split(/\r?\n/)).toContain("Sitemap: https://rookdex.app/sitemap.xml")
+	})
+
+	it.each(TRAINING_CRAWLERS)("robots.txt asks the training crawler %s to stay out", (agent) => {
+		expect(rulesFor(agent)).toEqual(["Disallow: /"])
+	})
+
+	it.each(WELCOME_CRAWLERS)("robots.txt leaves %s to the wildcard group", (agent) => {
+		expect(rulesFor(agent)).toBeUndefined()
 	})
 
 	it("the IndexNow key is 32 lowercase hex characters and nothing else", () => {

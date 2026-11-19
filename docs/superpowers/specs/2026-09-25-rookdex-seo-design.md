@@ -61,6 +61,8 @@ Sitemap: https://rookdex.app/sitemap.xml
 
 It is served on the version previews too. That is harmless: a crawler must be allowed to fetch a page to see its `noindex` header.
 
+**Amended 19.11.2026.** The block above is the September version. The file now also asks crawlers that collect pages to train AI models to stay out: `GPTBot`, `ClaudeBot`, `Applebot-Extended`, `meta-externalagent`, `Amazonbot`, `MistralAI-Training`, `CCBot`, and the shared `__usage_ai-training` preference token from the IETF draft. Search engines and the fetchers that answer a question and link back stay under the wildcard group. `Google-Extended` is left out on purpose: it also controls citations in the Gemini app. It is a request: following it is voluntary, and the seed data is public on GitHub either way. `src/test/public-files.test.ts` pins both lists.
+
 ### 4.4 Head changes: `Base.astro`, copy and guide schema
 
 **Props.** `title` now carries the complete `<title>` text, so the ` · Rookdex` suffix logic leaves `Base.astro` and moves into the copy. There is a new optional `indexable` prop (default `true`).
