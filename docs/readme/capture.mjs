@@ -16,10 +16,11 @@ const here = fileURLToPath(new URL(".", import.meta.url))
 
 // Ticks a fixed spread of items so the progress bars show colour and the shot is repeatable.
 const tickIndexes = [0, 1, 3, 4, 6, 8, 10, 12, 15]
+// The tracker goes first: its ticks are what the dashboard on the hub shot then shows.
 const shots = [
+	{ id: "desktop-tracker", path: "/en/tracker/", width: 1280, height: 800 },
 	{ id: "phone-hub", path: "/en/", width: 390, height: 844 },
 	{ id: "phone-dex", path: "/en/dex/wildlife/", width: 390, height: 844 },
-	{ id: "desktop-tracker", path: "/en/tracker/", width: 1280, height: 800 },
 ]
 
 const profile = mkdtempSync(join(tmpdir(), "rookdex-capture-"))
@@ -93,9 +94,19 @@ try {
 					boxes[i]?.click()
 					await new Promise((r) => setTimeout(r, 60))
 				}
+				// A box only shows as checked once its find is saved, so wait for all of them.
+				const checked = () => document.querySelectorAll("input[type=checkbox]:checked").length
+				for (let waited = 0; checked() < ${tickIndexes.length} && waited < 5000; waited += 100) {
+					await new Promise((r) => setTimeout(r, 100))
+				}
 				window.scrollTo(0, 0)
-				return document.querySelectorAll("input[type=checkbox]:checked").length
+				return checked()
 			})()`)
+			if (count !== tickIndexes.length) {
+				throw new Error(
+					`ticked ${count} of ${tickIndexes.length} items, so the shots would be wrong`
+				)
+			}
 			console.log(`ticked ${count} items`)
 			ticked = true
 			await wait(800)
