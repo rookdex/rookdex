@@ -2,7 +2,7 @@
 	"id": "/",
 	"name": "Rookdex",
 	"short_name": "Rookdex",
-	"description": "Launch-night companion: track what you find, see what is confirmed.",
+	"description": "GTA VI companion: track what you find, see what is confirmed.",
 	"start_url": "/",
 	"scope": "/",
 	"display": "standalone",

@@ -1,6 +1,6 @@
 {
 	"siteName": "Rookdex",
-	"tagline": "A launch-night companion for GTA VI. Track what you find, see what is confirmed.",
+	"tagline": "A GTA VI companion. Track what you find, see what is confirmed.",
 	"skipToContent": "Skip to content",
 	"newTab": "opens in a new tab",
 	"nav.label": "Main",
@@ -348,7 +348,7 @@
 	"seo.titles.dex.wildlife": "GTA 6 animals: every species confirmed so far · Rookdex",
 	"seo.titles.dex.vehicles": "GTA 6 cars and vehicles: every one confirmed so far · Rookdex",
 	"seo.titles.dex.places": "GTA 6 places: every location confirmed so far · Rookdex",
-	"seo.titles.dex.collectibles": "GTA 6 collectibles: what to expect at launch · Rookdex",
+	"seo.titles.dex.collectibles": "GTA 6 collectibles: what to expect · Rookdex",
 	"dex.title": "Dex",
 	"dex.indexLede": "Every animal, car, place and collectible confirmed for GTA 6 so far, with its sources.",
 	"dex.indexDescription": "Every GTA 6 animal, car, place and collectible confirmed so far, sorted by category, each with its status and a link to the trailer or report that shows it.",
