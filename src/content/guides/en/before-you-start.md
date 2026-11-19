@@ -20,7 +20,7 @@ Two editions are on sale: Standard at {price:standard} and Ultimate at {price:ul
 
 ## Pre-order bonus
 
-The Vintage Vice City Pack comes with every pre-order and with every copy bought before 20 November 2026.
+The Vintage Vice City Pack comes with every pre-order and with every digital copy bought before 20 November 2026.
 
 ## GTA+
 

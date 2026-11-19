@@ -20,7 +20,7 @@ To utgaver er i salg: Standard til {price:standard} og Ultimate til {price:ultim
 
 ## Bonus ved forhåndsbestilling
 
-Vintage Vice City Pack følger med alle forhåndsbestillinger og alle kjøp før 20. november 2026.
+Vintage Vice City Pack følger med alle forhåndsbestillinger og alle digitale kjøp før 20. november 2026.
 
 ## GTA+
 
