@@ -116,11 +116,23 @@ What Play could see in round 1 (my reading, not Google's):
 - [ ] Read the Testing feedback page every few days and answer what comes in.
 - [ ] Read the pre-launch report for every new bundle and fix what it flags.
 
+### Bubblewrap setup (done 19 November)
+
+I build the bundles with Bubblewrap on my own machine, so the keystore and both passwords never leave it.
+
+- [x] `npm install -g @bubblewrap/cli` (1.27.0).
+- [x] JDK 17, 64-bit: the Temurin 17 zip from Adoptium, unpacked to `~/.bubblewrap/jdk`. Bubblewrap accepts version 17 only. Its own installer fetches a 32-bit build on Windows, and the Gradle project it generates asks for a 1536 MB heap, so I skipped it. The system Java is untouched.
+- [x] Android SDK: the one Android Studio installed, with build-tools 36.1.0 added (`sdkmanager --install "build-tools;36.1.0"`). Bubblewrap only accepts an SDK folder that has `tools` or `bin` at its root, so I added an empty `tools` folder.
+- [x] `~/.bubblewrap/config.json` holds `jdkPath` and `androidSdkPath`. With both filled in, Bubblewrap asks nothing on first run.
+- [x] `bubblewrap doctor` confirms both paths. A test project generated from the live manifest built an unsigned `.apk` and `.aab`, with the three shortcuts in it.
+- `minSdkVersion` in `twa-manifest.json` has to be `24` (Android 7.0). Bubblewrap 1.27.0 defaults to `21`, its own helper library needs `24`, and the build fails on the default.
+- After a Bubblewrap upgrade: it looks for `sdkmanager` in `tools/bin` or `bin`, which this SDK layout doesn't have. If it asks for a newer build-tools version, I install that version by hand the same way.
+
 ### New bundles
 
 At least two new releases on the closed track before I apply again, the first by 25 November. Each one carries a real change.
 
-- [ ] Decide how to sign before the first rebuild. PWABuilder's update path (Signing key: Use mine) takes the keystore file, the key alias and both passwords on its site, where the key was generated in October. Building with Bubblewrap on my own machine keeps them local but needs a JDK and the Android SDK. An unsigned package can't be uploaded to Play.
+- [x] Decide how to sign before the first rebuild. Decided 19 November: Bubblewrap on my own machine (setup above). PWABuilder's update path (Signing key: Use mine) takes the keystore file, the key alias and both passwords on its site, where the key was generated in October. An unsigned package can't be uploaded to Play.
 - [ ] Rebuild with the same values as step 2, plus App version (`1.1.0`), App version code `2` (then `3`) and the existing key. I type the passwords myself, never into a chat or an AI tool.
 - [x] Changes that live in the wrapper, manifest side (done 19 November): `public/manifest.webmanifest` has app shortcuts to Tracker, Dex and News and a monochrome icon (`/monochrome-icon-512x512.png`, `purpose: "monochrome"`). The shortcut URLs are `/?tab=tracker`, `/?tab=dex` and `/?tab=news`. The root page opens the tab in the reader's language, the same way it resolves `start_url`. Fixes testers ask for ship on the web and are named in the release notes.
 - [ ] Rebuild only after that manifest is deployed: both tools read the live `https://rookdex.app/manifest.webmanifest`. Set Monochrome icon URL to `https://rookdex.app/monochrome-icon-512x512.png`. With Bubblewrap, `twa-manifest.json` should list three `shortcuts` after `init` (in an existing project, after `merge`).
