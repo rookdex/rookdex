@@ -4,17 +4,20 @@ import { createTranslator } from "../lib/i18n/index.js"
 import { rootScript, scriptHash } from "./root-resolver"
 
 const TAGS = ["en", "nb"]
-const source = rootScript(TAGS, "en", "lang")
+const TABS = { tracker: "tracker", news: "news" }
+const source = rootScript(TAGS, "en", "lang", TABS)
 
 interface Env {
 	stored?: string
 	languages?: string[]
 	language?: string
 	blocked?: boolean
+	/** The root page's query string, "" when there is none. */
+	search?: string
 }
 
 /** Runs the shipped script text with fake storage, navigator and location. */
-function run({ stored, languages, language, blocked }: Env) {
+function run({ stored, languages, language, blocked, search = "" }: Env) {
 	const store = new Map<string, string>(stored === undefined ? [] : [["lang", stored]])
 	const fail = () => {
 		throw new Error("SecurityError")
@@ -22,7 +25,7 @@ function run({ stored, languages, language, blocked }: Env) {
 	const localStorage = blocked
 		? { getItem: fail, removeItem: fail }
 		: { getItem: (k: string) => store.get(k) ?? null, removeItem: (k: string) => store.delete(k) }
-	const location = { replace: vi.fn() }
+	const location = { replace: vi.fn(), search }
 	vm.runInNewContext(source, { localStorage, navigator: { languages, language }, location })
 	expect(location.replace).toHaveBeenCalledOnce()
 	return { target: location.replace.mock.calls[0][0] as string, store }
@@ -77,6 +80,35 @@ describe("root resolver (locale spec §6.4, §7.4)", () => {
 			const wanted = env.languages?.length ? env.languages : [env.language]
 			expect(run(env).target, JSON.stringify(env)).toBe(`/${lib.resolveLang(stored, wanted)}/`)
 		}
+	})
+
+	it("opens a listed tab in the resolved language (the manifest's app shortcuts)", () => {
+		expect(run({ search: "?tab=tracker", languages: ["nb-NO"] }).target).toBe("/nb/tracker/")
+		expect(run({ search: "?tab=news", stored: "en", languages: ["nb"] }).target).toBe("/en/news/")
+		expect(run({ search: "?utm=x&tab=news&y=1", languages: ["sv"] }).target).toBe("/en/news/")
+	})
+
+	it("ignores a tab that is not listed, so the URL never chooses the target", () => {
+		const unlisted = [
+			"?tab=settings",
+			"?tab=constructor",
+			"?tab=__proto__",
+			"?tab=Tracker",
+			"?tab=tracker/../x",
+			"?tab=//evil.example",
+			"?tab=",
+			"?xtab=news",
+		]
+		for (const search of unlisted) {
+			expect(run({ search, languages: ["nb"] }).target, search).toBe("/nb/")
+		}
+	})
+
+	it("lists no tabs unless the caller passes them", () => {
+		const location = { replace: vi.fn(), search: "?tab=tracker" }
+		const bare = rootScript(TAGS, "en", "lang")
+		vm.runInNewContext(bare, { localStorage: {}, navigator: { languages: ["en"] }, location })
+		expect(location.replace).toHaveBeenCalledWith("/en/")
 	})
 
 	it("hashes the exact text for the CSP", () => {
