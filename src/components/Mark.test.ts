@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
+import { SHORTCUT_TABS } from "../model/tabs"
 
 const icon = readFileSync(new URL("../../public/icon.svg", import.meta.url), "utf8")
 const mark = readFileSync(new URL("./Mark.astro", import.meta.url), "utf8")
@@ -29,6 +30,75 @@ describe("mark parity (spec §5)", () => {
 		expect(mark).not.toContain("<filter")
 		expect(mark).not.toContain('<rect width="512"')
 		expect(mark).toContain('aria-hidden="true"')
+	})
+})
+
+const monochrome = readFileSync(
+	new URL("../../assets/icon-monochrome.svg", import.meta.url),
+	"utf8"
+)
+
+describe("monochrome mark parity", () => {
+	/** The trimmed lines of the element that opens with `open`, without its own two tags. */
+	function inner(svg: string, open: string): string[] {
+		const start = svg.indexOf(open)
+		expect(start, open).toBeGreaterThanOrEqual(0)
+		const tag = open.slice(1).split(/[\s>]/)[0]
+		const body = svg.slice(svg.indexOf(">", start) + 1, svg.indexOf(`</${tag}>`, start))
+		return lines(body)
+	}
+
+	it("cuts the icon's own stripes and palm out of the shape", () => {
+		const cuts = inner(monochrome, '<mask id="ink"').slice(1) // after the white keep-all rect
+		const stripes = lines(icon).slice(
+			lines(icon).indexOf('<g fill="#000000" clip-path="url(#disc)">'),
+			lines(icon).indexOf("</g>") + 1
+		)
+		const palm = lines(
+			icon.slice(icon.lastIndexOf('<g fill="#000000">'), icon.lastIndexOf("</svg>"))
+		)
+		expect(stripes).toHaveLength(5)
+		expect(palm).toHaveLength(10)
+		expect(cuts).toEqual([...stripes, ...palm])
+	})
+
+	it("fills the icon's sun and horizon bar, and nothing else", () => {
+		expect(inner(monochrome, '<g fill="#000000" mask="url(#ink)">')).toEqual([
+			'<circle cx="256" cy="236" r="150"/>',
+			'<rect x="96" y="398" width="320" height="14" rx="7"/>',
+		])
+		expect(icon).toContain('<circle cx="256" cy="236" r="150" fill="url(#sun)"/>')
+		expect(icon).toContain('<rect x="96" y="398" width="320" height="14" rx="7" fill="#22e0ff"/>')
+	})
+
+	it("carries no color and no background: only the alpha channel is used", () => {
+		const colors = new Set([...monochrome.matchAll(/#[0-9a-f]{6}/gi)].map((m) => m[0]))
+		expect([...colors].sort()).toEqual(["#000000", "#ffffff"])
+		expect(monochrome).not.toContain("Gradient")
+		expect(monochrome).not.toContain('<rect width="512" height="512" rx="96"')
+	})
+})
+
+const tabIcon = readFileSync(new URL("./TabIcon.astro", import.meta.url), "utf8")
+
+describe("app shortcut icon parity", () => {
+	/** Each drawing element as `tag attributes`, so `<path d="…" />` and `<path d="…"/>` compare. */
+	function shapes(markup: string): string[] {
+		return [...markup.matchAll(/<(path|rect|circle)\s+([^>]*?)\s*\/>/g)].map(
+			(m) => `${m[1]} ${m[2].replace(/\s+/g, " ")}`
+		)
+	}
+
+	it.each(SHORTCUT_TABS)("draws the %s tab's own icon", (tab) => {
+		const start = tabIcon.indexOf(`name === "${tab}" && (`)
+		expect(start).toBeGreaterThanOrEqual(0)
+		const fragment = tabIcon.slice(start, tabIcon.indexOf("</>", start))
+		const svg = readFileSync(new URL(`../../assets/shortcut-${tab}.svg`, import.meta.url), "utf8")
+		const glyph = svg.slice(svg.indexOf('<g transform="translate(12 12)"'), svg.lastIndexOf("</g>"))
+		expect(shapes(fragment).length).toBeGreaterThan(0)
+		expect(shapes(glyph)).toEqual(shapes(fragment))
+		// The same stroke as the tab bar, on the 24-unit grid the tab icons are drawn on.
+		expect(glyph).toContain('stroke-width="2" stroke-linecap="round" stroke-linejoin="round"')
 	})
 })
 

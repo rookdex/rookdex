@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="192" height="192" role="img" aria-labelledby="t">
+	<title id="t">Tracker</title>
+	<defs>
+		<linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#ff3d81"/>
+			<stop offset="1" stop-color="#ff8a3d"/>
+		</linearGradient>
+	</defs>
+	<circle cx="24" cy="24" r="22" fill="url(#sun)"/>
+	<g transform="translate(12 12)" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+		<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+		<path d="M8 12.5l3 3 5-6"/>
+	</g>
+</svg>

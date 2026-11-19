@@ -33,7 +33,9 @@ describe("precacheUrls", () => {
 			"en/index.html",
 			"index.html",
 			"manifest.webmanifest",
+			"monochrome-icon-512x512.png",
 			"pwa-192x192.png",
+			"shortcut-news-96x96.png",
 			"sw.js",
 		]
 		expect(precacheUrls(files)).toEqual([

@@ -9,6 +9,7 @@ import { buildNow } from "../model/build-now"
 import { hubPhase, LAUNCH_AT } from "../model/launch"
 import { rootScript, scriptHash } from "../model/root-resolver"
 import { homeSeoKeys, jsonLd, SITE } from "../model/seo"
+import { SHORTCUT_TABS, TAB_PATHS } from "../model/tabs"
 import "../styles/global.css"
 
 // The language-neutral root (locale spec §6.4). With JavaScript, the inline resolver jumps to the
@@ -17,7 +18,9 @@ import "../styles/global.css"
 // hand, and seo-check rule 8 fails the build if the two drift, so a move of the CSP into a header
 // can't block it. The og tags are here because link unfurlers fetch the bare domain without JavaScript.
 const { t, displayName } = translator(defaultLocale)
-const resolver = rootScript(locales, defaultLocale, LANG_KEY)
+// The manifest's app shortcuts arrive as /?tab=<id> and leave for that tab in the same language.
+const shortcutPaths = Object.fromEntries(SHORTCUT_TABS.map((id) => [id, TAB_PATHS[id]]))
+const resolver = rootScript(locales, defaultLocale, LANG_KEY, shortcutPaths)
 Astro.csp?.insertScriptHash(scriptHash(resolver))
 // The same build-time phase the hub renders, so the bare domain's unfurl matches /en/ and /nb/.
 const seo = homeSeoKeys(hubPhase(buildNow(process.env.ROOKDEX_NOW), LAUNCH_AT))

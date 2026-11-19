@@ -13,6 +13,14 @@ export const TAB_PATHS: Record<Tab, string> = {
 	settings: "settings",
 }
 
+/** The tabs the manifest's app shortcuts open, in menu order (public/manifest.webmanifest). A
+ *  shortcut's URL is `/?tab=<id>`: the root page sends it to that tab in the reader's language.
+ *  Never the dashboard: its path is empty, and the root page opens it already. */
+export const SHORTCUT_TABS = ["tracker", "dex", "news"] as const satisfies readonly Exclude<
+	Tab,
+	"dashboard"
+>[]
+
 /** The tab the page belongs to, from the first path segment. Guides belong to none. */
 export function currentTab(path: string, tab?: Tab | null): Tab | null {
 	if (tab !== undefined) return tab

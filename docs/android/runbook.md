@@ -122,10 +122,12 @@ At least two new releases on the closed track before I apply again, the first by
 
 - [ ] Decide how to sign before the first rebuild. PWABuilder's update path (Signing key: Use mine) takes the keystore file, the key alias and both passwords on its site, where the key was generated in October. Building with Bubblewrap on my own machine keeps them local but needs a JDK and the Android SDK. An unsigned package can't be uploaded to Play.
 - [ ] Rebuild with the same values as step 2, plus App version (`1.1.0`), App version code `2` (then `3`) and the existing key. I type the passwords myself, never into a chat or an AI tool.
-- [ ] Changes that live in the wrapper: app shortcuts to Tracker, Dex and News (`shortcuts` in the web manifest, none today) and a monochrome icon (left empty in October). Fixes testers ask for ship on the web and are named in the release notes.
+- [x] Changes that live in the wrapper, manifest side (done 19 November): `public/manifest.webmanifest` has app shortcuts to Tracker, Dex and News and a monochrome icon (`/monochrome-icon-512x512.png`, `purpose: "monochrome"`). The shortcut URLs are `/?tab=tracker`, `/?tab=dex` and `/?tab=news`. The root page opens the tab in the reader's language, the same way it resolves `start_url`. Fixes testers ask for ship on the web and are named in the release notes.
+- [ ] Rebuild only after that manifest is deployed: both tools read the live `https://rookdex.app/manifest.webmanifest`. Set Monochrome icon URL to `https://rookdex.app/monochrome-icon-512x512.png`. With Bubblewrap, `twa-manifest.json` should list three `shortcuts` after `init` (in an existing project, after `merge`).
+- [ ] What a tester sees in bundle 2 is the shortcuts (long-press the app icon). The monochrome icon doesn't show yet: Bubblewrap and PWABuilder use it only as the notification icon, and notification delegation is off. Neither builds an Android themed icon from it today, so bundle 3 needs a change of its own.
 - [ ] Closed testing, Create new release: upload the `.aab`, write release notes in English and Norwegian that say which feedback the release answers, send for review.
 - [ ] `assetlinks.json` stays as it is: same upload key, same app signing key.
-- [ ] When the release is live: check on a tester phone that the app still opens without a URL bar.
+- [ ] When the release is live: check on a tester phone that the app still opens without a URL bar, and that a long-press on the icon shows Tracker, Dex and News, each opening in the language the app already uses. A phone that hasn't opened the app since the manifest deploy still holds the old start page and lands on the home page once.
 
 ### Apply again
 

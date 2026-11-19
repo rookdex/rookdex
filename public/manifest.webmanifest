@@ -18,6 +18,41 @@
 			"sizes": "512x512",
 			"type": "image/png",
 			"purpose": "maskable"
+		},
+		{
+			"src": "/monochrome-icon-512x512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "monochrome"
+		}
+	],
+	"shortcuts": [
+		{
+			"name": "Tracker",
+			"short_name": "Tracker",
+			"url": "/?tab=tracker",
+			"icons": [
+				{ "src": "/shortcut-tracker-96x96.png", "sizes": "96x96", "type": "image/png" },
+				{ "src": "/shortcut-tracker-192x192.png", "sizes": "192x192", "type": "image/png" }
+			]
+		},
+		{
+			"name": "Dex",
+			"short_name": "Dex",
+			"url": "/?tab=dex",
+			"icons": [
+				{ "src": "/shortcut-dex-96x96.png", "sizes": "96x96", "type": "image/png" },
+				{ "src": "/shortcut-dex-192x192.png", "sizes": "192x192", "type": "image/png" }
+			]
+		},
+		{
+			"name": "News",
+			"short_name": "News",
+			"url": "/?tab=news",
+			"icons": [
+				{ "src": "/shortcut-news-96x96.png", "sizes": "96x96", "type": "image/png" },
+				{ "src": "/shortcut-news-192x192.png", "sizes": "192x192", "type": "image/png" }
+			]
 		}
 	]
 }
