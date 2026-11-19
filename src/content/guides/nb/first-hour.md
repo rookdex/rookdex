@@ -1,9 +1,9 @@
 ---
 title: Den første timen
-searchTitle: "Den første timen i GTA 6: lanseringskvelden · Rookdex"
-summary: Det du bør sjekke, hente og la være den første timen etter at GTA VI låses opp.
-searchDescription: "Den første timen i GTA 6 på lanseringskvelden: hva du sjekker før midnatt, hva du gjør hvis spillet ikke starter, hva du kan droppe, og Jason og Lucia."
-updated: 2026-11-03
+searchTitle: "Den første timen i GTA 6: sjekk, hent og hopp over · Rookdex"
+summary: Det du bør sjekke, hente og la være den første timen i GTA VI.
+searchDescription: "Den første timen i GTA 6: hva du sjekker før du starter spillet, hva du gjør hvis spillet ikke starter, hva du kan droppe, og Jason og Lucia."
+updated: 2026-11-19
 sources:
   - https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing
   - https://support.rockstargames.com/articles/3SZF8cy8dG7lHsLf38uWK1/redeeming-the-one-month-gta-membership-included-with-your-grand-theft-auto-vi-pre-order
@@ -13,19 +13,19 @@ sources:
   - https://www.gamesradar.com/edge/gtavi-cover/
 ---
 
-## Før midnatt
+## Før du starter spillet
 
-Sjekk at forhåndsnedlastingen er ferdig. Den åpnet 10. november, så spillet skal ligge installert og bare vente på å låses opp. En fysisk utgave har en nedlastingskode, ikke en plate, så den trenger samme nedlasting. Det låses opp ved midnatt lokal tid, og ingen oppdatering på lanseringsdagen er kunngjort. La konsollen stå på og være koblet til nett i tilfelle en oppdatering kommer ved lansering.
+Sjekk at nedlastingen er ferdig. En fysisk utgave har en nedlastingskode, ikke en plate, så den trenger samme nedlasting. La konsollen være koblet til nett, og installer oppdateringer den tilbyr først.
 
 ## Hvis spillet ikke starter
 
-Sjekk driftsstatusen på support.rockstargames.com først. Det er vanlig at serverne er travle på lanseringskvelden. Problemer med et kjøp eller en nedlasting som mangler, tar du med butikken du kjøpte fra (PlayStation, Xbox eller butikken), ikke med Rockstar.
+Sjekk driftsstatusen på support.rockstargames.com først. Det er vanlig at serverne er travle rett etter en lansering. Problemer med et kjøp eller en nedlasting som mangler, tar du med butikken du kjøpte fra (PlayStation, Xbox eller butikken), ikke med Rockstar.
 
 ## Dette trenger du ikke hente
 
 - **Ultimate Edition-gjenstander** låses opp kapittel for kapittel mens du spiller historien. Det er ingenting å lete etter den første timen.
-- **Vintage Vice City Pack** (en Vapid Stanier fra 1955 med garasje, antrekk, frisyrer og et våpenmønster) følger med alle kjøp før 20. november. Rockstar har ikke sagt hvor den dukker opp i spillet.
-- **GTA+-måneden** følger med et digitalt eksemplar kjøpt før 20. november, så lanseringsdagen teller også. Den gjelder GTA Online, ikke historien. Du løser den inn i PlayStation Store (innen 31. mars 2027) eller under Offers & Credits i Microsoft Store (innen 180 dager), og den fornyes til full pris til du sier den opp. Siden GTA Online ikke er med ved lansering, haster det ikke.
+- **Vintage Vice City Pack** (en Vapid Stanier fra 1955 med garasje, antrekk, frisyrer og et våpenmønster) følger med alle kjøp før 20. november 2026.
+- **GTA+-måneden** følger med et digitalt eksemplar kjøpt før 20. november 2026. Den gjelder GTA Online, ikke historien. Du løser den inn i PlayStation Store (innen 31. mars 2027) eller under Offers & Credits i Microsoft Store (innen 180 dager), og den fornyes til full pris til du sier den opp. Siden GTA Online ikke er med ved lansering, haster det ikke.
 
 ## To spillbare figurer
 
@@ -35,6 +35,6 @@ Du spiller som Jason og Lucia. Noen oppdrag låser deg til én av dem, noen tvin
 
 Edge beskriver et nytt system for hvor ettersøkt du er. Ikoner øverst på skjermen viser hva politiet vet om deg: hvordan du ser ut, om du hadde en partner, hva du hadde på deg, om et overvåkingskamera fanget deg og hvilket våpen du bar. Skiller dere lag, bytter du klær eller kaster våpenet, passer du dårligere med beskrivelsen. En nyere, dyr bil kan ha en sporingsenhet. En egen Criminal Profile vurderer hvordan du spiller, fra Professional til Irredeemable.
 
-## Rookdex på lanseringskvelden
+## Rookdex mens du spiller
 
-Ved midnatt blir [forsiden](/nb/) dashbordet ditt. Kryss av det du finner i [oversikten](/nb/tracker/), så viser Neste kategorien du er nærmest å fullføre. Alt blir liggende på enheten din, selv når wifi-en er full.
+[Forsiden](/nb/) er dashbordet ditt. Kryss av det du finner i [oversikten](/nb/tracker/), så viser Neste kategorien du er nærmest å fullføre. Alt blir liggende på enheten din, selv når wifi-en er full.

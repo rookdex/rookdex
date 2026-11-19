@@ -216,7 +216,7 @@ describe("Settings page (spec §7)", () => {
 		expect(row?.dataset.url).toBe("https://rookdex.app")
 		expect(row?.dataset.title).toBe("Rookdex")
 		expect(row?.dataset.text).toBe(
-			"A launch-night companion for GTA VI. Track what you find, see what is confirmed."
+			"A GTA VI companion. Track what you find, see what is confirmed."
 		)
 	})
 

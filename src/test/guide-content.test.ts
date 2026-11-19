@@ -18,9 +18,9 @@ describe.each([
 			"Editions",
 			"Pre-order bonus",
 			"GTA+",
-			"Preload",
+			"The download",
 			"Buying in Norway",
-			"What Rookdex does on launch night",
+			"What Rookdex does",
 		],
 	],
 	[
@@ -30,9 +30,9 @@ describe.each([
 			"Utgaver",
 			"Bonus ved forhåndsbestilling",
 			"GTA+",
-			"Forhåndsnedlasting",
+			"Nedlastingen",
 			"Kjøp i Norge",
-			"Hva Rookdex gjør på lanseringskvelden",
+			"Hva Rookdex gjør",
 		],
 	],
 ])("Before you start, %s (feedback spec §9)", (locale, expected) => {

@@ -1,9 +1,9 @@
 ---
 title: Før du begynner
-searchTitle: "GTA 6 pris og lanseringsdato i Norge: sjekkliste · Rookdex"
-summary: Det du bør ordne før lanseringskvelden, så du kan spille med en gang det låses opp.
-searchDescription: "GTA 6 kommer 19. november 2026 på PS5 og Xbox Series X|S. Forhåndsnedlasting fra 10. november, utgaver, bonus ved forhåndsbestilling, GTA+ og priser i Norge."
-updated: 2026-11-12
+searchTitle: "GTA 6 pris og utgaver i Norge: før du begynner · Rookdex"
+summary: Det du bør ordne før du begynner å spille GTA VI.
+searchDescription: "GTA 6 kom 19. november 2026 på PS5 og Xbox Series X|S. Utgaver, størrelsen på nedlastingen, bonus ved forhåndsbestilling, GTA+ og priser i Norge."
+updated: 2026-11-19
 sources:
   - https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions
   - https://www.rockstargames.com/newswire/article/5171972o3ak5oa/pre-order-grand-theft-auto-vi-on-june-25
@@ -12,7 +12,7 @@ sources:
 
 ## Datoen
 
-Spillet slippes ved midnatt lokal tid **19. november 2026** på PlayStation 5 og Xbox Series X|S. Det kommer ingen PC-versjon ved lansering, og spillet er enspiller ved lansering.
+Spillet kom **19. november 2026** på PlayStation 5 og Xbox Series X|S. Det ble lansert uten PC-versjon og uten GTA Online.
 
 ## Utgaver
 
@@ -20,20 +20,20 @@ To utgaver er i salg: Standard til {price:standard} og Ultimate til {price:ultim
 
 ## Bonus ved forhåndsbestilling
 
-Forhåndsbestiller du spillet, eller kjøper det før 20. november, får du Vintage Vice City Pack.
+Vintage Vice City Pack følger med alle forhåndsbestillinger og alle kjøp før 20. november 2026.
 
 ## GTA+
 
-En digital forhåndsbestilling gir én måned med GTA+. På PlayStation fornyes medlemskapet av seg selv til du sier det opp, og måneden må løses inn innen 31. mars 2027. Vil du ikke betale for en måned til, må du si opp før det fornyes.
+Et digitalt eksemplar kjøpt før 20. november 2026 gir én måned med GTA+. På PlayStation fornyes medlemskapet av seg selv til du sier det opp, og måneden må løses inn innen 31. mars 2027. Vil du ikke betale for en måned til, må du si opp før det fornyes.
 
-## Forhåndsnedlasting
+## Nedlastingen
 
-Forhåndsnedlasting åpnet **10. november**: ved midnatt lokal tid på PS5 og kl. 01:00 norsk tid på Xbox. Start den nå hvis du ikke har gjort det: nedlastingen er på opptil 212 GB, og serverne er trege på lanseringskvelden. En fysisk utgave sparer deg ikke for nedlastingen. Esken inneholder en nedlastingskode, og fysiske utgaver selges fra 12. november.
+Nedlastingen er på opptil **212 GB**, så start den i god tid før du vil spille. En fysisk utgave sparer deg ikke for nedlastingen: esken inneholder en nedlastingskode.
 
 ## Kjøp i Norge
 
-Standard digital utgave koster {price:standard} i PlayStation Store og Xbox Store. PlayStation Store trekker pengene når du forhåndsbestiller, ikke på lanseringsdagen. Fysiske utgaver får du hos de vanlige norske butikkene.
+Standard digital utgave koster {price:standard} i PlayStation Store og Xbox Store. Fysiske utgaver får du hos de vanlige norske butikkene.
 
-## Hva Rookdex gjør på lanseringskvelden
+## Hva Rookdex gjør
 
-[Forsiden](/nb/) blir dashbordet ditt ved midnatt. [Installer siden](/nb/settings/#about) på telefonen før det, så virker den selv når wifi-en er full. Når spillet er låst opp, forteller [den første timen](/nb/guides/first-hour/) hva du bør sjekke og hva du kan hoppe over.
+[Forsiden](/nb/) er dashbordet ditt: fremgangen din, hva som er neste og de siste nyhetene. [Installer siden](/nb/settings/#about) på telefonen, så virker den selv når wifi-en er full. [Den første timen](/nb/guides/first-hour/) forteller hva du bør sjekke og hva du kan hoppe over.
