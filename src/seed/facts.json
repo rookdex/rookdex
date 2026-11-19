@@ -64,7 +64,7 @@
 			},
 			{
 				"url": "https://www.rockstargames.com/VI/music",
-				"title": "The Music of Grand Theft Auto VI"
+				"title": "The Music of Grand Theft Auto VI: In-Game Radio Stations, Official Soundtrack, and More"
 			}
 		]
 	},
@@ -142,9 +142,9 @@
 		},
 		"summary": {
 			"en": "Rockstar set the release for midnight local time on 19 November, on both PS5 and Xbox Series X|S. In Norway that was 00:00 on Thursday 19 November.",
-			"nb": "Rockstar satte slippet til midnatt lokal tid 19. november, både på PS5 og Xbox Series X|S. I Norge var det kl. 00:00 torsdag 19. november."
+			"nb": "Rockstar satte lanseringen til midnatt lokal tid 19. november, både på PS5 og Xbox Series X|S. I Norge var det kl. 00:00 torsdag 19. november."
 		},
-		"announced": "2026-11-03",
+		"announced": "2026-11-19",
 		"sources": [
 			{
 				"url": "https://support.rockstargames.com/articles/29jV3Cv2cCgvwM1XgtMO5o/grand-theft-auto-vi-regional-pre-load-and-release-times-on-playstation-5-and-xbox-series-x-or-s",
@@ -194,12 +194,12 @@
 		"id": "facts/settings-menu",
 		"claim_key": "settings-categories",
 		"name": {
-			"en": "Eight Settings Categories, with Accessibility Options",
-			"nb": "Åtte innstillingskategorier, med tilgjengelighetsvalg"
+			"en": "Settings: Eight Categories, an Accessibility Section",
+			"nb": "Innstillinger: åtte kategorier og en del for tilgjengelighet"
 		},
 		"summary": {
-			"en": "The Settings menu has eight categories: Control Scheme, Controller, Gameplay, Display, UI, Camera, Audio and Account. Accessibility options include high-contrast shaders, subtitles and captions, scaling and readability, and narration.",
-			"nb": "Innstillingsmenyen har åtte kategorier: Control Scheme, Controller, Gameplay, Display, UI, Camera, Audio og Account. Blant tilgjengelighetsvalgene er høykontrast-shadere, undertekster og bildetekster, skalering og lesbarhet, og opplesing."
+			"en": "The Settings menu has eight categories: Control Scheme, Controller, Gameplay, Display, UI, Camera, Audio and Account. Gameplay has an Accessibility section, and the menu also lists High-Contrast Shaders, Subtitles & Captions, Scaling & Readability and Narration.",
+			"nb": "Innstillingsmenyen har åtte kategorier: Control Scheme, Controller, Gameplay, Display, UI, Camera, Audio og Account. Gameplay har en egen del for tilgjengelighet (Accessibility), og menyen har også High-Contrast Shaders, Subtitles & Captions, Scaling & Readability og Narration."
 		},
 		"announced": "2026-11-18",
 		"sources": [

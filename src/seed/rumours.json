@@ -63,10 +63,10 @@
 		]
 	},
 	{
-		"id": "rumours/reviews-november-18",
+		"id": "rumours/review-scores",
 		"name": "Reviews Are In: 99 on Metacritic",
-		"claim_key": "reviews-date-november-18",
-		"summary": "Reviews went live on 18 November, the day before launch. GamesRadar reports a Metacritic score of 99 after 107 reviews, level with the highest score on the site, and no mixed or negative reviews so far. Rockstar has not commented on the scores.",
+		"claim_key": "review-scores-metacritic",
+		"summary": "Reviews are out. On 18 November GamesRadar reported a Metacritic score of 99 after 107 reviews, level with the highest score on the site, with no mixed or negative reviews at that point. Rockstar has not commented on the scores.",
 		"added": "2026-11-19",
 		"sources": [
 			{
