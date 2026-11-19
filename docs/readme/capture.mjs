@@ -94,9 +94,19 @@ try {
 					boxes[i]?.click()
 					await new Promise((r) => setTimeout(r, 60))
 				}
+				// A box only shows as checked once its find is saved, so wait for all of them.
+				const checked = () => document.querySelectorAll("input[type=checkbox]:checked").length
+				for (let waited = 0; checked() < ${tickIndexes.length} && waited < 5000; waited += 100) {
+					await new Promise((r) => setTimeout(r, 100))
+				}
 				window.scrollTo(0, 0)
-				return document.querySelectorAll("input[type=checkbox]:checked").length
+				return checked()
 			})()`)
+			if (count !== tickIndexes.length) {
+				throw new Error(
+					`ticked ${count} of ${tickIndexes.length} items, so the shots would be wrong`
+				)
+			}
 			console.log(`ticked ${count} items`)
 			ticked = true
 			await wait(800)
