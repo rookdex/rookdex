@@ -20,18 +20,18 @@
 		"deploy:check": "astro build && wrangler deploy --dry-run"
 	},
 	"dependencies": {
-		"@astrojs/markdown-satteri": "0.4.7",
-		"@astrojs/react": "7.1.4",
+		"@astrojs/markdown-satteri": "0.4.10",
+		"@astrojs/react": "7.1.9",
 		"@fontsource-variable/dm-sans": "5.3.0",
 		"@fontsource-variable/inter": "5.3.0",
 		"@fontsource/bebas-neue": "5.3.0",
-		"astro": "7.4.7",
+		"astro": "7.4.12",
 		"react": "19.3.1",
 		"react-dom": "19.3.1"
 	},
 	"devDependencies": {
 		"@astrojs/check": "0.9.12",
-		"@biomejs/biome": "2.6.6",
+		"@biomejs/biome": "2.6.8",
 		"@testing-library/jest-dom": "7.0.1",
 		"@testing-library/react": "16.3.3",
 		"@types/node": "26.6.6",
@@ -39,10 +39,10 @@
 		"@types/react-dom": "19.3.0",
 		"@vite-pwa/assets-generator": "2.0.0",
 		"fake-indexeddb": "6.2.8",
-		"jsdom": "31.0.0",
+		"jsdom": "31.0.1",
 		"typescript": "6.0.3",
 		"vitest": "5.1.0",
 		"vitest-axe": "0.1.0",
-		"wrangler": "4.158.0"
+		"wrangler": "4.162.0"
 	}
 }
