@@ -133,13 +133,39 @@ I build the bundles with Bubblewrap on my own machine, so the keystore and both 
 At least two new releases on the closed track before I apply again, the first by 25 November. Each one carries a real change.
 
 - [x] Decide how to sign before the first rebuild. Decided 19 November: Bubblewrap on my own machine (setup above). PWABuilder's update path (Signing key: Use mine) takes the keystore file, the key alias and both passwords on its site, where the key was generated in October. An unsigned package can't be uploaded to Play.
-- [ ] Rebuild with the same values as step 2, plus App version (`1.1.0`), App version code `2` (then `3`) and the existing key. I type the passwords myself, never into a chat or an AI tool.
+- [ ] Rebuild with the existing key, following Build a bundle below. The values from step 2 are in `docs/android/twa-manifest.json`, with App version `1.1.0` and App version code `2` (then `3`). I type the passwords myself, never into a chat or an AI tool.
 - [x] Changes that live in the wrapper, manifest side (done 19 November): `public/manifest.webmanifest` has app shortcuts to Tracker, Dex and News and a monochrome icon (`/monochrome-icon-512x512.png`, `purpose: "monochrome"`). The shortcut URLs are `/?tab=tracker`, `/?tab=dex` and `/?tab=news`. The root page opens the tab in the reader's language, the same way it resolves `start_url`. Fixes testers ask for ship on the web and are named in the release notes.
-- [ ] Rebuild only after that manifest is deployed: both tools read the live `https://rookdex.app/manifest.webmanifest`. Set Monochrome icon URL to `https://rookdex.app/monochrome-icon-512x512.png`. With Bubblewrap, `twa-manifest.json` should list three `shortcuts` after `init` (in an existing project, after `merge`).
+- [x] Rebuild only after that manifest is deployed (done 19 November): `twa-manifest.json` was generated from the live `https://rookdex.app/manifest.webmanifest`. It lists the three `shortcuts` and has the monochrome icon URL, `https://rookdex.app/monochrome-icon-512x512.png`. When the web manifest changes again, `twa-manifest.json` has to follow before the next bundle.
 - [ ] What a tester sees in bundle 2 is the shortcuts (long-press the app icon). The monochrome icon doesn't show yet: Bubblewrap and PWABuilder use it only as the notification icon, and notification delegation is off. Neither builds an Android themed icon from it today, so bundle 3 needs a change of its own.
 - [ ] Closed testing, Create new release: upload the `.aab`, write release notes in English and Norwegian that say which feedback the release answers, send for review.
 - [ ] `assetlinks.json` stays as it is: same upload key, same app signing key.
 - [ ] When the release is live: check on a tester phone that the app still opens without a URL bar, and that a long-press on the icon shows Tracker, Dex and News, each opening in the language the app already uses. A phone that hasn't opened the app since the manifest deploy still holds the old start page and lands on the home page once.
+
+### Build a bundle
+
+`docs/android/twa-manifest.json` holds what the wrapper is built from: the values from step 2, the version, `minSdkVersion` `24` and the shortcuts. Bubblewrap generates the Android project from it into `rookdex-android`, a folder beside this repo. That folder is build output and is not in git: I can delete it and generate it again.
+
+Every command runs in `rookdex-android`.
+
+1. For a new version, raise `appVersionCode` by one in `twa-manifest.json`, and `appVersion` when the wrapper itself changed. I edit the file by hand: Bubblewrap's own version bump rewrites it with spaces, and Biome wants tabs.
+2. Generate the project:
+
+   ```powershell
+   bubblewrap update --skipVersionUpgrade --manifest=..\rookdex\docs\android\twa-manifest.json
+   ```
+
+3. Build and sign. Bubblewrap asks for the keystore password and the key password:
+
+   ```powershell
+   bubblewrap build --manifest=..\rookdex\docs\android\twa-manifest.json --signingKeyPath=<keystore file> --signingKeyAlias=<alias>
+   ```
+
+4. Upload `app-release-bundle.aab` from `rookdex-android` to Play.
+
+- The keystore path and the alias come in as flags, so the repo says nothing about the key. `signingKey` in `twa-manifest.json` holds Bubblewrap's defaults (`./android.keystore`, `android`). The password prompt names those defaults even with the flags set. The signing tools get the flags.
+- The keystore path can't contain a space: Bubblewrap hands the flag to the signing tools without quotes.
+- If `build` says "There are changes in twa-manifest.json" and offers to apply them, I stop it with Ctrl+C and run step 2 first. Yes raises the version code and rewrites the file. No builds the old project.
+- Checked on 19 November with an unsigned build from this manifest: package `app.rookdex`, version `1.1.0`, version code `2`, minimum SDK 24, target SDK 36, three shortcuts.
 
 ### Apply again
 
