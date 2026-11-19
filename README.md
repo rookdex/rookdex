@@ -6,7 +6,7 @@ Leonida is open, and you'll want somewhere to keep score. Rookdex gives you a tr
 
 **[Open rookdex.app](https://rookdex.app)** · English and Norsk · free · no account
 
-<a href="https://rookdex.app"><img src="docs/readme/screens.png" alt="Rookdex on desktop and phone: the tracker with search and progress per category, the launch countdown, and the Dex wildlife page." width="100%"></a>
+<a href="https://rookdex.app"><img src="docs/readme/screens.png" alt="Rookdex on desktop and phone: the tracker with search and progress per category, the dashboard with overall progress and what's next, and the Dex wildlife page." width="100%"></a>
 
 ## <img src="docs/readme/map.svg" width="22" height="22" alt=""> What you get
 
