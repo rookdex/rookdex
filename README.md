@@ -48,7 +48,7 @@ The README art lives in `docs/readme/`. To refresh the screenshot after a UI cha
 
 </details>
 
-## <img src="docs/readme/licence.svg" width="22" height="22" alt=""> License
+## <img src="docs/readme/license.svg" width="22" height="22" alt=""> License
 
 Code is MIT (see `LICENSE`; the brand files listed there are excluded). Guide text under `src/content/` is CC BY-SA 4.0.
 
