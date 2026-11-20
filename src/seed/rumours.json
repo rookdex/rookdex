@@ -39,18 +39,14 @@
 	},
 	{
 		"id": "rumours/preorder-estimate",
-		"name": "Pre-Orders Estimated at 7.7 Million",
+		"name": "Pre-Orders Estimated at 15.9 Million",
 		"claim_key": "preorder-estimate-us-digital",
-		"summary": "Sensor Tower estimates 7.71 million pre-purchases, 74% of them on PS5, and up to 25 million by launch. Rockstar has not shared sales figures, but Take-Two says pre-orders are far above its forecast, and Sony and Microsoft say it is the most pre-ordered game ever on their stores.",
+		"summary": "Sensor Tower estimated 15.88 million pre-purchases by 17 November, worth about $1.54 billion, and says 87% were the Ultimate Edition. Rockstar has not shared sales figures, but Take-Two says pre-orders are far above its forecast, and Sony and Microsoft call it their most pre-ordered game ever.",
 		"added": "2026-11-04",
 		"sources": [
 			{
-				"url": "https://www.gamespot.com/articles/gta-6-has-sold-almost-8-million-copies-so-far-and-ps5-is-dominating-the-split-of-course/",
-				"title": "GTA 6 Has Sold Almost 8 Million Copies So Far, And PS5 Is Dominating The Split"
-			},
-			{
-				"url": "https://rockstarintel.com/gta-6-pre-order-numbers-are-146-more-than-any-other-game/",
-				"title": "GTA 6 Pre-Orders Are 148% More Than Any Other Game"
+				"url": "https://rockstarintel.com/87-of-gta-vi-pre-orders-are-the-100-ultimate-edition/",
+				"title": "87% Of GTA VI Pre-Orders Are The $100 Ultimate Edition"
 			},
 			{
 				"url": "https://ir.take2games.com/static-files/a45ff316-72c4-4255-b123-aace2e41ad1a",

@@ -7,8 +7,8 @@
 			"nb": "To utgaver, fra 79,99 dollar"
 		},
 		"summary": {
-			"en": "Pre-orders opened on 25 June. The Standard Edition costs $79.99 and the digital-only Ultimate Edition $99.99; Standard owners can upgrade later. Digital copies bought before 20 November include the Vintage Vice City Pack and a month of GTA+. Boxed pre-orders include the pack.",
-			"nb": "Forhåndsbestillingen åpnet 25. juni. Standardutgaven koster 79,99 dollar og Ultimate Edition, som bare finnes digitalt, 99,99 dollar. Standard kan oppgraderes senere. Digitale kjøp før 20. november får Vintage Vice City Pack og én måned GTA+. Fysiske forhåndsbestillinger får pakken."
+			"en": "Pre-orders opened on 25 June. The Standard Edition costs $79.99 and the digital-only Ultimate Edition $99.99; Standard owners can upgrade later. Digital copies bought by 19 November came with the Vintage Vice City Pack and a month of GTA+. Boxed pre-orders include the pack.",
+			"nb": "Forhåndsbestillingen åpnet 25. juni. Standardutgaven koster 79,99 dollar og Ultimate Edition, som bare finnes digitalt, 99,99 dollar. Standard kan oppgraderes senere. Digitale kjøp til og med 19. november fikk Vintage Vice City Pack og én måned GTA+. Fysiske forhåndsbestillinger får pakken."
 		},
 		"announced": "2026-06-24",
 		"sources": [
@@ -19,6 +19,10 @@
 			{
 				"url": "https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions",
 				"title": "Grand Theft Auto VI Platforms, Editions, and Versions"
+			},
+			{
+				"url": "https://www.rockstargames.com/newswire/article/39akk424a9oo53/grand-theft-auto-vi-now-available",
+				"title": "Grand Theft Auto VI Now Available"
 			}
 		]
 	},
@@ -118,15 +122,19 @@
 		"id": "facts/map-poster",
 		"claim_key": "map-poster",
 		"name": {
-			"en": "Free Leonida Map on Launch Day",
-			"nb": "Gratis kart over Leonida på lanseringsdagen"
+			"en": "Free Leonida Map on the Official Site",
+			"nb": "Gratis kart over Leonida på den offisielle nettsiden"
 		},
 		"summary": {
-			"en": "On 19 November Rockstar adds a free printable cover art poster and map of Leonida to the official site. A double-sided printed version follows from the Rockstar Store shortly after launch, for $0.99 or free with any order.",
-			"nb": "19. november legger Rockstar ut en gratis plakat med coverbildet og et kart over Leonida på den offisielle nettsiden, klar til utskrift. En tosidig trykt versjon kommer i Rockstar Store kort tid etter lansering, til 0,99 dollar eller gratis ved et kjøp."
+			"en": "Since launch day the official site has a free printable cover art poster and a full map of Leonida. A double-sided printed version follows from the Rockstar Store shortly after launch, for $0.99 or free with any order.",
+			"nb": "Fra lanseringsdagen ligger en gratis plakat med coverbildet og et fullt kart over Leonida på den offisielle nettsiden, klar til utskrift. En tosidig trykt versjon kommer i Rockstar Store kort tid etter lansering, til 0,99 dollar eller gratis ved et kjøp."
 		},
 		"announced": "2026-11-03",
 		"sources": [
+			{
+				"url": "https://www.rockstargames.com/newswire/article/39akk424a9oo53/grand-theft-auto-vi-now-available",
+				"title": "Grand Theft Auto VI Now Available"
+			},
 			{
 				"url": "https://www.rockstargames.com/newswire/article/k4ak9okk485712/grand-theft-auto-vi-pre-load-begins-on-november-10",
 				"title": "Grand Theft Auto VI Pre-Load Begins on November 10"
@@ -225,6 +233,29 @@
 			{
 				"url": "https://support.rockstargames.com/articles/5hSbxodEFeNbU1wARy1p4X/cannot-put-any-more-money-in-my-buckme-account-in-grand-theft-auto-vi",
 				"title": "Cannot put any more money in my BuckMe account in Grand Theft Auto VI"
+			}
+		]
+	},
+	{
+		"id": "facts/plus-membership-bonuses",
+		"claim_key": "plus-membership-bonuses",
+		"name": {
+			"en": "GTA+ Members Get a Car and a Garage",
+			"nb": "GTA+-medlemmer får bil og garasje"
+		},
+		"summary": {
+			"en": "GTA+ members on PS5 and Xbox Series X|S get extras in the new game: the '90 Annis Venturas BLVD Elegy sports car and a garage in Crosstown. Both can be claimed from Chapter 3, along with a set of optional bonuses.",
+			"nb": "Med GTA+ på PS5 og Xbox Series X|S får du ekstra innhold i det nye spillet: sportsbilen '90 Annis Venturas BLVD Elegy og en garasje i Crosstown. Begge kan hentes fra kapittel 3, sammen med noen valgfrie bonuser."
+		},
+		"announced": "2026-11-19",
+		"sources": [
+			{
+				"url": "https://www.rockstargames.com/gta-plus/join",
+				"title": "GTA+"
+			},
+			{
+				"url": "https://www.rockstargames.com/newswire/article/39akk424a9oo53/grand-theft-auto-vi-now-available",
+				"title": "Grand Theft Auto VI Now Available"
 			}
 		]
 	}
