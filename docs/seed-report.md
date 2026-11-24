@@ -241,7 +241,7 @@ in both locales.
 | id | name | status | sources |
 |---|---|---|---|
 | vehicles/grotti-cheetah-95 | 1995 Grotti Cheetah | confirmed | rockstargames.com/VI/editions; GTABase; PC Gamer |
-| vehicles/vapid-ganado | Vapid Ganado | confirmed | rockstargames.com/VI/editions; GTABase; GamesRadar; PC Gamer |
+| vehicles/vapid-ganado | '70 Vapid Ganado | confirmed | rockstargames.com/VI/editions; GTABase; GamesRadar; PC Gamer |
 | vehicles/vapid-dominator-67-buggy | 1967 Vapid Dominator Buggy | confirmed | rockstargames.com/VI/editions; GTABase; GamesRadar; PC Gamer |
 | vehicles/dinka-enduro | Dinka Enduro | confirmed | rockstargames.com/VI/editions; GTABase; GamesRadar; PC Gamer |
 | vehicles/crest-kayak | Crest Kayak | confirmed | rockstargames.com/VI/editions; GTABase; GamesRadar |
@@ -270,7 +270,7 @@ in both locales.
 | vehicles/buckingham-luxor | Buckingham Luxor | confirmed | Rockstar Newswire; GTABase |
 | vehicles/buckingham-valkyrie | Buckingham Valkyrie | confirmed | Rockstar Newswire; GTABase |
 | vehicles/dundreary-landstalker-xl-police | Dundreary Landstalker XL Police | confirmed | Rockstar Newswire; GTABase |
-| vehicles/brute-ambulance | Brute Ambulance | confirmed | Rockstar Newswire; GTABase |
+| vehicles/brute-ambulance | Interstate Ambulance | confirmed | Rockstar Newswire; GTABase |
 | vehicles/brute-stockade | Brute Stockade | confirmed | Rockstar Newswire; GTABase; GamesRadar |
 | vehicles/hvy-airtug | HVY Airtug | confirmed | Rockstar Newswire; GTABase |
 | vehicles/vapid-benson | Vapid Benson | confirmed | Rockstar Newswire; GTABase |
@@ -307,7 +307,7 @@ in both locales.
 | vehicles/benefactor-schafter-v12 | Benefactor Schafter V12 | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar; PC Gamer |
 | vehicles/obey-tailgater | Obey Tailgater | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
 | vehicles/declasse-tulip-m-100 | Declasse Tulip M-100 | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar; PC Gamer |
-| vehicles/pegassi-zorrusso | Pegassi Zorrusso | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
+| vehicles/pegassi-zorrusso | Granforma Zorrusso | confirmed | Trailer 1 (YouTube); GTABase; GamesRadar |
 | vehicles/declasse-bobcat-xl | Declasse Bobcat XL | confirmed | Trailer 1 (YouTube); GTABase |
 | vehicles/ubermacht-cypher | Ubermacht Cypher | confirmed | Trailer 1 (YouTube); GTABase |
 | vehicles/vapid-dominator | Vapid Dominator | confirmed | Trailer 1 (YouTube); GTABase |
@@ -371,7 +371,7 @@ in both locales.
 | vehicles/albany-emperor | Albany Emperor | confirmed | Trailer 2 (YouTube); GTABase; GamesRadar |
 | vehicles/gallivanter-baller | Gallivanter Baller | confirmed | Trailer 2 (YouTube); GamesRadar |
 | vehicles/declasse-rancher | Declasse Rancher | confirmed | Trailer 2 (YouTube); GTABase; GamesRadar |
-| vehicles/western-zombie-chopper | Western Zombie Chopper | confirmed | Trailer 2 (YouTube); GTABase |
+| vehicles/western-zombie-chopper | Western Zombie Bobber | confirmed | Trailer 2 (YouTube); GTABase |
 | vehicles/nagasaki-dinghy | Nagasaki Dinghy | confirmed | Trailer 2 (YouTube); GTABase |
 | vehicles/speedophile-seashark | Speedophile Seashark | confirmed | Trailer 2 (YouTube); GTABase |
 | vehicles/nagasaki-buzzard-attack-chopper | Nagasaki Buzzard Attack Chopper | confirmed | Trailer 2 (YouTube); GTABase |
