@@ -157,7 +157,7 @@
 		"id": "vehicles/vapid-ganado",
 		"category": "vehicles",
 		"group": "cars",
-		"name": "Vapid Ganado",
+		"name": "'70 Vapid Ganado",
 		"status": "confirmed",
 		"description": "Jason's well-worn low-riding pickup, styled after the 1970 Ford Ranchero. Seen in Trailer 2 and the key art. The Ultimate Edition adds an exclusive Retro Build.",
 		"sources": [
@@ -715,7 +715,7 @@
 		"id": "vehicles/brute-ambulance",
 		"category": "vehicles",
 		"group": "emergency",
-		"name": "Brute Ambulance",
+		"name": "Interstate Ambulance",
 		"status": "confirmed",
 		"description": "An ambulance styled after the Chevrolet Express cutaway ambulance. Seen in An Extended Look.",
 		"sources": [
@@ -725,7 +725,7 @@
 			},
 			{
 				"url": "https://www.gtabase.com/vehicles/gta-6/ambulance",
-				"title": "Ambulance - GTA 6 Vehicle - GTABase"
+				"title": "Interstate Ambulance - GTA 6 Vehicle - GTABase"
 			}
 		]
 	},
@@ -1505,7 +1505,7 @@
 		"id": "vehicles/pegassi-zorrusso",
 		"category": "vehicles",
 		"group": "cars",
-		"name": "Pegassi Zorrusso",
+		"name": "Granforma Zorrusso",
 		"status": "confirmed",
 		"description": "A supercar styled after the Italdesign Zerouno. Seen racing down a highway with a passenger standing through the roof in Trailer 1.",
 		"sources": [
@@ -1515,7 +1515,7 @@
 			},
 			{
 				"url": "https://www.gtabase.com/gta-6/vehicles/zorrusso",
-				"title": "Pegassi Zorrusso - GTA 6 Vehicle - GTABase"
+				"title": "Granforma Zorrusso - GTA 6 Vehicle - GTABase"
 			},
 			{
 				"url": "https://www.gamesradar.com/gta-6-cars/",
@@ -2765,9 +2765,9 @@
 		"id": "vehicles/western-zombie-chopper",
 		"category": "vehicles",
 		"group": "motorcycles",
-		"name": "Western Zombie Chopper",
+		"name": "Western Zombie Bobber",
 		"status": "confirmed",
-		"description": "A chopper styled after the Harley-Davidson Fat Bob. Seen in Trailer 2.",
+		"description": "A bobber styled after the Harley-Davidson Fat Bob. Seen in Trailer 2.",
 		"sources": [
 			{
 				"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
@@ -2775,7 +2775,7 @@
 			},
 			{
 				"url": "https://www.gtabase.com/vehicles/gta-6/zombie-chopper",
-				"title": "Western Zombie Chopper - GTA 6 Vehicle - GTABase"
+				"title": "Western Zombie Bobber - GTA 6 Vehicle - GTABase"
 			}
 		]
 	},
