@@ -84,3 +84,32 @@ jobs:
           name: lighthouse-report
           path: lighthouse-report
           retention-days: 14
+
+  shipped-ids:
+    # Category model spec §6: an id on main is never dropped from shipped-ids.txt, and a new id
+    # starts with its folder's category. A required check from the PR after the one that adds it.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Read main's list
+        # Never fails open. An empty list ("no list yet") only when this branch adds the file;
+        # a missing origin/main or any other read error fails the job.
+        run: |
+          git rev-parse --verify origin/main
+          if git diff --diff-filter=A --name-only origin/main...HEAD | grep -qx src/seed/shipped-ids.txt; then
+            : > "$RUNNER_TEMP/main-ids.txt"
+          else
+            git show origin/main:src/seed/shipped-ids.txt > "$RUNNER_TEMP/main-ids.txt"
+          fi
+      - name: Check
+        env:
+          MAIN_SHIPPED_IDS: ${{ runner.temp }}/main-ids.txt
+        run: npx vitest run src/model/shippedIds.ci.test.ts

@@ -384,3 +384,31 @@ export function buildSeed(input: SeedInput): SeedResult {
 	errors.push(...shipped.errors, ...shippedErrors(shipped.ids, allIds))
 	return { categories, groups, items, errors }
 }
+
+/** Spec §6 checks 2 and 3, which need main's list, so CI runs them (shippedIds.ci.test.ts). */
+export function shippedIdErrors(
+	main: string[],
+	head: string[],
+	seed: { id: string; category: string }[]
+): string[] {
+	const onMain = new Set(main)
+	const atHead = new Set(head)
+	return [
+		...main
+			.filter((id) => !atHead.has(id))
+			.map((id) => `shipped-ids.txt drops ${id}, which is on main`),
+		...seed
+			.filter((item) => !onMain.has(item.id) && !item.id.startsWith(`${item.category}/`))
+			.map((item) => `${item.id}: a new id must start with ${item.category}/`),
+	]
+}
+
+/** Empty main text means main has no list yet: the PR that adds the file passes. */
+export function ciShippedErrors(
+	mainText: string,
+	headText: string,
+	seed: { id: string; category: string }[]
+): string[] {
+	if (mainText.trim() === "") return []
+	return shippedIdErrors(parseShipped(mainText).ids, parseShipped(headText).ids, seed)
+}

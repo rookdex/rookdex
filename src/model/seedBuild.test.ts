@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { type FixtureInput, game, ign, ignNordic, radar, validInput } from "../test/seed-fixture"
-import { buildSeed, parseShipped, sortKey } from "./seedBuild"
+import { buildSeed, ciShippedErrors, parseShipped, shippedIdErrors, sortKey } from "./seedBuild"
 
 function errorsAfter(change: (input: FixtureInput) => void): string {
 	const input = validInput()
@@ -346,5 +346,49 @@ describe("parseShipped", () => {
 		const crlf = parseShipped("# list\r\nanimals/a\r\n\r\nanimals/b\r\n")
 		expect(lf).toEqual({ ids: ["animals/a", "animals/b"], errors: [] })
 		expect(crlf).toEqual(lf)
+	})
+})
+
+describe("shippedIdErrors (spec §6 checks 2 and 3)", () => {
+	const seed = [
+		{ id: "wildlife/pelican", category: "animals" },
+		{ id: "animals/heron", category: "animals" },
+	]
+	it("passes when main's ids stay and new ids start with their category", () => {
+		expect(
+			shippedIdErrors(["wildlife/pelican"], ["wildlife/pelican", "animals/heron"], seed)
+		).toEqual([])
+	})
+	it("fails when the list drops a line that is on main", () => {
+		expect(
+			shippedIdErrors(
+				["wildlife/pelican", "wildlife/gone"],
+				["wildlife/pelican", "animals/heron"],
+				seed
+			)
+		).toEqual(["shipped-ids.txt drops wildlife/gone, which is on main"])
+	})
+	it("fails when a new id starts with another category", () => {
+		const added = [...seed, { id: "wildlife/heron2", category: "animals" }]
+		expect(
+			shippedIdErrors(
+				["wildlife/pelican"],
+				["wildlife/pelican", "animals/heron", "wildlife/heron2"],
+				added
+			)
+		).toEqual(["wildlife/heron2: a new id must start with animals/"])
+	})
+})
+
+describe("ciShippedErrors", () => {
+	it("passes while main has no list yet (the PR that adds it)", () => {
+		expect(
+			ciShippedErrors("", "wildlife/pelican\n", [{ id: "wildlife/pelican", category: "animals" }])
+		).toEqual([])
+	})
+	it("checks once main has a list", () => {
+		expect(ciShippedErrors("# ids\nanimals/a\n", "", [])).toEqual([
+			"shipped-ids.txt drops animals/a, which is on main",
+		])
 	})
 })
