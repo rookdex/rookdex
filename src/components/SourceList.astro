@@ -2,6 +2,7 @@
 import { type Locale, translator } from "../i18n"
 import { outletOf } from "../model/outlet"
 import type { ItemSource } from "../model/schema"
+import { isGameSource } from "../model/tiers"
 import ExternalLink from "./ExternalLink.astro"
 
 interface Props {
@@ -20,17 +21,15 @@ const { t } = translator(locale)
 <ul class="tap-links source-list">
 	{
 		sources.map((source) =>
-			"kind" in source ? (
+			isGameSource(source) ? (
 				<li>
 					<span class="game-source">{t("sources.game")}</span>
 					<span class="outlet">
-						{lang ? (
-							<span lang={lang}>
-								{source.screen.map((part, index) => (index === 0 ? part : <Fragment> <span aria-hidden="true">›</span> {part}</Fragment>))}
-							</span>
-						) : (
-							source.screen.map((part, index) => (index === 0 ? part : <Fragment> <span aria-hidden="true">›</span> {part}</Fragment>))
-						)}
+						{/* One copy of the path: the hidden › that screen readers skip must never drift between branches.
+						    lang is undefined on same-language pages, which renders no attribute. */}
+						<span lang={lang}>
+							{source.screen.map((part, index) => (index === 0 ? part : <Fragment> <span aria-hidden="true">›</span> {part}</Fragment>))}
+						</span>
 					</span>
 				</li>
 			) : (

@@ -104,7 +104,7 @@ jobs:
         # a missing origin/main or any other read error fails the job.
         run: |
           git rev-parse --verify origin/main
-          if git diff --diff-filter=A --name-only origin/main...HEAD | grep -qx src/seed/shipped-ids.txt; then
+          if git diff --diff-filter=A --name-only origin/main...HEAD | grep -qxF src/seed/shipped-ids.txt; then
             : > "$RUNNER_TEMP/main-ids.txt"
           else
             git show origin/main:src/seed/shipped-ids.txt > "$RUNNER_TEMP/main-ids.txt"

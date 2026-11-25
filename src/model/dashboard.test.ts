@@ -45,7 +45,7 @@ describe("closestCategory", () => {
 			"vehicles/c": "2026-11-20T10:00:00Z",
 			"animals/e": "2026-11-20T10:00:00Z",
 		})
-		// Both at 50 %: the tie goes to category order (alphabetical by file name).
+		// Both at 50 %: the tie goes to category order (the first category to appear in the item list).
 		expect(closestCategory(items, r)).toBe("vehicles")
 	})
 

@@ -1,5 +1,5 @@
 // The valid seed every seedBuild case starts from (category model spec §10). A case changes one
-// thing and expects one error, so each check is proven to fire on its own.
+// thing and expects its error, so each check is proven to fire on its own.
 import type { Allowlist } from "../model/schema"
 
 export const fixtureAllowlist: Allowlist = {
