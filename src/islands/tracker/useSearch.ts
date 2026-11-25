@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { foundIds, type SearchView, searchView } from "../../model/search"
-import { SEARCH_TERMS } from "../../model/searchTerms"
+import { ITEM_TERMS, SEARCH_TERMS } from "../../model/searchTerms"
 import type { TrackerState } from "../../model/tracker"
 import { clearFlag, HIDE_FOUND_KEY, readFlag, writeFlag } from "../seenFlag"
 
@@ -86,6 +86,7 @@ export function useSearch(source: SearchSource, arrival?: string, initialQuery =
 			query: q,
 			hidden: hide,
 			terms: SEARCH_TERMS,
+			itemTerms: ITEM_TERMS,
 		})
 	}
 

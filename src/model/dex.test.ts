@@ -190,6 +190,14 @@ describe("dexSearchRows (Dex search spec §5.1)", () => {
 		expect(boats.every((row) => matches("båt", [row.search]))).toBe(true)
 	})
 
+	it("finds police vehicles with the Norwegian word, and not Pay 'n' Spray", () => {
+		const rows = dexSearchRows(t, urlFor, live)
+		const hits = rows.filter((row) => matches("politi", [row.search])).map((row) => row.id)
+		expect(hits).toContain("vehicles/vapid-montagne-police")
+		expect(hits).toContain("vehicles/bravado-gauntlet-interceptor")
+		expect(hits).not.toContain("vehicles/pay-n-spray")
+	})
+
 	it("throws on a retired item", () => {
 		const retired = item("dodo", "birds", "confirmed", { retired: true })
 		expect(() => dexSearchRows(t, urlFor, [retired])).toThrow(/retired/)

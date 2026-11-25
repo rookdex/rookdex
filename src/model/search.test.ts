@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import type { SeedItem } from "./schema"
 import { emptyState, foundIds, matches, matchesNormalized, normalize, searchView } from "./search"
-import { SEARCH_TERMS } from "./searchTerms"
+import { ITEM_TERMS, SEARCH_TERMS } from "./searchTerms"
 import type { Records } from "./stats"
 
 const src = { url: "https://www.rockstargames.com/VI", title: "Site", tier: "official" as const }
@@ -37,7 +37,16 @@ const terms = {
 const none: ReadonlySet<string> = new Set()
 const ids = (list: SeedItem[]) => list.map((i) => i.id)
 const view = (patch: Partial<Parameters<typeof searchView>[0]>) =>
-	searchView({ items, selected: [], groups: [], query: "", hidden: none, terms, ...patch })
+	searchView({
+		items,
+		selected: [],
+		groups: [],
+		query: "",
+		hidden: none,
+		terms,
+		itemTerms: {},
+		...patch,
+	})
 
 describe("normalize (spec §3.1)", () => {
 	it("folds accents and case, keeps ø and æ as letters", () => {
@@ -186,10 +195,38 @@ describe("merged group words (category model spec §2)", () => {
 	it("finds a police car by its name, not every service item by an old group word", () => {
 		const result = view({ items: [police, spray, mule], query: "police", terms: SEARCH_TERMS })
 		expect(result.visible.map((i) => i.id)).toEqual([police.id])
-		for (const query of ["politi", "buss", "verksted", "nyttekjøretøy"]) {
-			const old = view({ items: [police, spray, mule], query, terms: SEARCH_TERMS })
-			expect(old.visible, query).toEqual([])
+	})
+
+	it("finds each service item by its own type words, in both languages", () => {
+		const bus = seeded("vehicles/dashound", "service", "Dashound")
+		const van = seeded("vehicles/declasse-burrito", "service", "Declasse Burrito")
+		const cases: Record<string, SeedItem[]> = {
+			politi: [police],
+			utrykning: [police],
+			emergency: [police],
+			verksted: [spray],
+			shop: [spray],
+			lastebil: [mule],
+			truck: [mule],
+			buss: [bus],
+			varebil: [van],
+			van: [van],
+			nyttekjøretøy: [mule, bus, van],
+			commercial: [mule, bus, van],
 		}
+		for (const [query, expected] of Object.entries(cases)) {
+			const result = view({
+				items: [police, spray, mule, bus, van],
+				query,
+				terms: SEARCH_TERMS,
+				itemTerms: ITEM_TERMS,
+			})
+			expect(ids(result.visible), query).toEqual(ids(expected))
+		}
+	})
+
+	it("finds nothing by item words when none are given", () => {
+		expect(view({ items: [police], query: "politi", terms: SEARCH_TERMS }).visible).toEqual([])
 	})
 
 	it("never answers a vehicle search with exploration items", () => {

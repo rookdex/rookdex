@@ -6,8 +6,19 @@ import { groupKey, type Records } from "./stats"
 
 export { normalize }
 
-/** Group id to search words in both languages (searchTerms.ts). */
+/** Group id, or item id, to search words in both languages (searchTerms.ts). */
 export type SearchTerms = Readonly<Record<string, readonly string[]>>
+
+/** The text a query searches for one item: its name, its aliases, its group's words and its own
+ *  words. One list for the tracker and the Dex, so both answer a query the same way. */
+export function searchFields(item: SeedItem, terms: SearchTerms, itemTerms: SearchTerms): string[] {
+	return [
+		item.name,
+		...(item.aliases ?? []),
+		...(terms[item.group] ?? []),
+		...(itemTerms[item.id] ?? []),
+	]
+}
 
 export interface SearchInput {
 	items: SeedItem[]
@@ -19,6 +30,8 @@ export interface SearchInput {
 	/** The snapshot of found ids; empty while Hide found is off. */
 	hidden: ReadonlySet<string>
 	terms: SearchTerms
+	/** Words true of one item only, keyed by item id (ITEM_TERMS). */
+	itemTerms: SearchTerms
 }
 
 export interface SearchView {
@@ -76,6 +89,7 @@ export function searchView({
 	query,
 	hidden,
 	terms,
+	itemTerms,
 }: SearchInput): SearchView {
 	const queryWords = words(query)
 	const all = selected.length === 0
@@ -92,11 +106,7 @@ export function searchView({
 	for (const item of items) {
 		// The list never shows a retired item, so no count may include one.
 		if (item.retired) continue
-		if (
-			queryWords.length > 0 &&
-			!hasAll(queryWords, [item.name, ...(item.aliases ?? []), ...(terms[item.group] ?? [])])
-		)
-			continue
+		if (queryWords.length > 0 && !hasAll(queryWords, searchFields(item, terms, itemTerms))) continue
 		// A category under All is never narrowed by chips.
 		const inside =
 			all ||
