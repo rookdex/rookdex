@@ -108,14 +108,14 @@ The new `--tracker-max-w` (§3.3), the spacing table (§3.5) and the tablet and 
 
 ### 5.1 The card (`ItemList.tsx`, `ItemRow`)
 
-Order in the DOM, which is also the Tab order: checkbox, chevron (only on a cut-off card), book link, flag button, then the open panel's close button.
+Order in the DOM, which is also the Tab order: checkbox, chevron (only on a cut-off card), book link, flag button. An open panel puts its close button right after the chevron.
 
 - **Icon tile** (36 px) with the category icon. Found: pink background tint and pink icon.
 - **Name** (15 px, semibold), as the checkbox's `label`.
 - **Meta line** (12 px, muted): a 7 px dot (pink for Confirmed, cyan for Expected), the tier text as today (`tracker.confirmed` or `tracker.expectedFrom`), " · ", the group label. It may wrap on narrow phones; it is never cut off.
 - **Check** top right, absolutely placed in a 44 px box. The label's `::after` still covers the card, so a tap anywhere on the card toggles it.
 - **Description** clamped to 2 lines (`-webkit-line-clamp: 2`). The full text stays in the DOM, so screen readers read all of it.
-- **Full text** (added 25.11.2026): when the clamp cuts the description, the footer gets a chevron first (`tracker.moreLabel`, tip `tracker.more`). It opens a `popover="auto"` panel laid over the card at the card's place and width, with the name and the whole description, so no card ever grows and the grid never jumps. The panel lifts when it would run past the bottom of the screen. It closes from its own up chevron (`tracker.lessLabel`), on Escape, on a tap outside, on a scroll of more than 8 px and when the window changes width. The tap outside that closes it does nothing else, so it never marks the card under it found. A card whose text fits gets no chevron.
+- **Full text** (added 25.11.2026): when the clamp cuts the description, the footer gets a chevron first (`tracker.moreLabel`, tip `tracker.more`). It opens a `popover="auto"` panel laid over the card at the card's place and width, with the name and the whole description, so no card ever grows and the grid never jumps. The panel stays on screen at both edges, and focus moves to its close button, since the chevron is under it. It closes from its own up chevron (`tracker.lessLabel`), on Escape, on a tap outside, on a scroll of more than 8 px, when the window changes width and when focus leaves it. A tap on another card's body that closes it does nothing else, so it never marks that card found; links and buttons work on the first tap. A card whose text fits gets no chevron, and a browser without popovers shows neither chevron nor panel.
 - **Footer**, right-aligned: chevron (above), book (Sources) and flag ("coming soon", `aria-disabled`). All sit above the label's click layer, as today. The footer is a flex row so December can add "Entry →" and a star without changing the layout. No empty placeholders now.
 - **Found:** the card border turns pink (45 % mix), the icon tile turns pink and the check shows the ✓.
 

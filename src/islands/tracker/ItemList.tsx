@@ -222,9 +222,11 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 				</a>
 			</div>
 			{/* The full text, over the card in the top layer, so no card ever changes size. It stays in
-			    the DOM while the chevron shows, so the chevron always has its target. */}
+			    the DOM while the chevron shows, so the chevron always has its target. tabIndex -1 keeps
+			    focus in the panel on a click on its text; otherwise it falls to the results region and
+			    usePanel reads that as focus leaving. */}
 			{cut && (
-				<div ref={panelRef} id={panelId} className="item-panel" popover="auto">
+				<div ref={panelRef} id={panelId} className="item-panel" popover="auto" tabIndex={-1}>
 					<p className="item-panel-name">{item.name}</p>
 					<p className="item-panel-desc">{item.description}</p>
 					<div className="item-panel-foot">

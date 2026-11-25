@@ -2188,7 +2188,7 @@ html:has(.search-row) {
 }
 
 /* A card's full text, over the card in the top layer (spec §5.1). usePanel sets top, left, width
-   and min-height from the card, so inset and margin drop the popover's centred default. Display
+   and min-height from the card, so inset and margin drop the popover's centered default. Display
    is set only while open, so the closed panel keeps the popover's display: none. */
 .item-panel {
 	inset: auto;
@@ -2208,6 +2208,11 @@ html:has(.search-row) {
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-1);
+}
+
+/* Focus lands on the panel itself only from a click on its text; its close button keeps the ring. */
+.item-panel:focus {
+	outline: none;
 }
 
 .item-panel p {
@@ -2231,6 +2236,15 @@ html:has(.search-row) {
 	display: flex;
 	justify-content: flex-end;
 	margin: auto -6px 0 0;
+}
+
+/* A browser without popovers would show the panel inline under the card and leave the chevron
+   dead, so both stay out there and the clamped card is all it shows. */
+@supports not selector(:popover-open) {
+	.item-panel,
+	.item-foot [popovertarget] {
+		display: none;
+	}
 }
 
 /* Found: a pink edge and a pink icon tile beside the ✓, never colour alone (spec §5.1). */

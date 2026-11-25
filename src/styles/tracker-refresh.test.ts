@@ -101,7 +101,7 @@ describe("icon-lead card (spec §5.1)", () => {
 		expect(rule(".item.found .item-tile")).toMatch(/color:\s*var\(--accent\)/)
 	})
 
-	it("drops the popover's centred box, so the panel lands where usePanel puts it", () => {
+	it("drops the popover's centered box, so the panel lands where usePanel puts it", () => {
 		expect(rule(".item-panel")).toMatch(/inset:\s*auto/)
 		expect(rule(".item-panel")).toMatch(/margin:\s*0/)
 	})
@@ -109,6 +109,12 @@ describe("icon-lead card (spec §5.1)", () => {
 	it("sets the panel's display only while open, so a closed panel stays hidden", () => {
 		expect(rule(".item-panel")).not.toMatch(/display:/)
 		expect(rule(".item-panel:popover-open")).toMatch(/display:\s*flex/)
+	})
+
+	it("hides the panel and its chevron in a browser without popovers", () => {
+		expect(css).toMatch(
+			/@supports not selector\(:popover-open\)\s*\{\s*\.item-panel,\s*\.item-foot \[popovertarget\]\s*\{\s*display:\s*none;?\s*\}/
+		)
 	})
 })
 

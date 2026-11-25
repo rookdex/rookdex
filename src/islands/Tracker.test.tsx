@@ -301,6 +301,8 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 			expect(chevron("American alligator")).toHaveAttribute("popovertarget", panel.id)
 			expect(chevron("American alligator").closest(".item-foot")).not.toBeNull()
 			expect(panel).toHaveAttribute("popover", "auto")
+			// A click on its text focuses the panel, so focus never seems to leave it.
+			expect(panel).toHaveAttribute("tabindex", "-1")
 			expect(panel).toHaveTextContent("American alligator")
 			expect(panel.querySelector(".item-panel-desc")).toHaveTextContent("Everglades native.")
 			const close = panel.querySelector("button") as HTMLElement
