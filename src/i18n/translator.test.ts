@@ -20,7 +20,7 @@ describe("translator (locale spec §5.2)", () => {
 	})
 
 	it("fills extra vars in a plural", () => {
-		expect(en.plural("dex.lede.wildlife", 25, { confirmed: 24, expected: 1 })).toBe(
+		expect(en.plural("dex.lede.animals", 25, { confirmed: 24, expected: 1 })).toBe(
 			"25 animals so far: 24 confirmed, 1 expected."
 		)
 	})
@@ -45,8 +45,8 @@ describe("translator (locale spec §5.2)", () => {
 	})
 
 	it("labels seed ids and shows an unknown id as itself", () => {
-		expect(seedLabel(en.t, "category", "wildlife")).toBe("Wildlife")
-		expect(seedLabel(nb.t, "group", "hidden-items")).toBe(nb.t("group.hidden-items"))
+		expect(seedLabel(en.t, "category", "animals")).toBe("Animals")
+		expect(seedLabel(nb.t, "group", "reptiles-amphibians")).toBe(nb.t("group.reptiles-amphibians"))
 		expect(seedLabel(en.t, "group", "dragons")).toBe("dragons")
 	})
 

@@ -123,21 +123,6 @@ export const categoriesFileSchema = z.strictObject({
 		.min(1),
 })
 
-export const seedItemInputSchema = z.strictObject({
-	id: idSchema,
-	category: z.string().regex(SLUG),
-	group: z.string().regex(SLUG),
-	name: text(TEXT.name),
-	status: z.enum(["confirmed", "expected"]),
-	precedent: text(TEXT.name).optional(),
-	description: text(TEXT.description).optional(),
-	location: z
-		.strictObject({ x: z.number(), y: z.number(), region: z.string().regex(SLUG) })
-		.optional(),
-	sources: z.array(sourceInputSchema).min(1),
-	retired: z.boolean().optional(),
-})
-
 export const rumourInputSchema = z.strictObject({
 	id: idSchema,
 	name: text(TEXT.name),
@@ -224,7 +209,6 @@ export type Source = z.infer<typeof sourceSchema>
 export type GameSource = z.infer<typeof gameSourceSchema>
 export type ItemSourceInput = z.infer<typeof itemSourceInputSchema>
 export type ItemSource = Source | GameSource
-export type SeedItemInput = z.infer<typeof seedItemInputSchema>
 export type Spoiler = (typeof SPOILERS)[number]
 export type ItemInput = z.infer<typeof itemInputSchema>
 export type GroupFile = z.infer<typeof groupFileSchema>

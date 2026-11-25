@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import type { SeedItem } from "./schema"
 import { emptyState, foundIds, matches, matchesNormalized, normalize, searchView } from "./search"
+import { SEARCH_TERMS } from "./searchTerms"
 import type { Records } from "./stats"
 
 const src = { url: "https://www.rockstargames.com/VI", title: "Site", tier: "official" as const }
@@ -146,6 +147,39 @@ describe("searchView (spec §3.1)", () => {
 		expect(view({ query: "bravado" }).visible).toEqual([])
 		const hidden = new Set(["vehicles/old-bravado"])
 		expect(view({ query: "bravado", hidden }).hiddenCount).toBe(0)
+	})
+})
+
+describe("old group words (category model spec §2)", () => {
+	it("finds a former commercial vehicle by the old group's Norwegian word", () => {
+		const mule = {
+			id: "vehicles/mule",
+			category: "vehicles",
+			group: "service",
+			name: "Mule",
+			status: "confirmed" as const,
+			sources: [src],
+		}
+		const result = view({ items: [mule], query: "nyttekjøretøy", terms: SEARCH_TERMS })
+		expect(result.visible.map((i) => i.id)).toEqual(["vehicles/mule"])
+	})
+
+	it("finds the Classic Car Collection by the old vehicles group's words", () => {
+		const classic = {
+			id: "collectibles/classic-car-collection",
+			category: "collections",
+			group: "exploration",
+			name: "Classic Car Collection",
+			status: "confirmed" as const,
+			sources: [src],
+		}
+		for (const query of ["vehicle", "vehicles", "kjøretøy"]) {
+			const result = view({ items: [classic], query, terms: SEARCH_TERMS })
+			expect(
+				result.visible.map((i) => i.id),
+				query
+			).toEqual(["collectibles/classic-car-collection"])
+		}
 	})
 })
 

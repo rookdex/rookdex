@@ -15,7 +15,14 @@
 		"rockstarintel.com",
 		"gtabase.com",
 		"bloomberg.com",
-		"patents.google.com"
+		"patents.google.com",
+		"powerpyx.com",
+		"pushsquare.com",
+		"videogameschronicle.com",
+		"kotaku.com",
+		"blog.playstation.com",
+		"news.xbox.com",
+		"redbull.com"
 	],
 	"blocklist": [
 		"gtaboom.com",

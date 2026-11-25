@@ -1,0 +1,172 @@
+{
+	"group": "bikes",
+	"order": 2,
+	"total": 29,
+	"sort": "name",
+	"items": [
+		{
+			"id": "vehicles/maibatsu-sanchez",
+			"name": "Maibatsu Sanchez",
+			"status": "confirmed",
+			"description": "A dirt bike styled after motocross machines such as the Yamaha YZ450F and Kawasaki KX450F, built for off-road riding. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/sanchez",
+					"title": "Maibatsu Sanchez - GTA 6 Bike - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/lcc-avarus",
+			"name": "LCC Avarus",
+			"status": "confirmed",
+			"description": "A stripped-down custom chopper from Liberty City Cycles, styled after a naked chopper build. Seen in Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/avarus",
+					"title": "LCC Avarus - GTA 6 Motorcycle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/dinka-enduro",
+			"name": "Dinka Enduro",
+			"status": "confirmed",
+			"description": "An off-road motorcycle in an Army fatigue livery, kept at Jason's safehouse. An Ultimate Edition bonus vehicle.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/enduro",
+					"title": "Dinka Enduro - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				},
+				{
+					"url": "https://www.pcgamer.com/gta-6-cars-list/",
+					"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+				}
+			]
+		},
+		{
+			"id": "vehicles/principe-lectro",
+			"name": "Principe Lectro",
+			"status": "confirmed",
+			"description": "A naked sport bike styled after the Ducati Streetfighter. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/lectro",
+					"title": "Principe Lectro - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/pegassi-faggio",
+			"name": "Pegassi Faggio",
+			"status": "confirmed",
+			"description": "A scooter styled after the Vespa. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/faggio",
+					"title": "Pegassi Faggio - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/nagasaki-carbon-rs",
+			"name": "Nagasaki Carbon RS",
+			"status": "confirmed",
+			"description": "A sport bike styled after the Ducati 1199, seen in a red and white colorway in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/carbon-rs",
+					"title": "Nagasaki Carbon RS - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				},
+				{
+					"url": "https://www.pcgamer.com/gta-6-cars-list/",
+					"title": "GTA 6 cars and motorbikes we've spotted in the trailers and screenshots - PC Gamer"
+				}
+			]
+		},
+		{
+			"id": "vehicles/western-sovereign",
+			"name": "Western Sovereign",
+			"status": "confirmed",
+			"description": "A cruiser motorcycle styled after the Harley-Davidson Road King. Seen on a street of customized vehicles in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/sovereign",
+					"title": "Western Sovereign - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/dinka-double-t",
+			"name": "Dinka Double-T",
+			"status": "confirmed",
+			"description": "A sport bike styled after the Honda CBR. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/double-t",
+					"title": "Dinka Double-T - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/western-zombie-chopper",
+			"name": "Western Zombie Bobber",
+			"status": "confirmed",
+			"description": "A bobber styled after the Harley-Davidson Fat Bob. Seen in Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/zombie-chopper",
+					"title": "Western Zombie Bobber - GTA 6 Vehicle - GTABase"
+				}
+			]
+		}
+	]
+}

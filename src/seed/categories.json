@@ -1,0 +1,16 @@
+{
+	"categories": [
+		{ "id": "vehicles" },
+		{ "id": "weapons" },
+		{ "id": "animals" },
+		{ "id": "equipment" },
+		{ "id": "collections" },
+		{ "id": "activities" },
+		{ "id": "contacts" },
+		{ "id": "gangs" },
+		{ "id": "robberies" },
+		{ "id": "challenges" },
+		{ "id": "places" },
+		{ "id": "story", "spoiler": "story" }
+	]
+}

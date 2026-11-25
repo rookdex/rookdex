@@ -28,7 +28,9 @@ export function indexablePaths(guideSlugs: string[], categoryIds: string[]): str
 		"tracker",
 		"tracker/sources",
 		"dex",
-		...validSlugs(categoryIds, "rename the seed file in src/seed/").map((id) => `dex/${id}`),
+		...validSlugs(categoryIds, "rename the category folder in src/seed/categories/").map(
+			(id) => `dex/${id}`
+		),
 		"news",
 		"privacy",
 		...validSlugs(guideSlugs).map((slug) => `guides/${slug}`),

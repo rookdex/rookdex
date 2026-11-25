@@ -31,19 +31,19 @@ const items = [
 	item("collectibles/b"),
 	item("vehicles/c"),
 	item("vehicles/d"),
-	item("wildlife/e"),
-	item("wildlife/f"),
+	item("animals/e"),
+	item("animals/f"),
 ]
 
 describe("closestCategory", () => {
-	it("starts with wildlife when nothing is found", () => {
-		expect(closestCategory(items, {})).toBe("wildlife")
+	it("starts with animals when nothing is found", () => {
+		expect(closestCategory(items, {})).toBe("animals")
 	})
 
 	it("picks the highest share below 100 %", () => {
 		const r = records({
 			"vehicles/c": "2026-11-20T10:00:00Z",
-			"wildlife/e": "2026-11-20T10:00:00Z",
+			"animals/e": "2026-11-20T10:00:00Z",
 		})
 		// Both at 50 %: the tie goes to category order (alphabetical by file name).
 		expect(closestCategory(items, r)).toBe("vehicles")
@@ -63,25 +63,25 @@ describe("closestCategory", () => {
 	})
 
 	it("ignores retired items and records with no seed item", () => {
-		const withRetired = [...items, item("wildlife/gone", "g", { retired: true })]
+		const withRetired = [...items, item("animals/gone", "g", { retired: true })]
 		// Only the retired item and an unknown id are ticked: still "nothing found".
 		const r = records({
-			"wildlife/gone": "2026-11-20T10:00:00Z",
+			"animals/gone": "2026-11-20T10:00:00Z",
 			"weapons/x": "2026-11-20T10:00:00Z",
 		})
-		expect(closestCategory(withRetired, r)).toBe("wildlife")
+		expect(closestCategory(withRetired, r)).toBe("animals")
 		// Retired items don't hold a category below 100 % either.
 		const done = records({
-			"wildlife/e": "2026-11-20T10:00:00Z",
-			"wildlife/f": "2026-11-20T10:00:00Z",
+			"animals/e": "2026-11-20T10:00:00Z",
+			"animals/f": "2026-11-20T10:00:00Z",
 		})
 		expect(closestCategory(withRetired, done)).toBe("collectibles")
 	})
 })
 
 describe("rankCategories", () => {
-	it("puts wildlife first, then category order, when nothing is found", () => {
-		expect(rankCategories(items, {})).toEqual(["wildlife", "collectibles", "vehicles"])
+	it("puts animals first, then category order, when nothing is found", () => {
+		expect(rankCategories(items, {})).toEqual(["animals", "collectibles", "vehicles"])
 	})
 	it("ranks by share found, ties in category order, and drops finished categories", () => {
 		const r = records({
@@ -89,24 +89,25 @@ describe("rankCategories", () => {
 			"collectibles/b": "2026-11-20T10:00:00Z",
 			"vehicles/c": "2026-11-20T10:00:00Z",
 		})
-		expect(rankCategories(items, r)).toEqual(["vehicles", "wildlife"])
+		expect(rankCategories(items, r)).toEqual(["vehicles", "animals"])
 	})
 	it("agrees with closestCategory on its first entry", () => {
 		const cases: Records[] = [
 			{},
 			records({ "vehicles/c": "2026-11-20T10:00:00Z" }),
-			records({ "collectibles/a": "2026-11-20T10:00:00Z", "wildlife/e": "2026-11-20T10:00:00Z" }),
+			records({ "collectibles/a": "2026-11-20T10:00:00Z", "animals/e": "2026-11-20T10:00:00Z" }),
 		]
 		for (const r of cases) expect(rankCategories(items, r)[0]).toBe(closestCategory(items, r))
 	})
 })
 
 describe("nextGroups", () => {
+	// In seed order: seedBuild sorts groups and names once, and the dashboard keeps that order.
 	const birds = [
-		item("wildlife/pelican", "birds"),
-		item("wildlife/egret", "birds"),
-		item("wildlife/alligator", "reptiles"),
-		item("wildlife/dodo", "birds", { retired: true }),
+		item("animals/egret", "birds"),
+		item("animals/pelican", "birds"),
+		item("animals/dodo", "birds", { retired: true }),
+		item("animals/alligator", "reptiles"),
 		item("vehicles/bike", "bikes"),
 	]
 	const names = (groups: ReturnType<typeof nextGroups>) =>
@@ -114,16 +115,16 @@ describe("nextGroups", () => {
 
 	it("lists unfound items of the closest category in tracker order, up to the limit", () => {
 		expect(names(nextGroups(birds, {}, 3))).toEqual([
-			["wildlife", 3, ["egret", "pelican", "alligator"]],
+			["animals", 3, ["egret", "pelican", "alligator"]],
 		])
 	})
 	it("counts every unfound item in left, not only the ones shown", () => {
-		expect(names(nextGroups(birds, {}, 2))).toEqual([["wildlife", 3, ["egret", "pelican"]]])
+		expect(names(nextGroups(birds, {}, 2))).toEqual([["animals", 3, ["egret", "pelican"]]])
 	})
 	it("skips found and retired items and fills from the next-closest category", () => {
-		const r = records({ "wildlife/egret": "2026-11-20T10:00:00Z" })
+		const r = records({ "animals/egret": "2026-11-20T10:00:00Z" })
 		expect(names(nextGroups(birds, r, 3))).toEqual([
-			["wildlife", 2, ["pelican", "alligator"]],
+			["animals", 2, ["pelican", "alligator"]],
 			["vehicles", 1, ["bike"]],
 		])
 	})
@@ -160,17 +161,17 @@ describe("foundToday", () => {
 
 	it("counts finds on the local calendar day of now", () => {
 		const r = records({
-			"wildlife/e": "2026-11-19T23:30:00Z", // 00:30 on 20 Nov in Oslo: today
-			"wildlife/f": "2026-11-19T22:30:00Z", // 23:30 on 19 Nov in Oslo: yesterday
+			"animals/e": "2026-11-19T23:30:00Z", // 00:30 on 20 Nov in Oslo: today
+			"animals/f": "2026-11-19T22:30:00Z", // 23:30 on 19 Nov in Oslo: yesterday
 		})
 		expect(foundToday(items, r, new Date("2026-11-20T09:00:00Z"))).toBe(1)
 	})
 
 	it("ignores unticked records, retired items and records with no seed item", () => {
-		const retired = [...items, item("wildlife/gone", "g", { retired: true })]
+		const retired = [...items, item("animals/gone", "g", { retired: true })]
 		const r: Records = {
-			...records({ "wildlife/gone": "2026-11-20T10:00:00Z", "weapons/x": "2026-11-20T10:00:00Z" }),
-			"wildlife/e": { ...found(), item_id: "wildlife/e", done: false },
+			...records({ "animals/gone": "2026-11-20T10:00:00Z", "weapons/x": "2026-11-20T10:00:00Z" }),
+			"animals/e": { ...found(), item_id: "animals/e", done: false },
 		}
 		expect(foundToday(retired, r, new Date("2026-11-20T12:00:00Z"))).toBe(0)
 	})
@@ -265,8 +266,8 @@ describe("findsByDay", () => {
 
 	it("returns the last `days` local days ending today, oldest first, zero days kept", () => {
 		const r = records({
-			"wildlife/e": "2026-11-20T10:00:00Z",
-			"wildlife/f": "2026-11-22T10:00:00Z",
+			"animals/e": "2026-11-20T10:00:00Z",
+			"animals/f": "2026-11-22T10:00:00Z",
 			"vehicles/c": "2026-11-22T11:00:00Z",
 		})
 		expect(findsByDay(items, r, "2026-11-22", 7)).toEqual([
@@ -281,7 +282,7 @@ describe("findsByDay", () => {
 	})
 
 	it("counts a tick by its local calendar day, not its UTC day", () => {
-		const r = records({ "wildlife/e": "2026-11-21T23:30:00Z" }) // 00:30 on 22 Nov in Oslo
+		const r = records({ "animals/e": "2026-11-21T23:30:00Z" }) // 00:30 on 22 Nov in Oslo
 		const days = findsByDay(items, r, "2026-11-22", 2)
 		expect(days).toEqual([
 			{ day: "2026-11-21", count: 0 },
@@ -290,10 +291,10 @@ describe("findsByDay", () => {
 	})
 
 	it("skips unticked records, retired items and records with no seed item", () => {
-		const withRetired = [...items, item("wildlife/old", "g", { retired: true })]
+		const withRetired = [...items, item("animals/old", "g", { retired: true })]
 		const r: Records = {
-			...records({ "wildlife/old": "2026-11-22T10:00:00Z", "ghost/x": "2026-11-22T10:00:00Z" }),
-			"wildlife/e": { ...found("2026-11-22T10:00:00Z"), item_id: "wildlife/e", done: false },
+			...records({ "animals/old": "2026-11-22T10:00:00Z", "ghost/x": "2026-11-22T10:00:00Z" }),
+			"animals/e": { ...found("2026-11-22T10:00:00Z"), item_id: "animals/e", done: false },
 		}
 		expect(findsByDay(withRetired, r, "2026-11-22", 1)).toEqual([{ day: "2026-11-22", count: 0 }])
 	})
@@ -316,15 +317,15 @@ describe("categoryRows", () => {
 	it("gives each category its total, found count and group ids in tracker order", () => {
 		const grouped = [
 			item("vehicles/c", "bikes"),
-			item("wildlife/e", "reptiles"),
-			item("wildlife/f", "birds"),
-			item("wildlife/g", "reptiles"),
-			item("wildlife/old", "fish", { retired: true }),
+			item("animals/f", "birds"),
+			item("animals/e", "reptiles"),
+			item("animals/g", "reptiles"),
+			item("animals/old", "fish", { retired: true }),
 		]
-		const r = records({ "wildlife/e": "2026-11-20T10:00:00Z" })
+		const r = records({ "animals/e": "2026-11-20T10:00:00Z" })
 		expect(categoryRows(grouped, r)).toEqual([
 			{ id: "vehicles", done: 0, total: 1, groups: ["bikes"] },
-			{ id: "wildlife", done: 1, total: 3, groups: ["birds", "reptiles"] },
+			{ id: "animals", done: 1, total: 3, groups: ["birds", "reptiles"] },
 		])
 	})
 })

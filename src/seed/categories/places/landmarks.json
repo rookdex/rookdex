@@ -1,0 +1,103 @@
+{
+	"group": "landmarks",
+	"order": 5,
+	"sort": "name",
+	"items": [
+		{
+			"id": "places/state-penitentiary",
+			"name": "Leonida Penitentiary",
+			"status": "confirmed",
+			"description": "The state prison where Lucia was locked up for fighting to protect her family, named in her official Vice City character bio.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/vice-city",
+					"title": "Grand Theft Auto VI - Vice City - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/vc-port",
+			"name": "VC Port",
+			"status": "confirmed",
+			"description": "The Vice City port, billed by Rockstar as the cruise ship capital of the world.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+					"title": "Every GTA 6 location revealed"
+				}
+			]
+		},
+		{
+			"id": "places/the-city-airport",
+			"name": "Vice City International Airport",
+			"status": "confirmed",
+			"description": "The city's airport, signposted as VCI on a highway road sign in the first trailer.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-trailer-1-breakdown-things-you-missed/",
+					"title": "GTA 6 trailer breakdown - 12 things you might have missed"
+				},
+				{
+					"url": "https://rockstarintel.com/gta-6-all-confirmed-locations-so-far/",
+					"title": "GTA 6 - All confirmed locations so far - RockstarINTEL"
+				}
+			]
+		},
+		{
+			"id": "places/tisha-wocka-flea-market",
+			"name": "Tisha-Wocka Flea Market",
+			"status": "confirmed",
+			"description": "A Vice City flea market known for its bootleg brands, named by Rockstar on its Vice City postcard.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/the-lake",
+			"name": "Lake Leonida",
+			"status": "confirmed",
+			"description": "A lake area named by Rockstar as the home of One-Eyed Willie's Mod Shop.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/gambit-bay",
+			"name": "Gambit Bay",
+			"status": "confirmed",
+			"description": "A bay Rockstar names as a fishing spot in its Ultimate Edition text for the Shitzu Squalo boat.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/paradise-garage",
+			"name": "Paradise Garage",
+			"status": "confirmed",
+			"description": "An Ultimate Edition garage in Watson Bay with a weapon locker and a secure drop for stolen goods to be fenced.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		}
+	]
+}

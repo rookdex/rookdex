@@ -41,13 +41,13 @@ describe("Tracker search (tracker search spec §4)", () => {
 		type("peli")
 		expect(names()).toEqual(["item-wildlife/pelican"])
 		type("dyr")
-		expect(names()).toEqual(["item-wildlife/pelican", "item-wildlife/american-alligator"])
+		expect(names()).toEqual(["item-wildlife/american-alligator", "item-wildlife/pelican"])
 	})
 
 	it("finds the same items with English terms on the Norwegian page", async () => {
 		await ready("nb")
 		type("animal")
-		expect(names()).toEqual(["item-wildlife/pelican", "item-wildlife/american-alligator"])
+		expect(names()).toEqual(["item-wildlife/american-alligator", "item-wildlife/pelican"])
 	})
 
 	it("keeps a ticked item visible with Hide found on until the search changes", async () => {
@@ -241,9 +241,9 @@ describe("Tracker search announcements (tracker search spec §5)", () => {
 		await ready()
 		type("alli")
 		fireEvent.click(screen.getByRole("checkbox", { name: "American alligator" }))
-		await waitFor(() => expect(status()).toHaveTextContent("Wildlife: 1 of 2"))
+		await waitFor(() => expect(status()).toHaveTextContent("Animals: 1 of 2"))
 		await wait(700)
-		expect(status()).toHaveTextContent("Wildlife: 1 of 2")
+		expect(status()).toHaveTextContent("Animals: 1 of 2")
 	})
 
 	it("announces Hide found on with its count, and off", async () => {

@@ -135,13 +135,39 @@ describe("categories", () => {
 		expect(tracker.getState().selected).toEqual(["vehicles"])
 	})
 	it("parseShow keeps known ids in known order; showParam serialises or drops", () => {
-		expect(parseShow("?show=vehicles,wildlife,evil", ["wildlife", "vehicles"])).toEqual([
-			"wildlife",
+		expect(parseShow("?show=vehicles,animals,evil", ["animals", "vehicles"])).toEqual([
+			"animals",
 			"vehicles",
 		])
-		expect(parseShow("", ["wildlife"])).toEqual([])
-		expect(showParam(["wildlife", "vehicles"])).toBe("wildlife,vehicles")
+		expect(parseShow("", ["animals"])).toEqual([])
+		expect(showParam(["animals", "vehicles"])).toBe("animals,vehicles")
 		expect(showParam([])).toBeNull()
+	})
+
+	it("parseShow reads the old wildlife and collectibles ids as the new ones", () => {
+		expect(
+			parseShow("?show=wildlife,collectibles", ["vehicles", "animals", "collections"])
+		).toEqual(["animals", "collections"])
+	})
+
+	it("parseGroups drops an old group key, so the view falls back to the whole category", () => {
+		const src = {
+			url: "https://www.rockstargames.com/VI",
+			title: "Site",
+			tier: "official" as const,
+		}
+		const base = { category: "animals", status: "confirmed" as const, sources: [src] }
+		const items = [
+			{ ...base, id: "wildlife/cougar", group: "mammals", name: "Cougar" },
+			{ ...base, id: "wildlife/pelican", group: "birds", name: "Pelican" },
+		]
+		// A group key is `${category}/${group}` (groupKey in stats.ts), so an old link says wildlife/birds.
+		const search = "?show=wildlife&group=wildlife/birds"
+		const selected = parseShow(search, ["vehicles", "animals"])
+		expect(selected).toEqual(["animals"])
+		const chips = chipGroups(items, selected)
+		expect(parseGroups(search, chips)).toEqual([])
+		expect(parseGroups("?show=animals&group=animals/birds", chips)).toEqual(["animals/birds"])
 	})
 })
 
@@ -149,19 +175,19 @@ describe("remembered view", () => {
 	const bare = { search: "", hash: "" }
 
 	it("viewParams holds the pressed tiles and chips, or nothing when both are empty", () => {
-		expect(viewParams(["wildlife", "vehicles"], ["wildlife/birds"])).toBe(
-			"show=wildlife%2Cvehicles&group=wildlife%2Fbirds"
+		expect(viewParams(["animals", "vehicles"], ["animals/birds"])).toBe(
+			"show=animals%2Cvehicles&group=animals%2Fbirds"
 		)
-		expect(viewParams(["wildlife"], [])).toBe("show=wildlife")
+		expect(viewParams(["animals"], [])).toBe("show=animals")
 		expect(viewParams([], [])).toBeNull()
 	})
 
 	it("the saved filters parse back to the same tiles and chips", () => {
-		const params = viewParams(["wildlife"], ["wildlife/birds"]) ?? ""
+		const params = viewParams(["animals"], ["animals/birds"]) ?? ""
 		const { search } = openingView(bare, { params, query: "", scroll: 0 })
-		expect(parseShow(search, ["wildlife", "vehicles"])).toEqual(["wildlife"])
-		expect(parseGroups(search, new Map([["wildlife", ["birds", "reptiles"]]]))).toEqual([
-			"wildlife/birds",
+		expect(parseShow(search, ["animals", "vehicles"])).toEqual(["animals"])
+		expect(parseGroups(search, new Map([["animals", ["birds", "reptiles"]]]))).toEqual([
+			"animals/birds",
 		])
 	})
 })
@@ -523,68 +549,64 @@ describe("active profile (dashboard spec §5)", () => {
 
 describe("group chips (tracker refresh spec §14.1)", () => {
 	const grouped: SeedItem[] = [
-		{ ...item("wildlife/a", "wildlife"), group: "reptiles" },
-		{ ...item("wildlife/b", "wildlife"), group: "birds" },
-		{ ...item("wildlife/r", "wildlife"), group: "mammals", retired: true },
-		{ ...item("vehicles/c", "vehicles"), group: "cars" },
+		// In seed order: seedBuild sorts groups and names once, and the chips keep that order.
+		{ ...item("animals/b", "animals"), group: "birds" },
+		{ ...item("animals/a", "animals"), group: "reptiles" },
+		{ ...item("animals/r", "animals"), group: "mammals", retired: true },
 		{ ...item("vehicles/d", "vehicles"), group: "boats" },
+		{ ...item("vehicles/c", "vehicles"), group: "cars" },
 		{ ...item("misc/e", "misc"), group: "only" },
 	]
 
 	it("offers chips per pressed category in list order, never for one group or a retired one", () => {
 		expect([...chipGroups(grouped, [])]).toEqual([])
 		// Pressed out of order on purpose: the chips follow the list, not the press order.
-		expect([...chipGroups(grouped, ["misc", "vehicles", "wildlife"])]).toEqual([
-			["wildlife", ["birds", "reptiles"]],
+		expect([...chipGroups(grouped, ["misc", "vehicles", "animals"])]).toEqual([
+			["animals", ["birds", "reptiles"]],
 			["vehicles", ["boats", "cars"]],
 		])
 	})
 
 	it("parseGroups keeps offered keys in list order; groupParam serialises or drops", () => {
-		const chips = chipGroups(grouped, ["wildlife"])
+		const chips = chipGroups(grouped, ["animals"])
 		// vehicles is not pressed, mammals has only a retired item, evil is not a key at all.
 		expect(
-			parseGroups(
-				"?group=wildlife/reptiles,wildlife/birds,vehicles/cars,wildlife/mammals,evil",
-				chips
-			)
-		).toEqual(["wildlife/birds", "wildlife/reptiles"])
+			parseGroups("?group=animals/reptiles,animals/birds,vehicles/cars,animals/mammals,evil", chips)
+		).toEqual(["animals/birds", "animals/reptiles"])
 		expect(parseGroups("", chips)).toEqual([])
-		expect(groupParam(["wildlife/birds", "wildlife/reptiles"])).toBe(
-			"wildlife/birds,wildlife/reptiles"
-		)
+		expect(groupParam(["animals/birds", "animals/reptiles"])).toBe("animals/birds,animals/reptiles")
 		expect(groupParam([])).toBeNull()
 	})
 
 	it("round-trips through URLSearchParams, which percent-encodes the slash and comma", () => {
-		const chips = chipGroups(grouped, ["wildlife", "vehicles"])
-		const keys = ["wildlife/birds", "vehicles/cars"]
+		const chips = chipGroups(grouped, ["animals", "vehicles"])
+		const keys = ["animals/birds", "vehicles/cars"]
 		const params = new URLSearchParams()
 		params.set("group", groupParam(keys) ?? "")
 		expect(parseGroups(`?${params.toString()}`, chips)).toEqual(keys)
 	})
 
 	it("toggleGroup presses and unpresses a chip and ignores keys no chip offers", () => {
-		const { tracker } = make({ items: grouped, selected: ["wildlife"] })
-		tracker.toggleGroup("wildlife/reptiles")
-		tracker.toggleGroup("wildlife/birds")
-		expect(tracker.getState().groups).toEqual(["wildlife/birds", "wildlife/reptiles"])
-		tracker.toggleGroup("wildlife/birds")
-		expect(tracker.getState().groups).toEqual(["wildlife/reptiles"])
+		const { tracker } = make({ items: grouped, selected: ["animals"] })
+		tracker.toggleGroup("animals/reptiles")
+		tracker.toggleGroup("animals/birds")
+		expect(tracker.getState().groups).toEqual(["animals/birds", "animals/reptiles"])
+		tracker.toggleGroup("animals/birds")
+		expect(tracker.getState().groups).toEqual(["animals/reptiles"])
 		const before = tracker.getState()
-		for (const key of ["vehicles/cars", "misc/only", "wildlife/mammals", "nope"]) {
+		for (const key of ["vehicles/cars", "misc/only", "animals/mammals", "nope"]) {
 			tracker.toggleGroup(key)
 		}
 		expect(tracker.getState()).toBe(before)
 	})
 
 	it("drops a category's chips when it is unpressed, so pressing it again starts with none", () => {
-		const { tracker } = make({ items: grouped, selected: ["wildlife", "vehicles"] })
-		tracker.toggleGroup("wildlife/birds")
+		const { tracker } = make({ items: grouped, selected: ["animals", "vehicles"] })
+		tracker.toggleGroup("animals/birds")
 		tracker.toggleGroup("vehicles/cars")
 		tracker.selectCategories(["vehicles"])
 		expect(tracker.getState().groups).toEqual(["vehicles/cars"])
-		tracker.selectCategories(["wildlife", "vehicles"])
+		tracker.selectCategories(["animals", "vehicles"])
 		expect(tracker.getState().groups).toEqual(["vehicles/cars"])
 		tracker.selectCategories([])
 		expect(tracker.getState().groups).toEqual([])
@@ -593,18 +615,18 @@ describe("group chips (tracker refresh spec §14.1)", () => {
 	it("starts from the groups it is given, keeping only the ones a chip offers", () => {
 		const { tracker } = make({
 			items: grouped,
-			selected: ["wildlife"],
-			groups: ["vehicles/cars", "wildlife/birds"],
+			selected: ["animals"],
+			groups: ["vehicles/cars", "animals/birds"],
 		})
-		expect(tracker.getState().groups).toEqual(["wildlife/birds"])
+		expect(tracker.getState().groups).toEqual(["animals/birds"])
 	})
 
 	it("keeps the chips across a profile switch", async () => {
-		const { tracker } = make({ items: grouped, selected: ["wildlife"] })
+		const { tracker } = make({ items: grouped, selected: ["animals"] })
 		await tracker.init()
-		tracker.toggleGroup("wildlife/birds")
+		tracker.toggleGroup("animals/birds")
 		await tracker.createProfile("Dad")
-		expect(tracker.getState().groups).toEqual(["wildlife/birds"])
+		expect(tracker.getState().groups).toEqual(["animals/birds"])
 	})
 })
 

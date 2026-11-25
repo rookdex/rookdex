@@ -1,0 +1,655 @@
+{
+	"group": "service",
+	"order": 5,
+	"total": 47,
+	"sort": "name",
+	"items": [
+		{
+			"id": "vehicles/vehicle-garages",
+			"name": "Vehicle Garages",
+			"status": "expected",
+			"precedent": "GTA V",
+			"description": "Purchasable garage properties across Leonida for storing multiple personal vehicles beyond starting capacity, with some garages including a weapon locker and a stolen-goods deposit.",
+			"sources": [
+				{
+					"url": "https://www.gtabase.com/articles/gta-6/gta-6-previews-recap-all-new-gameplay-features-revealed",
+					"title": "GTA 6 Previews Roundup - All New Gameplay Features Revealed - GTABase"
+				},
+				{
+					"url": "https://www.gtabase.com/grand-theft-auto-v/properties/",
+					"title": "GTA 5 Story Mode Properties Guide: All Businesses, Safehouses & Garages - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/vehicle-customization",
+			"name": "Vehicle Customization Shops",
+			"status": "expected",
+			"precedent": "GTA V",
+			"description": "Multiple specialized mod shops across Leonida, each offering a different set of upgrades such as liveries, engines, brakes, suspension and wheels, similar to GTA V's Los Santos Customs.",
+			"sources": [
+				{
+					"url": "https://www.gtabase.com/articles/gta-6/gta-6-previews-recap-all-new-gameplay-features-revealed",
+					"title": "GTA 6 Previews Roundup - All New Gameplay Features Revealed - GTABase"
+				},
+				{
+					"url": "https://www.gtabase.com/grand-theft-auto-v/properties/story-mode/los-santos-customs",
+					"title": "Los Santos Customs (Blaine County) - GTA 5 Story Property - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/rideout-customs",
+			"name": "Rideout Customs",
+			"status": "confirmed",
+			"description": "An Ultimate Edition mod shop that turns stock vehicles into show cars with detailed interiors, custom rims and donk styling.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/one-eyed-willies-mod-shop",
+			"name": "One-Eyed Willie's Mod Shop",
+			"status": "confirmed",
+			"description": "An Ultimate Edition mod shop in Lake Leonida that specializes in off-road modifications and hand-painted paint jobs.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/declasse-granger-police",
+			"name": "Declasse Granger Police",
+			"status": "confirmed",
+			"description": "A police SUV styled after the Chevrolet Suburban. Seen in the Launch Trailer.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/517572321a549a/watch-the-grand-theft-auto-vi-launch-trailer",
+					"title": "Watch the Grand Theft Auto VI Launch Trailer - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/granger-police",
+					"title": "Granger Police - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/dundreary-landstalker-xl-police",
+			"name": "Dundreary Landstalker XL Police",
+			"status": "confirmed",
+			"description": "A police SUV styled after the Lincoln Navigator. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/police-landstalker-xl",
+					"title": "Police Landstalker XL - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/brute-ambulance",
+			"name": "Interstate Ambulance",
+			"status": "confirmed",
+			"description": "An ambulance styled after the Chevrolet Express cutaway ambulance. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/ambulance",
+					"title": "Interstate Ambulance - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/brute-stockade",
+			"name": "Brute Stockade",
+			"status": "confirmed",
+			"description": "A Gruppe Sechs armored cash truck styled after the International 4700. A biker gang robs one in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/stockade",
+					"title": "Brute Stockade - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/hvy-airtug",
+			"name": "HVY Airtug",
+			"status": "confirmed",
+			"description": "An airport tug styled after the Clark CT30. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/airtug",
+					"title": "Airtug - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/vapid-benson",
+			"name": "Vapid Benson",
+			"status": "confirmed",
+			"description": "A box truck styled after the International 4700. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/benson",
+					"title": "Vapid Benson - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/hvy-biff",
+			"name": "HVY Biff",
+			"status": "confirmed",
+			"description": "A dump truck styled after the Kenworth T800. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/biff",
+					"title": "HVY Biff - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/jobuilt-flatbed",
+			"name": "JoBuilt Flatbed",
+			"status": "confirmed",
+			"description": "A flatbed truck styled after the Freightliner Century Class. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/flatbed",
+					"title": "JoBuilt Flatbed - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/declasse-granger-taxi",
+			"name": "Declasse Granger Taxi",
+			"status": "confirmed",
+			"description": "A taxi styled after the Chevrolet Suburban. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/granger-taxi",
+					"title": "Granger Taxi - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/brute-tipper",
+			"name": "Brute Tipper",
+			"status": "confirmed",
+			"description": "A six-wheel dump truck styled after the Chevrolet Kodiak. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/tipper-6-wheels",
+					"title": "Brute Tipper (6 wheels) - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/brute-utility-truck",
+			"name": "Brute Utility Truck",
+			"status": "confirmed",
+			"description": "An utility truck styled after the International 4700. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/utility-truck-van",
+					"title": "Utility Truck - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/nagasaki-caddy",
+			"name": "Nagasaki Caddy",
+			"status": "confirmed",
+			"description": "A golf cart. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/caddy",
+					"title": "Caddy - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/vapid-stanier-le-police-cruiser",
+			"name": "Vapid Stanier LE Police Cruiser",
+			"status": "confirmed",
+			"description": "A police cruiser styled after the Ford Crown Victoria. Seen in police chases in Trailers 1 and 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/police-cruiser",
+					"title": "Police Cruiser (Stanier LE) - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/bravado-buffalo-police-cruiser",
+			"name": "Bravado Buffalo Police Cruiser",
+			"status": "confirmed",
+			"description": "A police car styled after the Dodge Charger. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/police-cruiser-buffalo",
+					"title": "Police Cruiser (Buffalo) - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/bravado-buffalo-stx-pursuit",
+			"name": "Bravado Buffalo STX Pursuit",
+			"status": "confirmed",
+			"description": "A police pursuit car styled after the 2015 Dodge Charger. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/police-cruiser-buffalo-stx",
+					"title": "Police Buffalo STX Pursuit - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/bravado-gauntlet-interceptor",
+			"name": "Bravado Gauntlet Interceptor",
+			"status": "confirmed",
+			"description": "A police interceptor styled after the Dodge Challenger SRT Demon. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/police-cruiser-gauntlet-hellfire",
+					"title": "Police Gauntlet Interceptor - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/vapid-lowline-police-interceptor",
+			"name": "Vapid Lowline Police Interceptor",
+			"status": "confirmed",
+			"description": "A police sedan styled after the Ford Police Interceptor. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/police-cruiser-interceptor",
+					"title": "Police Lowline (Interceptor) - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/vapid-montagne-police",
+			"name": "Vapid Montagne Police",
+			"status": "confirmed",
+			"description": "A police SUV styled after the Ford Explorer. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/ford-explorer-suv-police",
+					"title": "Police Montagne - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/jobuilt-phantom",
+			"name": "JoBuilt Phantom",
+			"status": "confirmed",
+			"description": "A semi truck styled after the Peterbilt 359. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/phantom",
+					"title": "JoBuilt Phantom - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/vapid-speedo",
+			"name": "Vapid Speedo",
+			"status": "confirmed",
+			"description": "A van styled after the Chevrolet Express. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/speedo",
+					"title": "Vapid Speedo - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/declasse-burrito",
+			"name": "Declasse Burrito",
+			"status": "confirmed",
+			"description": "A van styled after the Chevrolet Express. Seen in Trailer 1 and An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/burrito",
+					"title": "Declasse Burrito - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/bravado-rumpo",
+			"name": "Bravado Rumpo",
+			"status": "confirmed",
+			"description": "A van styled after the Ford E-Series. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/rumpo",
+					"title": "Bravado Rumpo - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/dashound",
+			"name": "Dashound",
+			"status": "confirmed",
+			"description": "An intercity coach styled after the Greyhound bus. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/dashound",
+					"title": "Dashound - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/vapid-tow-truck",
+			"name": "Vapid Tow Truck",
+			"status": "confirmed",
+			"description": "A tow truck styled after the 1980s International S-Series. Seen in Trailer 1 and An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/tow-truck",
+					"title": "Tow Truck - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/maibatsu-mule",
+			"name": "Maibatsu Mule",
+			"status": "confirmed",
+			"description": "A box truck styled after the Mitsubishi Fuso Canter. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/mule",
+					"title": "Maibatsu Mule - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/jobuilt-rubble",
+			"name": "JoBuilt Rubble",
+			"status": "confirmed",
+			"description": "A dump truck styled after the Peterbilt 359. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/rubble",
+					"title": "JoBuilt Rubble - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/vapid-stanier-taxi",
+			"name": "Vapid Stanier Taxi",
+			"status": "confirmed",
+			"description": "A taxi styled after the Ford Crown Victoria. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/taxi",
+					"title": "Stanier Taxi - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/bravado-youga-classic",
+			"name": "Bravado Youga Classic",
+			"status": "confirmed",
+			"description": "A van styled after the second-generation Ford Econoline. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/youga-classic",
+					"title": "Bravado Youga Classic - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/vapid-stanier-le-police-ghost",
+			"name": "Vapid Stanier LE Police Ghost",
+			"status": "confirmed",
+			"description": "A police car styled after the Ford Crown Victoria. Seen in Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/police-ghost-stanier-le",
+					"title": "Police Ghost (Stanier LE) - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/brute-police-riot",
+			"name": "Brute Police Riot",
+			"status": "confirmed",
+			"description": "An armored police truck styled after the Lenco BearCat. Seen in Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/police-riot",
+					"title": "Police Riot - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/mtl-packer",
+			"name": "MTL Packer",
+			"status": "confirmed",
+			"description": "A semi truck styled after the International 9000. Seen in Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/packer",
+					"title": "MTL Packer - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/brute-rental-shuttle-bus",
+			"name": "Brute Rental Shuttle Bus",
+			"status": "confirmed",
+			"description": "A shuttle bus styled after the Chevrolet Express. Seen in Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/rental-shuttle-bus",
+					"title": "Rental Shuttle Bus - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/pay-n-spray",
+			"name": "Pay 'n' Spray",
+			"status": "expected",
+			"precedent": "GTA Vice City",
+			"description": "The respray shop from GTA Vice City returns, according to press previews. It repaints cars to shake off the police, repairs them, assesses their value and registers stolen cars.",
+			"sources": [
+				{
+					"url": "https://www.gtabase.com/articles/gta-6/gta-6-previews-recap-all-new-gameplay-features-revealed",
+					"title": "GTA 6 Previews Roundup - All New Gameplay Features Revealed - GTABase"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-vice-city/vehicles/",
+					"title": "GTA Vice City Cars List, Stats & Vehicles Database - GTABase"
+				}
+			]
+		}
+	]
+}

@@ -9,6 +9,8 @@ import type { SeedItem } from "../model/schema"
 
 const src = { url: "https://www.rockstargames.com/VI", title: "Site", tier: "official" as const }
 
+// In seed order: categories.json, then the game's group order (Reptiles & Amphibians before
+// Birds), then name. The ids are the shipped ones, from before Wildlife became Animals.
 export const fixtures: SeedItem[] = [
 	{
 		id: "vehicles/bike",
@@ -20,8 +22,8 @@ export const fixtures: SeedItem[] = [
 	},
 	{
 		id: "wildlife/american-alligator",
-		category: "wildlife",
-		group: "reptiles",
+		category: "animals",
+		group: "reptiles-amphibians",
 		name: "American alligator",
 		status: "confirmed",
 		sources: [src],
@@ -29,7 +31,7 @@ export const fixtures: SeedItem[] = [
 	},
 	{
 		id: "wildlife/pelican",
-		category: "wildlife",
+		category: "animals",
 		group: "birds",
 		name: "Pelican",
 		status: "expected",

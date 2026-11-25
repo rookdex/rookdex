@@ -64,7 +64,30 @@ export function AllIcon() {
 	)
 }
 
-export function CollectiblesIcon() {
+/** A stopwatch, not a flag: every tracker row already shows a flag for Report. */
+export function ActivitiesIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<circle cx="12" cy="14" r="7" />
+			<path d="M10 3h4M12 3v4" />
+			<path d="m17.5 8.5 1.5-1.5" />
+			<path d="M12 14l2.5-2.5" />
+		</svg>
+	)
+}
+
+export function AnimalsIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<circle cx="7" cy="9" r="1.8" />
+			<circle cx="12" cy="6.5" r="1.8" />
+			<circle cx="17" cy="9" r="1.8" />
+			<path d="M12 12c-3 0-5.5 3.5-5.5 5.5 0 1.5 1.5 2.5 3 2l2.5-.8 2.5.8c1.5.5 3-.5 3-2 0-2-2.5-5.5-5.5-5.5z" />
+		</svg>
+	)
+}
+
+export function CollectionsIcon() {
 	return (
 		<svg {...common} aria-hidden="true">
 			<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z" />
@@ -92,22 +115,12 @@ export function VehiclesIcon() {
 	)
 }
 
-export function WildlifeIcon() {
-	return (
-		<svg {...common} aria-hidden="true">
-			<circle cx="7" cy="9" r="1.8" />
-			<circle cx="12" cy="6.5" r="1.8" />
-			<circle cx="17" cy="9" r="1.8" />
-			<path d="M12 12c-3 0-5.5 3.5-5.5 5.5 0 1.5 1.5 2.5 3 2l2.5-.8 2.5.8c1.5.5 3-.5 3-2 0-2-2.5-5.5-5.5-5.5z" />
-		</svg>
-	)
-}
-
 const byCategory: Record<string, () => ReactElement> = {
-	collectibles: CollectiblesIcon,
+	activities: ActivitiesIcon,
+	animals: AnimalsIcon,
+	collections: CollectionsIcon,
 	places: PlacesIcon,
 	vehicles: VehiclesIcon,
-	wildlife: WildlifeIcon,
 }
 
 /** The icon for a category id. An id a future seed adds gets the All icon until it has its own;

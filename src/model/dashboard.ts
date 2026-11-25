@@ -6,7 +6,7 @@ import { categoryIds, groupItems } from "./seed"
 import { countable, perCategory, type Records, shown } from "./stats"
 
 /** Where a player with nothing found starts. */
-export const FIRST_GOAL = "wildlife"
+export const FIRST_GOAL = "animals"
 
 /** How many categories What's next draws from (dashboard spec §4). */
 export const NEXT_GROUPS = 2
@@ -21,7 +21,7 @@ export interface NextGroup {
 
 /**
  * Categories below 100 %, highest share found first, ties in category order. With nothing found,
- * wildlife comes first and the rest follow in category order.
+ * animals comes first and the rest follow in category order.
  */
 export function rankCategories(items: SeedItem[], records: Records): string[] {
 	const counts = perCategory(countable(items), records)
@@ -38,7 +38,7 @@ export function rankCategories(items: SeedItem[], records: Records): string[] {
 
 /**
  * The category with the highest share found below 100 %. Ties go to category order. With nothing
- * found it is wildlife; with everything found it is undefined.
+ * found it is animals; with everything found it is undefined.
  */
 export function closestCategory(items: SeedItem[], records: Records): string | undefined {
 	return rankCategories(items, records)[0]

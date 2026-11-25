@@ -8,21 +8,12 @@ import {
 	MAX_RECORDS,
 	progressRecordSchema,
 	rumourInputSchema,
-	seedItemInputSchema,
 	sourceInputSchema,
 	specValueSchema,
 	text,
 } from "./schema"
 
 const source = { url: "https://www.rockstargames.com/VI", title: "Grand Theft Auto VI" }
-const item = {
-	id: "wildlife/american-alligator",
-	category: "wildlife",
-	group: "reptiles",
-	name: "American alligator",
-	status: "confirmed",
-	sources: [source],
-}
 const record = {
 	item_id: "wildlife/american-alligator",
 	done: true,
@@ -56,25 +47,6 @@ describe("sourceInputSchema", () => {
 	})
 	it("rejects an authored tier", () => {
 		expect(sourceInputSchema.safeParse({ ...source, tier: "press" }).success).toBe(false)
-	})
-})
-
-describe("seedItemInputSchema", () => {
-	it("accepts a minimal confirmed item", () => {
-		expect(seedItemInputSchema.safeParse(item).success).toBe(true)
-	})
-	it("rejects bad ids, unknown fields and empty sources", () => {
-		expect(seedItemInputSchema.safeParse({ ...item, id: "Wildlife/Gator" }).success).toBe(false)
-		expect(seedItemInputSchema.safeParse({ ...item, id: "wildlife/a/b" }).success).toBe(false)
-		expect(seedItemInputSchema.safeParse({ ...item, id: "wildlife" }).success).toBe(false)
-		expect(seedItemInputSchema.safeParse({ ...item, extra: 1 }).success).toBe(false)
-		expect(seedItemInputSchema.safeParse({ ...item, sources: [] }).success).toBe(false)
-	})
-	it("caps the name at 80 and the description at 300", () => {
-		expect(seedItemInputSchema.safeParse({ ...item, name: "x".repeat(81) }).success).toBe(false)
-		expect(seedItemInputSchema.safeParse({ ...item, description: "x".repeat(301) }).success).toBe(
-			false
-		)
 	})
 })
 
