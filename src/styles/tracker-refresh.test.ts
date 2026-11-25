@@ -36,6 +36,14 @@ describe("tracker refresh look (spec §3, §4)", () => {
 		expect(rule(".item-check")).toMatch(/width:\s*24px/)
 	})
 
+	it("taps the check through its own 44 px box, above the card's open layer", () => {
+		expect(rule(".item-check-wrap")).toMatch(/width:\s*var\(--tap\)/)
+		expect(rule(".item-check-wrap")).toMatch(/height:\s*var\(--tap\)/)
+		expect(rule(".item-check-wrap")).toMatch(/z-index:\s*1/)
+		expect(rule(".item .item-open::after")).toMatch(/inset:\s*0/)
+		expect(css).not.toMatch(/\.item-main label::after/)
+	})
+
 	it("breaks a tile label only inside a word that cannot fit on its own line (R2)", () => {
 		expect(rule(".tile-name")).toMatch(/overflow-wrap:\s*break-word/)
 		expect(rule(".tile-name")).toMatch(/hyphens:\s*auto/)
@@ -94,6 +102,10 @@ describe("icon-lead card (spec §5.1)", () => {
 	it("clamps the description to two lines and keeps the 65ch cap off", () => {
 		expect(rule(".item-desc")).toMatch(/-webkit-line-clamp:\s*2/)
 		expect(rule(".item-desc")).toMatch(/max-width:\s*none/)
+	})
+
+	it("shows the whole description on an open card", () => {
+		expect(rule(".item[data-open] .item-desc")).toMatch(/-webkit-line-clamp:\s*unset/)
 	})
 
 	it("turns a found card's border and icon tile pink", () => {

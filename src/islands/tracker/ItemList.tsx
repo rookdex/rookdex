@@ -1,3 +1,4 @@
+import { useState } from "react"
 import type { Translate } from "../../i18n"
 import { itemReportUrl } from "../../model/report"
 import type { SeedItem } from "../../model/schema"
@@ -139,41 +140,71 @@ interface RowProps {
 }
 
 /**
- * The icon-lead card (tracker refresh spec §5.1). The label's ::after covers the card, so a tap
- * anywhere toggles the one real checkbox; the footer icons sit above that layer.
+ * The icon-lead card (tracker refresh spec §5.1). Only the check marks an item found, through its
+ * own 44 px box. The open button's ::after covers the rest of the card, so a tap anywhere else
+ * opens the card to its full description; the check and the footer icons sit above that layer.
  */
 function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: RowProps) {
+	const [open, setOpen] = useState(false)
 	// The seed id has exactly one slash (schema), so it is unique as a DOM id as it stands.
 	const inputId = `item-${item.id}`
+	const nameId = `name-${item.id}`
+	const descId = `desc-${item.id}`
 	const Icon = categoryIcon(item.category)
 	const tier =
 		item.status === "confirmed"
 			? t("tracker.confirmed")
 			: t("tracker.expectedFrom", { precedent: item.precedent ?? "" })
+	const name = (
+		<span id={nameId} className="item-name">
+			{item.name}
+		</span>
+	)
 	return (
-		<li className={done ? "item found" : "item"}>
-			{/* First in the DOM, so Tab runs checkbox, book, flag. CSS places it top right. */}
-			<input
-				id={inputId}
-				className="item-check"
-				type="checkbox"
-				checked={done}
-				disabled={disabled}
-				onChange={(event) => onToggle(item.id, event.target.checked)}
-			/>
+		<li className={done ? "item found" : "item"} data-open={open || undefined}>
+			{/* First in the DOM, so Tab runs checkbox, open, book, flag. CSS places it top right. The
+			    wrapping label is the 44 px tap box; the name comes from aria-labelledby. */}
+			<label className="item-check-wrap">
+				<input
+					id={inputId}
+					className="item-check"
+					type="checkbox"
+					aria-labelledby={nameId}
+					checked={done}
+					disabled={disabled}
+					onChange={(event) => onToggle(item.id, event.target.checked)}
+				/>
+			</label>
 			<div className="item-main">
 				<span className="item-tile" aria-hidden="true">
 					<Icon />
 				</span>
 				<div className="item-text">
-					<label htmlFor={inputId}>{item.name}</label>
+					{/* Nothing to open without a description, so the name is plain text then. */}
+					{item.description ? (
+						<button
+							type="button"
+							className="item-open"
+							aria-expanded={open}
+							aria-controls={descId}
+							onClick={() => setOpen(!open)}
+						>
+							{name}
+						</button>
+					) : (
+						name
+					)}
 					<span className="item-meta">
 						<span className="item-dot" data-status={item.status} />
 						<span className="item-tier">{tier}</span> · {groupName}
 					</span>
 				</div>
 			</div>
-			{item.description && <p className="item-desc">{item.description}</p>}
+			{item.description && (
+				<p id={descId} className="item-desc">
+					{item.description}
+				</p>
+			)}
 			{/* A flex row, so December can add "Entry →" and a star without a new layout. */}
 			<div className="item-foot">
 				<a className="item-icon item-book has-tip tip-end" href={`${sourcesHref}#${item.id}`}>

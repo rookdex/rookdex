@@ -2051,12 +2051,21 @@ html:has(.search-row) {
 	min-width: 0;
 }
 
-.item-check {
-	/* The centre of a 44 px box 12 px from the top and 6 px from the right (spec §5.1). The hit
-	   area is the whole card, through the label's ::after. */
+/* The check's own tap box: 44 px, 12 px from the top and 6 px from the right (spec §5.1), above
+   the open button's layer, so only this box marks an item found. */
+.item-check-wrap {
 	position: absolute;
-	top: 22px;
-	right: 16px;
+	top: 12px;
+	right: 6px;
+	z-index: 1;
+	display: grid;
+	place-items: center;
+	width: var(--tap);
+	height: var(--tap);
+	cursor: pointer;
+}
+
+.item-check {
 	appearance: none;
 	display: grid;
 	place-content: center;
@@ -2098,23 +2107,37 @@ html:has(.search-row) {
 	outline: none;
 }
 
-.item-main label {
+.item-name {
 	font-size: 0.9375rem;
 	font-weight: 600;
 	/* A long word breaks instead of running under the check or out of the card. */
 	overflow-wrap: anywhere;
+}
+
+/* The name as a plain-looking button; .item .item-open outranks the shared `.tracker button` reset. */
+.item .item-open {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: inherit;
+	text-align: start;
 	cursor: pointer;
 }
 
-/* The whole card is the label's click area. */
-.item-main label::after {
+/* The rest of the card is the open button's click area. */
+.item .item-open::after {
 	content: "";
 	position: absolute;
 	inset: 0;
-	border-radius: inherit;
+	border-radius: var(--radius);
 }
 
-.item:has(input:disabled) label {
+/* The card carries the focus ring instead (below). */
+.item .item-open:focus-visible {
+	outline: none;
+}
+
+.item:has(input:disabled) .item-check-wrap {
 	cursor: default;
 }
 
@@ -2155,6 +2178,11 @@ html:has(.search-row) {
 	color: var(--text-muted);
 	font-size: 0.875rem;
 	line-height: 1.5;
+}
+
+/* An open card shows its whole description. */
+.item[data-open] .item-desc {
+	-webkit-line-clamp: unset;
 }
 
 /* The footer row, in the flow and pushed to the bottom. It starts 46 px in (the 36 px tile plus the
@@ -2205,6 +2233,7 @@ html:has(.search-row) {
 /* data-arrived marks the card you land on from a Sources back link: Chromium does not report
    :focus-visible after a page load, so :focus is enough there and ends when focus leaves. */
 .item:has(input:focus-visible),
+.item:has(.item-open:focus-visible),
 .item[data-arrived]:has(input:focus) {
 	outline: 2px solid var(--accent);
 	outline-offset: 2px;

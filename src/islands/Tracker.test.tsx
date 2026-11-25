@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
 import { renderReady, resetBrowser } from "../test/tracker-fixtures"
@@ -51,9 +51,10 @@ describe("Tracker list", () => {
 		expect(screen.getAllByRole("link", { name: /^Report a problem with/ })).toHaveLength(3)
 	})
 
-	it("toggles an item from its label, and a flag tap doesn't toggle it", async () => {
+	it("toggles an item from its check's 44 px box, and a flag tap doesn't toggle it", async () => {
 		await ready()
-		fireEvent.click(screen.getByText("Pelican"))
+		const box = screen.getByRole("checkbox", { name: "Pelican" })
+		fireEvent.click(box.closest("label.item-check-wrap") as HTMLElement)
 		// The tick goes through IndexedDB before the controlled checkbox re-renders.
 		await waitFor(() => expect(screen.getByRole("checkbox", { name: "Pelican" })).toBeChecked())
 
@@ -250,11 +251,12 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 		expect(pelican.querySelector('.item-dot[data-status="expected"]')).not.toBeNull()
 	})
 
-	it("runs Tab as checkbox, book, flag, with the book and flag in the footer", async () => {
+	it("runs Tab as checkbox, open button, book, flag, with the book and flag in the footer", async () => {
 		await ready()
 		const gator = card("American alligator")
 		expect([...gator.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
 			"INPUT",
+			"BUTTON",
 			"A",
 			"A",
 		])
@@ -271,8 +273,32 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 	it("marks a found card", async () => {
 		await ready()
 		expect(card("Pelican")).not.toHaveClass("found")
-		fireEvent.click(screen.getByText("Pelican"))
+		fireEvent.click(screen.getByRole("checkbox", { name: "Pelican" }))
 		await waitFor(() => expect(card("Pelican")).toHaveClass("found"))
+	})
+
+	it("opens a card from a tap on it and closes it again, without marking it found", async () => {
+		await ready()
+		const gator = card("American alligator")
+		const open = within(gator).getByRole("button", { name: "American alligator" })
+		expect(open).toHaveAttribute("aria-expanded", "false")
+		expect(open).toHaveAttribute("aria-controls", gator.querySelector(".item-desc")?.id)
+		expect(gator).not.toHaveAttribute("data-open")
+
+		fireEvent.click(open)
+		expect(open).toHaveAttribute("aria-expanded", "true")
+		expect(gator).toHaveAttribute("data-open")
+		expect(screen.getByRole("checkbox", { name: "American alligator" })).not.toBeChecked()
+
+		fireEvent.click(open)
+		expect(open).toHaveAttribute("aria-expanded", "false")
+		expect(gator).not.toHaveAttribute("data-open")
+	})
+
+	it("gives a card with no description nothing to open", async () => {
+		await ready()
+		expect(within(card("Pelican")).queryByRole("button")).toBeNull()
+		expect(card("Pelican").querySelector(".item-name")).toHaveTextContent("Pelican")
 	})
 })
 
