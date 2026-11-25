@@ -337,7 +337,7 @@ Two asks after PR 1 merged, settled in the brainstorm of 04.11 with mockups in t
 
 - The tracker page's `main` gets its own server-rendered modifier (`Base.astro` prop `trackerWide`, class `tracker-wide`; the hub's `.wrap.wide` stays 85rem). The modifier sets `--tracker-max-w: none` at the steps, so `.tracker`, the title row, the h1 and `.dex-browse` all fill `main` together. Never a `.tracker` or `:has()` rule: those match only after the island mounts and would shift the title.
 - At a 1920 px viewport with a 17 px scrollbar the list is about 1343 px, still four cards. The search field spans the tracker's width (about 1800 px); accepted.
-- Above 120rem the page stays centred and the sides stay empty on purpose; more than four columns is harder to scan.
+- Above 120rem the page stays centered and the sides stay empty on purpose; more than four columns is harder to scan.
 - **Accepted:** the hub (85rem) and the tracker differ in width from 1600 px.
 - Breakpoints read the viewport width, so a 1920 px wide browser window with borders lands just under 1920 and shows three cards. That is fine; the measure set emulates exact widths.
 - Phones, tablet and 1024 to 1599 px do not change.
