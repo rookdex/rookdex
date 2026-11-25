@@ -5,7 +5,8 @@ import type { SeedItem } from "../../model/schema"
 import { categoryIds, groupItems } from "../../model/seed"
 import { type Count, groupKey, type Records } from "../../model/stats"
 import { GroupChips } from "./GroupChips"
-import { BookIcon, categoryIcon, FlagIcon } from "./icons"
+import { BookIcon, ChevronIcon, categoryIcon, FlagIcon } from "./icons"
+import { usePanel } from "./usePanel"
 
 const none: Count = { done: 0, total: 0 }
 
@@ -140,64 +141,41 @@ interface RowProps {
 }
 
 /**
- * The icon-lead card (tracker refresh spec §5.1). Only the check marks an item found, through its
- * own 44 px box. The open button's ::after covers the rest of the card, so a tap anywhere else
- * opens the card to its full description; the check and the footer icons sit above that layer.
+ * The icon-lead card (tracker refresh spec §5.1). The label's ::after covers the card, so a tap
+ * anywhere toggles the one real checkbox; the footer icons sit above that layer. When the clamp
+ * cuts the description, a chevron in the footer opens the full text in a panel over the card.
  */
 function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: RowProps) {
-	const [open, setOpen] = useState(false)
+	const cardRef = useRef<HTMLLIElement>(null)
 	const descRef = useRef<HTMLParagraphElement>(null)
-	const cut = useCut(descRef, open)
+	const panelRef = useRef<HTMLDivElement>(null)
+	const cut = useCut(descRef)
+	usePanel(panelRef, cardRef, cut)
 	// The seed id has exactly one slash (schema), so it is unique as a DOM id as it stands.
 	const inputId = `item-${item.id}`
-	const nameId = `name-${item.id}`
-	const descId = `desc-${item.id}`
+	const panelId = `more-${item.id}`
 	const Icon = categoryIcon(item.category)
 	const tier =
 		item.status === "confirmed"
 			? t("tracker.confirmed")
 			: t("tracker.expectedFrom", { precedent: item.precedent ?? "" })
-	const name = (
-		<span id={nameId} className="item-name">
-			{item.name}
-		</span>
-	)
 	return (
-		<li className={done ? "item found" : "item"} data-open={open || undefined}>
-			{/* First in the DOM, so Tab runs checkbox, open, book, flag. CSS places it top right. The
-			    wrapping label is the 44 px tap box; the name comes from aria-labelledby. */}
-			<label className="item-check-wrap">
-				<input
-					id={inputId}
-					className="item-check"
-					type="checkbox"
-					aria-labelledby={nameId}
-					checked={done}
-					disabled={disabled}
-					onChange={(event) => onToggle(item.id, event.target.checked)}
-				/>
-			</label>
+		<li ref={cardRef} className={done ? "item found" : "item"}>
+			{/* First in the DOM, so Tab runs checkbox, chevron, book, flag. CSS places it top right. */}
+			<input
+				id={inputId}
+				className="item-check"
+				type="checkbox"
+				checked={done}
+				disabled={disabled}
+				onChange={(event) => onToggle(item.id, event.target.checked)}
+			/>
 			<div className="item-main">
 				<span className="item-tile" aria-hidden="true">
 					<Icon />
 				</span>
 				<div className="item-text">
-					{/* Nothing to open when the clamp cuts no text, so the name is plain text then. An open
-					    card keeps its button, so the same tap closes it. */}
-					{open || cut ? (
-						<button
-							type="button"
-							className="item-open"
-							aria-label={t("tracker.openLabel", { name: item.name })}
-							aria-expanded={open}
-							aria-controls={descId}
-							onClick={() => setOpen(!open)}
-						>
-							{name}
-						</button>
-					) : (
-						name
-					)}
+					<label htmlFor={inputId}>{item.name}</label>
 					<span className="item-meta">
 						<span className="item-dot" data-status={item.status} />
 						<span className="item-tier">{tier}</span> · {groupName}
@@ -205,12 +183,22 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 				</div>
 			</div>
 			{item.description && (
-				<p id={descId} ref={descRef} className="item-desc">
+				<p ref={descRef} className="item-desc">
 					{item.description}
 				</p>
 			)}
 			{/* A flex row, so December can add "Entry →" and a star without a new layout. */}
 			<div className="item-foot">
+				{/* Only when the clamp cuts the text, so a chevron always means there is more to read. */}
+				{cut && (
+					<button type="button" className="item-icon has-tip tip-end" popoverTarget={panelId}>
+						<ChevronIcon />
+						<span className="visually-hidden">{t("tracker.moreLabel", { name: item.name })}</span>
+						<span className="tip" aria-hidden="true">
+							{t("tracker.more")}
+						</span>
+					</button>
+				)}
 				<a className="item-icon item-book has-tip tip-end" href={`${sourcesHref}#${item.id}`}>
 					<BookIcon />
 					<span className="visually-hidden">
@@ -233,36 +221,50 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 					</span>
 				</a>
 			</div>
+			{/* The full text, over the card in the top layer, so no card ever changes size. It stays in
+			    the DOM while the chevron shows, so the chevron always has its target. */}
+			{cut && (
+				<div ref={panelRef} id={panelId} className="item-panel" popover="auto">
+					<p className="item-panel-name">{item.name}</p>
+					<p className="item-panel-desc">{item.description}</p>
+					<div className="item-panel-foot">
+						<button
+							type="button"
+							className="item-icon"
+							popoverTarget={panelId}
+							popoverTargetAction="hide"
+						>
+							<ChevronIcon up />
+							<span className="visually-hidden">{t("tracker.lessLabel", { name: item.name })}</span>
+						</button>
+					</div>
+				</div>
+			)}
 		</li>
 	)
 }
 
 /**
- * Whether the two-line clamp cuts the description. Checked while the card is closed, again when the
- * paragraph resizes (width, 200 % text) and once the web fonts have loaded; an open card keeps the
- * last answer.
+ * Whether the two-line clamp cuts the description. Checked on mount, again when the paragraph
+ * resizes (width, 200 % text) and once the web fonts have loaded.
  */
-function useCut(ref: RefObject<HTMLElement | null>, open: boolean): boolean {
+function useCut(ref: RefObject<HTMLElement | null>): boolean {
 	const [cut, setCut] = useState(false)
 	useLayoutEffect(() => {
 		const desc = ref.current
-		if (!desc || open) return
+		if (!desc) return
 		let live = true
 		const check = () => {
 			if (live) setCut(desc.scrollHeight > desc.clientHeight + 1)
 		}
 		check()
 		document.fonts?.ready.then(check)
-		if (typeof ResizeObserver === "undefined")
-			return () => {
-				live = false
-			}
-		const observer = new ResizeObserver(check)
-		observer.observe(desc)
+		const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(check)
+		observer?.observe(desc)
 		return () => {
 			live = false
-			observer.disconnect()
+			observer?.disconnect()
 		}
-	}, [ref, open])
+	}, [ref])
 	return cut
 }

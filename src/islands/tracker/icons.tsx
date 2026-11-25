@@ -51,6 +51,15 @@ export function CloseIcon() {
 	)
 }
 
+/** Down opens a card's full text, up closes it again. */
+export function ChevronIcon({ up = false }: { up?: boolean }) {
+	return (
+		<svg {...common} aria-hidden="true">
+			<path d={up ? "m6 15 6-6 6 6" : "m6 9 6 6 6-6"} />
+		</svg>
+	)
+}
+
 // Category icons (tracker refresh spec §4.2). My own geometry, drawn for the S3 mockup, so no icon
 // set's license applies.
 export function AllIcon() {

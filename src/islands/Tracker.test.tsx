@@ -51,10 +51,9 @@ describe("Tracker list", () => {
 		expect(screen.getAllByRole("link", { name: /^Report a problem with/ })).toHaveLength(3)
 	})
 
-	it("toggles an item from its check's 44 px box, and a flag tap doesn't toggle it", async () => {
+	it("toggles an item from its label, and a flag tap doesn't toggle it", async () => {
 		await ready()
-		const box = screen.getByRole("checkbox", { name: "Pelican" })
-		fireEvent.click(box.closest("label.item-check-wrap") as HTMLElement)
+		fireEvent.click(screen.getByText("Pelican"))
 		// The tick goes through IndexedDB before the controlled checkbox re-renders.
 		await waitFor(() => expect(screen.getByRole("checkbox", { name: "Pelican" })).toBeChecked())
 
@@ -241,22 +240,6 @@ describe("Section and group counts (tracker refresh spec §4.3)", () => {
 describe("Item card (tracker refresh spec §5.1)", () => {
 	const card = (name: string) =>
 		screen.getByRole("checkbox", { name }).closest("li.item") as HTMLElement
-	const openButton = (name: string) =>
-		within(card(name)).getByRole("button", { name: `Show the whole description of ${name}` })
-
-	/** jsdom lays nothing out, so this makes every description report more text than it shows. */
-	const cutDescriptions = () =>
-		Object.defineProperty(HTMLElement.prototype, "scrollHeight", {
-			configurable: true,
-			get(this: HTMLElement) {
-				return this.classList.contains("item-desc") ? 60 : 0
-			},
-		})
-
-	afterEach(() => {
-		// Drops the stub, so jsdom's own scrollHeight on Element shows through again.
-		Reflect.deleteProperty(HTMLElement.prototype, "scrollHeight")
-	})
 
 	it("leads with the category icon, then the name and one meta line", async () => {
 		await ready()
@@ -267,13 +250,11 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 		expect(pelican.querySelector('.item-dot[data-status="expected"]')).not.toBeNull()
 	})
 
-	it("runs Tab as checkbox, open button, book, flag, with the book and flag in the footer", async () => {
-		cutDescriptions()
+	it("runs Tab as checkbox, book, flag when the text fits, with the book and flag in the footer", async () => {
 		await ready()
 		const gator = card("American alligator")
 		expect([...gator.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
 			"INPUT",
-			"BUTTON",
 			"A",
 			"A",
 		])
@@ -290,45 +271,77 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 	it("marks a found card", async () => {
 		await ready()
 		expect(card("Pelican")).not.toHaveClass("found")
-		fireEvent.click(screen.getByRole("checkbox", { name: "Pelican" }))
+		fireEvent.click(screen.getByText("Pelican"))
 		await waitFor(() => expect(card("Pelican")).toHaveClass("found"))
 	})
 
-	it("opens a card from a tap on it and closes it again, without marking it found", async () => {
-		cutDescriptions()
-		await ready()
-		const gator = card("American alligator")
-		const open = openButton("American alligator")
-		expect(open).toHaveAttribute("aria-expanded", "false")
-		expect(open).toHaveAttribute("aria-controls", gator.querySelector(".item-desc")?.id)
-		expect(gator).not.toHaveAttribute("data-open")
+	describe("full text panel", () => {
+		const chevron = (name: string) =>
+			within(card(name)).getByRole("button", { name: `Show the whole description of ${name}` })
 
-		fireEvent.click(open)
-		expect(open).toHaveAttribute("aria-expanded", "true")
-		expect(gator).toHaveAttribute("data-open")
-		expect(screen.getByRole("checkbox", { name: "American alligator" })).not.toBeChecked()
+		/** jsdom lays nothing out, so this makes every description report more text than it shows. */
+		const cutDescriptions = () =>
+			Object.defineProperty(HTMLElement.prototype, "scrollHeight", {
+				configurable: true,
+				get(this: HTMLElement) {
+					return this.classList.contains("item-desc") ? 60 : 0
+				},
+			})
 
-		fireEvent.click(open)
-		expect(open).toHaveAttribute("aria-expanded", "false")
-		expect(gator).not.toHaveAttribute("data-open")
-	})
+		afterEach(() => {
+			// Drops the stub, so jsdom's own scrollHeight on Element shows through again.
+			Reflect.deleteProperty(HTMLElement.prototype, "scrollHeight")
+		})
 
-	it("gives a card with no description nothing to open", async () => {
-		await ready()
-		expect(within(card("Pelican")).queryByRole("button")).toBeNull()
-		expect(card("Pelican").querySelector(".item-name")).toHaveTextContent("Pelican")
-	})
+		it("gives a cut-off card a chevron that opens its full text over the card", async () => {
+			cutDescriptions()
+			await ready()
+			const gator = card("American alligator")
+			const panel = gator.querySelector(".item-panel") as HTMLElement
+			expect(chevron("American alligator")).toHaveAttribute("popovertarget", panel.id)
+			expect(chevron("American alligator").closest(".item-foot")).not.toBeNull()
+			expect(panel).toHaveAttribute("popover", "auto")
+			expect(panel).toHaveTextContent("American alligator")
+			expect(panel.querySelector(".item-panel-desc")).toHaveTextContent("Everglades native.")
+			const close = panel.querySelector("button") as HTMLElement
+			expect(close).toHaveAttribute("popovertarget", panel.id)
+			expect(close).toHaveAttribute("popovertargetaction", "hide")
+			expect(close).toHaveTextContent("Close the whole description of American alligator")
+		})
 
-	it("gives a description that already fits nothing to open", async () => {
-		await ready()
-		expect(within(card("American alligator")).queryByRole("button")).toBeNull()
-	})
+		it("runs Tab as checkbox, chevron, book, flag, then the panel's close", async () => {
+			cutDescriptions()
+			await ready()
+			const gator = card("American alligator")
+			expect([...gator.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
+				"INPUT",
+				"BUTTON",
+				"A",
+				"A",
+				"BUTTON",
+			])
+		})
 
-	it("names the open button apart from the check", async () => {
-		cutDescriptions()
-		await ready()
-		expect(openButton("American alligator")).toBeInTheDocument()
-		expect(screen.getAllByRole("checkbox", { name: "American alligator" })).toHaveLength(1)
+		it("opens from the chevron without marking the card found", async () => {
+			cutDescriptions()
+			await ready()
+			fireEvent.click(chevron("American alligator"))
+			expect(screen.getByRole("checkbox", { name: "American alligator" })).not.toBeChecked()
+			expect(card("American alligator")).not.toHaveClass("found")
+		})
+
+		it("gives a card with no description no chevron", async () => {
+			cutDescriptions()
+			await ready()
+			expect(within(card("Pelican")).queryByRole("button")).toBeNull()
+			expect(card("Pelican").querySelector(".item-panel")).toBeNull()
+		})
+
+		it("gives a description that already fits no chevron", async () => {
+			await ready()
+			expect(within(card("American alligator")).queryByRole("button")).toBeNull()
+			expect(card("American alligator").querySelector(".item-panel")).toBeNull()
+		})
 	})
 })
 

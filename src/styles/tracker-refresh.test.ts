@@ -36,14 +36,6 @@ describe("tracker refresh look (spec §3, §4)", () => {
 		expect(rule(".item-check")).toMatch(/width:\s*24px/)
 	})
 
-	it("taps the check through its own 44 px box, above the card's open layer", () => {
-		expect(rule(".item-check-wrap")).toMatch(/width:\s*var\(--tap\)/)
-		expect(rule(".item-check-wrap")).toMatch(/height:\s*var\(--tap\)/)
-		expect(rule(".item-check-wrap")).toMatch(/z-index:\s*1/)
-		expect(rule(".item .item-open::after")).toMatch(/inset:\s*0/)
-		expect(css).not.toMatch(/\.item-main label::after/)
-	})
-
 	it("breaks a tile label only inside a word that cannot fit on its own line (R2)", () => {
 		expect(rule(".tile-name")).toMatch(/overflow-wrap:\s*break-word/)
 		expect(rule(".tile-name")).toMatch(/hyphens:\s*auto/)
@@ -104,18 +96,19 @@ describe("icon-lead card (spec §5.1)", () => {
 		expect(rule(".item-desc")).toMatch(/max-width:\s*none/)
 	})
 
-	it("lifts only a card that a tap can open on hover", () => {
-		expect(css).not.toMatch(/(^|[\s,}])\.item:hover/)
-		expect(rule(".item:has(.item-open):hover")).toMatch(/background:\s*var\(--bg-hover\)/)
-	})
-
-	it("shows the whole description on an open card", () => {
-		expect(rule(".item[data-open] .item-desc")).toMatch(/-webkit-line-clamp:\s*unset/)
-	})
-
 	it("turns a found card's border and icon tile pink", () => {
 		expect(rule(".item.found")).toMatch(/border-color:[^;]*var\(--accent\)/)
 		expect(rule(".item.found .item-tile")).toMatch(/color:\s*var\(--accent\)/)
+	})
+
+	it("drops the popover's centred box, so the panel lands where usePanel puts it", () => {
+		expect(rule(".item-panel")).toMatch(/inset:\s*auto/)
+		expect(rule(".item-panel")).toMatch(/margin:\s*0/)
+	})
+
+	it("sets the panel's display only while open, so a closed panel stays hidden", () => {
+		expect(rule(".item-panel")).not.toMatch(/display:/)
+		expect(rule(".item-panel:popover-open")).toMatch(/display:\s*flex/)
 	})
 })
 
