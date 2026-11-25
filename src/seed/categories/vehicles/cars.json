@@ -63,6 +63,7 @@
 		{
 			"id": "vehicles/vapid-ganado",
 			"name": "'70 Vapid Ganado",
+			"aliases": ["Vapid Ganado"],
 			"status": "confirmed",
 			"description": "Jason's well-worn low-riding pickup, styled after the 1970 Ford Ranchero. Seen in Trailer 2 and the key art. The Ultimate Edition adds an exclusive Retro Build.",
 			"sources": [
@@ -923,6 +924,7 @@
 		{
 			"id": "vehicles/pegassi-zorrusso",
 			"name": "Granforma Zorrusso",
+			"aliases": ["Pegassi Zorrusso"],
 			"status": "confirmed",
 			"description": "A supercar styled after the Italdesign Zerouno. Seen racing down a highway with a passenger standing through the roof in Trailer 1.",
 			"sources": [

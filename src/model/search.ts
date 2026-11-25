@@ -92,7 +92,10 @@ export function searchView({
 	for (const item of items) {
 		// The list never shows a retired item, so no count may include one.
 		if (item.retired) continue
-		if (queryWords.length > 0 && !hasAll(queryWords, [item.name, ...(terms[item.group] ?? [])]))
+		if (
+			queryWords.length > 0 &&
+			!hasAll(queryWords, [item.name, ...(item.aliases ?? []), ...(terms[item.group] ?? [])])
+		)
 			continue
 		// A category under All is never narrowed by chips.
 		const inside =

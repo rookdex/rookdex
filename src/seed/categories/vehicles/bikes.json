@@ -155,6 +155,7 @@
 		{
 			"id": "vehicles/western-zombie-chopper",
 			"name": "Western Zombie Bobber",
+			"aliases": ["Western Zombie Chopper"],
 			"status": "confirmed",
 			"description": "A bobber styled after the Harley-Davidson Fat Bob. Seen in Trailer 2.",
 			"sources": [

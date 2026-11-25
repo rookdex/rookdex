@@ -150,6 +150,16 @@ describe("searchView (spec §3.1)", () => {
 	})
 })
 
+describe("aliases (#149)", () => {
+	it("matches an alias, which is never shown", () => {
+		const renamed = item("vehicles/pegassi-zorrusso", "cars", "Granforma Zorrusso", {
+			aliases: ["Pegassi Zorrusso"],
+		})
+		const result = view({ items: [renamed], query: "pegassi" })
+		expect(result.visible.map((i) => i.name)).toEqual(["Granforma Zorrusso"])
+	})
+})
+
 describe("old group words (category model spec §2)", () => {
 	it("finds a former commercial vehicle by the old group's Norwegian word", () => {
 		const mule = {

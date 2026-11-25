@@ -176,6 +176,12 @@ describe("dexSearchRows (Dex search spec §5.1)", () => {
 		expect(matches("reptile", [crane.search])).toBe(false)
 	})
 
+	it("puts aliases in the search text", () => {
+		const [crane] = dexSearchRows(t, urlFor, [{ ...fixture[0], aliases: ["Pegassi Zorrusso"] }])
+		expect(crane.search).toContain("pegassi zorrusso")
+		expect(crane.name).toBe(fixture[0].name)
+	})
+
 	it("finds boats with the Norwegian word", () => {
 		// "båt" normalizes to "bat", so substring matching also finds "Maibatsu" cars, as the
 		// tracker does. What matters is that no boat is missed.

@@ -63,8 +63,8 @@ export interface DexSearchRow {
 	statusWord: string
 	/** "<category> · <group>" in the page language. */
 	place: string
-	/** The name and the group's search words, normalized. One string is enough: a query word never
-	 *  holds a space after normalize, so it cannot match across two fields. */
+	/** The name, its aliases and the group's search words, normalized. One string is enough: a
+	 *  query word never holds a space after normalize, so it cannot match across two fields. */
 	search: string
 }
 
@@ -85,7 +85,9 @@ export function dexSearchRows(
 				status: item.status,
 				statusWord: item.status === "confirmed" ? t("tracker.confirmed") : t("dex.expected"),
 				place: `${seedLabel(t, "category", category.id)} · ${seedLabel(t, "group", group.id)}`,
-				search: normalize([item.name, ...(terms[item.group] ?? [])].join(" ")),
+				search: normalize(
+					[item.name, ...(item.aliases ?? []), ...(terms[item.group] ?? [])].join(" ")
+				),
 			}))
 		)
 	)

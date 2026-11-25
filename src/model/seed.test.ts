@@ -120,6 +120,13 @@ describe("shipped seed", () => {
 		expect(facts.length).toBeGreaterThan(0)
 		expect(allowlist.blocklist).toBeDefined()
 	})
+	it("finds the four renamed vehicles by their old names (#149)", () => {
+		const byAlias = (alias: string) => seedItems.find((i) => i.aliases?.includes(alias))?.name
+		expect(byAlias("Pegassi Zorrusso")).toBe("Granforma Zorrusso")
+		expect(byAlias("Brute Ambulance")).toBe("Interstate Ambulance")
+		expect(byAlias("Western Zombie Chopper")).toBe("Western Zombie Bobber")
+		expect(byAlias("Vapid Ganado")).toBe("'70 Vapid Ganado")
+	})
 	it("follows categories.json and keeps every shipped id", () => {
 		expect(categoryIds(seedItems)).toEqual([
 			"vehicles",

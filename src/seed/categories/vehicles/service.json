@@ -105,6 +105,7 @@
 		{
 			"id": "vehicles/brute-ambulance",
 			"name": "Interstate Ambulance",
+			"aliases": ["Brute Ambulance"],
 			"status": "confirmed",
 			"description": "An ambulance styled after the Chevrolet Express cutaway ambulance. Seen in An Extended Look.",
 			"sources": [
