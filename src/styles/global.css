@@ -2005,6 +2005,8 @@ html:has(.search-row) {
 	color: var(--text);
 	text-transform: uppercase;
 	letter-spacing: 0.1em;
+	/* A long name like "Tjenestekjøretøy" breaks instead of widening the page at 200 % text. */
+	overflow-wrap: anywhere;
 }
 
 .group-count {
@@ -2120,6 +2122,7 @@ html:has(.search-row) {
 .item-meta {
 	font-size: 0.75rem;
 	color: var(--text-muted);
+	overflow-wrap: anywhere;
 }
 
 /* Tier colours come from their own tokens so a theme can swap them without touching the accent. */
