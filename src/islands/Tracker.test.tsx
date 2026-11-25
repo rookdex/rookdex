@@ -241,6 +241,22 @@ describe("Section and group counts (tracker refresh spec §4.3)", () => {
 describe("Item card (tracker refresh spec §5.1)", () => {
 	const card = (name: string) =>
 		screen.getByRole("checkbox", { name }).closest("li.item") as HTMLElement
+	const openButton = (name: string) =>
+		within(card(name)).getByRole("button", { name: `Show the whole description of ${name}` })
+
+	/** jsdom lays nothing out, so this makes every description report more text than it shows. */
+	const cutDescriptions = () =>
+		Object.defineProperty(HTMLElement.prototype, "scrollHeight", {
+			configurable: true,
+			get(this: HTMLElement) {
+				return this.classList.contains("item-desc") ? 60 : 0
+			},
+		})
+
+	afterEach(() => {
+		// Drops the stub, so jsdom's own scrollHeight on Element shows through again.
+		Reflect.deleteProperty(HTMLElement.prototype, "scrollHeight")
+	})
 
 	it("leads with the category icon, then the name and one meta line", async () => {
 		await ready()
@@ -252,6 +268,7 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 	})
 
 	it("runs Tab as checkbox, open button, book, flag, with the book and flag in the footer", async () => {
+		cutDescriptions()
 		await ready()
 		const gator = card("American alligator")
 		expect([...gator.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
@@ -278,9 +295,10 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 	})
 
 	it("opens a card from a tap on it and closes it again, without marking it found", async () => {
+		cutDescriptions()
 		await ready()
 		const gator = card("American alligator")
-		const open = within(gator).getByRole("button", { name: "American alligator" })
+		const open = openButton("American alligator")
 		expect(open).toHaveAttribute("aria-expanded", "false")
 		expect(open).toHaveAttribute("aria-controls", gator.querySelector(".item-desc")?.id)
 		expect(gator).not.toHaveAttribute("data-open")
@@ -299,6 +317,18 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 		await ready()
 		expect(within(card("Pelican")).queryByRole("button")).toBeNull()
 		expect(card("Pelican").querySelector(".item-name")).toHaveTextContent("Pelican")
+	})
+
+	it("gives a description that already fits nothing to open", async () => {
+		await ready()
+		expect(within(card("American alligator")).queryByRole("button")).toBeNull()
+	})
+
+	it("names the open button apart from the check", async () => {
+		cutDescriptions()
+		await ready()
+		expect(openButton("American alligator")).toBeInTheDocument()
+		expect(screen.getAllByRole("checkbox", { name: "American alligator" })).toHaveLength(1)
 	})
 })
 

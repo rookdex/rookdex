@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { type RefObject, useLayoutEffect, useRef, useState } from "react"
 import type { Translate } from "../../i18n"
 import { itemReportUrl } from "../../model/report"
 import type { SeedItem } from "../../model/schema"
@@ -146,6 +146,8 @@ interface RowProps {
  */
 function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: RowProps) {
 	const [open, setOpen] = useState(false)
+	const descRef = useRef<HTMLParagraphElement>(null)
+	const cut = useCut(descRef, open)
 	// The seed id has exactly one slash (schema), so it is unique as a DOM id as it stands.
 	const inputId = `item-${item.id}`
 	const nameId = `name-${item.id}`
@@ -180,11 +182,13 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 					<Icon />
 				</span>
 				<div className="item-text">
-					{/* Nothing to open without a description, so the name is plain text then. */}
-					{item.description ? (
+					{/* Nothing to open when the clamp cuts no text, so the name is plain text then. An open
+					    card keeps its button, so the same tap closes it. */}
+					{open || cut ? (
 						<button
 							type="button"
 							className="item-open"
+							aria-label={t("tracker.openLabel", { name: item.name })}
 							aria-expanded={open}
 							aria-controls={descId}
 							onClick={() => setOpen(!open)}
@@ -201,7 +205,7 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 				</div>
 			</div>
 			{item.description && (
-				<p id={descId} className="item-desc">
+				<p id={descId} ref={descRef} className="item-desc">
 					{item.description}
 				</p>
 			)}
@@ -231,4 +235,34 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 			</div>
 		</li>
 	)
+}
+
+/**
+ * Whether the two-line clamp cuts the description. Checked while the card is closed, again when the
+ * paragraph resizes (width, 200 % text) and once the web fonts have loaded; an open card keeps the
+ * last answer.
+ */
+function useCut(ref: RefObject<HTMLElement | null>, open: boolean): boolean {
+	const [cut, setCut] = useState(false)
+	useLayoutEffect(() => {
+		const desc = ref.current
+		if (!desc || open) return
+		let live = true
+		const check = () => {
+			if (live) setCut(desc.scrollHeight > desc.clientHeight + 1)
+		}
+		check()
+		document.fonts?.ready.then(check)
+		if (typeof ResizeObserver === "undefined")
+			return () => {
+				live = false
+			}
+		const observer = new ResizeObserver(check)
+		observer.observe(desc)
+		return () => {
+			live = false
+			observer.disconnect()
+		}
+	}, [ref, open])
+	return cut
 }

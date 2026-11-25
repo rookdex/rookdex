@@ -104,6 +104,11 @@ describe("icon-lead card (spec §5.1)", () => {
 		expect(rule(".item-desc")).toMatch(/max-width:\s*none/)
 	})
 
+	it("lifts only a card that a tap can open on hover", () => {
+		expect(css).not.toMatch(/(^|[\s,}])\.item:hover/)
+		expect(rule(".item:has(.item-open):hover")).toMatch(/background:\s*var\(--bg-hover\)/)
+	})
+
 	it("shows the whole description on an open card", () => {
 		expect(rule(".item[data-open] .item-desc")).toMatch(/-webkit-line-clamp:\s*unset/)
 	})
