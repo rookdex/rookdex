@@ -2,6 +2,7 @@
 // returns the items in display order plus every error, so Vitest runs it on fixtures and seed.ts
 // runs it on the shipped files. The build fails on any error.
 import type { z } from "astro/zod"
+import { normalize } from "./normalize"
 import {
 	type Allowlist,
 	categoriesFileSchema,
@@ -11,6 +12,7 @@ import {
 	type ItemLocation,
 	type ItemSource,
 	idSchema,
+	PLATFORMS,
 	type SeedItem,
 	type Spoiler,
 	type Tip,
@@ -112,6 +114,53 @@ function joinSources(own: ItemSource[], header: ItemSource[]): ItemSource[] {
 	return [...own, ...header.filter((s) => !seen.has(sourceKey(s)))]
 }
 
+type SpecKind = "text" | "bar"
+const BASE_VEHICLE = { style: "text", era: "text", modShop: "text" } as const
+const STANDOUT = {
+	rating: "text",
+	speed: "bar",
+	acceleration: "bar",
+	asphaltHandling: "bar",
+	offRoadHandling: "bar",
+	strength: "bar",
+} as const
+const WEAPON = { damage: "bar", accuracy: "bar", handling: "bar", range: "bar" } as const
+
+/** Spec §8.7: the spec keys each group's Progress screen shows. Any other key fails the build. */
+export const SPEC_KEYS: Readonly<
+	Record<string, Readonly<Record<string, Readonly<Record<string, SpecKind>>>>>
+> = {
+	vehicles: {
+		cars: BASE_VEHICLE,
+		bikes: BASE_VEHICLE,
+		watercraft: BASE_VEHICLE,
+		aircraft: BASE_VEHICLE,
+		service: BASE_VEHICLE,
+		standout: STANDOUT,
+	},
+	weapons: { guns: WEAPON, melee: WEAPON, explosives: WEAPON, variants: WEAPON },
+}
+
+function specErrors(
+	id: string,
+	category: string,
+	group: string,
+	specs: Record<string, string | number>
+): string[] {
+	const byGroup = Object.hasOwn(SPEC_KEYS, category) ? SPEC_KEYS[category] : undefined
+	const allowed = byGroup && Object.hasOwn(byGroup, group) ? byGroup[group] : undefined
+	if (!allowed) return [`${id}: ${category}/${group} takes no specs`]
+	return Object.entries(specs).flatMap(([key, value]) => {
+		if (!Object.hasOwn(allowed, key))
+			return [`${id}: unknown spec key ${key} for ${category}/${group}`]
+		if (allowed[key] === "bar" && typeof value !== "number")
+			return [`${id}: spec ${key} must be a 1 to 10 bar`]
+		if (allowed[key] === "text" && typeof value !== "string")
+			return [`${id}: spec ${key} must be text from the screen`]
+		return []
+	})
+}
+
 function buildItem(
 	category: string,
 	group: string,
@@ -160,9 +209,19 @@ function buildItem(
 	return ruleErrors.length > 0 ? { errors: ruleErrors } : { item, errors: [] }
 }
 
-/** Task 4 fills this in; until then nothing is checked here. */
-function extrasErrors(_category: string, _group: string, _input: ItemInput): string[] {
-	return []
+/** Spec §8.4, §8.6, §8.7: what the schema cannot see on its own. */
+function extrasErrors(category: string, group: string, input: ItemInput): string[] {
+	const { id } = input
+	const errors: string[] = []
+	if (input.spoiler === "story")
+		errors.push(`${id}: story spoilers wait for the Hide spoilers switch (spec §8.4)`)
+	const limited = input.platforms !== undefined && new Set(input.platforms).size < PLATFORMS.length
+	if (input.mode === "online" || limited)
+		errors.push(
+			`${id}: online and platform-limited items wait for the Settings preference (spec §8.6)`
+		)
+	if (input.specs) errors.push(...specErrors(id, category, group, input.specs))
+	return errors
 }
 
 function totalErrors(where: string, file: GroupFile, items: SeedItem[]): string[] {
@@ -187,6 +246,8 @@ function buildGroup(
 	const errors: string[] = []
 	const header = tierItemSources(where, file.sources ?? [], list)
 	errors.push(...header.errors)
+	if (file.spoiler === "story")
+		errors.push(`${where}: story spoilers wait for the Hide spoilers switch (spec §8.4)`)
 	const sets = file.sets ?? []
 	errors.push(
 		...duplicates(sets.map((s) => s.id)).map((id) => `${where}: set ${id} is listed twice`)
@@ -220,9 +281,30 @@ function shippedErrors(shipped: string[], seedIds: string[]): string[] {
 	]
 }
 
-/** Task 4 fills this in: twin names and alias collisions within a category. */
-function nameErrors(_category: string, _items: SeedItem[]): string[] {
-	return []
+/** Spec §6 and §8.1, within one category: a live item may not take a retired item's name unless
+ *  it replaces it, and an alias may not be another live item's name or alias. */
+function nameErrors(category: string, items: SeedItem[]): string[] {
+	const errors: string[] = []
+	const retired = new Map<string, string>()
+	for (const item of items) if (item.retired) retired.set(normalize(item.name), item.id)
+	const live = items.filter((item) => !item.retired)
+	const owner = new Map<string, string>()
+	for (const item of live) owner.set(normalize(item.name), item.id)
+	for (const item of live) {
+		for (const name of [item.name, ...(item.aliases ?? [])]) {
+			const twin = retired.get(normalize(name))
+			if (twin && !(item.replaces ?? []).includes(twin))
+				errors.push(`${item.id}: same name as retired ${twin}; add replaces`)
+		}
+		for (const alias of item.aliases ?? []) {
+			const key = normalize(alias)
+			const other = owner.get(key)
+			if (other && other !== item.id)
+				errors.push(`${item.id}: alias ${alias} is already a name or alias in ${category}`)
+			else owner.set(key, item.id)
+		}
+	}
+	return errors
 }
 
 export function buildSeed(input: SeedInput): SeedResult {
@@ -238,6 +320,9 @@ export function buildSeed(input: SeedInput): SeedResult {
 	const categoryList = parsed.data.categories.map((c) => c.id)
 	errors.push(...duplicates(categoryList).map((id) => `categories.json: ${id} is listed twice`))
 	const known = new Set(categoryList)
+	const story = new Set(
+		parsed.data.categories.filter((c) => c.spoiler === "story").map((c) => c.id)
+	)
 	const files = new Map<string, GroupFile[]>()
 	const allIds: string[] = []
 	for (const [path, data] of Object.entries(input.groups).sort(([a], [b]) => a.localeCompare(b))) {
@@ -252,6 +337,10 @@ export function buildSeed(input: SeedInput): SeedResult {
 		}
 		if (!known.has(category)) {
 			errors.push(`${path}: ${category} is not in categories.json`)
+			continue
+		}
+		if (story.has(category)) {
+			errors.push(`${path}: story content waits for the Hide spoilers switch (spec §8.4)`)
 			continue
 		}
 		const file = groupFileSchema.safeParse(data)

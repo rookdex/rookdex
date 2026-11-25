@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { type FixtureInput, ign, ignNordic, validInput } from "../test/seed-fixture"
+import { type FixtureInput, game, ign, ignNordic, radar, validInput } from "../test/seed-fixture"
 import { buildSeed, parseShipped, sortKey } from "./seedBuild"
 
 function errorsAfter(change: (input: FixtureInput) => void): string {
@@ -11,6 +11,17 @@ const cars = (input: FixtureInput) => input.groups["vehicles/cars.json"]
 const bikes = (input: FixtureInput) => input.groups["vehicles/bikes.json"]
 const birds = (input: FixtureInput) => input.groups["animals/birds.json"]
 const pelican = (input: FixtureInput) => birds(input).items[0]
+function addStandout(input: FixtureInput, specs: Record<string, unknown>) {
+	input.groups["vehicles/standout.json"] = {
+		group: "standout",
+		order: 3,
+		sort: "name",
+		items: [
+			{ id: "vehicles/blazing", name: "Blazing", status: "confirmed", sources: [game], specs },
+		],
+	}
+	input.shipped += "vehicles/blazing\n"
+}
 
 describe("buildSeed on the valid fixture", () => {
 	const result = buildSeed(validInput())
@@ -172,8 +183,150 @@ describe("buildSeed rejects", () => {
 				}),
 			/vehicles\/extra\/cars\.json: a group file sits at <category>\/<group>\.json/,
 		],
+		[
+			"a new item with a retired item's name",
+			(i: FixtureInput) => {
+				cars(i).items.push({
+					id: "vehicles/hoop-nine",
+					name: "Hoop 9",
+					status: "confirmed",
+					sources: [ign, radar],
+				})
+				i.shipped += "vehicles/hoop-nine\n"
+			},
+			/vehicles\/hoop-nine: same name as retired vehicles\/hoop-9; add replaces/,
+		],
+		[
+			"an alias that is another item's name",
+			(i: FixtureInput) => (birds(i).items[1].aliases = ["Pelican"]),
+			/animals\/heron: alias Pelican is already a name or alias in animals/,
+		],
+		[
+			"a tip without a source",
+			(i: FixtureInput) => (pelican(i).tips = [{ text: "Look up.", sources: [] }]),
+			/animals\/birds\.json items\.0\.tips\.0\.sources/,
+		],
+		[
+			"a game source with a url",
+			(i: FixtureInput) =>
+				(cars(i).items[1].sources = [{ ...game, url: "https://www.rockstargames.com/VI" }]),
+			/vehicles\/cars\.json items\.1\.sources\.0/,
+		],
+		[
+			"markup in a specs value",
+			(i: FixtureInput) => (cars(i).items[1].specs = { style: "<b>Classic</b>" }),
+			/vehicles\/cars\.json items\.1\.specs\.style/,
+		],
+		[
+			"an unknown spec key",
+			(i: FixtureInput) => (cars(i).items[1].specs = { style: "Classic", paint: "Red" }),
+			/vehicles\/alpha: unknown spec key paint for vehicles\/cars/,
+		],
+		[
+			"specs on a group that takes none",
+			(i: FixtureInput) => (pelican(i).specs = { speed: 5 }),
+			/animals\/pelican: animals\/birds takes no specs/,
+		],
+		[
+			"a bar outside 1 to 10",
+			(i: FixtureInput) => addStandout(i, { rating: "A", speed: 11 }),
+			/vehicles\/standout\.json items\.0\.specs\.speed/,
+		],
+		[
+			"text where a bar belongs",
+			(i: FixtureInput) => addStandout(i, { speed: "fast" }),
+			/vehicles\/blazing: spec speed must be a 1 to 10 bar/,
+		],
+		[
+			"a number where text belongs",
+			(i: FixtureInput) => addStandout(i, { rating: 7 }),
+			/vehicles\/blazing: spec rating must be text from the screen/,
+		],
+		[
+			"an online item",
+			(i: FixtureInput) => (pelican(i).mode = "online"),
+			/animals\/pelican: online and platform-limited items wait for the Settings preference/,
+		],
+		[
+			"a platform-limited item",
+			(i: FixtureInput) => (pelican(i).platforms = ["pc"]),
+			/animals\/pelican: online and platform-limited items wait for the Settings preference/,
+		],
+		[
+			"a story spoiler item",
+			(i: FixtureInput) => (pelican(i).spoiler = "story"),
+			/animals\/pelican: story spoilers wait for the Hide spoilers switch/,
+		],
+		[
+			"a story spoiler group",
+			(i: FixtureInput) => (birds(i).spoiler = "story"),
+			/animals\/birds: story spoilers wait for the Hide spoilers switch/,
+		],
+		[
+			"a group file in a story category",
+			(i: FixtureInput) =>
+				(i.groups["story/chapters.json"] = {
+					group: "chapters",
+					order: 1,
+					sort: "file",
+					items: [],
+				}),
+			/story\/chapters\.json: story content waits for the Hide spoilers switch/,
+		],
 	])("%s", (_name, change, error) => {
 		expect(errorsAfter(change)).toMatch(error)
+	})
+})
+
+describe("buildSeed accepts", () => {
+	it("a header with two press sources on different entries over an item with no sources", () => {
+		expect(errorsAfter((i) => (bikes(i).sources = [ign, radar]))).toBe("")
+	})
+	it("a twin name when the new item replaces the retired one", () => {
+		expect(
+			errorsAfter((i) => {
+				cars(i).total = 4
+				cars(i).items.push({
+					id: "vehicles/hoop-nine",
+					name: "Hoop 9",
+					status: "confirmed",
+					sources: [ign, radar],
+					replaces: ["vehicles/hoop-9"],
+				})
+				i.shipped += "vehicles/hoop-nine\n"
+			})
+		).toBe("")
+	})
+	it("an alias equal to a retired name when the item replaces it", () => {
+		expect(
+			errorsAfter((i) => {
+				cars(i).items[0].aliases = ["Hoop 9"]
+				cars(i).items[0].replaces = ["vehicles/hoop-9"]
+			})
+		).toBe("")
+	})
+	it("every platform listed, story mode and a gate spoiler", () => {
+		expect(
+			errorsAfter((i) => {
+				pelican(i).platforms = ["ps5", "xbox", "pc"]
+				pelican(i).mode = "story"
+				pelican(i).spoiler = "gate"
+			})
+		).toBe("")
+	})
+	it("Standout specs with every key", () => {
+		expect(
+			errorsAfter((i) =>
+				addStandout(i, {
+					rating: "A",
+					speed: 7,
+					acceleration: 6,
+					asphaltHandling: 5,
+					offRoadHandling: 4,
+					strength: 3,
+				})
+			)
+		).toBe("")
 	})
 })
 
