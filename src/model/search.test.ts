@@ -198,6 +198,11 @@ describe("merged group words (category model spec §2)", () => {
 			expect(result.visible, query).toEqual([])
 		}
 	})
+
+	it("never answers the Norwegian word for car with races", () => {
+		const sea = seeded("activities/sea-races", "racing", "Sea Races")
+		expect(view({ items: [sea], query: "bil", terms: SEARCH_TERMS }).visible).toEqual([])
+	})
 })
 
 describe("emptyState (spec §4)", () => {

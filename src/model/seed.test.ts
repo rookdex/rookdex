@@ -25,6 +25,20 @@ const official = { url: "https://www.rockstargames.com/VI", title: "GTA VI site"
 const trailer = { url: "https://www.youtube.com/@RockstarGames/videos", title: "Trailer 1" }
 const press = { url: "https://nordic.ign.com/gta-6/1", title: "IGN on wildlife" }
 
+describe("src/seed/ holds only what the build reads", () => {
+	it("has no stray file, such as an old seed file kept in a merge", async () => {
+		const { readdirSync } = await import("node:fs")
+		const names = readdirSync(new URL("../seed/", import.meta.url)).sort()
+		expect(names).toEqual([
+			"categories",
+			"categories.json",
+			"facts.json",
+			"rumours.json",
+			"shipped-ids.txt",
+		])
+	})
+})
+
 describe("matchesPrefix", () => {
 	it("bare domain covers www and subdomains, case-insensitively", () => {
 		expect(matchesPrefix(new URL("https://www.IGN.com/a"), "ign.com")).toBe(true)

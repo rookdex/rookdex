@@ -58,7 +58,8 @@ export function validateRumours(
 	return { rumours, errors }
 }
 
-/** Facts follow the same source rule as a confirmed seed item. */
+/** Facts keep the official-source rule (`officialErrors`). Seed items have the looser rule in
+ *  `confirmedItemErrors`: a game screen or two press sources also confirm them. */
 export function validateFacts(data: unknown, list: Allowlist): { facts: Fact[]; errors: string[] } {
 	const parsed = z.array(factInputSchema).safeParse(data)
 	if (!parsed.success) return { facts: [], errors: issueMessages("facts", parsed.error) }

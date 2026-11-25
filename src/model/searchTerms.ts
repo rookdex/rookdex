@@ -82,7 +82,6 @@ export const SEARCH_TERMS: SearchTerms = {
 		"races",
 		"time trial",
 		"løp",
-		"billøp",
 		"tidsløp",
 		"challenge",
 		"challenges",
