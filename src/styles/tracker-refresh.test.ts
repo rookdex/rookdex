@@ -106,6 +106,10 @@ describe("icon-lead card (spec §5.1)", () => {
 		expect(rule(".item-panel")).toMatch(/margin:\s*0/)
 	})
 
+	it("keeps a scroll past the end of a long text inside the panel", () => {
+		expect(rule(".item-panel")).toMatch(/overscroll-behavior:\s*contain/)
+	})
+
 	it("sets the panel's display only while open, so a closed panel stays hidden", () => {
 		expect(rule(".item-panel")).not.toMatch(/display:/)
 		expect(rule(".item-panel:popover-open")).toMatch(/display:\s*flex/)

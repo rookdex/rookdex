@@ -2195,6 +2195,8 @@ html:has(.search-row) {
 	box-sizing: border-box;
 	max-height: calc(100dvh - 16px);
 	overflow-y: auto;
+	/* A scroll past the end of a long text stays in the panel; a page scroll would close it. */
+	overscroll-behavior: contain;
 	margin: 0;
 	padding: 12px 12px 4px 14px;
 	border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);

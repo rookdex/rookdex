@@ -308,7 +308,7 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 			const close = panel.querySelector("button") as HTMLElement
 			expect(close).toHaveAttribute("popovertarget", panel.id)
 			expect(close).toHaveAttribute("popovertargetaction", "hide")
-			expect(close).toHaveTextContent("Close the whole description of American alligator")
+			expect(close).toHaveTextContent("Close full text: American alligator")
 		})
 
 		it("runs Tab as checkbox, chevron, book, flag, then the panel's close", async () => {

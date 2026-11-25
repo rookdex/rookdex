@@ -12,7 +12,12 @@ function Card({ onOther, onLink }: { onOther: () => void; onLink: () => void }) 
 	return (
 		<ul>
 			<li ref={card} className="item" data-testid="card" data-open={open || undefined}>
-				<div ref={panel} data-testid="panel" popover="auto">
+				<div className="item-foot">
+					<button type="button" popoverTarget="panel">
+						chevron
+					</button>
+				</div>
+				<div ref={panel} id="panel" data-testid="panel" popover="auto">
 					<button type="button">inside</button>
 				</div>
 			</li>
@@ -70,12 +75,12 @@ function mount({
 	render(<Card onOther={onOther} onLink={onLink} />)
 	const card = screen.getByTestId("card")
 	const panel = screen.getByTestId("panel")
-	card.getBoundingClientRect = () => rect(cardTop, cardHeight)
+	const at = { top: cardTop }
+	card.getBoundingClientRect = () => rect(at.top, cardHeight)
 	panel.getBoundingClientRect = () => rect(Number.parseFloat(panel.style.top), panelHeight)
 	hide = vi.fn()
 	panel.hidePopover = hide as unknown as () => void
-	// The other card's button stands in for the chevron a keyboard user pressed.
-	if (keyboard) screen.getByText("more").focus()
+	if (keyboard) screen.getByText("chevron").focus()
 	toggle(panel, "beforetoggle", "open")
 	// jsdom keeps a [popover] display: none; an open one shows, so focus can land inside it.
 	panel.style.display = "block"
@@ -85,7 +90,7 @@ function mount({
 	// Most tests start after the keyboard settle window, as a user's own scroll or touch ends it.
 	if (!settling) fireEvent.wheel(window)
 	const other = screen.getByText("other")
-	return { panel, onOther, onLink, other }
+	return { panel, onOther, onLink, other, at }
 }
 
 beforeEach(() => {
@@ -143,6 +148,13 @@ describe("usePanel placement (tracker refresh spec §5.1)", () => {
 		expect(screen.getByText("inside")).not.toHaveFocus()
 	})
 
+	it("leaves focus in another field, as Safari does on a tap, which does not focus the button", () => {
+		render(<input aria-label="search" />)
+		screen.getByLabelText("search").focus()
+		mount()
+		expect(screen.getByLabelText("search")).toHaveFocus()
+	})
+
 	it("reports open until it closes, so the card keeps it mounted meanwhile", () => {
 		const { panel } = mount()
 		expect(screen.getByTestId("card")).toHaveAttribute("data-open")
@@ -164,14 +176,27 @@ describe("usePanel closing (tracker refresh spec §5.1)", () => {
 		expect(hide).toHaveBeenCalledOnce()
 	})
 
-	it("moves its baseline instead of closing while the phone keyboard settles", () => {
+	it("follows its card instead of closing while the phone keyboard settles", () => {
 		vi.useFakeTimers()
-		mount({ settling: true })
+		const { panel, at } = mount({ settling: true })
+		at.top = 220
 		vi.stubGlobal("scrollY", 120)
 		fireEvent.scroll(window)
 		expect(hide).not.toHaveBeenCalled()
+		expect(panel.style.top).toBe("220px")
 		act(() => vi.advanceTimersByTime(PANEL_SETTLE_MS))
 		vi.stubGlobal("scrollY", 120 + SCROLL_SLACK + 1)
+		fireEvent.scroll(window)
+		expect(hide).toHaveBeenCalledOnce()
+	})
+
+	it.each([
+		["a key", () => fireEvent.keyDown(window, { key: "PageDown" })],
+		["a press", () => fireEvent.pointerDown(window)],
+	])("ends the settle window at %s, such as a keyboard or scrollbar scroll", (_, user) => {
+		mount({ settling: true })
+		user()
+		vi.stubGlobal("scrollY", 60)
 		fireEvent.scroll(window)
 		expect(hide).toHaveBeenCalledOnce()
 	})
@@ -275,6 +300,23 @@ describe("usePanel's closing tap (tracker refresh spec §5.1)", () => {
 		const { onOther, other } = mount()
 		fireEvent.pointerDown(other, { button: 2, isPrimary: true })
 		fireEvent.pointerUp(other, { button: 2, isPrimary: true })
+		fireEvent.click(other)
+		expect(onOther).toHaveBeenCalledOnce()
+	})
+
+	it("ends the wait at a long press's context menu", () => {
+		const { onOther, other } = mount()
+		fireEvent.pointerDown(other, { button: 0, isPrimary: true })
+		fireEvent.contextMenu(other)
+		fireEvent.click(other)
+		expect(onOther).toHaveBeenCalledOnce()
+	})
+
+	it("gives up on a press that never ends, so it never eats a later click", () => {
+		vi.useFakeTimers()
+		const { onOther, other } = mount()
+		fireEvent.pointerDown(other, { button: 0, isPrimary: true })
+		act(() => vi.advanceTimersByTime(5000))
 		fireEvent.click(other)
 		expect(onOther).toHaveBeenCalledOnce()
 	})
