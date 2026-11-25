@@ -273,12 +273,25 @@ describe("buildSeed rejects", () => {
 				}),
 			/story\/chapters\.json: story content waits for the Hide spoilers switch/,
 		],
+		[
+			"a set listed twice",
+			(i: FixtureInput) => cars(i).sets?.push({ id: "coupes" }),
+			/vehicles\/cars: set coupes is listed twice/,
+		],
+		[
+			"a header source on an unlisted host",
+			(i: FixtureInput) => (bikes(i).sources = [{ url: "https://example.com/", title: "Blog" }]),
+			/vehicles\/bikes/,
+		],
 	])("%s", (_name, change, error) => {
 		expect(errorsAfter(change)).toMatch(error)
 	})
 })
 
 describe("buildSeed accepts", () => {
+	it("a total that only the counted items fit, since edition items do not count", () => {
+		expect(errorsAfter((i) => (birds(i).total = 1))).toBe("")
+	})
 	it("a header with two press sources on different entries over an item with no sources", () => {
 		expect(errorsAfter((i) => (bikes(i).sources = [ign, radar]))).toBe("")
 	})
