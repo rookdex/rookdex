@@ -3,7 +3,7 @@
 import { addDays, localDayKey } from "./days"
 import type { Fact, Rumour, SeedItem } from "./schema"
 import { categoryIds, groupItems } from "./seed"
-import { countable, perCategory, type Records } from "./stats"
+import { countable, perCategory, type Records, shown } from "./stats"
 
 /** Where a player with nothing found starts. */
 export const FIRST_GOAL = "wildlife"
@@ -157,7 +157,7 @@ export interface CategoryRow {
 
 /** Every category, in the order its first item appears in the tracker. Retired items are skipped. */
 export function categoryRows(items: SeedItem[], records: Records): CategoryRow[] {
-	const live = countable(items)
+	const live = shown(items)
 	const counts = perCategory(live, records)
 	return categoryIds(live).map((id) => {
 		const count = counts.find((c) => c.category === id) ?? { done: 0, total: 0 }

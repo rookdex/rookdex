@@ -5,7 +5,7 @@ import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { openingView } from "../model/savedView"
 import { type EmptyState, emptyState, type SearchView } from "../model/search"
 import { categoryIds, seedItems } from "../model/seed"
-import { countable, countItems, perCategory, perGroup, recentFinds } from "../model/stats"
+import { countItems, perCategory, perGroup, recentFinds, shown } from "../model/stats"
 import { chipGroups, parseGroups, parseShow } from "../model/tracker"
 import type { ImportResult } from "../model/transfer"
 import { downloadJson } from "../scripts/download"
@@ -345,7 +345,7 @@ export function Tracker({ locale }: Props) {
 		search.resnapshot()
 	}
 
-	const categories = perCategory(countable(state.items), state.records).map((c) => ({
+	const categories = perCategory(shown(state.items), state.records).map((c) => ({
 		...c,
 		id: c.category,
 		label: seedLabel(t, "category", c.category),

@@ -14,6 +14,8 @@ export const TEXT = {
 	sourceTitle: 120,
 	note: 500,
 	profileName: 40,
+	tip: 300,
+	area: 120,
 } as const
 
 export const MAX_RECORDS = 10_000
@@ -22,7 +24,8 @@ export const MAX_BACKUP_PROFILES = 100
 /** Exactly `<category>/<kebab-name>`: one slash, so an id can also serve as a DOM id. */
 export const ID_PATTERN = /^[a-z0-9-]+\/[a-z0-9-]+$/
 const FORBIDDEN = /[<>]|http/i
-const SLUG = /^[a-z][a-z0-9-]{0,39}$/
+export const SLUG = /^[a-z][a-z0-9-]{0,39}$/
+export const slugSchema = z.string().regex(SLUG)
 
 /** Plain text: trimmed, non-empty, capped, no URLs, no markup. */
 export function text(max: number) {
@@ -52,6 +55,74 @@ export const gameSourceSchema = z.strictObject({
 })
 export const itemSourceInputSchema = z.union([sourceInputSchema, gameSourceSchema])
 
+export const SPOILERS = ["story", "gate"] as const
+export const PLATFORMS = ["ps5", "xbox", "pc"] as const
+
+/** Spec §8.2: one or two sentences in my own words, never pasted guide text. */
+const tipSchema = z.strictObject({
+	text: text(TEXT.tip),
+	spoiler: z.enum(SPOILERS).optional(),
+	sources: z.array(itemSourceInputSchema).min(1),
+})
+
+/** Spec §8.3: words plus a link to a guide page. No x/y until the map spec. */
+const locationSchema = z.strictObject({
+	area: text(TEXT.area),
+	kind: z.enum(["find", "spawn", "buy", "unlock"]),
+	link: sourceInputSchema.optional(),
+})
+
+/** Spec §8.7: a bar read off the screen as 1 to 10, or exact text from the screen. Which keys a
+ *  group takes is checked in seedBuild.ts (SPEC_KEYS). */
+export const specValueSchema = z.union([z.int().min(1).max(10), text(TEXT.name)])
+
+/** One item as authored in a group file. The folder and file give its category and group. */
+export const itemInputSchema = z.strictObject({
+	id: idSchema,
+	set: slugSchema.optional(),
+	name: text(TEXT.name),
+	status: z.enum(["confirmed", "expected"]),
+	precedent: text(TEXT.name).optional(),
+	description: text(TEXT.description).optional(),
+	/** May be empty only when the group header has sources (seedBuild checks it). */
+	sources: z.array(itemSourceInputSchema),
+	retired: z.boolean().optional(),
+	/** Retired ids this item is the same thing as, so a twin name is allowed (spec §6). */
+	replaces: z.array(idSchema).min(1).optional(),
+	/** Old or common names. Search matches them; they are never shown (spec §8.1). */
+	aliases: z.array(text(TEXT.name)).min(1).max(5).optional(),
+	tips: z.array(tipSchema).min(1).max(3).optional(),
+	locations: z.array(locationSchema).min(1).max(10).optional(),
+	spoiler: z.enum(SPOILERS).optional(),
+	edition: z.enum(["ultimate", "plus"]).optional(),
+	mode: z.enum(["story", "online"]).optional(),
+	platforms: z.array(z.enum(PLATFORMS)).min(1).optional(),
+	specs: z.record(z.string().regex(/^[a-z][a-zA-Z]{0,39}$/), specValueSchema).optional(),
+})
+
+/** `src/seed/categories/<category>/<group>.json` (spec §3). */
+export const groupFileSchema = z.strictObject({
+	group: slugSchema,
+	/** Position among the category's groups: the game's tab order. */
+	order: z.int().min(1),
+	/** The game's count. Absent while it is unsettled (spec §2) and for my own groups. */
+	total: z.int().min(1).optional(),
+	sort: z.enum(["name", "file"]),
+	/** false: shown but never counted. Absent means true. */
+	counts: z.boolean().optional(),
+	spoiler: z.enum(SPOILERS).optional(),
+	sets: z.array(z.strictObject({ id: slugSchema, total: z.int().min(1).optional() })).optional(),
+	sources: z.array(itemSourceInputSchema).optional(),
+	items: z.array(itemInputSchema),
+})
+
+/** `src/seed/categories.json`: category order, and which one is a spoiler. */
+export const categoriesFileSchema = z.strictObject({
+	categories: z
+		.array(z.strictObject({ id: slugSchema, spoiler: z.literal("story").optional() }))
+		.min(1),
+})
+
 export const seedItemInputSchema = z.strictObject({
 	id: idSchema,
 	category: z.string().regex(SLUG),
@@ -66,7 +137,6 @@ export const seedItemInputSchema = z.strictObject({
 	sources: z.array(sourceInputSchema).min(1),
 	retired: z.boolean().optional(),
 })
-export const seedItemSchema = seedItemInputSchema.extend({ sources: z.array(sourceSchema).min(1) })
 
 export const rumourInputSchema = z.strictObject({
 	id: idSchema,
@@ -155,7 +225,29 @@ export type GameSource = z.infer<typeof gameSourceSchema>
 export type ItemSourceInput = z.infer<typeof itemSourceInputSchema>
 export type ItemSource = Source | GameSource
 export type SeedItemInput = z.infer<typeof seedItemInputSchema>
-export type SeedItem = Omit<z.infer<typeof seedItemSchema>, "sources"> & { sources: ItemSource[] }
+export type Spoiler = (typeof SPOILERS)[number]
+export type ItemInput = z.infer<typeof itemInputSchema>
+export type GroupFile = z.infer<typeof groupFileSchema>
+export interface Tip {
+	text: string
+	spoiler?: Spoiler
+	sources: ItemSource[]
+}
+export interface ItemLocation {
+	area: string
+	kind: "find" | "spawn" | "buy" | "unlock"
+	link?: Source
+}
+/** An item after the build: category and group from its file, sources tiered and joined with the
+ *  header's, `uncounted` when its group has `counts: false` or it is edition-only. */
+export type SeedItem = Omit<ItemInput, "sources" | "tips" | "locations"> & {
+	category: string
+	group: string
+	sources: ItemSource[]
+	tips?: Tip[]
+	locations?: ItemLocation[]
+	uncounted?: true
+}
 export type RumourInput = z.infer<typeof rumourInputSchema>
 export type Rumour = z.infer<typeof rumourSchema>
 export type FactInput = z.infer<typeof factInputSchema>

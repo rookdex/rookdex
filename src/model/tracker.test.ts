@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest"
 import { listRecords } from "./progress"
 import { openingView } from "./savedView"
 import type { SeedItem } from "./schema"
+import { countItems } from "./stats"
 import { openStore, type Store } from "./store"
 import {
 	chipGroups,
@@ -605,4 +606,15 @@ describe("group chips (tracker refresh spec §14.1)", () => {
 		await tracker.createProfile("Dad")
 		expect(tracker.getState().groups).toEqual(["wildlife/birds"])
 	})
+})
+
+it("chipGroups gives a counts: false group its chip, and the group adds 0 to the total", () => {
+	const src = { url: "https://www.rockstargames.com/VI", title: "Site", tier: "official" as const }
+	const base = { category: "animals", status: "confirmed" as const, sources: [src] }
+	const items = [
+		{ ...base, id: "animals/a", group: "birds", name: "A" },
+		{ ...base, id: "animals/b", group: "mammals", name: "B", uncounted: true as const },
+	]
+	expect(chipGroups(items, ["animals"]).get("animals")).toEqual(["birds", "mammals"])
+	expect(countItems(items, {}).total).toBe(1)
 })

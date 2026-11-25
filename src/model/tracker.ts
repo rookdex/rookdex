@@ -14,7 +14,7 @@ import {
 import { listRecords, setDone } from "./progress"
 import { type ExportFile, type Profile, type SeedItem, TEXT } from "./schema"
 import { categoryIds, groupItems } from "./seed"
-import { countable, countItems, groupKey, type Records } from "./stats"
+import { countItems, groupKey, type Records, shown } from "./stats"
 import type { Store } from "./store"
 import {
 	backupEntries,
@@ -124,12 +124,12 @@ export function showParam(selected: string[]): string | null {
 
 /**
  * Per pressed category, the groups its chips offer (tracker refresh spec §14.1): every group with
- * a countable item, in the list's group order. A category with one group gets no chips, because
+ * a shown item, in the list's group order. A category with one group gets no chips, because
  * one chip would filter nothing. Categories come in seed order. A Map, so a category id such as
  * "constructor" can never read Object.prototype (R16).
  */
 export function chipGroups(items: SeedItem[], selected: string[]): Map<string, string[]> {
-	const live = countable(items)
+	const live = shown(items)
 	const chips = new Map<string, string[]>()
 	for (const category of categoryIds(live)) {
 		if (!selected.includes(category)) continue

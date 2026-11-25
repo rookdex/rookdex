@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest"
 import type { SeedItem } from "./schema"
-import { countItems, groupKey, perCategory, perGroup, type Records, recentFinds } from "./stats"
+import {
+	countable,
+	countItems,
+	groupKey,
+	perCategory,
+	perGroup,
+	type Records,
+	recentFinds,
+	shown,
+} from "./stats"
 
 const src = { url: "https://www.rockstargames.com/VI", title: "Site", tier: "official" as const }
 function item(id: string, category: string, retired?: boolean): SeedItem {
@@ -80,5 +89,24 @@ describe("perGroup (tracker refresh spec §4.3)", () => {
 
 	it("keys groups the way the list reads them", () => {
 		expect(groupKey("wildlife", "birds")).toBe("wildlife/birds")
+	})
+})
+
+describe("countable and shown", () => {
+	it("countable leaves out retired and uncounted items, shown keeps the uncounted ones", () => {
+		const base = {
+			category: "animals",
+			group: "birds",
+			status: "confirmed" as const,
+			sources: [src],
+		}
+		const list = [
+			{ ...base, id: "animals/a", name: "A" },
+			{ ...base, id: "animals/b", name: "B", retired: true },
+			{ ...base, id: "animals/c", name: "C", uncounted: true as const },
+		]
+		expect(countable(list).map((i) => i.id)).toEqual(["animals/a"])
+		expect(shown(list).map((i) => i.id)).toEqual(["animals/a", "animals/c"])
+		expect(countItems(list, {})).toEqual({ done: 0, total: 1 })
 	})
 })

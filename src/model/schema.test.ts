@@ -1,12 +1,16 @@
 import { z } from "astro/zod"
 import { describe, expect, it } from "vitest"
 import {
+	categoriesFileSchema,
 	exportFileSchema,
+	groupFileSchema,
+	itemInputSchema,
 	MAX_RECORDS,
 	progressRecordSchema,
 	rumourInputSchema,
 	seedItemInputSchema,
 	sourceInputSchema,
+	specValueSchema,
 	text,
 } from "./schema"
 
@@ -71,6 +75,116 @@ describe("seedItemInputSchema", () => {
 		expect(seedItemInputSchema.safeParse({ ...item, description: "x".repeat(301) }).success).toBe(
 			false
 		)
+	})
+})
+
+describe("itemInputSchema", () => {
+	const item = {
+		id: "animals/pelican",
+		name: "Pelican",
+		status: "confirmed",
+		sources: [{ url: "https://www.rockstargames.com/VI", title: "GTA VI site" }],
+	}
+	it("accepts a minimal item and an item with no sources (the header may carry them)", () => {
+		expect(itemInputSchema.safeParse(item).success).toBe(true)
+		expect(itemInputSchema.safeParse({ ...item, sources: [] }).success).toBe(true)
+	})
+	it("rejects bad ids, unknown fields, category and group fields", () => {
+		expect(itemInputSchema.safeParse({ ...item, id: "Animals/Pelican" }).success).toBe(false)
+		expect(itemInputSchema.safeParse({ ...item, id: "animals/a/b" }).success).toBe(false)
+		expect(itemInputSchema.safeParse({ ...item, id: `animals/${"a".repeat(80)}` }).success).toBe(
+			false
+		)
+		expect(itemInputSchema.safeParse({ ...item, extra: 1 }).success).toBe(false)
+		expect(itemInputSchema.safeParse({ ...item, category: "animals" }).success).toBe(false)
+		expect(
+			itemInputSchema.safeParse({ ...item, location: { x: 1, y: 2, region: "a" } }).success
+		).toBe(false)
+	})
+	it("caps the name at 80 and the description at 300", () => {
+		expect(itemInputSchema.safeParse({ ...item, name: "x".repeat(81) }).success).toBe(false)
+		expect(itemInputSchema.safeParse({ ...item, description: "x".repeat(301) }).success).toBe(false)
+	})
+	it("takes a game source, but never one with a url", () => {
+		const game = { kind: "game", screen: ["Progress", "Animals", "Birds"] }
+		expect(itemInputSchema.safeParse({ ...item, sources: [game] }).success).toBe(true)
+		expect(
+			itemInputSchema.safeParse({
+				...item,
+				sources: [{ ...game, url: "https://www.rockstargames.com/VI" }],
+			}).success
+		).toBe(false)
+	})
+	it("caps the extras: 5 aliases, 3 tips with a source each, 10 locations", () => {
+		const source = item.sources[0]
+		expect(
+			itemInputSchema.safeParse({ ...item, aliases: ["a", "b", "c", "d", "e", "f"] }).success
+		).toBe(false)
+		expect(
+			itemInputSchema.safeParse({ ...item, tips: [{ text: "Look up.", sources: [] }] }).success
+		).toBe(false)
+		expect(
+			itemInputSchema.safeParse({ ...item, tips: [{ text: "x".repeat(301), sources: [source] }] })
+				.success
+		).toBe(false)
+		const spot = { area: "Ocean Beach piers", kind: "find" }
+		expect(itemInputSchema.safeParse({ ...item, locations: [spot] }).success).toBe(true)
+		expect(itemInputSchema.safeParse({ ...item, locations: Array(11).fill(spot) }).success).toBe(
+			false
+		)
+		expect(
+			itemInputSchema.safeParse({ ...item, locations: [{ ...spot, kind: "steal" }] }).success
+		).toBe(false)
+		expect(
+			itemInputSchema.safeParse({ ...item, locations: [{ ...spot, area: "x".repeat(121) }] })
+				.success
+		).toBe(false)
+	})
+})
+
+describe("specValueSchema", () => {
+	it("takes a bar from 1 to 10 or plain text from the screen", () => {
+		expect(specValueSchema.safeParse(7).success).toBe(true)
+		expect(specValueSchema.safeParse("Classic").success).toBe(true)
+		expect(specValueSchema.safeParse(0).success).toBe(false)
+		expect(specValueSchema.safeParse(11).success).toBe(false)
+		expect(specValueSchema.safeParse(6.5).success).toBe(false)
+		expect(specValueSchema.safeParse("<b>Classic</b>").success).toBe(false)
+	})
+})
+
+describe("groupFileSchema", () => {
+	const file = { group: "birds", order: 1, sort: "name", items: [] }
+	it("accepts a bare header and one with total, sets, counts and sources", () => {
+		expect(groupFileSchema.safeParse(file).success).toBe(true)
+		expect(
+			groupFileSchema.safeParse({
+				...file,
+				total: 60,
+				counts: false,
+				sets: [{ id: "shorebirds", total: 4 }],
+				sources: [{ kind: "game", screen: ["Progress", "Animals", "Birds"] }],
+			}).success
+		).toBe(true)
+	})
+	it("rejects an unknown sort, a zero total and unknown fields", () => {
+		expect(groupFileSchema.safeParse({ ...file, sort: "date" }).success).toBe(false)
+		expect(groupFileSchema.safeParse({ ...file, total: 0 }).success).toBe(false)
+		expect(groupFileSchema.safeParse({ ...file, category: "animals" }).success).toBe(false)
+	})
+})
+
+describe("categoriesFileSchema", () => {
+	it("takes an ordered list where only story may be a spoiler", () => {
+		expect(
+			categoriesFileSchema.safeParse({
+				categories: [{ id: "vehicles" }, { id: "story", spoiler: "story" }],
+			}).success
+		).toBe(true)
+		expect(
+			categoriesFileSchema.safeParse({ categories: [{ id: "story", spoiler: "gate" }] }).success
+		).toBe(false)
+		expect(categoriesFileSchema.safeParse({ categories: [] }).success).toBe(false)
 	})
 })
 
