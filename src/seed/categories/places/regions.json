@@ -1,0 +1,87 @@
+{
+	"group": "regions",
+	"order": 1,
+	"sort": "name",
+	"items": [
+		{
+			"id": "places/grassrivers",
+			"name": "Grassrivers",
+			"status": "confirmed",
+			"description": "A swampy wetlands region of Leonida, one of the six named regions, modeled on the Everglades.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/map/",
+					"title": "GTA 6 Map: Full Leonida Map, Vice City and All Locations"
+				}
+			]
+		},
+		{
+			"id": "places/port-gellhorn",
+			"name": "Port Gellhorn",
+			"status": "confirmed",
+			"description": "A coastal region of Leonida named by Rockstar, one of the six named regions beyond Vice City.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/map/",
+					"title": "GTA 6 Map: Full Leonida Map, Vice City and All Locations"
+				}
+			]
+		},
+		{
+			"id": "places/ambrosia",
+			"name": "Ambrosia",
+			"status": "confirmed",
+			"description": "A rural, industrial region of Leonida named by Rockstar, one of the six named regions beyond Vice City.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/map/",
+					"title": "GTA 6 Map: Full Leonida Map, Vice City and All Locations"
+				}
+			]
+		},
+		{
+			"id": "places/mount-kalaga-national-park",
+			"name": "Mount Kalaga National Park",
+			"status": "confirmed",
+			"description": "A wilderness national park region of Leonida, one of the six named regions shown on the official Grand Theft Auto VI site.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/map/",
+					"title": "GTA 6 Map: Full Leonida Map, Vice City and All Locations"
+				}
+			]
+		},
+		{
+			"id": "places/kelly-county",
+			"name": "Kelly County",
+			"status": "confirmed",
+			"description": "A county of Leonida named on a highway road sign in the first trailer.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-trailer-1-breakdown-things-you-missed/",
+					"title": "GTA 6 trailer breakdown - 12 things you might have missed"
+				}
+			]
+		}
+	]
+}

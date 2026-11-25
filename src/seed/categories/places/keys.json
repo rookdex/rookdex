@@ -1,0 +1,39 @@
+{
+	"group": "keys",
+	"order": 4,
+	"sort": "name",
+	"items": [
+		{
+			"id": "places/the-keys",
+			"name": "Leonida Keys",
+			"status": "confirmed",
+			"description": "A touristy archipelago south of Vice City, one of the six named regions of Leonida, modeled on the Florida Keys.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/map/",
+					"title": "GTA 6 Map: Full Leonida Map, Vice City and All Locations"
+				}
+			]
+		},
+		{
+			"id": "places/goose-key",
+			"name": "Goose Key",
+			"status": "confirmed",
+			"description": "A key named on a road sign behind a sign for The Keys at the start of the launch trailer. The name nods to Top Gun.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/517572321a549a/watch-the-grand-theft-auto-vi-launch-trailer",
+					"title": "Watch the Grand Theft Auto VI Launch Trailer - Rockstar Games"
+				},
+				{
+					"url": "https://www.gamespot.com/articles/things-we-noticed-in-the-gta-6-launch-trailer/",
+					"title": "10 Things We Noticed In The GTA 6 Launch Trailer - GameSpot"
+				}
+			]
+		}
+	]
+}

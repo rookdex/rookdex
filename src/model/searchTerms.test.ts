@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import en from "../locales/en.json"
 import nb from "../locales/nb.json"
-import { missingTerms, SEARCH_TERMS } from "./searchTerms"
+import { ITEM_TERMS, missingTerms, SEARCH_TERMS } from "./searchTerms"
 import { seedItems } from "./seed"
 
 function groupLabels(bundle: Record<string, string>): Record<string, string> {
@@ -30,6 +30,21 @@ describe("search terms (spec §3.2)", () => {
 			'boats: no nb label "Båter"',
 			"bikes: no terms",
 		])
+	})
+
+	it("key item words by ids the seed holds, so a rename cannot drop them silently", () => {
+		const ids = new Set(seedItems.map((item) => item.id))
+		const keys = Object.keys(ITEM_TERMS)
+		expect(keys.length).toBeGreaterThan(0)
+		expect(keys.filter((id) => !ids.has(id))).toEqual([])
+	})
+
+	it("give every merged service item its own type words", () => {
+		const service = seedItems.filter((item) => item.group === "service" && !item.retired)
+		expect(service.length).toBeGreaterThan(0)
+		expect(
+			service.filter((item) => (ITEM_TERMS[item.id] ?? []).length === 0).map((item) => item.id)
+		).toEqual([])
 	})
 
 	it("compare labels the way search does, ignoring case and accents", () => {

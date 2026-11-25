@@ -1,10 +1,24 @@
 // Tracker search (tracker search spec §3.1). Pure: no React, no DOM. The functions take plain
 // text fields, so a later site-wide search can reuse normalize and matches.
+import { normalize } from "./normalize"
 import type { SeedItem } from "./schema"
 import { groupKey, type Records } from "./stats"
 
-/** Group id to search words in both languages (searchTerms.ts). */
+export { normalize }
+
+/** Group id, or item id, to search words in both languages (searchTerms.ts). */
 export type SearchTerms = Readonly<Record<string, readonly string[]>>
+
+/** The text a query searches for one item: its name, its aliases, its group's words and its own
+ *  words. One list for the tracker and the Dex, so both answer a query the same way. */
+export function searchFields(item: SeedItem, terms: SearchTerms, itemTerms: SearchTerms): string[] {
+	return [
+		item.name,
+		...(item.aliases ?? []),
+		...(terms[item.group] ?? []),
+		...(itemTerms[item.id] ?? []),
+	]
+}
 
 export interface SearchInput {
 	items: SeedItem[]
@@ -16,6 +30,8 @@ export interface SearchInput {
 	/** The snapshot of found ids; empty while Hide found is off. */
 	hidden: ReadonlySet<string>
 	terms: SearchTerms
+	/** Words true of one item only, keyed by item id (ITEM_TERMS). */
+	itemTerms: SearchTerms
 }
 
 export interface SearchView {
@@ -32,12 +48,6 @@ export type EmptyState = "none" | "elsewhere" | "all-found" | "no-match"
 /** How long typing must pause before its result is announced (tracker search spec §5). Shared by
  *  the tracker and the Dex search, so it lives here and not in a React module. */
 export const SETTLE_MS = 500
-
-/** NFD with combining marks removed, lowercase, trimmed, inner whitespace collapsed. ø and æ
- *  are letters, not accents, so they stay. */
-export function normalize(text: string): string {
-	return text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim().replace(/\s+/g, " ")
-}
 
 function words(query: string): string[] {
 	const text = normalize(query)
@@ -79,6 +89,7 @@ export function searchView({
 	query,
 	hidden,
 	terms,
+	itemTerms,
 }: SearchInput): SearchView {
 	const queryWords = words(query)
 	const all = selected.length === 0
@@ -95,8 +106,7 @@ export function searchView({
 	for (const item of items) {
 		// The list never shows a retired item, so no count may include one.
 		if (item.retired) continue
-		if (queryWords.length > 0 && !hasAll(queryWords, [item.name, ...(terms[item.group] ?? [])]))
-			continue
+		if (queryWords.length > 0 && !hasAll(queryWords, searchFields(item, terms, itemTerms))) continue
 		// A category under All is never narrowed by chips.
 		const inside =
 			all ||

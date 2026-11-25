@@ -1,0 +1,128 @@
+{
+	"group": "watercraft",
+	"order": 3,
+	"total": 28,
+	"sort": "name",
+	"items": [
+		{
+			"id": "vehicles/marquis",
+			"name": "Marquis",
+			"status": "confirmed",
+			"description": "A cabin cruiser returning from GTA V, previously owned by Michael De Santa, rendered with an updated paint job and blue stripes. Seen at the start of Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://rockstarintel.com/gta-6-trailer-2-might-feature-gta-v-story-easter-egg/",
+					"title": "GTA 6 Trailer 2 Might Feature GTA V Story Easter Egg - RockstarINTEL"
+				}
+			]
+		},
+		{
+			"id": "vehicles/crest-kayak",
+			"name": "Crest Kayak",
+			"status": "confirmed",
+			"description": "A kayak for paddling Leonida's rivers, kept at Jason's safehouse. An Ultimate Edition bonus vehicle.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/kayak",
+					"title": "Crest Kayak - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/shitzu-squalo",
+			"name": "Shitzu Squalo",
+			"status": "confirmed",
+			"description": "A speedboat built for fishing trips. The Ultimate Edition version is pink and blue, docked at Washington Beach and carries a crate of explosives. Also seen in Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/squalo",
+					"title": "Shitzu Squalo - GTA 6 Vehicle - GTABase"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-cars/",
+					"title": "All of the GTA 6 cars we know about so far - GamesRadar+"
+				}
+			]
+		},
+		{
+			"id": "vehicles/pegassi-speeder",
+			"name": "Pegassi Speeder",
+			"status": "confirmed",
+			"description": "A speedboat styled after the classic Italian runabout. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/speeder",
+					"title": "Pegassi Speeder - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/shitzu-tropic",
+			"name": "Shitzu Tropic",
+			"status": "confirmed",
+			"description": "A cabin cruiser styled after the Sea Ray Sundancer. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/tropic",
+					"title": "Shitzu Tropic - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/nagasaki-dinghy",
+			"name": "Nagasaki Dinghy",
+			"status": "confirmed",
+			"description": "A rigid inflatable boat. Seen in Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/dinghy",
+					"title": "Nagasaki Dinghy - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/speedophile-seashark",
+			"name": "Speedophile Seashark",
+			"status": "confirmed",
+			"description": "A jet ski styled after the Sea-Doo RXT. Seen in Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/seashark",
+					"title": "Speedophile Seashark - GTA 6 Vehicle - GTABase"
+				}
+			]
+		}
+	]
+}

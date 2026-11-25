@@ -125,7 +125,7 @@ Category order follows the game's Progress tiles, then Places, then Story. Group
 ## 7. Navigation
 
 - **Phones:** the category grid folds to one bar on the first tile press ("Collections 3 of 886 · Change"). With two pressed it lists both; with All it says "All". "Change" is a `button` with `aria-expanded`. After folding, focus moves to Change; after unfolding, to the first pressed tile, so focus never drops to `body`. Pressing more categories means unfolding first. With 11 tiles (Story hidden), the unfolded grid would push the first item to about 931 px on a 360 px phone. Folded, it starts at about 426 px.
-- **768 px and up:** the grid always shows. 11 categories plus the All and Sources tiles make 13, so 4 columns by 4 rows (Story stays hidden until the spoiler switch ships). Desktop keeps the side list.
+- **768 px and up:** the grid always shows. PR 1 removed the Sources tile (every item already links its sources), so 11 categories plus the All tile make 12: All across, then the 11 categories in 4 columns (Story stays hidden until the spoiler switch ships). No tile may sit alone in a row. Desktop keeps the side list.
 - **Tile order:** the game's Progress order, then Places, then Story. Story shows only when Hide spoilers is off.
 - **Group chips (option B):** small square chips replace the pills.
   - The visible box is `min-height: 2rem` (32 px at normal text size), padding-driven so a wrapped label at 200 % text never clips, with a 6 px radius and 0.8125rem text.

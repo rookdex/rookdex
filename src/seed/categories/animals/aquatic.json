@@ -1,0 +1,104 @@
+{
+	"group": "aquatic",
+	"order": 7,
+	"total": 18,
+	"sort": "name",
+	"items": [
+		{
+			"id": "wildlife/dolphin",
+			"name": "Dolphin",
+			"status": "confirmed",
+			"description": "Dolphins appear in trailer 1 alongside flamingos, alligators and sharks.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-trailer-1-breakdown-things-you-missed/",
+					"title": "GTA 6 trailer breakdown - 12 things you might have missed"
+				}
+			]
+		},
+		{
+			"id": "wildlife/great-white-shark",
+			"name": "Great white shark",
+			"status": "confirmed",
+			"description": "Barely visible beneath the waves of a busy marina in footage and screenshots released alongside trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+				},
+				{
+					"url": "https://www.pcgamer.com/games/grand-theft-auto/bodega-cats-trash-pandas-and-a-great-white-shark-the-real-stars-of-the-gta-6-reveal-are-all-the-animals-hiding-in-plain-sight/",
+					"title": "Bodega cats, trash pandas, and a great white shark - PC Gamer"
+				}
+			]
+		},
+		{
+			"id": "wildlife/manatee",
+			"name": "Manatee",
+			"status": "confirmed",
+			"description": "Listed among the confirmed marine species spotted across the trailers and official screenshots.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+				},
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/animals/",
+					"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+				}
+			]
+		},
+		{
+			"id": "wildlife/eel",
+			"name": "Eel",
+			"status": "confirmed",
+			"description": "Listed among the confirmed marine species spotted across the trailers and official screenshots.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 (Rockstar Games)"
+				},
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 (Rockstar Games)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/animals/",
+					"title": "GTA 6 Animals List: All Animals, Birds and Fish Confirmed"
+				}
+			]
+		},
+		{
+			"id": "wildlife/ray",
+			"name": "Ray",
+			"status": "confirmed",
+			"description": "Rays swim past a diver in a wetsuit in the Extended Look. Press coverage names them as manta rays and stingrays. Rays are also on the wildlife list Rockstar gave Game Informer.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look, Now Playing (Rockstar Newswire)"
+				},
+				{
+					"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-side-activities/",
+					"title": "All of the GTA 6 side activities confirmed so far - GamesRadar+"
+				},
+				{
+					"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-extended-look-breakdown-7-things-you-might-have-missed/",
+					"title": "GTA 6 extended look breakdown: 7 things you might have missed - GamesRadar+"
+				},
+				{
+					"url": "https://rockstarintel.com/gta-6-has-hurricanes-170-animals-fun-activities-weather-system-detailed/",
+					"title": "GTA 6 Has Hurricanes, 170 Animals, Fun Activities, Weather System Detailed - RockstarINTEL"
+				}
+			]
+		}
+	]
+}

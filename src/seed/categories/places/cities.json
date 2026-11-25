@@ -1,0 +1,23 @@
+{
+	"group": "cities",
+	"order": 2,
+	"sort": "name",
+	"items": [
+		{
+			"id": "places/the-city",
+			"name": "Vice City",
+			"status": "confirmed",
+			"description": "The neon-soaked coastal city at the heart of Grand Theft Auto VI, in the state of Leonida, home to Jason and Lucia.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI",
+					"title": "Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.rockstargames.com/VI/vice-city",
+					"title": "Grand Theft Auto VI - Vice City - Rockstar Games"
+				}
+			]
+		}
+	]
+}

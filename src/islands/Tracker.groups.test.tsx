@@ -12,13 +12,13 @@ vi.mock("../model/seed", async (importOriginal) => {
 
 beforeEach(resetBrowser)
 
-// Vehicles has one group (Bikes), so it never gets chips. Wildlife has Birds (Pelican) and
-// Reptiles (American alligator); birds sort first, so the Pelican's card comes first.
+// Vehicles has one group (Bikes), so it never gets chips. Animals has Reptiles & Amphibians
+// (American alligator) and Birds (Pelican), in the game's group order, so the alligator comes first.
 const ready = () => renderReady(<Tracker locale="en" />)
 const names = () => screen.queryAllByRole("checkbox").map((box) => box.getAttribute("id"))
 const button = (name: RegExp | string) => screen.getByRole("button", { name })
 const press = (name: RegExp | string) => fireEvent.click(button(name))
-const chipRow = () => screen.queryByRole("group", { name: "Groups: Wildlife" })
+const chipRow = () => screen.queryByRole("group", { name: "Groups: Animals" })
 const groupParam = () => new URLSearchParams(window.location.search).get("group")
 const type = (value: string) =>
 	fireEvent.change(screen.getByRole("searchbox"), { target: { value } })
@@ -29,62 +29,72 @@ describe("Group chips (tracker refresh spec §14.1)", () => {
 	it("shows chips under a pressed category with more than one group, never under All", async () => {
 		await ready()
 		expect(screen.queryByRole("group", { name: /^Groups:/ })).toBeNull()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		press(/^Vehicles,/)
 		const row = chipRow() as HTMLElement
 		expect(
 			within(row)
 				.getAllByRole("button")
 				.map((b) => b.getAttribute("aria-label"))
-		).toEqual(["Birds, 0 of 1", "Reptiles, 0 of 1"])
+		).toEqual(["Reptiles & Amphibians, 0 of 1", "Birds, 0 of 1"])
 		expect(screen.queryByRole("group", { name: "Groups: Vehicles" })).toBeNull()
 	})
 
 	it("narrows only its own category and mirrors the chips to ?group=", async () => {
 		await ready()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		press(/^Birds,/)
 		expect(names()).toEqual(["item-wildlife/pelican"])
 		expect(button(/^Birds,/)).toHaveAttribute("aria-pressed", "true")
-		expect(groupParam()).toBe("wildlife/birds")
+		expect(groupParam()).toBe("animals/birds")
 		press(/^Vehicles,/)
 		expect(names()).toEqual(["item-vehicles/bike", "item-wildlife/pelican"])
 	})
 
 	it("drops a category's chips when it is unpressed", async () => {
 		await ready()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		press(/^Birds,/)
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		expect(groupParam()).toBeNull()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		expect(button(/^Birds,/)).toHaveAttribute("aria-pressed", "false")
-		expect(names()).toEqual(["item-wildlife/pelican", "item-wildlife/american-alligator"])
+		expect(names()).toEqual(["item-wildlife/american-alligator", "item-wildlife/pelican"])
 	})
 
 	it("counts whole groups on the chips while a search narrows the list", async () => {
 		await ready()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		type("peli")
-		expect(button("Reptiles, 0 of 1")).toBeInTheDocument()
+		expect(button("Reptiles & Amphibians, 0 of 1")).toBeInTheDocument()
 	})
 
 	it("reads ?group= on load and drops keys no chip offers", async () => {
 		window.history.replaceState(
 			null,
 			"",
-			"/en/tracker/?show=wildlife&group=wildlife/birds,vehicles/bikes,evil"
+			"/en/tracker/?show=animals&group=animals/birds,vehicles/bikes,evil"
 		)
 		render(<Tracker locale="en" />)
 		const box = await screen.findByRole("checkbox", { name: "Pelican" })
 		await waitFor(() => expect(box).toBeEnabled())
 		expect(names()).toEqual(["item-wildlife/pelican"])
-		expect(groupParam()).toBe("wildlife/birds")
+		expect(groupParam()).toBe("animals/birds")
+	})
+
+	it("opens an old Wildlife link on Animals with the whole category (category model spec §6)", async () => {
+		window.history.replaceState(null, "", "/en/tracker/?show=wildlife&group=wildlife/birds")
+		render(<Tracker locale="en" />)
+		const box = await screen.findByRole("checkbox", { name: "Pelican" })
+		await waitFor(() => expect(box).toBeEnabled())
+		expect(button(/^Animals,/)).toHaveAttribute("aria-pressed", "true")
+		expect(names()).toEqual(["item-wildlife/american-alligator", "item-wildlife/pelican"])
+		expect(button(/^Birds,/)).toHaveAttribute("aria-pressed", "false")
 	})
 
 	it("keeps the title and chips when a press empties the view, with focus on the chip (R17)", async () => {
 		await ready()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		type("zzz")
 		expect(chipRow()).not.toBeNull()
 		expect(screen.getByText('No match for "zzz".')).toBeInTheDocument()
@@ -94,39 +104,39 @@ describe("Group chips (tracker refresh spec §14.1)", () => {
 		fireEvent.click(birds)
 		// Unpressing the last chip under a search with no match: the row stays, the node is the same.
 		expect(chipRow()).not.toBeNull()
-		expect(screen.getByRole("heading", { name: "Wildlife" })).toBeInTheDocument()
+		expect(screen.getByRole("heading", { name: "Animals" })).toBeInTheDocument()
 		expect(birds).toHaveFocus()
 	})
 
 	it("keeps the title, chips and focus when a chip press empties a matching view (spec §14.1)", async () => {
 		await ready()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		type("peli")
 		expect(names()).toEqual(["item-wildlife/pelican"])
-		const reptiles = button(/^Reptiles,/)
+		const reptiles = button(/^Reptiles & Amphibians,/)
 		reptiles.focus()
 		fireEvent.click(reptiles)
 		expect(names()).toEqual([])
 		expect(screen.getByText("1 more outside your filters")).toBeInTheDocument()
 		expect(chipRow()).not.toBeNull()
-		expect(screen.getByRole("heading", { name: "Wildlife" })).toBeInTheDocument()
+		expect(screen.getByRole("heading", { name: "Animals" })).toBeInTheDocument()
 		expect(document.activeElement).toBe(reptiles)
 	})
 
 	it("keeps an unmatched chip category on screen while another pressed category matches (R17)", async () => {
 		await ready()
 		press(/^Vehicles,/)
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		type("bike")
 		expect(names()).toEqual(["item-vehicles/bike"])
-		expect(screen.getByRole("heading", { name: "Wildlife" })).toBeInTheDocument()
+		expect(screen.getByRole("heading", { name: "Animals" })).toBeInTheDocument()
 		expect(chipRow()).not.toBeNull()
 		expect(screen.queryByText(/outside your filters/)).toBeNull()
 	})
 
 	it("points to a match a chip hides, and Clear filters clears tiles and chips", async () => {
 		await ready()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		press(/^Birds,/)
 		type("gator")
 		expect(names()).toEqual([])
@@ -143,7 +153,7 @@ describe("Group chips (tracker refresh spec §14.1)", () => {
 
 	it("lets a chip toggle cancel a pending result", async () => {
 		await ready()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		type("peli")
 		press(/^Birds,/)
 		await wait(700)
@@ -154,8 +164,8 @@ describe("Group chips (tracker refresh spec §14.1)", () => {
 		await ready()
 		fireEvent.click(screen.getByRole("checkbox", { name: "Pelican" }))
 		await screen.findByRole("button", { name: /^Last found Pelican/ })
-		press(/^Wildlife,/)
-		press(/^Reptiles,/)
+		press(/^Animals,/)
+		press(/^Reptiles & Amphibians,/)
 		expect(screen.queryByRole("button", { name: /^Last found/ })).toBeNull()
 		expect(document.querySelector(".last-found")?.tagName).toBe("P")
 	})
@@ -166,7 +176,7 @@ describe("Remembered filters (leave the tracker and come back)", () => {
 
 	it("opens a bare tracker URL with the tiles and chips pressed before", async () => {
 		const first = await ready()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		press(/^Vehicles,/)
 		press(/^Birds,/)
 		first.unmount()
@@ -175,17 +185,17 @@ describe("Remembered filters (leave the tracker and come back)", () => {
 		const box = await screen.findByRole("checkbox", { name: "Pelican" })
 		await waitFor(() => expect(box).toBeEnabled())
 		expect(names()).toEqual(["item-vehicles/bike", "item-wildlife/pelican"])
-		expect(button(/^Wildlife,/)).toHaveAttribute("aria-pressed", "true")
+		expect(button(/^Animals,/)).toHaveAttribute("aria-pressed", "true")
 		expect(button(/^Vehicles,/)).toHaveAttribute("aria-pressed", "true")
 		expect(button(/^Birds,/)).toHaveAttribute("aria-pressed", "true")
-		expect(showParam()).toBe("vehicles,wildlife")
-		expect(groupParam()).toBe("wildlife/birds")
+		expect(showParam()).toBe("vehicles,animals")
+		expect(groupParam()).toBe("animals/birds")
 	})
 
 	it("opens on All again once the filters are cleared", async () => {
 		const first = await ready()
-		press(/^Wildlife,/)
-		press(/^Wildlife,/)
+		press(/^Animals,/)
+		press(/^Animals,/)
 		first.unmount()
 		window.history.replaceState(null, "", "/en/tracker/")
 		await ready()
@@ -196,7 +206,7 @@ describe("Remembered filters (leave the tracker and come back)", () => {
 	it("keeps the search text and the scroll position too", async () => {
 		const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => undefined)
 		const first = await ready()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		type("peli")
 		Object.defineProperty(window, "scrollY", { configurable: true, value: 480 })
 		first.unmount()
@@ -224,7 +234,7 @@ describe("Remembered filters (leave the tracker and come back)", () => {
 
 	it("lets a link that names its own category win over the saved view", async () => {
 		const first = await ready()
-		press(/^Wildlife,/)
+		press(/^Animals,/)
 		type("peli")
 		first.unmount()
 		window.history.replaceState(null, "", "/en/tracker/?show=vehicles")

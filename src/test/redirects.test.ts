@@ -6,11 +6,23 @@ const lines = readFileSync(new URL("../../public/_redirects", import.meta.url), 
 	.map((line) => line.trim().replace(/\s+/g, " "))
 	.filter(Boolean)
 
-describe("_redirects (locale spec §6.2)", () => {
-	it("sends every old Norwegian URL to /nb/ in one 301, the specific rumours rule first", () => {
+describe("_redirects (locale spec §6.2, category model spec §6)", () => {
+	it("sends every old URL to its new home in one 301, the specific rules before /no/*", () => {
 		expect(lines).toEqual([
 			"/no/tracker/rumours/ /nb/news/ 301",
 			"/en/tracker/rumours/ /en/news/ 301",
+			"/no/dex/wildlife/ /nb/dex/animals/ 301",
+			"/no/dex/collectibles/ /nb/dex/collections/ 301",
+			"/en/dex/wildlife/ /en/dex/animals/ 301",
+			"/nb/dex/wildlife/ /nb/dex/animals/ 301",
+			"/en/dex/collectibles/ /en/dex/collections/ 301",
+			"/nb/dex/collectibles/ /nb/dex/collections/ 301",
+			"/no/dex/wildlife /nb/dex/animals/ 301",
+			"/no/dex/collectibles /nb/dex/collections/ 301",
+			"/en/dex/wildlife /en/dex/animals/ 301",
+			"/nb/dex/wildlife /nb/dex/animals/ 301",
+			"/en/dex/collectibles /en/dex/collections/ 301",
+			"/nb/dex/collectibles /nb/dex/collections/ 301",
 			"/no /nb/ 301",
 			"/no/* /nb/:splat 301",
 		])

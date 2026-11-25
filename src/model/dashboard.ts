@@ -3,10 +3,10 @@
 import { addDays, localDayKey } from "./days"
 import type { Fact, Rumour, SeedItem } from "./schema"
 import { categoryIds, groupItems } from "./seed"
-import { countable, perCategory, type Records } from "./stats"
+import { countable, perCategory, type Records, shown } from "./stats"
 
 /** Where a player with nothing found starts. */
-export const FIRST_GOAL = "wildlife"
+export const FIRST_GOAL = "animals"
 
 /** How many categories What's next draws from (dashboard spec §4). */
 export const NEXT_GROUPS = 2
@@ -21,7 +21,7 @@ export interface NextGroup {
 
 /**
  * Categories below 100 %, highest share found first, ties in category order. With nothing found,
- * wildlife comes first and the rest follow in category order.
+ * animals comes first and the rest follow in category order.
  */
 export function rankCategories(items: SeedItem[], records: Records): string[] {
 	const counts = perCategory(countable(items), records)
@@ -38,7 +38,7 @@ export function rankCategories(items: SeedItem[], records: Records): string[] {
 
 /**
  * The category with the highest share found below 100 %. Ties go to category order. With nothing
- * found it is wildlife; with everything found it is undefined.
+ * found it is animals; with everything found it is undefined.
  */
 export function closestCategory(items: SeedItem[], records: Records): string | undefined {
 	return rankCategories(items, records)[0]
@@ -71,7 +71,7 @@ export function nextGroups(items: SeedItem[], records: Records, limit: number): 
 /** Finds whose tick (stored in UTC) falls on `now`'s local calendar day. */
 export function foundToday(items: SeedItem[], records: Records, now: Date): number {
 	const today = localDayKey(now)
-	return countable(items).filter((item) => {
+	return shown(items).filter((item) => {
 		const record = records[item.id]
 		return record?.done === true && localDayKey(new Date(record.updated_at)) === today
 	}).length
@@ -137,7 +137,7 @@ export function findsByDay(
 ): DayCount[] {
 	const counts = new Map<string, number>()
 	for (let n = days - 1; n >= 0; n--) counts.set(addDays(today, -n), 0)
-	for (const item of countable(items)) {
+	for (const item of shown(items)) {
 		const record = records[item.id]
 		if (record?.done !== true) continue
 		const day = localDayKey(new Date(record.updated_at))
@@ -157,7 +157,7 @@ export interface CategoryRow {
 
 /** Every category, in the order its first item appears in the tracker. Retired items are skipped. */
 export function categoryRows(items: SeedItem[], records: Records): CategoryRow[] {
-	const live = countable(items)
+	const live = shown(items)
 	const counts = perCategory(live, records)
 	return categoryIds(live).map((id) => {
 		const count = counts.find((c) => c.category === id) ?? { done: 0, total: 0 }

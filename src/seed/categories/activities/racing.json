@@ -1,0 +1,83 @@
+{
+	"group": "racing",
+	"order": 2,
+	"sort": "name",
+	"items": [
+		{
+			"id": "collectibles/time-trials",
+			"name": "Time Trials",
+			"status": "expected",
+			"precedent": "GTA V",
+			"description": "A set of timed vehicle and stunt-plane courses in GTA V, an optional extra not required for 100% completion; press coverage expects time trials to return in GTA 6.",
+			"sources": [
+				{
+					"url": "https://www.gtabase.com/articles/gta-6/gta-6-100-completion-guide-interactive-checklist",
+					"title": "GTA 6 100% Completion Guide & Interactive Checklist"
+				},
+				{
+					"url": "https://www.gtabase.com/grand-theft-auto-v/side-missions/stunt-plane-time-trials",
+					"title": "Stunt Plane Time Trials - GTA 5 Hobbies & Pastimes Guide"
+				}
+			]
+		},
+		{
+			"id": "collectibles/street-races",
+			"name": "Street Races",
+			"status": "expected",
+			"precedent": "GTA V",
+			"description": "Five night-time street races in GTA V, each unlocking the next, with a medal in every race needed for 100% completion. Street racing is confirmed for GTA 6, so a similar race set is expected.",
+			"sources": [
+				{
+					"url": "https://www.gamesradar.com/gta-6-guide/",
+					"title": "GTA 6: Everything we know so far"
+				},
+				{
+					"url": "https://rockstarintel.com/gta-6-has-hurricanes-170-animals-fun-activities-weather-system-detailed/",
+					"title": "GTA 6 Has Hurricanes, 170 Animals, Fun Activities, Weather System Detailed"
+				},
+				{
+					"url": "https://www.gtabase.com/grand-theft-auto-v/side-missions/hao-street-races",
+					"title": "Hao Street Races - GTA 5 Hobbies & Pastimes Guide"
+				}
+			]
+		},
+		{
+			"id": "collectibles/off-road-races",
+			"name": "Off-Road Races",
+			"status": "expected",
+			"precedent": "GTA V",
+			"description": "Six off-road races for trucks and bikes in GTA V, with a top-three finish in each needed for 100% completion. Off-road racing is confirmed for GTA 6, so a similar race set is expected.",
+			"sources": [
+				{
+					"url": "https://www.gamesradar.com/gta-6-guide/",
+					"title": "GTA 6: Everything we know so far"
+				},
+				{
+					"url": "https://rockstarintel.com/gta-6-has-hurricanes-170-animals-fun-activities-weather-system-detailed/",
+					"title": "GTA 6 Has Hurricanes, 170 Animals, Fun Activities, Weather System Detailed"
+				},
+				{
+					"url": "https://www.gtabase.com/grand-theft-auto-v/side-missions/off-road-races",
+					"title": "Off-Road Races - GTA 5 Hobbies & Pastimes Guide"
+				}
+			]
+		},
+		{
+			"id": "collectibles/sea-races",
+			"name": "Sea Races",
+			"status": "expected",
+			"precedent": "GTA V",
+			"description": "Four races on Seashark jet skis in GTA V, with a top-three finish in each needed for 100% completion. Press coverage expects sea races to return in GTA 6.",
+			"sources": [
+				{
+					"url": "https://www.gtabase.com/side-missions/gta-6/sea-races",
+					"title": "Sea Races - GTA 6 Activities & Side Missions"
+				},
+				{
+					"url": "https://www.gtabase.com/grand-theft-auto-v/side-missions/sea-races",
+					"title": "Sea Races - GTA 5 Hobbies & Pastimes Guide"
+				}
+			]
+		}
+	]
+}

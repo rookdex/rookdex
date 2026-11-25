@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { categoryIds, seedItems } from "../model/seed"
+import { isGameSource } from "../model/tiers"
 import Sources from "../pages/[locale]/tracker/sources.astro"
 import { renderDoc } from "./render"
 
@@ -39,7 +40,9 @@ describe("Sources page (feedback spec §5)", () => {
 			const entry = doc.getElementById(item.id)
 			expect(text(entry?.querySelector("h3"))).toBe(item.name)
 			const links = [...(entry?.querySelectorAll('a[target="_blank"]') ?? [])]
-			expect(links.map((a) => a.getAttribute("href"))).toEqual(item.sources.map((s) => s.url))
+			expect(links.map((a) => a.getAttribute("href"))).toEqual(
+				item.sources.flatMap((s) => (isGameSource(s) ? [] : [s.url]))
+			)
 			for (const a of links) expect(a.querySelector(".new-tab-note")).not.toBeNull()
 			expect(entry?.querySelectorAll(".outlet")).toHaveLength(item.sources.length)
 		}
@@ -70,7 +73,9 @@ describe("Sources page (feedback spec §5)", () => {
 			const entry = doc.getElementById(item.id)
 			expect(entry?.querySelector("h3")?.getAttribute("lang")).toBe("en")
 			const titles = [...(entry?.querySelectorAll(".source-list a > span[lang='en']") ?? [])]
-			expect(titles.map((s) => s.textContent)).toEqual(item.sources.map((s) => s.title))
+			expect(titles.map((s) => s.textContent)).toEqual(
+				item.sources.flatMap((s) => (isGameSource(s) ? [] : [s.title]))
+			)
 		}
 		for (const note of doc.querySelectorAll(".new-tab-note")) {
 			expect(note.closest("[lang='en']")).toBeNull()

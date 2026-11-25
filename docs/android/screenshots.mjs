@@ -26,7 +26,7 @@ const pages = [
 		"tracker/",
 		[{ start: "top" }, { start: "main h1" }, { start: "button.last-found" }],
 	],
-	["3-dex", "dex/wildlife/", [{ start: "top" }, { start: "main h1" }, { start: ".dex-card" }]],
+	["3-dex", "dex/animals/", [{ start: "top" }, { start: "main h1" }, { start: ".dex-card" }]],
 	[
 		"4-news",
 		"news/",

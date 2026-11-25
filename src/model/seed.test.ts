@@ -7,18 +7,14 @@ import {
 	allowlist,
 	categoryIds,
 	facts,
-	groupItems,
-	isVideo,
-	loadAll,
 	matchesPrefix,
 	resolveTier,
 	rumours,
 	seedItems,
-	tierErrors,
 	validateFacts,
 	validateRumours,
-	validateSeedFile,
 } from "./seed"
+import { sortKey } from "./seedBuild"
 
 const list: Allowlist = {
 	official: ["rockstargames.com", "youtube.com/@RockstarGames/"],
@@ -29,17 +25,19 @@ const official = { url: "https://www.rockstargames.com/VI", title: "GTA VI site"
 const trailer = { url: "https://www.youtube.com/@RockstarGames/videos", title: "Trailer 1" }
 const press = { url: "https://nordic.ign.com/gta-6/1", title: "IGN on wildlife" }
 
-function item(overrides: Record<string, unknown>) {
-	return {
-		id: "wildlife/american-alligator",
-		category: "wildlife",
-		group: "reptiles",
-		name: "American alligator",
-		status: "confirmed",
-		sources: [official],
-		...overrides,
-	}
-}
+describe("src/seed/ holds only what the build reads", () => {
+	it("has no stray file, such as an old seed file kept in a merge", async () => {
+		const { readdirSync } = await import("node:fs")
+		const names = readdirSync(new URL("../seed/", import.meta.url)).sort()
+		expect(names).toEqual([
+			"categories",
+			"categories.json",
+			"facts.json",
+			"rumours.json",
+			"shipped-ids.txt",
+		])
+	})
+})
 
 describe("matchesPrefix", () => {
 	it("bare domain covers www and subdomains, case-insensitively", () => {
@@ -75,62 +73,6 @@ describe("resolveTier", () => {
 	it("blocklist wins over an allow entry", () => {
 		const both = { ...list, blocklist: ["ign.com"] }
 		expect(resolveTier(press.url, both)).toBe("blocked")
-	})
-})
-
-describe("tier rules", () => {
-	it("confirmed needs an official source", () => {
-		const { errors } = validateSeedFile("wildlife", [item({ sources: [press] })], list)
-		expect(errors).toEqual(["wildlife/american-alligator: confirmed needs an official source"])
-	})
-	it("a video-only official source needs a press source naming the item", () => {
-		expect(isVideo(trailer.url)).toBe(true)
-		const only = validateSeedFile("wildlife", [item({ sources: [trailer] })], list)
-		expect(only.errors[0]).toMatch(/video-only/)
-		const both = validateSeedFile("wildlife", [item({ sources: [trailer, press] })], list)
-		expect(both.errors).toEqual([])
-	})
-	it("expected needs a precedent", () => {
-		const { errors } = validateSeedFile(
-			"wildlife",
-			[item({ status: "expected", sources: [press] })],
-			list
-		)
-		expect(errors).toEqual(["wildlife/american-alligator: expected needs a precedent"])
-		const ok = validateSeedFile(
-			"wildlife",
-			[item({ status: "expected", precedent: "GTA V", sources: [press] })],
-			list
-		)
-		expect(ok.errors).toEqual([])
-		expect(tierErrors(ok.items[0])).toEqual([])
-	})
-	it("rejects blocked and unlisted sources", () => {
-		const { errors } = validateSeedFile(
-			"wildlife",
-			[item({ sources: [official, { url: "https://leaksite.example/x", title: "Dump" }] })],
-			list
-		)
-		expect(errors).toEqual([
-			"wildlife/american-alligator: source https://leaksite.example/x is blocked",
-		])
-	})
-})
-
-describe("validateSeedFile", () => {
-	it("attaches tiers to valid items", () => {
-		const { items, errors } = validateSeedFile("wildlife", [item({})], list)
-		expect(errors).toEqual([])
-		expect(items[0].sources[0].tier).toBe("official")
-	})
-	it("reports schema errors with the path", () => {
-		const { errors } = validateSeedFile("wildlife", [item({ name: "<b>Gator</b>" })], list)
-		expect(errors[0]).toMatch(/^wildlife\[0\]\.name: /)
-	})
-	it("requires category and id prefix to match the file", () => {
-		const { errors } = validateSeedFile("vehicles", [item({})], list)
-		expect(errors).toContain("wildlife/american-alligator: category must be vehicles")
-		expect(errors).toContain("wildlife/american-alligator: id must start with vehicles/")
 	})
 })
 
@@ -185,38 +127,44 @@ describe("validateFacts", () => {
 	})
 })
 
-describe("loadAll", () => {
-	it("maps file names to categories, skips rumours, and rejects duplicate ids", () => {
-		const files = {
-			"../seed/wildlife.json": [item({})],
-			"../seed/vehicles.json": [item({ id: "wildlife/american-alligator", category: "vehicles" })],
-			"../seed/rumours.json": [],
-			"../seed/facts.json": [],
-		}
-		const result = loadAll(files, list)
-		expect(result.errors).toContain("duplicate id wildlife/american-alligator")
-		expect(result.errors).toContain("wildlife/american-alligator: id must start with vehicles/")
-	})
-	it("orders categories alphabetically and groups items", () => {
-		const files = {
-			"../seed/wildlife.json": [item({})],
-			"../seed/vehicles.json": [
-				item({ id: "vehicles/bike", category: "vehicles", group: "bikes", name: "Bike" }),
-			],
-		}
-		const { items, errors } = loadAll(files, list)
-		expect(errors).toEqual([])
-		expect(categoryIds(items)).toEqual(["vehicles", "wildlife"])
-		expect([...groupItems(items).keys()]).toEqual(["bikes", "reptiles"])
-	})
-})
-
 describe("shipped seed", () => {
 	it("validates against the shipped allowlist (this is the CI gate)", () => {
 		expect(Array.isArray(seedItems)).toBe(true)
 		expect(Array.isArray(rumours)).toBe(true)
 		expect(facts.length).toBeGreaterThan(0)
 		expect(allowlist.blocklist).toBeDefined()
+	})
+	it("finds the four renamed vehicles by their old names (#149)", () => {
+		const byAlias = (alias: string) => seedItems.find((i) => i.aliases?.includes(alias))?.name
+		expect(byAlias("Pegassi Zorrusso")).toBe("Granforma Zorrusso")
+		expect(byAlias("Brute Ambulance")).toBe("Interstate Ambulance")
+		expect(byAlias("Western Zombie Chopper")).toBe("Western Zombie Bobber")
+		expect(byAlias("Vapid Ganado")).toBe("'70 Vapid Ganado")
+	})
+	it("follows categories.json and keeps every shipped id", () => {
+		expect(categoryIds(seedItems)).toEqual([
+			"vehicles",
+			"animals",
+			"collections",
+			"activities",
+			"places",
+		])
+		expect(seedItems).toHaveLength(216)
+		expect(seedItems.find((i) => i.id === "wildlife/pelican")).toMatchObject({
+			category: "animals",
+			group: "birds",
+		})
+		expect(seedItems.find((i) => i.id === "collectibles/stunt-jumps")).toMatchObject({
+			category: "activities",
+			group: "stunts",
+		})
+	})
+	it("sorts '70 Vapid Ganado under V, not at the top", () => {
+		const collator = new Intl.Collator("en", { numeric: true, sensitivity: "base" })
+		const names = seedItems.filter((i) => i.group === "cars").map((i) => i.name)
+		const ganado = names.indexOf("'70 Vapid Ganado")
+		expect(ganado).toBeGreaterThan(0)
+		expect(collator.compare(sortKey(names[ganado - 1]), "Vapid Ganado")).toBeLessThan(0)
 	})
 	it("has an English name and a label in both languages for every category and group", () => {
 		for (const item of seedItems) {

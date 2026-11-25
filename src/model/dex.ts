@@ -9,8 +9,8 @@ import {
 	type Translator,
 } from "../i18n"
 import type { SeedItem } from "./schema"
-import { normalize, type SearchTerms } from "./search"
-import { SEARCH_TERMS } from "./searchTerms"
+import { normalize, type SearchTerms, searchFields } from "./search"
+import { ITEM_TERMS, SEARCH_TERMS } from "./searchTerms"
 import { categoryIds, groupItems } from "./seed"
 
 export interface DexGroup {
@@ -63,8 +63,8 @@ export interface DexSearchRow {
 	statusWord: string
 	/** "<category> · <group>" in the page language. */
 	place: string
-	/** The name and the group's search words, normalized. One string is enough: a query word never
-	 *  holds a space after normalize, so it cannot match across two fields. */
+	/** The name, its aliases, the group's words and its own words, normalized. One string is enough: a
+	 *  query word never holds a space after normalize, so it cannot match across two fields. */
 	search: string
 }
 
@@ -74,7 +74,8 @@ export function dexSearchRows(
 	t: Translate,
 	urlFor: (category: string) => string,
 	items: SeedItem[],
-	terms: SearchTerms = SEARCH_TERMS
+	terms: SearchTerms = SEARCH_TERMS,
+	itemTerms: SearchTerms = ITEM_TERMS
 ): DexSearchRow[] {
 	return dexIndex(items).flatMap((category) =>
 		category.groups.flatMap((group) =>
@@ -85,7 +86,7 @@ export function dexSearchRows(
 				status: item.status,
 				statusWord: item.status === "confirmed" ? t("tracker.confirmed") : t("dex.expected"),
 				place: `${seedLabel(t, "category", category.id)} · ${seedLabel(t, "group", group.id)}`,
-				search: normalize([item.name, ...(terms[item.group] ?? [])].join(" ")),
+				search: normalize(searchFields(item, terms, itemTerms).join(" ")),
 			}))
 		)
 	)

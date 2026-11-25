@@ -1,0 +1,45 @@
+{
+	"group": "stunts",
+	"order": 6,
+	"sort": "name",
+	"items": [
+		{
+			"id": "collectibles/stunt-jumps",
+			"name": "Stunt Jumps",
+			"status": "expected",
+			"precedent": "GTA V",
+			"description": "Fifty marked ramps to launch a vehicle from for a checklist reward in GTA V; press coverage expects stunt jumps to return in GTA 6.",
+			"sources": [
+				{
+					"url": "https://www.gtabase.com/articles/gta-6/gta-6-100-completion-guide-interactive-checklist",
+					"title": "GTA 6 100% Completion Guide & Interactive Checklist"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-5-stunt-jump-locations/",
+					"title": "GTA 5 Stunt Jumps locations and where to find all ramps"
+				}
+			]
+		},
+		{
+			"id": "collectibles/base-jumps",
+			"name": "Base Jumps",
+			"status": "expected",
+			"precedent": "GTA V",
+			"description": "Parachute jumps onto a landing target in GTA V, some through checkpoints, and all of them needed for 100% completion. Base jumping is confirmed for GTA 6, so a similar set of jumps is expected.",
+			"sources": [
+				{
+					"url": "https://rockstarintel.com/gta-6-has-hurricanes-170-animals-fun-activities-weather-system-detailed/",
+					"title": "GTA 6 Has Hurricanes, 170 Animals, Fun Activities, Weather System Detailed"
+				},
+				{
+					"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-side-activities/",
+					"title": "All of the GTA 6 side activities confirmed so far"
+				},
+				{
+					"url": "https://www.gtabase.com/grand-theft-auto-v/side-missions/parachuting",
+					"title": "Parachuting - GTA 5 Hobbies & Pastimes Guide"
+				}
+			]
+		}
+	]
+}

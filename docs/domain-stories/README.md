@@ -18,7 +18,7 @@ node ~/.claude/loadout/skills/domain-story/scripts/story-to-egn.mjs rookdex-over
 
 | # | Sentence | Code |
 |---|----------|------|
-| 1 | Maintainer updates seed and guides | `src/seed/*.json`, `src/content/guides/{en,nb}/`, schema in `src/model/schema.ts`, sources in `allowlist.json` |
+| 1 | Maintainer updates seed and guides | `src/seed/categories/<category>/<group>.json`, `src/seed/{rumours,facts}.json`, `src/content/guides/{en,nb}/`, schema in `src/model/schema.ts`, sources in `allowlist.json` |
 | 2 | GitHub deploys the static build | `.github/workflows/deploy.yml` (job `deploy`), `wrangler.jsonc` |
 | 3 | Player installs the Android app | A Play Store TWA that wraps the live site; `public/.well-known/assetlinks.json` |
 | 4 | Browser requests a page | Cloudflare Workers static assets serving `dist/` |

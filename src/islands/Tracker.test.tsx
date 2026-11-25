@@ -27,7 +27,7 @@ describe("Profile button while loading (final review E2)", () => {
 describe("Tracker list", () => {
 	it("renders one card per item, with a book link and a flag instead of source links", async () => {
 		await ready()
-		expect(screen.getByRole("heading", { name: "Wildlife", level: 2 })).toBeInTheDocument()
+		expect(screen.getByRole("heading", { name: "Animals", level: 2 })).toBeInTheDocument()
 		expect(screen.getByRole("heading", { name: /reptiles/i, level: 3 })).toBeInTheDocument()
 		expect(screen.getByText("Expected, as in GTA V")).toBeInTheDocument()
 		expect(document.querySelectorAll("li.item")).toHaveLength(3)
@@ -65,7 +65,7 @@ describe("Tracker list", () => {
 	it("ticking announces the category count in the live region", async () => {
 		await ready()
 		fireEvent.click(screen.getByRole("checkbox", { name: "American alligator" }))
-		await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Wildlife: 1 of 2"))
+		await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Animals: 1 of 2"))
 		expect(screen.getByRole("checkbox", { name: "American alligator" })).toBeChecked()
 	})
 })
@@ -80,32 +80,29 @@ describe("Category toggles", () => {
 		expect(vehicles).toHaveAttribute("aria-pressed", "true")
 		expect(all).toHaveAttribute("aria-pressed", "false")
 		expect(window.location.search).toBe("?show=vehicles")
-		expect(screen.queryByRole("heading", { name: "Wildlife", level: 2 })).not.toBeInTheDocument()
+		expect(screen.queryByRole("heading", { name: "Animals", level: 2 })).not.toBeInTheDocument()
 		fireEvent.click(all)
 		expect(all).toHaveAttribute("aria-pressed", "true")
 		expect(window.location.search).toBe("")
 	})
 
-	it("ends the chip row with a Sources link, not a toggle", async () => {
+	it("ends the tile row with the last category, with no Sources tile", async () => {
 		await ready()
 		const nav = screen.getByRole("navigation", { name: "Categories" })
+		expect(nav.querySelector("a")).toBeNull()
 		const items = [...nav.querySelectorAll("li")]
-		const last = items[items.length - 1].firstElementChild
-		expect(last?.tagName).toBe("A")
-		expect(last).toHaveAttribute("href", "/en/tracker/sources/")
-		expect(last).toHaveTextContent("Sources")
-		expect(last).not.toHaveAttribute("aria-pressed")
+		expect(items[items.length - 1].firstElementChild).toHaveAttribute("aria-pressed")
 	})
 
 	it("reads a deep link and drops unknown ids", async () => {
-		window.history.replaceState(null, "", "/en/tracker/?show=wildlife,evil")
+		window.history.replaceState(null, "", "/en/tracker/?show=animals,evil")
 		await ready()
-		expect(screen.getByRole("button", { name: /^Wildlife,/ })).toHaveAttribute(
+		expect(screen.getByRole("button", { name: /^Animals,/ })).toHaveAttribute(
 			"aria-pressed",
 			"true"
 		)
 		expect(screen.getByRole("button", { name: /^All,/ })).toHaveAttribute("aria-pressed", "false")
-		expect(window.location.search).toBe("?show=wildlife")
+		expect(window.location.search).toBe("?show=animals")
 	})
 
 	it("keeps the whole category in a tile's count with Hide found on", async () => {
@@ -222,10 +219,10 @@ describe("Section and group counts (tracker refresh spec §4.3)", () => {
 
 	it("puts each count beside its heading, not inside it", async () => {
 		await ready()
-		expect(screen.getByRole("heading", { name: "Wildlife", level: 2 })).toBeInTheDocument()
+		expect(screen.getByRole("heading", { name: "Animals", level: 2 })).toBeInTheDocument()
 		expect(screen.getByRole("heading", { name: "Birds", level: 3 })).toBeInTheDocument()
-		expect(catCount("wildlife")).toHaveTextContent("0 of 2")
-		expect(groupCount("wildlife/birds")).toHaveTextContent("0 of 1")
+		expect(catCount("animals")).toHaveTextContent("0 of 2")
+		expect(groupCount("animals/birds")).toHaveTextContent("0 of 1")
 		expect(document.querySelector(".cat-rule")).toHaveAttribute("aria-hidden", "true")
 	})
 
@@ -233,10 +230,10 @@ describe("Section and group counts (tracker refresh spec §4.3)", () => {
 		await ready()
 		fireEvent.change(screen.getByRole("searchbox"), { target: { value: "peli" } })
 		expect(screen.queryByRole("checkbox", { name: "American alligator" })).toBeNull()
-		expect(catCount("wildlife")).toHaveTextContent("0 of 2")
+		expect(catCount("animals")).toHaveTextContent("0 of 2")
 		fireEvent.click(screen.getByRole("checkbox", { name: "Pelican" }))
-		await waitFor(() => expect(catCount("wildlife")).toHaveTextContent("1 of 2"))
-		expect(groupCount("wildlife/birds")).toHaveTextContent("1 of 1")
+		await waitFor(() => expect(catCount("animals")).toHaveTextContent("1 of 2"))
+		expect(groupCount("animals/birds")).toHaveTextContent("1 of 1")
 	})
 })
 

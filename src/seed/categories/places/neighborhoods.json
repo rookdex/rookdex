@@ -1,0 +1,91 @@
+{
+	"group": "neighborhoods",
+	"order": 3,
+	"sort": "name",
+	"items": [
+		{
+			"id": "places/ocean-beach",
+			"name": "Ocean Beach",
+			"status": "confirmed",
+			"description": "A Vice City neighborhood of pastel art deco hotels and bright white sands. Rockstar calls it world-famous in the Vintage Vice City Pack text.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/little-cuba",
+			"name": "Little Cuba",
+			"status": "confirmed",
+			"description": "A Vice City neighborhood known for its bustling bakeries, named by Rockstar on its Vice City postcard.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+					"title": "Every GTA 6 location revealed"
+				}
+			]
+		},
+		{
+			"id": "places/stockyard",
+			"name": "Stockyard",
+			"status": "confirmed",
+			"description": "A district signposted in the first trailer. Rockstar places the Stock 305 clothing store and the Electric Fang tattoo parlor here.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				},
+				{
+					"url": "https://www.gamesradar.com/gta-6-trailer-1-breakdown-things-you-missed/",
+					"title": "GTA 6 trailer breakdown - 12 things you might have missed"
+				}
+			]
+		},
+		{
+			"id": "places/washington-beach",
+			"name": "Washington Beach",
+			"status": "confirmed",
+			"description": "A beach area where the Ultimate Edition's Shitzu Squalo boat is docked, named by Rockstar.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/southside",
+			"name": "Southside Vice City",
+			"status": "confirmed",
+			"description": "Part of Vice City named by Rockstar as home turf of the PTT Youngin$, one of its loudest gangs.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/watson-bay",
+			"name": "Watson Bay",
+			"status": "confirmed",
+			"description": "An area of Leonida named by Rockstar as the location of the Paradise Garage, an Ultimate Edition garage.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		}
+	]
+}

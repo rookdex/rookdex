@@ -48,8 +48,15 @@ const { label, chips, headingId } = Astro.props
 		list-style: none;
 	}
 
+	/* A long label breaks inside the chip instead of widening a phone at 200 % text. */
+	.chip-list li {
+		max-width: 100%;
+	}
+
 	.chip-list a {
 		display: inline-flex;
+		max-width: 100%;
+		overflow-wrap: anywhere;
 		align-items: center;
 		gap: var(--space-2);
 		min-height: var(--tap);

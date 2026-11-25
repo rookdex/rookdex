@@ -596,7 +596,6 @@ p {
 
 .tabbar a,
 .tiles button,
-.tiles a,
 .group-chips button,
 .search-toggle,
 .search-clear,
@@ -630,7 +629,7 @@ p {
 		text-decoration-thickness: 2px;
 	}
 
-	/* Keeps its cyan, like the Sources chip. */
+	/* Keeps its cyan: only the background lifts. */
 	.go-link:hover {
 		background: var(--bg-hover);
 	}
@@ -655,10 +654,6 @@ p {
 	.tracker button.last-found:hover {
 		background: var(--bg-hover);
 		color: var(--text);
-	}
-
-	.tiles a:hover {
-		background: var(--bg-hover);
 	}
 
 	/* Preview: a faint copy of the selected marker. */
@@ -721,7 +716,6 @@ p {
 	:is(.tracker, .dex-search) .search-clear:active,
 	.tracker .search-elsewhere-btn:active,
 	.tracker button.last-found:active,
-	.tiles a:active,
 	.go-link:active {
 		background: var(--bg-hover);
 	}
@@ -750,8 +744,7 @@ p {
 	color: var(--text);
 }
 
-/* The Sources chip and links on their own line keep their cyan: focus is the lift plus the outline. */
-.tiles a:focus-visible,
+/* Links on their own line keep their cyan: focus is the lift plus the outline. */
 .go-link:focus-visible {
 	background: var(--bg-hover);
 }
@@ -1662,8 +1655,8 @@ html:has(.search-row) {
 	}
 }
 
-/* Filter tiles (tracker refresh spec §4.1). Phones: All across, the categories two by two, Sources
-   across. One tile component; the arrangements are CSS only. */
+/* Filter tiles (tracker refresh spec §4.1). Phones: All across, the categories two by two, and a
+   last category left alone in its row spans it. One tile component; the arrangements are CSS only. */
 .tiles {
 	list-style: none;
 	margin: 0;
@@ -1678,8 +1671,12 @@ html:has(.search-row) {
 	display: flex;
 }
 
-.tiles .tile-all,
-.tiles .tile-sources {
+.tiles .tile-all {
+	grid-column: 1 / -1;
+}
+
+/* All is item 1, so a last category at an even position starts a row of its own. */
+.tiles li:last-child:nth-child(even) {
 	grid-column: 1 / -1;
 }
 
@@ -2008,6 +2005,8 @@ html:has(.search-row) {
 	color: var(--text);
 	text-transform: uppercase;
 	letter-spacing: 0.1em;
+	/* A long name like "Tjenestekjøretøy" breaks instead of widening the page at 200 % text. */
+	overflow-wrap: anywhere;
 }
 
 .group-count {
@@ -2123,6 +2122,7 @@ html:has(.search-row) {
 .item-meta {
 	font-size: 0.75rem;
 	color: var(--text-muted);
+	overflow-wrap: anywhere;
 }
 
 /* Tier colours come from their own tokens so a theme can swap them without touching the accent. */
@@ -2234,27 +2234,6 @@ html:has(.search-row) {
 	.item:hover {
 		box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 15%, transparent);
 	}
-}
-
-/* The Sources tile: a link, outlined in cyan. */
-.tiles a {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	gap: var(--space-2);
-	min-height: var(--tap);
-	padding: 0 12px;
-	border: 1px solid color-mix(in srgb, var(--link) 60%, transparent);
-	border-radius: var(--radius);
-	color: var(--link);
-	font-weight: 500;
-	text-decoration: none;
-}
-
-.tiles a svg {
-	flex: none;
-	width: 18px;
-	height: 18px;
 }
 
 .tracker-alert {
@@ -3274,8 +3253,13 @@ html:has(.search-row) {
 		font-size: 3.5rem;
 	}
 
+	/* All across, then the five categories in one row, so no tile is left alone. */
 	.tiles {
-		grid-template-columns: repeat(4, minmax(0, 1fr));
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+	}
+
+	.tiles li:last-child:nth-child(even) {
+		grid-column: auto;
 	}
 }
 

@@ -16,8 +16,15 @@ export interface RecentFind {
 	updated_at: string
 }
 
-export function countable(items: SeedItem[]): SeedItem[] {
+/** What the list shows: everything but retired items. Chips and tiles read it, so a
+ *  `counts: false` group still gets its chip and its category still gets a tile. */
+export function shown(items: SeedItem[]): SeedItem[] {
 	return items.filter((item) => !item.retired)
+}
+
+/** What counts toward a total: not retired, not in a `counts: false` group, not edition-only. */
+export function countable(items: SeedItem[]): SeedItem[] {
+	return items.filter((item) => !item.retired && !item.uncounted)
 }
 
 export function countItems(items: SeedItem[], records: Records): Count {
@@ -54,8 +61,9 @@ export function perGroup(items: SeedItem[], records: Records): Record<string, Co
 	return counts
 }
 
+/** Finds are activity, not totals: every shown item counts, uncounted ones too. */
 export function recentFinds(items: SeedItem[], records: Records, limit = 5): RecentFind[] {
-	return countable(items)
+	return shown(items)
 		.flatMap((item) => {
 			const record = records[item.id]
 			return record?.done ? [{ item, updated_at: record.updated_at }] : []

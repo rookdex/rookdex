@@ -55,6 +55,12 @@ describe("tracker refresh look (spec §3, §4)", () => {
 		expect(rule(".item-list")).toMatch(/grid-template-columns:\s*minmax\(0, 1fr\)/)
 	})
 
+	it("lets a long group name break so it never widens a phone at 200 % text", () => {
+		// "Tjenestekjøretøy" needs 322 px as a heading and 275 px in a card's meta line at 200 % text.
+		expect(rule(".group-head h3")).toMatch(/overflow-wrap:\s*anywhere/)
+		expect(rule(".item-meta")).toMatch(/overflow-wrap:\s*anywhere/)
+	})
+
 	it("keeps the hub's uppercase label look off the tracker tile name", () => {
 		const uppercased = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)]
 			.filter(([, , body]) => /text-transform:\s*uppercase/.test(body))

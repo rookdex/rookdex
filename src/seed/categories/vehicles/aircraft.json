@@ -1,0 +1,152 @@
+{
+	"group": "aircraft",
+	"order": 4,
+	"total": 16,
+	"sort": "name",
+	"items": [
+		{
+			"id": "vehicles/buckingham-luxor",
+			"name": "Buckingham Luxor",
+			"status": "confirmed",
+			"description": "A private jet styled after the Learjet 45. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/luxor",
+					"title": "Buckingham Luxor - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/buckingham-valkyrie",
+			"name": "Buckingham Valkyrie",
+			"status": "confirmed",
+			"description": "A military helicopter styled after the Bell UH-1 Huey. Seen in An Extended Look.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing",
+					"title": "Grand Theft Auto VI: An Extended Look - Now Playing - Rockstar Newswire"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/valkyrie",
+					"title": "Buckingham Valkyrie - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/mammoth-dodo",
+			"name": "Mammoth Dodo",
+			"status": "confirmed",
+			"description": "A seaplane styled after the de Havilland Canada Beaver. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/dodo",
+					"title": "Mammoth Dodo - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/buckingham-nimbus",
+			"name": "Buckingham Nimbus",
+			"status": "confirmed",
+			"description": "A business jet styled after the Cessna Citation X. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/nimbus",
+					"title": "Buckingham Nimbus - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/sea-sparrow",
+			"name": "Sea Sparrow",
+			"status": "confirmed",
+			"description": "A light helicopter styled after the Sikorsky S-300. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/sea-sparrow",
+					"title": "Sea Sparrow - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/buckingham-supervolito",
+			"name": "Buckingham SuperVolito",
+			"status": "confirmed",
+			"description": "A luxury helicopter styled after the Eurocopter EC145. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/supervolito",
+					"title": "Buckingham SuperVolito - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/buckingham-police-maverick",
+			"name": "Buckingham Police Maverick",
+			"status": "confirmed",
+			"description": "A police helicopter styled after the Eurocopter AS350. Seen in Trailer 1.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+					"title": "Grand Theft Auto VI Trailer 1 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/gta-6/vehicles/police-maverick",
+					"title": "Police Maverick - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/nagasaki-buzzard-attack-chopper",
+			"name": "Nagasaki Buzzard Attack Chopper",
+			"status": "confirmed",
+			"description": "A light attack helicopter styled after the MD Helicopters AH-6 Little Bird. Seen in Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/buzzard-attack-chopper",
+					"title": "Nagasaki Buzzard Attack Chopper - GTA 6 Vehicle - GTABase"
+				}
+			]
+		},
+		{
+			"id": "vehicles/mammoth-streamer216",
+			"name": "Mammoth Streamer216",
+			"status": "confirmed",
+			"description": "A twin-engine utility plane styled after the de Havilland Canada Twin Otter. Seen in Trailer 2.",
+			"sources": [
+				{
+					"url": "https://www.youtube.com/watch?v=VQRLujxTm3c",
+					"title": "Grand Theft Auto VI Trailer 2 - Rockstar Games (YouTube)"
+				},
+				{
+					"url": "https://www.gtabase.com/vehicles/gta-6/streamer216",
+					"title": "Mammoth Streamer216 - GTA 6 Vehicle - GTABase"
+				}
+			]
+		}
+	]
+}

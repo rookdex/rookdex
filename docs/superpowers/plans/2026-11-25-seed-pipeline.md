@@ -2115,7 +2115,7 @@ export const SEARCH_TERMS: SearchTerms = {
 }
 ```
 
-`missingTerms` checks that each entry holds both labels after `normalize`, so "Reptiles & Amphibians" needs the `"reptiles & amphibians"` entry above. The old groups' words move with their items: the `commercial` and `emergency` words plus "garage", "shop" and "verksted" go to `service`, the `challenges` words to `racing`, the `hidden-items` words to `exploration`. Someone who searches an old group name still finds the item.
+`missingTerms` checks that each entry holds both labels after `normalize`, so "Reptiles & Amphibians" needs the `"reptiles & amphibians"` entry above. The old groups' words move with their items: the `challenges` words to `racing`, the `hidden-items` words to `exploration`. Changed at review (25.11): the `commercial` and `emergency` words did not go to `service`, because a group word matches every item in the group and "police" then found Pay 'n' Spray. A merged group keeps only words true of all its items; item names carry the rest.
 
 Add to `src/model/search.test.ts` (import `SEARCH_TERMS` from `./searchTerms`), on the file's `view` helper:
 

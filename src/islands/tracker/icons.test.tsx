@@ -2,16 +2,22 @@ import { renderToStaticMarkup } from "react-dom/server"
 import { describe, expect, it } from "vitest"
 import { categoryIds, seedItems } from "../../model/seed"
 import {
+	ActivitiesIcon,
 	AllIcon,
+	AnimalsIcon,
 	AtIcon,
 	CameraIcon,
 	ChecklistIcon,
 	ClockIcon,
+	CollectionsIcon,
 	categoryIcon,
+	FlagIcon,
 	guideIcon,
 	ImageIcon,
 	NewspaperIcon,
+	PlacesIcon,
 	PlayIcon,
+	VehiclesIcon,
 } from "./icons"
 
 describe("categoryIcon (tracker refresh spec §4.2)", () => {
@@ -22,8 +28,22 @@ describe("categoryIcon (tracker refresh spec §4.2)", () => {
 		expect(new Set(icons).size).toBe(ids.length)
 	})
 
+	it("draws the categories the seed has today (category model spec §2)", () => {
+		expect(categoryIcon("vehicles")).toBe(VehiclesIcon)
+		expect(categoryIcon("animals")).toBe(AnimalsIcon)
+		expect(categoryIcon("collections")).toBe(CollectionsIcon)
+		expect(categoryIcon("activities")).toBe(ActivitiesIcon)
+		expect(categoryIcon("places")).toBe(PlacesIcon)
+	})
+
+	it("keeps the Activities icon apart from the Report flag on every row", () => {
+		expect(renderToStaticMarkup(<ActivitiesIcon />)).not.toBe(renderToStaticMarkup(<FlagIcon />))
+		expect(renderToStaticMarkup(<ActivitiesIcon />)).not.toContain('d="M5 21V4"')
+	})
+
 	it("falls back to the All icon for an unknown id, inherited object names included", () => {
 		expect(categoryIcon("boats")).toBe(AllIcon)
+		expect(categoryIcon("wildlife")).toBe(AllIcon)
 		expect(categoryIcon("constructor")).toBe(AllIcon)
 		expect(categoryIcon("toString")).toBe(AllIcon)
 	})

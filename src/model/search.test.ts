@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import type { SeedItem } from "./schema"
 import { emptyState, foundIds, matches, matchesNormalized, normalize, searchView } from "./search"
+import { ITEM_TERMS, SEARCH_TERMS } from "./searchTerms"
 import type { Records } from "./stats"
 
 const src = { url: "https://www.rockstargames.com/VI", title: "Site", tier: "official" as const }
@@ -36,7 +37,16 @@ const terms = {
 const none: ReadonlySet<string> = new Set()
 const ids = (list: SeedItem[]) => list.map((i) => i.id)
 const view = (patch: Partial<Parameters<typeof searchView>[0]>) =>
-	searchView({ items, selected: [], groups: [], query: "", hidden: none, terms, ...patch })
+	searchView({
+		items,
+		selected: [],
+		groups: [],
+		query: "",
+		hidden: none,
+		terms,
+		itemTerms: {},
+		...patch,
+	})
 
 describe("normalize (spec §3.1)", () => {
 	it("folds accents and case, keeps ø and æ as letters", () => {
@@ -146,6 +156,89 @@ describe("searchView (spec §3.1)", () => {
 		expect(view({ query: "bravado" }).visible).toEqual([])
 		const hidden = new Set(["vehicles/old-bravado"])
 		expect(view({ query: "bravado", hidden }).hiddenCount).toBe(0)
+	})
+})
+
+describe("aliases (#149)", () => {
+	it("matches an alias, which is never shown", () => {
+		const renamed = item("vehicles/pegassi-zorrusso", "cars", "Granforma Zorrusso", {
+			aliases: ["Pegassi Zorrusso"],
+		})
+		const result = view({ items: [renamed], query: "pegassi" })
+		expect(result.visible.map((i) => i.name)).toEqual(["Granforma Zorrusso"])
+	})
+})
+
+describe("merged group words (category model spec §2)", () => {
+	const seeded = (id: string, group: string, name: string) => ({
+		id,
+		category: id.split("/")[0],
+		group,
+		name,
+		status: "confirmed" as const,
+		sources: [src],
+	})
+	const police = seeded("vehicles/vapid-montagne-police", "service", "Vapid Montagne Police")
+	const spray = seeded("vehicles/pay-n-spray", "service", "Pay 'n' Spray")
+	const mule = seeded("vehicles/maibatsu-mule", "service", "Maibatsu Mule")
+	const parts = seeded("collectibles/spaceship-parts", "exploration", "Spaceship Parts")
+
+	it("finds every service item by the merged group's own name", () => {
+		for (const query of ["service", "tjenestekjøretøy"]) {
+			const result = view({ items: [police, spray, mule], query, terms: SEARCH_TERMS })
+			expect(result.visible.map((i) => i.id).sort(), query).toEqual(
+				[police, spray, mule].map((i) => i.id).sort()
+			)
+		}
+	})
+
+	it("finds a police car by its name, not every service item by an old group word", () => {
+		const result = view({ items: [police, spray, mule], query: "police", terms: SEARCH_TERMS })
+		expect(result.visible.map((i) => i.id)).toEqual([police.id])
+	})
+
+	it("finds each service item by its own type words, in both languages", () => {
+		const bus = seeded("vehicles/dashound", "service", "Dashound")
+		const van = seeded("vehicles/declasse-burrito", "service", "Declasse Burrito")
+		const cases: Record<string, SeedItem[]> = {
+			politi: [police],
+			utrykning: [police],
+			emergency: [police],
+			verksted: [spray],
+			shop: [spray],
+			lastebil: [mule],
+			truck: [mule],
+			buss: [bus],
+			varebil: [van],
+			van: [van],
+			nyttekjøretøy: [mule, bus, van],
+			commercial: [mule, bus, van],
+		}
+		for (const [query, expected] of Object.entries(cases)) {
+			const result = view({
+				items: [police, spray, mule, bus, van],
+				query,
+				terms: SEARCH_TERMS,
+				itemTerms: ITEM_TERMS,
+			})
+			expect(ids(result.visible), query).toEqual(ids(expected))
+		}
+	})
+
+	it("finds nothing by item words when none are given", () => {
+		expect(view({ items: [police], query: "politi", terms: SEARCH_TERMS }).visible).toEqual([])
+	})
+
+	it("never answers a vehicle search with exploration items", () => {
+		for (const query of ["vehicle", "vehicles", "kjøretøy"]) {
+			const result = view({ items: [parts], query, terms: SEARCH_TERMS })
+			expect(result.visible, query).toEqual([])
+		}
+	})
+
+	it("never answers the Norwegian word for car with races", () => {
+		const sea = seeded("activities/sea-races", "racing", "Sea Races")
+		expect(view({ items: [sea], query: "bil", terms: SEARCH_TERMS }).visible).toEqual([])
 	})
 })
 

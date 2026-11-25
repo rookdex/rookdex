@@ -93,10 +93,10 @@ describe("Dashboard blocks (dashboard spec §4)", () => {
 		expect(container.querySelector(".is-skeleton")).toBeNull()
 	})
 
-	it("gives a newcomer 0 %, Wildlife as the goal and the before-you-start link", async () => {
+	it("gives a newcomer 0 %, Animals as the goal and the before-you-start link", async () => {
 		await ready()
 		expect(tile("Overall")).toHaveTextContent("0%")
-		expect(tile("Closest: Wildlife")).toHaveTextContent("0%")
+		expect(tile("Closest: Animals")).toHaveTextContent("0%")
 		expect(screen.getByRole("link", { name: "New to GTA VI? Before you start" })).toHaveAttribute(
 			"href",
 			"/en/guides/before-you-start/"
@@ -113,8 +113,8 @@ describe("Dashboard blocks (dashboard spec §4)", () => {
 		expect(screen.getByText("1 found today")).toBeInTheDocument()
 		expect(screen.queryByRole("link", { name: /New to GTA VI/ })).toBeNull()
 		expect(tile("Overall")).toHaveTextContent("66%")
-		// Vehicles is done, so the closest unfinished category is Wildlife at 1 of 2.
-		expect(tile("Closest: Wildlife")).toHaveTextContent("50%")
+		// Vehicles is done, so the closest unfinished category is Animals at 1 of 2.
+		expect(tile("Closest: Animals")).toHaveTextContent("50%")
 		expect(
 			screen.getAllByRole("progressbar").map((bar) => bar.getAttribute("aria-valuetext"))
 		).toEqual(["1 of 1", "1 of 2"])
@@ -189,9 +189,9 @@ describe("desktop blocks (desktop spec §3)", () => {
 		await ready()
 		expect(document.querySelector(".hero-big")).toHaveTextContent("1")
 		expect(screen.getByRole("heading", { level: 2, name: "Categories" })).toBeInTheDocument()
-		expect(screen.getByRole("link", { name: /^Wildlife/ })).toHaveAttribute(
+		expect(screen.getByRole("link", { name: /^Animals/ })).toHaveAttribute(
 			"href",
-			"/en/tracker/?show=wildlife"
+			"/en/tracker/?show=animals"
 		)
 		expect(document.querySelector(".dash-top .dash-day")).toHaveTextContent("Day 1 since launch")
 		expect(screen.getByRole("link", { name: "Every item in the Dex" })).toHaveAttribute(
@@ -223,7 +223,7 @@ describe("desktop blocks (desktop spec §3)", () => {
 		const first = document.querySelector(".dash-recent .recent li")
 		expect(first?.querySelector(".recent-label")).toHaveTextContent("Latest")
 		expect(first?.querySelector(".recent-when")).toHaveTextContent("today")
-		expect(first?.querySelector(".recent-meta")).toHaveTextContent(/Wildlife · /)
+		expect(first?.querySelector(".recent-meta")).toHaveTextContent(/Animals · /)
 	})
 
 	it("shows the chart only with finds on 2 days", async () => {
@@ -242,27 +242,27 @@ describe("ticking on the hub (dashboard spec §6.1, §7)", () => {
 
 	it("ticks from What's next, announces it, and Undo puts it back with focus on it", async () => {
 		await ready()
-		// Tracker order: the birds group before reptiles, then Vehicles fills the third row.
+		// Tracker order: Reptiles & Amphibians before Birds, then Vehicles fills the third row.
 		expect(
 			within(next())
 				.getAllByRole("checkbox")
 				.map((b) => b.getAttribute("id"))
-		).toEqual(["next-wildlife/pelican", "next-wildlife/american-alligator", "next-vehicles/bike"])
-		fireEvent.click(within(next()).getByRole("checkbox", { name: "American alligator" }))
+		).toEqual(["next-wildlife/american-alligator", "next-wildlife/pelican", "next-vehicles/bike"])
+		fireEvent.click(within(next()).getByRole("checkbox", { name: "Pelican" }))
 		const undo = await screen.findByRole("button", { name: "Undo" })
-		expect(announce).toHaveBeenCalledWith("American alligator marked as found.")
+		expect(announce).toHaveBeenCalledWith("Pelican marked as found.")
 		await waitFor(() =>
-			expect(within(next()).queryByRole("checkbox", { name: "American alligator" })).toBeNull()
+			expect(within(next()).queryByRole("checkbox", { name: "Pelican" })).toBeNull()
 		)
-		// Focus lands on the row now in the ticked row's place, here the first of the next group.
+		// The Pelican is the category's last row, so focus lands on the first row of the next one.
 		await waitFor(() =>
 			expect(within(next()).getByRole("checkbox", { name: "Bike" })).toHaveFocus()
 		)
 		fireEvent.click(undo)
 		await waitFor(() =>
-			expect(within(next()).getByRole("checkbox", { name: "American alligator" })).toHaveFocus()
+			expect(within(next()).getByRole("checkbox", { name: "Pelican" })).toHaveFocus()
 		)
-		expect(announce).toHaveBeenCalledWith("American alligator marked as not found.")
+		expect(announce).toHaveBeenCalledWith("Pelican marked as not found.")
 		expect(screen.queryByRole("button", { name: "Undo" })).toBeNull()
 	})
 
@@ -273,7 +273,7 @@ describe("ticking on the hub (dashboard spec §6.1, §7)", () => {
 			within(next())
 				.getAllByRole("heading", { level: 3 })
 				.map((h) => h.textContent)
-		expect(titles()).toEqual(["Wildlife · 1 left", "Then: Vehicles · 1 left"])
+		expect(titles()).toEqual(["Animals · 1 left", "Then: Vehicles · 1 left"])
 		fireEvent.click(within(next()).getByRole("checkbox", { name: "American alligator" }))
 		const bike = await within(next()).findByRole("checkbox", { name: "Bike" })
 		await waitFor(() => expect(bike).toHaveFocus())
@@ -283,8 +283,8 @@ describe("ticking on the hub (dashboard spec §6.1, §7)", () => {
 		await waitFor(() =>
 			expect(within(next()).getByRole("checkbox", { name: "American alligator" })).toHaveFocus()
 		)
-		expect(titles()).toEqual(["Wildlife · 1 left", "Then: Vehicles · 1 left"])
-		expect(screen.getByText("Closest: Wildlife")).toBeInTheDocument()
+		expect(titles()).toEqual(["Animals · 1 left", "Then: Vehicles · 1 left"])
+		expect(screen.getByText("Closest: Animals")).toBeInTheDocument()
 	})
 
 	it("shows the all-found line and no checkboxes when everything is found", async () => {

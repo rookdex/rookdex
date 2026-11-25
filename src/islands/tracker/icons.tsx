@@ -64,7 +64,29 @@ export function AllIcon() {
 	)
 }
 
-export function CollectiblesIcon() {
+/** A ticket: things to do, from races to golf. Not a flag (every tracker row shows one for
+ *  Report) and not a globe (the language switch uses one). */
+export function ActivitiesIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<path d="M4 6h16a1 1 0 0 1 1 1v3a2 2 0 0 0 0 4v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a2 2 0 0 0 0-4V7a1 1 0 0 1 1-1z" />
+			<path d="M15 6v2M15 11v2M15 16v2" />
+		</svg>
+	)
+}
+
+export function AnimalsIcon() {
+	return (
+		<svg {...common} aria-hidden="true">
+			<circle cx="7" cy="9" r="1.8" />
+			<circle cx="12" cy="6.5" r="1.8" />
+			<circle cx="17" cy="9" r="1.8" />
+			<path d="M12 12c-3 0-5.5 3.5-5.5 5.5 0 1.5 1.5 2.5 3 2l2.5-.8 2.5.8c1.5.5 3-.5 3-2 0-2-2.5-5.5-5.5-5.5z" />
+		</svg>
+	)
+}
+
+export function CollectionsIcon() {
 	return (
 		<svg {...common} aria-hidden="true">
 			<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z" />
@@ -92,22 +114,12 @@ export function VehiclesIcon() {
 	)
 }
 
-export function WildlifeIcon() {
-	return (
-		<svg {...common} aria-hidden="true">
-			<circle cx="7" cy="9" r="1.8" />
-			<circle cx="12" cy="6.5" r="1.8" />
-			<circle cx="17" cy="9" r="1.8" />
-			<path d="M12 12c-3 0-5.5 3.5-5.5 5.5 0 1.5 1.5 2.5 3 2l2.5-.8 2.5.8c1.5.5 3-.5 3-2 0-2-2.5-5.5-5.5-5.5z" />
-		</svg>
-	)
-}
-
 const byCategory: Record<string, () => ReactElement> = {
-	collectibles: CollectiblesIcon,
+	activities: ActivitiesIcon,
+	animals: AnimalsIcon,
+	collections: CollectionsIcon,
 	places: PlacesIcon,
 	vehicles: VehiclesIcon,
-	wildlife: WildlifeIcon,
 }
 
 /** The icon for a category id. An id a future seed adds gets the All icon until it has its own;

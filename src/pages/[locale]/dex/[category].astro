@@ -28,15 +28,13 @@ const copy = dexCopy(tr, dex)
 const tracker = getRelativeLocaleUrl(locale as Locale, "tracker")
 // Seed text is English; nb pages say so (spec §10).
 const itemLang = locale === "en" ? undefined : "en"
-const more = [
-	...categoryIds(live)
-		.filter((id) => id !== dex.id)
-		.map((id) => ({
-			href: getRelativeLocaleUrl(locale as Locale, `dex/${id}`),
-			label: seedLabel(t, "category", id),
-		})),
-	{ href: getRelativeLocaleUrl(locale as Locale, "tracker/sources"), label: t("sources.title") },
-]
+// Only the other categories: every card already lists its own sources.
+const more = categoryIds(live)
+	.filter((id) => id !== dex.id)
+	.map((id) => ({
+		href: getRelativeLocaleUrl(locale as Locale, `dex/${id}`),
+		label: seedLabel(t, "category", id),
+	}))
 ---
 
 <Base locale={locale} title={copy.title} description={copy.description} path={`dex/${dex.id}`}>

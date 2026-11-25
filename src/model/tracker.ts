@@ -14,7 +14,7 @@ import {
 import { listRecords, setDone } from "./progress"
 import { type ExportFile, type Profile, type SeedItem, TEXT } from "./schema"
 import { categoryIds, groupItems } from "./seed"
-import { countable, countItems, groupKey, type Records } from "./stats"
+import { countItems, groupKey, type Records, shown } from "./stats"
 import type { Store } from "./store"
 import {
 	backupEntries,
@@ -111,10 +111,22 @@ export interface Tracker {
 	clearError(): void
 }
 
+/** Spec §6: category ids renamed after launch. Old links and saved views still open what the old
+ *  one held: Collectibles' races and jumps moved to Activities, so it opens both. */
+export const CATEGORY_ALIASES: Readonly<Record<string, readonly string[]>> = {
+	wildlife: ["animals"],
+	collectibles: ["collections", "activities"],
+}
+
 /** Category ids named in `?show=`, kept in `known` order, unknown ones dropped. */
 export function parseShow(search: string, known: string[]): string[] {
 	const raw = new URLSearchParams(search).get("show") ?? ""
-	const wanted = new Set(raw.split(",").map((s) => s.trim()))
+	const wanted = new Set(
+		raw.split(",").flatMap((s) => {
+			const id = s.trim()
+			return Object.hasOwn(CATEGORY_ALIASES, id) ? CATEGORY_ALIASES[id] : [id]
+		})
+	)
 	return known.filter((id) => wanted.has(id))
 }
 
@@ -124,12 +136,12 @@ export function showParam(selected: string[]): string | null {
 
 /**
  * Per pressed category, the groups its chips offer (tracker refresh spec §14.1): every group with
- * a countable item, in the list's group order. A category with one group gets no chips, because
+ * a shown item, in the list's group order. A category with one group gets no chips, because
  * one chip would filter nothing. Categories come in seed order. A Map, so a category id such as
  * "constructor" can never read Object.prototype (R16).
  */
 export function chipGroups(items: SeedItem[], selected: string[]): Map<string, string[]> {
-	const live = countable(items)
+	const live = shown(items)
 	const chips = new Map<string, string[]>()
 	for (const category of categoryIds(live)) {
 		if (!selected.includes(category)) continue

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import { translator } from "../i18n"
 import { dexCategory } from "../model/dex"
 import { categoryIds, seedItems } from "../model/seed"
+import { isGameSource } from "../model/tiers"
 import Page from "../pages/[locale]/dex/[category].astro"
 import { renderDoc } from "./render"
 
@@ -12,10 +13,10 @@ const text = (el: Element | null | undefined) => el?.textContent?.replace(/\s+/g
 
 describe("Dex category page (category pages spec §5)", () => {
 	it("is a titled sub page under the Dex tab, with its counts in the lede", async () => {
-		const doc = await page("en", "wildlife")
-		const dex = dexCategory(live, "wildlife")
+		const doc = await page("en", "animals")
+		const dex = dexCategory(live, "animals")
 		expect(doc.querySelectorAll("h1")).toHaveLength(1)
-		expect(text(doc.querySelector("h1"))).toBe("Wildlife")
+		expect(text(doc.querySelector("h1"))).toBe("Animals")
 		expect(text(doc.querySelector(".lede"))).toBe(
 			`${dex.total} animals so far: ${dex.confirmed} confirmed, ${dex.expected} expected.`
 		)
@@ -24,7 +25,7 @@ describe("Dex category page (category pages spec §5)", () => {
 		expect(text(lit)).toBe("Dex")
 		expect(lit?.getAttribute("aria-current")).toBe("true")
 		expect(doc.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe(
-			"https://rookdex.app/en/dex/wildlife/"
+			"https://rookdex.app/en/dex/animals/"
 		)
 	})
 
@@ -49,9 +50,9 @@ describe("Dex category page (category pages spec §5)", () => {
 	})
 
 	it("shows each item's name, status word and description", async () => {
-		const doc = await page("en", "collectibles")
+		const doc = await page("en", "collections")
 		const { t } = translator("en")
-		for (const item of live.filter((i) => i.category === "collectibles")) {
+		for (const item of live.filter((i) => i.category === "collections")) {
 			const card = doc.getElementById(item.id)
 			expect(text(card?.querySelector("h3"))).toBe(item.name)
 			const status = card?.querySelector(".status")
@@ -74,7 +75,9 @@ describe("Dex category page (category pages spec §5)", () => {
 			expect(text(details?.querySelector("summary"))).toBe(`Kilder (${item.sources.length})`)
 			expect(details?.querySelector("summary svg")?.getAttribute("aria-hidden")).toBe("true")
 			const links = [...(details?.querySelectorAll('a[target="_blank"]') ?? [])]
-			expect(links.map((a) => a.getAttribute("href"))).toEqual(item.sources.map((s) => s.url))
+			expect(links.map((a) => a.getAttribute("href"))).toEqual(
+				item.sources.flatMap((s) => (isGameSource(s) ? [] : [s.url]))
+			)
 		}
 	})
 
@@ -93,7 +96,7 @@ describe("Dex category page (category pages spec §5)", () => {
 	})
 
 	it("marks English seed text on nb and leaves Norwegian text outside it", async () => {
-		const doc = await page("nb", "wildlife")
+		const doc = await page("nb", "animals")
 		const card = doc.querySelector("article.dex-card")
 		expect(card?.querySelector("h3")?.getAttribute("lang")).toBe("en")
 		if (card?.querySelector(".desc")) {
@@ -104,19 +107,18 @@ describe("Dex category page (category pages spec §5)", () => {
 			expect(note.closest("[lang='en']")).toBeNull()
 		}
 		expect(text(card?.querySelector(".status"))).toMatch(/^(Bekreftet|Forventet)/)
-		const en = await page("en", "wildlife")
+		const en = await page("en", "animals")
 		expect(en.querySelector(".dex-group [lang='en']")).toBeNull()
 	})
 
-	it("ends with the other categories and the Sources page", async () => {
-		const doc = await page("en", "wildlife")
+	it("ends with the other categories only, no Sources chip", async () => {
+		const doc = await page("en", "animals")
 		const more = doc.querySelector('nav[aria-labelledby="dex-more"]')
 		expect(text(more?.querySelector("h2"))).toBe("More in the Dex")
 		expect([...(more?.querySelectorAll("a") ?? [])].map((a) => a.getAttribute("href"))).toEqual([
 			...categoryIds(live)
-				.filter((c) => c !== "wildlife")
+				.filter((c) => c !== "animals")
 				.map((c) => `/en/dex/${c}/`),
-			"/en/tracker/sources/",
 		])
 	})
 

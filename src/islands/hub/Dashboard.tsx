@@ -9,7 +9,7 @@ import {
 } from "../../model/dashboard"
 import { dayFromKey } from "../../model/days"
 import { activeProfiles } from "../../model/profiles"
-import { type Count, countable, countItems, perCategory, recentFinds } from "../../model/stats"
+import { type Count, countItems, perCategory, recentFinds, shown } from "../../model/stats"
 import { buildTracker } from "../buildTracker"
 import { ProfileMenu } from "../tracker/ProfileMenu"
 import { Bar } from "../tracker/StatsRail"
@@ -86,7 +86,7 @@ export function Dashboard({
 		const closest = closestCategory(items, records)
 		return {
 			overall: countItems(items, records),
-			categories: perCategory(countable(items), records),
+			categories: perCategory(shown(items), records),
 			closest,
 			next: nextGroups(items, records, NEXT_LIMIT),
 			foundToday: foundToday(items, records, dayFromKey(today)),

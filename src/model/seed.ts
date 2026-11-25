@@ -1,9 +1,12 @@
-// Seed loading and the source-tier rules. Runs at build (Astro pages), in tests, and in the
-// island (which only reads the exported constants). Throws at module load when the shipped
-// seed is invalid, so a bad seed fails the build and CI.
+// Seed loading. The item rules live in seedBuild.ts, the source rules in tiers.ts. Runs at build
+// (Astro pages), in tests, and in the island (which only reads the exported constants). Throws at
+// module load when the shipped seed is invalid, so a bad seed fails the build and CI.
 import { z } from "astro/zod"
 import allowlistJson from "../../allowlist.json"
-import { normalizeHost } from "./outlet"
+import categoriesJson from "../seed/categories.json"
+import factsJson from "../seed/facts.json"
+import rumoursJson from "../seed/rumours.json"
+import shippedIds from "../seed/shipped-ids.txt?raw"
 import {
 	type Allowlist,
 	allowlistSchema,
@@ -12,81 +15,19 @@ import {
 	type Rumour,
 	rumourInputSchema,
 	type SeedItem,
-	type Source,
-	type SourceInput,
-	seedItemInputSchema,
-	type Tier,
 } from "./schema"
+import { buildSeed, duplicates, idsIn } from "./seedBuild"
+import { attachTiers, officialErrors } from "./tiers"
 
 export const allowlist: Allowlist = allowlistSchema.parse(allowlistJson)
 
-const VIDEO_HOSTS = ["youtube.com", "youtu.be"]
-
-/**
- * `prefix` is a URL without scheme: a bare domain covers the domain and its subdomains,
- * `host/path` covers that host and paths under `/path`, and `host/path?query` names one exact
- * page (a trailer's watch URL; a channel prefix cannot cover `/watch`). Case-insensitive,
- * `www.` ignored.
- */
-export function matchesPrefix(url: URL, prefix: string): boolean {
-	const [rawHost = "", ...rest] = prefix.toLowerCase().split("/")
-	const host = normalizeHost(rawHost)
-	const urlHost = normalizeHost(url.hostname)
-	if (urlHost !== host && !(rest.length === 0 && urlHost.endsWith(`.${host}`))) return false
-	if (rest.length === 0) return true
-	const path = `/${rest.join("/")}`
-	if (!path.includes("?")) return url.pathname.toLowerCase().startsWith(path)
-	const page = `${url.pathname}${url.search}`.toLowerCase()
-	return page === path || page.startsWith(`${path}&`)
-}
-
-export type TierResult = Tier | "blocked" | "unlisted"
-
-export function resolveTier(urlString: string, list: Allowlist): TierResult {
-	const url = new URL(urlString)
-	if (list.blocklist.some((p) => matchesPrefix(url, p))) return "blocked"
-	if (list.official.some((p) => matchesPrefix(url, p))) return "official"
-	if (list.press.some((p) => matchesPrefix(url, p))) return "press"
-	return "unlisted"
-}
-
-export function isVideo(urlString: string): boolean {
-	const url = new URL(urlString)
-	return VIDEO_HOSTS.some((host) => matchesPrefix(url, host))
-}
-
-function attachTiers(
-	id: string,
-	sources: SourceInput[],
-	list: Allowlist
-): { sources: Source[]; errors: string[] } {
-	const errors: string[] = []
-	const tiered: Source[] = []
-	for (const source of sources) {
-		const tier = resolveTier(source.url, list)
-		if (tier === "blocked" || tier === "unlisted") {
-			errors.push(`${id}: source ${source.url} is ${tier}`)
-		} else {
-			tiered.push({ ...source, tier })
-		}
-	}
-	return { sources: tiered, errors }
-}
-
-/** Spec §4: confirmed needs an official source, and an official video alone needs press too. */
-function confirmedErrors(id: string, sources: Source[]): string[] {
-	const official = sources.filter((s) => s.tier === "official")
-	if (official.length === 0) return [`${id}: confirmed needs an official source`]
-	if (official.every((s) => isVideo(s.url)) && !sources.some((s) => s.tier === "press"))
-		return [`${id}: video-only official source needs a press source naming the item`]
-	return []
-}
-
-/** Spec §4: what each status needs from its sources. */
-export function tierErrors(item: SeedItem): string[] {
-	if (item.status === "confirmed") return confirmedErrors(item.id, item.sources)
-	return item.precedent ? [] : [`${item.id}: expected needs a precedent`]
-}
+export {
+	isVideo,
+	matchesPrefix,
+	resolveTier,
+	type TierResult,
+	tierErrors,
+} from "./tiers"
 
 function issueMessages(prefix: string, error: z.ZodError): string[] {
 	return error.issues.map((issue) => {
@@ -94,37 +35,6 @@ function issueMessages(prefix: string, error: z.ZodError): string[] {
 		const field = rest.length > 0 ? `.${rest.map(String).join(".")}` : ""
 		return `${prefix}[${String(index)}]${field}: ${issue.message}`
 	})
-}
-
-export function validateSeedFile(
-	category: string,
-	data: unknown,
-	list: Allowlist
-): { items: SeedItem[]; errors: string[] } {
-	const parsed = z.array(seedItemInputSchema).safeParse(data)
-	if (!parsed.success) return { items: [], errors: issueMessages(category, parsed.error) }
-	const items: SeedItem[] = []
-	const errors: string[] = []
-	for (const input of parsed.data) {
-		let mismatched = false
-		if (input.category !== category) {
-			errors.push(`${input.id}: category must be ${category}`)
-			mismatched = true
-		}
-		if (!input.id.startsWith(`${category}/`)) {
-			errors.push(`${input.id}: id must start with ${category}/`)
-			mismatched = true
-		}
-		if (mismatched) continue
-		const tiered = attachTiers(input.id, input.sources, list)
-		errors.push(...tiered.errors)
-		if (tiered.errors.length > 0) continue
-		const item: SeedItem = { ...input, sources: tiered.sources }
-		const ruleErrors = tierErrors(item)
-		errors.push(...ruleErrors)
-		if (ruleErrors.length === 0) items.push(item)
-	}
-	return { items, errors }
 }
 
 export function validateRumours(
@@ -148,7 +58,8 @@ export function validateRumours(
 	return { rumours, errors }
 }
 
-/** Facts follow the same source rule as a confirmed seed item. */
+/** Facts keep the official-source rule (`officialErrors`). Seed items have the looser rule in
+ *  `confirmedItemErrors`: a game screen or two press sources also confirm them. */
 export function validateFacts(data: unknown, list: Allowlist): { facts: Fact[]; errors: string[] } {
 	const parsed = z.array(factInputSchema).safeParse(data)
 	if (!parsed.success) return { facts: [], errors: issueMessages("facts", parsed.error) }
@@ -158,93 +69,59 @@ export function validateFacts(data: unknown, list: Allowlist): { facts: Fact[]; 
 		const tiered = attachTiers(input.id, input.sources, list)
 		errors.push(...tiered.errors)
 		if (tiered.errors.length > 0) continue
-		const ruleErrors = confirmedErrors(input.id, tiered.sources)
+		const ruleErrors = officialErrors(input.id, tiered.sources)
 		errors.push(...ruleErrors)
 		if (ruleErrors.length === 0) facts.push({ ...input, sources: tiered.sources })
 	}
 	return { facts, errors }
 }
 
-function categoryOf(path: string): string {
-	return (path.split("/").pop() ?? "").replace(/\.json$/, "")
-}
-
-/**
- * Ids present in a raw seed file, read straight off the unvalidated JSON. Used only for the
- * cross-file duplicate check, which must catch a collision even when one of the two entries
- * also has a category/id-prefix error and is therefore dropped from the validated `items`.
- */
-function idsIn(data: unknown): string[] {
-	if (!Array.isArray(data)) return []
-	return data
-		.map((entry) =>
-			entry && typeof entry === "object" ? (entry as { id?: unknown }).id : undefined
-		)
-		.filter((id): id is string => typeof id === "string")
-}
-
-/** `files` maps a path ending in `<category>.json` to that file's parsed JSON. */
-export function loadAll(
-	files: Record<string, unknown>,
-	list: Allowlist
-): { items: SeedItem[]; rumours: Rumour[]; facts: Fact[]; errors: string[] } {
-	const items: SeedItem[] = []
-	let rumours: Rumour[] = []
-	let facts: Fact[] = []
-	const errors: string[] = []
-	const allIds: string[] = []
-	const categories = Object.entries(files)
-		.map(([path, data]) => [categoryOf(path), data] as const)
-		.sort(([a], [b]) => a.localeCompare(b))
-	for (const [category, data] of categories) {
-		allIds.push(...idsIn(data))
-		if (category === "rumours") {
-			const result = validateRumours(data, list)
-			rumours = result.rumours
-			errors.push(...result.errors)
-			continue
-		}
-		if (category === "facts") {
-			const result = validateFacts(data, list)
-			facts = result.facts
-			errors.push(...result.errors)
-			continue
-		}
-		const result = validateSeedFile(category, data, list)
-		items.push(...result.items)
-		errors.push(...result.errors)
-	}
-	const seen = new Set<string>()
-	for (const id of allIds) {
-		if (seen.has(id)) errors.push(`duplicate id ${id}`)
-		seen.add(id)
-	}
-	return { items, rumours, facts, errors }
-}
-
-/** Category ids in the order items appear (alphabetical by file name). */
+/** Category ids in seed order (categories.json). */
 export function categoryIds(items: SeedItem[]): string[] {
 	return [...new Set(items.map((i) => i.category))]
 }
 
-/** Items by group, groups alphabetical, items alphabetical by name within a group. */
+/** Items by group in seed order: groups by their header's `order`, items by the group's `sort`.
+ *  seedBuild sorts once, so every page and the tracker list items the same way. */
 export function groupItems(items: SeedItem[]): Map<string, SeedItem[]> {
 	const groups = new Map<string, SeedItem[]>()
-	for (const item of [...items].sort((a, b) => a.name.localeCompare(b.name))) {
-		const list = groups.get(item.group) ?? []
-		list.push(item)
-		groups.set(item.group, list)
+	for (const item of items) {
+		const list = groups.get(item.group)
+		if (list) list.push(item)
+		else groups.set(item.group, [item])
 	}
-	return new Map([...groups.entries()].sort(([a], [b]) => a.localeCompare(b)))
+	return groups
 }
 
-const seedFiles = import.meta.glob<{ default: unknown }>("../seed/*.json", { eager: true })
-const loaded = loadAll(
-	Object.fromEntries(Object.entries(seedFiles).map(([path, mod]) => [path, mod.default])),
-	allowlist
-)
-if (loaded.errors.length > 0) throw new Error(`Seed invalid:\n${loaded.errors.join("\n")}`)
+// Every JSON file at any depth, so a misplaced one reaches buildSeed's path check instead of
+// being skipped without a word.
+const groupFiles = import.meta.glob<{ default: unknown }>("../seed/categories/**/*.json", {
+	eager: true,
+})
+const built = buildSeed({
+	categories: categoriesJson,
+	groups: Object.fromEntries(
+		Object.entries(groupFiles).map(([path, mod]) => [
+			path.replace("../seed/categories/", ""),
+			mod.default,
+		])
+	),
+	shipped: shippedIds,
+	allowlist,
+})
+const news = {
+	rumours: validateRumours(rumoursJson, allowlist),
+	facts: validateFacts(factsJson, allowlist),
+}
+const crossIds = [
+	...new Set(built.items.map((i) => i.id)),
+	...idsIn(rumoursJson),
+	...idsIn(factsJson),
+]
+const crossErrors = duplicates(crossIds).map((id) => `duplicate id ${id}`)
+const errors = [...built.errors, ...news.rumours.errors, ...news.facts.errors, ...crossErrors]
+if (errors.length > 0) throw new Error(`Seed invalid:\n${errors.join("\n")}`)
 
-export const seedItems: SeedItem[] = loaded.items
-export const rumours: Rumour[] = loaded.rumours
-export const facts: Fact[] = loaded.facts
+export const seedItems: SeedItem[] = built.items
+export const rumours: Rumour[] = news.rumours.rumours
+export const facts: Fact[] = news.facts.facts

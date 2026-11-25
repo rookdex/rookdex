@@ -1,0 +1,155 @@
+{
+	"group": "businesses",
+	"order": 6,
+	"sort": "name",
+	"items": [
+		{
+			"id": "places/only-raw-records",
+			"name": "Only Raw Records",
+			"status": "confirmed",
+			"description": "The record label Dre'Quan Priest runs with Boobie's backing, home to rap duo Real Dimez, named on the official Vice City page.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/vice-city",
+					"title": "Grand Theft Auto VI - Vice City - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/allied-crystal-sugar-refinery",
+			"name": "Allied Crystal Sugar Refinery",
+			"status": "confirmed",
+			"description": "The sugar refinery that provides the jobs in Ambrosia, named on Rockstar's Ambrosia postcard.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+					"title": "Every GTA 6 location revealed"
+				}
+			]
+		},
+		{
+			"id": "places/the-rusty-anchor",
+			"name": "The Rusty Anchor",
+			"status": "confirmed",
+			"description": "A dive bar in the Leonida Keys, shown with its sign in an official Leonida Keys screenshot.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+					"title": "Every GTA 6 location revealed"
+				}
+			]
+		},
+		{
+			"id": "places/starlet-motel",
+			"name": "Starlet Motel",
+			"status": "confirmed",
+			"description": "A roadside motel in Port Gellhorn, shown with its neon sign in an official Port Gellhorn screenshot.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+					"title": "Every GTA 6 location revealed"
+				}
+			]
+		},
+		{
+			"id": "places/delights-cabaret",
+			"name": "Delights Cabaret",
+			"status": "confirmed",
+			"description": "A roadside cabaret club in Port Gellhorn, shown with its neon sign in an official Port Gellhorn screenshot.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/only-in-leonida",
+					"title": "Only in Leonida - Grand Theft Auto VI - Rockstar Games"
+				},
+				{
+					"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-locations/",
+					"title": "Every GTA 6 location revealed"
+				}
+			]
+		},
+		{
+			"id": "places/ptt-youngins-illegal-goods-store",
+			"name": "PTT Youngin$ Illegal Goods Store",
+			"status": "confirmed",
+			"description": "An Ultimate Edition raid on the compound of a Southside Vice City gang. Escape safely to score special items and contraband.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/rideout-customs-mod-shop",
+			"name": "Rideout Customs Mod Shop",
+			"status": "confirmed",
+			"description": "An Ultimate Edition mod shop for detailed interiors, exquisite rims and donk stylings.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/saras-unisex-salon",
+			"name": "Sara's Unisex Salon",
+			"status": "confirmed",
+			"description": "A salon with signature styles for Jason and Lucia, including facial hair, makeup and nails. Only open with the Ultimate Edition.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/stock-305-clothing-store",
+			"name": "Stock 305 Clothing Store",
+			"status": "confirmed",
+			"description": "Stockyard's premier streetwear store, with exclusive looks for Jason and Lucia. Only open with the Ultimate Edition.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/electric-fang-tattoo-parlor",
+			"name": "Electric Fang Tattoo Parlor",
+			"status": "confirmed",
+			"description": "Stockyard's best-known ink bar, with over 50 tattoos designed by the artist collective FAILE. Only open with the Ultimate Edition.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		},
+		{
+			"id": "places/one-eyed-willies-mod-shop",
+			"name": "One-Eyed Willie's Mod Shop",
+			"status": "confirmed",
+			"description": "A mod shop in Lake Leonida for off-road modifications and hand-painted automotive art. Only open with the Ultimate Edition.",
+			"sources": [
+				{
+					"url": "https://www.rockstargames.com/VI/editions",
+					"title": "Grand Theft Auto VI - Editions - Rockstar Games"
+				}
+			]
+		}
+	]
+}

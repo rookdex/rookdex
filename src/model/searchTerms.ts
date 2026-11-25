@@ -6,16 +6,21 @@ import { normalize, type SearchTerms } from "./search"
 
 export const SEARCH_TERMS: SearchTerms = {
 	cars: ["car", "cars", "bil", "biler"],
-	motorcycles: [
+	bikes: [
+		"bike",
+		"bikes",
 		"motorcycle",
 		"motorcycles",
 		"motorbike",
-		"bike",
+		"bicycle",
 		"motorsykkel",
 		"motorsykler",
+		"motorsykler og sykler",
+		"sykkel",
+		"sykler",
 		"mc",
 	],
-	boats: ["boat", "boats", "båt", "båter"],
+	watercraft: ["watercraft", "boat", "boats", "båt", "båter"],
 	aircraft: [
 		"aircraft",
 		"plane",
@@ -27,24 +32,151 @@ export const SEARCH_TERMS: SearchTerms = {
 		"helikoptre",
 		"fly og helikoptre",
 	],
-	emergency: ["emergency", "police", "ambulance", "utrykning", "politi", "ambulanse"],
-	commercial: ["commercial", "van", "truck", "bus", "nyttekjøretøy", "varebil", "lastebil", "buss"],
-	service: ["service", "services", "garage", "shop", "tjeneste", "tjenester", "verksted"],
-	vehicles: ["vehicle", "vehicles", "kjøretøy"],
-	reptiles: ["reptile", "reptiles", "animal", "animals", "krypdyr", "dyr"],
-	birds: ["bird", "birds", "animal", "animals", "fugl", "fugler", "dyr"],
+	// Only the group's own name. The old Emergency, Commercial and Service words (police, politi,
+	// bus, verksted) would match every item after the merge, so they live per item in ITEM_TERMS.
+	service: ["service", "services", "tjeneste", "tjenester", "tjenestekjøretøy"],
 	mammals: ["mammal", "mammals", "animal", "animals", "pattedyr", "dyr"],
-	marine: ["marine life", "fish", "sea", "animal", "animals", "sjødyr", "fisk", "hav", "dyr"],
+	"reptiles-amphibians": [
+		"reptiles & amphibians",
+		"reptile",
+		"reptiles",
+		"amphibian",
+		"amphibians",
+		"animal",
+		"animals",
+		"krypdyr og amfibier",
+		"krypdyr",
+		"amfibie",
+		"dyr",
+	],
+	birds: ["bird", "birds", "animal", "animals", "fugl", "fugler", "dyr"],
+	aquatic: [
+		"aquatic",
+		"fish",
+		"sea",
+		"marine life",
+		"animal",
+		"animals",
+		"vanndyr",
+		"fisk",
+		"sjødyr",
+		"hav",
+		"dyr",
+	],
+	exploration: [
+		"exploration",
+		"hidden",
+		"collectible",
+		"collectibles",
+		"utforsking",
+		"skjult",
+		"samleobjekt",
+		"hidden item",
+		"hidden items",
+		"skjult gjenstand",
+		"skjulte gjenstander",
+	],
+	racing: [
+		"racing",
+		"race",
+		"races",
+		"time trial",
+		"løp",
+		"tidsløp",
+		"challenge",
+		"challenges",
+		"utfordring",
+		"utfordringer",
+	],
+	stunts: ["stunt", "stunts", "jump", "base jump", "hopp"],
 	cities: ["city", "cities", "by", "byer"],
 	keys: ["keys", "island", "islands", "øy", "øyer"],
 	regions: ["region", "regions", "regioner"],
 	landmarks: ["landmark", "landmarks", "landemerke", "landemerker"],
 	businesses: ["business", "businesses", "shop", "store", "bedrift", "bedrifter", "butikk"],
 	neighborhoods: ["neighborhood", "neighborhoods", "district", "bydel", "bydeler"],
-	"hidden-items": ["hidden item", "hidden items", "skjult gjenstand", "skjulte gjenstander"],
-	stunts: ["stunt", "stunts", "jump", "hopp"],
-	challenges: ["challenge", "challenges", "utfordring", "utfordringer"],
 }
+
+// Words true of one item only, keyed by item id. Emergency, Commercial and Service merged into one
+// Service group, and a group word matches every item in the group, so "politi" on the group would
+// find Pay 'n' Spray. Each item carries its own type words instead, so "politi", "buss" and
+// "verksted" still find the right vehicles and places. searchTerms.test.ts checks that every id is
+// in the seed and that every Service item has words.
+const EMERGENCY = ["emergency", "utrykning", "utrykningskjøretøy"]
+const COMMERCIAL = ["commercial", "nyttekjøretøy"]
+const TRUCK = [...COMMERCIAL, "truck", "lastebil"]
+
+const BY_TYPE: ReadonlyArray<readonly [words: readonly string[], ids: readonly string[]]> = [
+	[
+		[...EMERGENCY, "police", "politi", "politibil"],
+		[
+			"vehicles/declasse-granger-police",
+			"vehicles/dundreary-landstalker-xl-police",
+			"vehicles/vapid-stanier-le-police-cruiser",
+			"vehicles/bravado-buffalo-police-cruiser",
+			"vehicles/bravado-buffalo-stx-pursuit",
+			"vehicles/bravado-gauntlet-interceptor",
+			"vehicles/vapid-lowline-police-interceptor",
+			"vehicles/vapid-montagne-police",
+			"vehicles/vapid-stanier-le-police-ghost",
+			"vehicles/brute-police-riot",
+		],
+	],
+	[[...EMERGENCY, "ambulance", "ambulanse"], ["vehicles/brute-ambulance"]],
+	[
+		TRUCK,
+		[
+			"vehicles/brute-stockade",
+			"vehicles/vapid-benson",
+			"vehicles/hvy-biff",
+			"vehicles/jobuilt-flatbed",
+			"vehicles/brute-tipper",
+			"vehicles/brute-utility-truck",
+			"vehicles/jobuilt-phantom",
+			"vehicles/maibatsu-mule",
+			"vehicles/jobuilt-rubble",
+			"vehicles/mtl-packer",
+		],
+	],
+	[[...TRUCK, "tow truck", "slepebil", "bergingsbil"], ["vehicles/vapid-tow-truck"]],
+	[
+		[...COMMERCIAL, "van", "varebil"],
+		[
+			"vehicles/vapid-speedo",
+			"vehicles/declasse-burrito",
+			"vehicles/bravado-rumpo",
+			"vehicles/bravado-youga-classic",
+		],
+	],
+	[
+		[...COMMERCIAL, "bus", "buss"],
+		["vehicles/dashound", "vehicles/brute-rental-shuttle-bus"],
+	],
+	[
+		[...COMMERCIAL, "taxi", "drosje"],
+		["vehicles/declasse-granger-taxi", "vehicles/vapid-stanier-taxi"],
+	],
+	[[...COMMERCIAL, "golf cart", "golfbil"], ["vehicles/nagasaki-caddy"]],
+	[COMMERCIAL, ["vehicles/hvy-airtug"]],
+	[["garage", "garasje"], ["vehicles/vehicle-garages"]],
+	[
+		["garage", "shop", "workshop", "verksted"],
+		[
+			"vehicles/vehicle-customization",
+			"vehicles/rideout-customs",
+			"vehicles/one-eyed-willies-mod-shop",
+			"vehicles/pay-n-spray",
+		],
+	],
+]
+
+export const ITEM_TERMS: SearchTerms = BY_TYPE.reduce<Record<string, string[]>>(
+	(byId, [words, ids]) => {
+		for (const id of ids) byId[id] = [...(byId[id] ?? []), ...words]
+		return byId
+	},
+	{}
+)
 
 /** Every group needs an entry that contains each locale's label. Returns the problems, if any. */
 export function missingTerms(
