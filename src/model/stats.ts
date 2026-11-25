@@ -61,8 +61,9 @@ export function perGroup(items: SeedItem[], records: Records): Record<string, Co
 	return counts
 }
 
+/** Finds are activity, not totals: every shown item counts, uncounted ones too. */
 export function recentFinds(items: SeedItem[], records: Records, limit = 5): RecentFind[] {
-	return countable(items)
+	return shown(items)
 		.flatMap((item) => {
 			const record = records[item.id]
 			return record?.done ? [{ item, updated_at: record.updated_at }] : []

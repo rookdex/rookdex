@@ -175,6 +175,12 @@ describe("foundToday", () => {
 		}
 		expect(foundToday(retired, r, new Date("2026-11-20T12:00:00Z"))).toBe(0)
 	})
+
+	it("counts a find in a counts: false group or an edition item, which the list shows", () => {
+		const extra = [...items, item("animals/bonus", "g", { uncounted: true })]
+		const r = records({ "animals/bonus": "2026-11-20T10:00:00Z" })
+		expect(foundToday(extra, r, new Date("2026-11-20T12:00:00Z"))).toBe(1)
+	})
 })
 
 describe("latestRumours", () => {
@@ -297,6 +303,12 @@ describe("findsByDay", () => {
 			"animals/e": { ...found("2026-11-22T10:00:00Z"), item_id: "animals/e", done: false },
 		}
 		expect(findsByDay(withRetired, r, "2026-11-22", 1)).toEqual([{ day: "2026-11-22", count: 0 }])
+	})
+
+	it("counts a find of an uncounted item, which the list shows", () => {
+		const extra = [...items, item("animals/bonus", "g", { uncounted: true })]
+		const r = records({ "animals/bonus": "2026-11-22T10:00:00Z" })
+		expect(findsByDay(extra, r, "2026-11-22", 1)).toEqual([{ day: "2026-11-22", count: 1 }])
 	})
 
 	it("returns 7 distinct days across the 25 October 2026 daylight-saving change", () => {

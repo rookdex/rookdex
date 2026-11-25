@@ -263,6 +263,16 @@ describe("buildSeed rejects", () => {
 			/animals\/birds: story spoilers wait for the Hide spoilers switch/,
 		],
 		[
+			"a gate spoiler item",
+			(i: FixtureInput) => (pelican(i).spoiler = "gate"),
+			/animals\/pelican: gate spoilers wait for their disclosure/,
+		],
+		[
+			"a gate spoiler group",
+			(i: FixtureInput) => (birds(i).spoiler = "gate"),
+			/animals\/birds: gate spoilers wait for their disclosure/,
+		],
+		[
 			"a group file in a story category",
 			(i: FixtureInput) =>
 				(i.groups["story/chapters.json"] = {
@@ -310,6 +320,30 @@ describe("buildSeed accepts", () => {
 			})
 		).toBe("")
 	})
+	it("a twin name that replaces one of two retired items with that name", () => {
+		expect(
+			errorsAfter((i) => {
+				cars(i).total = 4
+				cars(i).items.push(
+					{
+						id: "vehicles/hoop-9-old",
+						name: "Hoop 9",
+						status: "confirmed",
+						sources: [ign, radar],
+						retired: true,
+					},
+					{
+						id: "vehicles/hoop-nine",
+						name: "Hoop 9",
+						status: "confirmed",
+						sources: [ign, radar],
+						replaces: ["vehicles/hoop-9"],
+					}
+				)
+				i.shipped += "vehicles/hoop-9-old\nvehicles/hoop-nine\n"
+			})
+		).toBe("")
+	})
 	it("an alias equal to a retired name when the item replaces it", () => {
 		expect(
 			errorsAfter((i) => {
@@ -318,12 +352,11 @@ describe("buildSeed accepts", () => {
 			})
 		).toBe("")
 	})
-	it("every platform listed, story mode and a gate spoiler", () => {
+	it("every platform listed and story mode", () => {
 		expect(
 			errorsAfter((i) => {
 				pelican(i).platforms = ["ps5", "xbox", "pc"]
 				pelican(i).mode = "story"
-				pelican(i).spoiler = "gate"
 			})
 		).toBe("")
 	})

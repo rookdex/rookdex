@@ -75,6 +75,19 @@ describe("recentFinds", () => {
 		expect(recentFinds(items, more).map((f) => f.item.id)).toEqual(["wildlife/b", "wildlife/a"])
 		expect(recentFinds(items, more, 1).map((f) => f.item.id)).toEqual(["wildlife/b"])
 	})
+
+	it("lists a find the list shows even when it never counts toward a total", () => {
+		const bonus = { ...items[0], id: "wildlife/bonus", uncounted: true as const }
+		const found: Records = {
+			"wildlife/bonus": {
+				item_id: "wildlife/bonus",
+				done: true,
+				updated_at: "2026-09-15T00:00:00.000Z",
+				origin: "manual",
+			},
+		}
+		expect(recentFinds([bonus], found).map((f) => f.item.id)).toEqual(["wildlife/bonus"])
+	})
 })
 
 describe("perGroup (tracker refresh spec §4.3)", () => {

@@ -71,7 +71,7 @@ export function nextGroups(items: SeedItem[], records: Records, limit: number): 
 /** Finds whose tick (stored in UTC) falls on `now`'s local calendar day. */
 export function foundToday(items: SeedItem[], records: Records, now: Date): number {
 	const today = localDayKey(now)
-	return countable(items).filter((item) => {
+	return shown(items).filter((item) => {
 		const record = records[item.id]
 		return record?.done === true && localDayKey(new Date(record.updated_at)) === today
 	}).length
@@ -137,7 +137,7 @@ export function findsByDay(
 ): DayCount[] {
 	const counts = new Map<string, number>()
 	for (let n = days - 1; n >= 0; n--) counts.set(addDays(today, -n), 0)
-	for (const item of countable(items)) {
+	for (const item of shown(items)) {
 		const record = records[item.id]
 		if (record?.done !== true) continue
 		const day = localDayKey(new Date(record.updated_at))

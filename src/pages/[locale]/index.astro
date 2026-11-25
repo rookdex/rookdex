@@ -16,7 +16,6 @@ import { hubPhase, LAUNCH_AT } from "../../model/launch"
 import { scriptHash } from "../../model/root-resolver"
 import { facts, rumours, seedItems } from "../../model/seed"
 import { homeSeoKeys } from "../../model/seo"
-import { countable } from "../../model/stats"
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale } }))
@@ -40,7 +39,7 @@ const guideTitle = (slug: string) => {
 	if (!found) throw new Error(`Missing guide: ${slug}`)
 	return found.entry.data.title
 }
-const categories = categoryRows(countable(seedItems), {})
+const categories = categoryRows(seedItems, {})
 const news = latestNews(facts, rumours, NEWS_LIMIT).map(({ id, kind, date, name }) => ({
 	id,
 	kind,

@@ -215,6 +215,8 @@ function extrasErrors(category: string, group: string, input: ItemInput): string
 	const errors: string[] = []
 	if (input.spoiler === "story")
 		errors.push(`${id}: story spoilers wait for the Hide spoilers switch (spec §8.4)`)
+	if (input.spoiler === "gate")
+		errors.push(`${id}: gate spoilers wait for their disclosure (spec §8.4)`)
 	const limited = input.platforms !== undefined && new Set(input.platforms).size < PLATFORMS.length
 	if (input.mode === "online" || limited)
 		errors.push(
@@ -248,6 +250,8 @@ function buildGroup(
 	errors.push(...header.errors)
 	if (file.spoiler === "story")
 		errors.push(`${where}: story spoilers wait for the Hide spoilers switch (spec §8.4)`)
+	if (file.spoiler === "gate")
+		errors.push(`${where}: gate spoilers wait for their disclosure (spec §8.4)`)
 	const sets = file.sets ?? []
 	errors.push(
 		...duplicates(sets.map((s) => s.id)).map((id) => `${where}: set ${id} is listed twice`)
@@ -285,16 +289,20 @@ function shippedErrors(shipped: string[], seedIds: string[]): string[] {
  *  it replaces it, and an alias may not be another live item's name or alias. */
 function nameErrors(category: string, items: SeedItem[]): string[] {
 	const errors: string[] = []
-	const retired = new Map<string, string>()
-	for (const item of items) if (item.retired) retired.set(normalize(item.name), item.id)
+	const retired = new Map<string, string[]>()
+	for (const item of items)
+		if (item.retired) {
+			const key = normalize(item.name)
+			retired.set(key, [...(retired.get(key) ?? []), item.id])
+		}
 	const live = items.filter((item) => !item.retired)
 	const owner = new Map<string, string>()
 	for (const item of live) owner.set(normalize(item.name), item.id)
 	for (const item of live) {
 		for (const name of [item.name, ...(item.aliases ?? [])]) {
-			const twin = retired.get(normalize(name))
-			if (twin && !(item.replaces ?? []).includes(twin))
-				errors.push(`${item.id}: same name as retired ${twin}; add replaces`)
+			const twins = retired.get(normalize(name)) ?? []
+			if (twins.length > 0 && !twins.some((twin) => (item.replaces ?? []).includes(twin)))
+				errors.push(`${item.id}: same name as retired ${twins.join(", ")}; add replaces`)
 		}
 		for (const alias of item.aliases ?? []) {
 			const key = normalize(alias)
