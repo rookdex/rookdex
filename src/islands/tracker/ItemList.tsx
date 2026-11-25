@@ -149,8 +149,9 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 	const cardRef = useRef<HTMLLIElement>(null)
 	const descRef = useRef<HTMLParagraphElement>(null)
 	const panelRef = useRef<HTMLDivElement>(null)
-	const cut = useCut(descRef)
-	usePanel(panelRef, cardRef, cut)
+	const cut = useCut(descRef, item.description)
+	// An open panel stays until it closes, even if its text stops being cut meanwhile.
+	const shown = usePanel(panelRef, cardRef, cut) || cut
 	// The seed id has exactly one slash (schema), so it is unique as a DOM id as it stands.
 	const inputId = `item-${item.id}`
 	const panelId = `more-${item.id}`
@@ -190,7 +191,7 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 			{/* A flex row, so December can add "Entry →" and a star without a new layout. */}
 			<div className="item-foot">
 				{/* Only when the clamp cuts the text, so a chevron always means there is more to read. */}
-				{cut && (
+				{shown && (
 					<button type="button" className="item-icon has-tip tip-end" popoverTarget={panelId}>
 						<ChevronIcon />
 						<span className="visually-hidden">{t("tracker.moreLabel", { name: item.name })}</span>
@@ -225,7 +226,7 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 			    the DOM while the chevron shows, so the chevron always has its target. tabIndex -1 keeps
 			    focus in the panel on a click on its text; otherwise it falls to the results region and
 			    usePanel reads that as focus leaving. */}
-			{cut && (
+			{shown && (
 				<div ref={panelRef} id={panelId} className="item-panel" popover="auto" tabIndex={-1}>
 					<p className="item-panel-name">{item.name}</p>
 					<p className="item-panel-desc">{item.description}</p>
@@ -247,14 +248,17 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 }
 
 /**
- * Whether the two-line clamp cuts the description. Checked on mount, again when the paragraph
- * resizes (width, 200 % text) and once the web fonts have loaded.
+ * Whether the two-line clamp cuts the description. Checked on mount and whenever the text
+ * changes, again when the paragraph resizes (width, 200 % text) and once the web fonts have loaded.
  */
-function useCut(ref: RefObject<HTMLElement | null>): boolean {
+function useCut(ref: RefObject<HTMLElement | null>, text: string | undefined): boolean {
 	const [cut, setCut] = useState(false)
 	useLayoutEffect(() => {
 		const desc = ref.current
-		if (!desc) return
+		if (!desc || !text) {
+			setCut(false)
+			return
+		}
 		let live = true
 		const check = () => {
 			if (live) setCut(desc.scrollHeight > desc.clientHeight + 1)
@@ -267,6 +271,6 @@ function useCut(ref: RefObject<HTMLElement | null>): boolean {
 			live = false
 			observer?.disconnect()
 		}
-	}, [ref])
+	}, [ref, text])
 	return cut
 }

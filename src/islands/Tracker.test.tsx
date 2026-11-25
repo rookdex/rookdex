@@ -277,7 +277,7 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 
 	describe("full text panel", () => {
 		const chevron = (name: string) =>
-			within(card(name)).getByRole("button", { name: `Show the whole description of ${name}` })
+			within(card(name)).getByRole("button", { name: `Full text: ${name}` })
 
 		/** jsdom lays nothing out, so this makes every description report more text than it shows. */
 		const cutDescriptions = () =>

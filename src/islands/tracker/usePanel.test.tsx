@@ -2,16 +2,16 @@
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import { useRef } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { PANEL_EDGE, SCROLL_SLACK, usePanel } from "./usePanel"
+import { PANEL_EDGE, PANEL_SETTLE_MS, SCROLL_SLACK, usePanel } from "./usePanel"
 
 /** A card with its panel, then a second card and a link, the shape ItemRow renders. */
 function Card({ onOther, onLink }: { onOther: () => void; onLink: () => void }) {
 	const card = useRef<HTMLLIElement>(null)
 	const panel = useRef<HTMLDivElement>(null)
-	usePanel(panel, card, true)
+	const open = usePanel(panel, card, true)
 	return (
 		<ul>
-			<li ref={card} className="item" data-testid="card">
+			<li ref={card} className="item" data-testid="card" data-open={open || undefined}>
 				<div ref={panel} data-testid="panel" popover="auto">
 					<button type="button">inside</button>
 				</div>
@@ -48,7 +48,23 @@ const tap = (target: Element, init: PointerEventInit = {}) => {
 
 let hide: ReturnType<typeof vi.fn>
 
-function mount(cardTop = 100, cardHeight = 120, panelHeight = 200) {
+interface Mount {
+	cardTop?: number
+	cardHeight?: number
+	panelHeight?: number
+	/** Opened with Enter or Space on a focused chevron, not a tap. */
+	keyboard?: boolean
+	/** Leaves the settle window open, as right after a tap. */
+	settling?: boolean
+}
+
+function mount({
+	cardTop = 100,
+	cardHeight = 120,
+	panelHeight = 200,
+	keyboard = false,
+	settling = false,
+}: Mount = {}) {
 	const onOther = vi.fn()
 	const onLink = vi.fn()
 	render(<Card onOther={onOther} onLink={onLink} />)
@@ -58,10 +74,16 @@ function mount(cardTop = 100, cardHeight = 120, panelHeight = 200) {
 	panel.getBoundingClientRect = () => rect(Number.parseFloat(panel.style.top), panelHeight)
 	hide = vi.fn()
 	panel.hidePopover = hide as unknown as () => void
+	// The other card's button stands in for the chevron a keyboard user pressed.
+	if (keyboard) screen.getByText("more").focus()
 	toggle(panel, "beforetoggle", "open")
 	// jsdom keeps a [popover] display: none; an open one shows, so focus can land inside it.
 	panel.style.display = "block"
-	toggle(panel, "toggle", "open")
+	act(() => {
+		toggle(panel, "toggle", "open")
+	})
+	// Most tests start after the keyboard settle window, as a user's own scroll or touch ends it.
+	if (!settling) fireEvent.wheel(window)
 	const other = screen.getByText("other")
 	return { panel, onOther, onLink, other }
 }
@@ -92,23 +114,42 @@ describe("usePanel placement (tracker refresh spec §5.1)", () => {
 	})
 
 	it("lifts a panel that would run past the bottom of the screen", () => {
-		const { panel } = mount(700, 120, 300)
+		const { panel } = mount({ cardTop: 700, panelHeight: 300 })
 		expect(panel.style.top).toBe(`${800 - PANEL_EDGE - 300}px`)
 	})
 
 	it("keeps the top on screen when the card starts above it", () => {
-		const { panel } = mount(-60, 200, 200)
+		const { panel } = mount({ cardTop: -60, cardHeight: 200 })
 		expect(panel.style.top).toBe(`${PANEL_EDGE}px`)
 	})
 
 	it("never lifts a panel above the top edge", () => {
-		const { panel } = mount(100, 120, 900)
+		const { panel } = mount({ panelHeight: 900 })
 		expect(panel.style.top).toBe(`${PANEL_EDGE}px`)
 	})
 
-	it("moves focus to the close button, since the chevron is under the panel now", () => {
-		mount()
+	it("caps its min-height at the screen, so a taller card's text scrolls inside the panel", () => {
+		const { panel } = mount({ cardHeight: 1000 })
+		expect(panel.style.minHeight).toBe(`${800 - 2 * PANEL_EDGE}px`)
+	})
+
+	it("moves focus to the close button when opened from the keyboard, since the chevron is under it", () => {
+		mount({ keyboard: true })
 		expect(screen.getByText("inside")).toHaveFocus()
+	})
+
+	it("leaves focus alone when opened by a tap, so the phone keyboard stays as it was", () => {
+		mount()
+		expect(screen.getByText("inside")).not.toHaveFocus()
+	})
+
+	it("reports open until it closes, so the card keeps it mounted meanwhile", () => {
+		const { panel } = mount()
+		expect(screen.getByTestId("card")).toHaveAttribute("data-open")
+		act(() => {
+			toggle(panel, "toggle", "closed")
+		})
+		expect(screen.getByTestId("card")).not.toHaveAttribute("data-open")
 	})
 })
 
@@ -119,6 +160,26 @@ describe("usePanel closing (tracker refresh spec §5.1)", () => {
 		fireEvent.scroll(window)
 		expect(hide).not.toHaveBeenCalled()
 		vi.stubGlobal("scrollY", SCROLL_SLACK + 1)
+		fireEvent.scroll(window)
+		expect(hide).toHaveBeenCalledOnce()
+	})
+
+	it("moves its baseline instead of closing while the phone keyboard settles", () => {
+		vi.useFakeTimers()
+		mount({ settling: true })
+		vi.stubGlobal("scrollY", 120)
+		fireEvent.scroll(window)
+		expect(hide).not.toHaveBeenCalled()
+		act(() => vi.advanceTimersByTime(PANEL_SETTLE_MS))
+		vi.stubGlobal("scrollY", 120 + SCROLL_SLACK + 1)
+		fireEvent.scroll(window)
+		expect(hide).toHaveBeenCalledOnce()
+	})
+
+	it("ends the settle window at the user's first touch", () => {
+		mount({ settling: true })
+		fireEvent.touchStart(window)
+		vi.stubGlobal("scrollY", 60)
 		fireEvent.scroll(window)
 		expect(hide).toHaveBeenCalledOnce()
 	})
@@ -135,7 +196,7 @@ describe("usePanel closing (tracker refresh spec §5.1)", () => {
 
 	it("closes once focus leaves it, after the focus has landed", () => {
 		vi.useFakeTimers()
-		const { panel } = mount()
+		const { panel } = mount({ keyboard: true })
 		const link = screen.getByText("elsewhere")
 		fireEvent.focusOut(screen.getByText("inside"), { relatedTarget: link })
 		expect(hide).not.toHaveBeenCalled()

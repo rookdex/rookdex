@@ -1,4 +1,4 @@
-import { type RefObject, useEffect } from "react"
+import { type RefObject, useEffect, useState } from "react"
 
 /** The panel keeps this far from the screen's top and bottom edges. */
 export const PANEL_EDGE = 8
@@ -6,29 +6,40 @@ export const PANEL_EDGE = 8
 export const SCROLL_SLACK = 8
 /** A tap's click lands within this of its pointerup; a later click belongs to a new tap. */
 const CLICK_AFTER_UP_MS = 400
+/**
+ * A chevron tap blurs the search field, and the phone keyboard closing shifts the page. Until it
+ * settles, or the user touches or scrolls the page, a scroll only moves the baseline. Same span as
+ * Tracker.tsx's KEYBOARD_SETTLE_MS.
+ */
+export const PANEL_SETTLE_MS = 1000
+const USER_SCROLL = ["touchstart", "wheel"] as const
 
 type Toggle = Event & { newState?: string }
 
 /**
- * Lays a card's popover panel over the card (tracker refresh spec §5.1). On open it takes the
- * card's place and width, kept on screen at both edges, and focus moves to its close button. It
- * closes on Escape and on a tap outside (both native to `popover="auto"`), on a scroll past
- * `SCROLL_SLACK`, when the window changes width and when focus leaves it. A tap on another card's
- * body that closes it does nothing else, so closing it never marks that card found. `mounted`
- * re-runs the wiring when the panel comes and goes.
+ * Lays a card's popover panel over the card (tracker refresh spec §5.1) and reports whether it is
+ * open. On open it takes the card's place and width, kept on screen at both edges. Opened from the
+ * keyboard, focus moves to its close button, since the chevron is under the panel. It closes on
+ * Escape and on a tap outside (both native to `popover="auto"`), on a scroll past `SCROLL_SLACK`,
+ * when the window changes width and when focus moves on. A tap on another card's body that closes
+ * it does nothing else, so closing it never marks that card found. `cut` mounts the panel; an open
+ * panel stays mounted until it closes, even if its text stops being cut.
  */
 export function usePanel(
 	panelRef: RefObject<HTMLElement | null>,
 	cardRef: RefObject<HTMLElement | null>,
-	mounted: boolean
-): void {
+	cut: boolean
+): boolean {
+	const [open, setOpen] = useState(false)
+	const mounted = cut || open
 	useEffect(() => {
 		const panel = panelRef.current
 		if (!mounted || !panel) return
 		let unwatch = () => {}
 
 		// Set before the panel shows, and lifted in the frame before its first paint, so it never
-		// flashes past the bottom edge.
+		// flashes past the bottom edge. The min-height cap keeps a panel taller than the screen
+		// inside it, where its own max-height and scroll apply.
 		const place = (event: Toggle) => {
 			const card = cardRef.current
 			if (event.newState !== "open" || !card) return
@@ -36,7 +47,7 @@ export function usePanel(
 			panel.style.left = `${box.left}px`
 			panel.style.top = `${Math.max(PANEL_EDGE, box.top)}px`
 			panel.style.width = `${box.width}px`
-			panel.style.minHeight = `${box.height}px`
+			panel.style.minHeight = `${Math.min(box.height, window.innerHeight - 2 * PANEL_EDGE)}px`
 			requestAnimationFrame(() => {
 				const top = Number.parseFloat(panel.style.top)
 				const height = panel.getBoundingClientRect().height
@@ -47,12 +58,20 @@ export function usePanel(
 
 		const watch = (event: Toggle) => {
 			unwatch()
-			if (event.newState !== "open") return
-			const startY = window.scrollY
+			const isOpen = event.newState === "open"
+			setOpen(isOpen)
+			if (!isOpen) return
+			let startY = window.scrollY
 			const startWidth = window.innerWidth
+			let settling = true
+			const settled = () => {
+				settling = false
+			}
+			const settleTimer = window.setTimeout(settled, PANEL_SETTLE_MS)
 			const close = () => panel.hidePopover?.()
 			const onScroll = () => {
-				if (Math.abs(window.scrollY - startY) > SCROLL_SLACK) close()
+				if (settling) startY = window.scrollY
+				else if (Math.abs(window.scrollY - startY) > SCROLL_SLACK) close()
 			}
 			const onResize = () => {
 				if (window.innerWidth !== startWidth) close()
@@ -65,22 +84,28 @@ export function usePanel(
 				if (target.closest("a, button")) return
 				swallowNextClick()
 			}
-			// Only when focus moves to another control (Tab, Shift+Tab). A click on the panel's own text
-			// drops focus to the body with no relatedTarget, and must keep it open. Deferred, so focus
-			// has landed and hiding never pulls it back to the chevron.
+			// Only when focus moves to another control (Tab, Shift+Tab). A click on the panel's text
+			// focuses the panel itself (tabIndex -1). Deferred, so focus has landed and hiding never
+			// pulls it back to the chevron.
 			const onFocusOut = (out: FocusEvent) => {
 				const next = out.relatedTarget as Node | null
 				if (next && !panel.contains(next)) window.setTimeout(close, 0)
 			}
 			window.addEventListener("scroll", onScroll, { passive: true })
 			window.addEventListener("resize", onResize)
+			for (const type of USER_SCROLL) window.addEventListener(type, settled, { passive: true })
 			document.addEventListener("pointerdown", onDown, true)
 			panel.addEventListener("focusout", onFocusOut)
-			// The chevron sits under the panel now, so focus goes where the reader is.
-			panel.querySelector("button")?.focus({ preventScroll: true })
+			// Only a keyboard opening moves focus. A tap leaves it alone, so it never wakes the phone
+			// keyboard, and Safari, which does not focus a tapped button, restores nothing odd.
+			if (document.activeElement?.matches(":focus-visible")) {
+				panel.querySelector("button")?.focus({ preventScroll: true })
+			}
 			unwatch = () => {
+				window.clearTimeout(settleTimer)
 				window.removeEventListener("scroll", onScroll)
 				window.removeEventListener("resize", onResize)
+				for (const type of USER_SCROLL) window.removeEventListener(type, settled)
 				document.removeEventListener("pointerdown", onDown, true)
 				panel.removeEventListener("focusout", onFocusOut)
 				unwatch = () => {}
@@ -95,6 +120,7 @@ export function usePanel(
 			panel.removeEventListener("toggle", watch)
 		}
 	}, [panelRef, cardRef, mounted])
+	return open
 }
 
 /**
