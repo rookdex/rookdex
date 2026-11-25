@@ -66,7 +66,7 @@ Category order follows the game's Progress tiles, then Places, then Story. Group
 - **No `category` or `group` on an item.** The folder and file give them. `set` is optional and must match a set in the header.
 - **`src/seed/categories.json`** lists the category order and which category is a spoiler. Labels stay in `src/locales/{en,nb}.json` as `category.<id>`, `group.<id>` and `set.<id>`.
 - **`total`** is the game's count for the group or set. The build fails when more items are listed than the total. When fewer are listed, the view says "Listed 60 of 125".
-- **`sort: name | file`.** `name` sorts numbers by value and ignores leading punctuation, so "'70 Vapid Ganado" sorts under V and "Hoop 10" comes after "Hoop 9". `file` keeps the order in the file (card numbers, chapter order).
+- **`sort: name | file`.** `name` sorts numbers by value and ignores a leading model year ("1955 ", "'70 " or "’70 ") and leading punctuation, so "'70 Vapid Ganado" and "1955 Vapid Stanier" sort under V and "Hoop 10" comes after "Hoop 9". `file` keeps the order in the file (card numbers, chapter order).
 - **Sets fold.** In the tracker and the Dex, each set is a native `details` element, open by default. Its `summary` holds the set name as an `h4`, "n of N" and a progress bar marked `aria-hidden="true"` (the text carries the value). There are no set chips. If the NVDA pass shows the `h4` is not reachable with H inside `summary`, the fallback is `h4 > button[aria-expanded]`.
 - **Nothing hides inside a closed set.** A hash target (`#item-<id>`, `hashTarget()` in `src/islands/tracker/hash.ts`), a Dex `#<id>` or a `?line=` filter opens every ancestor `details` before focus and scroll. While a search is active, sets with a match are open and sets without one are hidden.
 - **What counts as listed:** only countable items (not retired, not `counts: false`, not edition-only). A set is complete only when listed equals its total and every item is ticked.
@@ -178,7 +178,7 @@ These replace the unused `location` field. There is no x/y: coordinates and a `p
 Rules:
 - The allowed keys are fixed per category and group, and the build rejects others.
 - The Dex shows bars as bars, never as bare numbers, so a reading never looks more exact than the screen. Each bar is `aria-hidden` and has a visually hidden text equivalent that keeps the same precision ("Speed: about 7 of 10", in en and nb).
-- The source is a new kind, `{ kind: "game", screen: "Progress > Vehicles > Standout" }`, with no URL. The Sources page lists it as "In-game Progress menu".
+- The source is a new kind, `{ kind: "game", screen: ["Progress", "Vehicles", "Standout"] }`, with no URL. `screen` is the menu path, one entry per level, because plain text allows no `>`. The Sources page lists it as "In-game Progress menu" with the path under it, its parts split by a `›` that screen readers skip.
 - Values fill in as screenshots arrive. An item without specs shows nothing.
 - Numbers tables from other sites are never copied.
 
@@ -192,7 +192,7 @@ Rules:
 
 - **Source of record:** a game screen (the `game` source kind), or two independent press sources.
 - **Allowlist additions to press:** powerpyx.com, pushsquare.com, videogameschronicle.com, kotaku.com, blog.playstation.com, news.xbox.com and redbull.com.
-- **Independent** means two different hosts after `normalizeHost`. Item `sources` may be empty only when the group header has sources; the status rule applies to the union. `game` is its own branch of a discriminated source schema and has no `url`.
+- **Independent** means two different press entries on the allowlist. Item `sources` may be empty only when the group header has sources; the status rule applies to the union. `game` is its own branch of a discriminated source schema and has no `url`.
 - **No list is taken whole from one site.** Under the EEA database right (åndsverkloven § 24), a guide's complete list (names, order and set split) is protected even though each entry is a fact. That holds for gtabase.com, powerpyx.com and every other guide. A group's list comes from a game screen, or each item has two independent press sources. Single facts from one site are fine.
 - **Status:** new items are `confirmed`. `expected` and `precedent` stay in the schema for the items already shipped. The pre-launch guesses get retired in the content PRs (§11).
 
