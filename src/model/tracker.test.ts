@@ -150,6 +150,12 @@ describe("categories", () => {
 		).toEqual(["animals", "collections"])
 	})
 
+	it("parseShow opens Activities too for collectibles, where its races and jumps went", () => {
+		expect(
+			parseShow("?show=collectibles", ["vehicles", "animals", "collections", "activities"])
+		).toEqual(["collections", "activities"])
+	})
+
 	it("parseGroups drops an old group key, so the view falls back to the whole category", () => {
 		const src = {
 			url: "https://www.rockstargames.com/VI",

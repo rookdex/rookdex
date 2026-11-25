@@ -84,7 +84,11 @@ export function categoryIds(items: SeedItem[]): string[] {
  *  seedBuild sorts once, so every page and the tracker list items the same way. */
 export function groupItems(items: SeedItem[]): Map<string, SeedItem[]> {
 	const groups = new Map<string, SeedItem[]>()
-	for (const item of items) groups.set(item.group, [...(groups.get(item.group) ?? []), item])
+	for (const item of items) {
+		const list = groups.get(item.group)
+		if (list) list.push(item)
+		else groups.set(item.group, [item])
+	}
 	return groups
 }
 

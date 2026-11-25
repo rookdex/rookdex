@@ -105,7 +105,8 @@ export function duplicates(values: string[]): string[] {
 }
 
 function sourceKey(source: ItemSource): string {
-	return "kind" in source ? `game:${source.screen.join("/")}` : source.url
+	// JSON, because a screen part may itself hold a "/".
+	return "kind" in source ? `game:${JSON.stringify(source.screen)}` : source.url
 }
 
 /** The item's own sources first, then the header's it does not already cite. */
@@ -217,6 +218,14 @@ function extrasErrors(category: string, group: string, input: ItemInput): string
 		errors.push(`${id}: story spoilers wait for the Hide spoilers switch (spec §8.4)`)
 	if (input.spoiler === "gate")
 		errors.push(`${id}: gate spoilers wait for their disclosure (spec §8.4)`)
+	input.tips?.forEach((tip, index) => {
+		if (tip.spoiler === "story")
+			errors.push(
+				`${id} tip ${index + 1}: story spoilers wait for the Hide spoilers switch (spec §8.4)`
+			)
+		if (tip.spoiler === "gate")
+			errors.push(`${id} tip ${index + 1}: gate spoilers wait for their disclosure (spec §8.4)`)
+	})
 	const limited = input.platforms !== undefined && new Set(input.platforms).size < PLATFORMS.length
 	if (input.mode === "online" || limited)
 		errors.push(
@@ -295,7 +304,12 @@ function nameErrors(category: string, items: SeedItem[]): string[] {
 			const key = normalize(item.name)
 			retired.set(key, [...(retired.get(key) ?? []), item.id])
 		}
+	const retiredIds = new Set(items.filter((item) => item.retired).map((item) => item.id))
 	const live = items.filter((item) => !item.retired)
+	for (const item of live)
+		for (const id of item.replaces ?? [])
+			if (!retiredIds.has(id))
+				errors.push(`${item.id}: replaces ${id}, which is not a retired item in ${category}`)
 	const owner = new Map<string, string>()
 	for (const item of live) owner.set(normalize(item.name), item.id)
 	for (const item of live) {

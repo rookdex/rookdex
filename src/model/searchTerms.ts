@@ -32,8 +32,8 @@ export const SEARCH_TERMS: SearchTerms = {
 		"helikoptre",
 		"fly og helikoptre",
 	],
-	// Only words true of all 37 items. The old Emergency and Commercial words (police, politi, bus,
-	// buss) matched every service item after the merge; item names still carry most of them.
+	// Only the group's own name. The old Emergency, Commercial and Service words (police, politi,
+	// bus, verksted) matched every item after the merge; item names still carry most of them.
 	service: ["service", "services", "tjeneste", "tjenester", "tjenestekjøretøy"],
 	mammals: ["mammal", "mammals", "animal", "animals", "pattedyr", "dyr"],
 	"reptiles-amphibians": [

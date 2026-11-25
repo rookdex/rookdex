@@ -111,19 +111,20 @@ export interface Tracker {
 	clearError(): void
 }
 
-/** Spec §6: category ids renamed after launch. Old links and saved views still open the new one. */
-export const CATEGORY_ALIASES: Readonly<Record<string, string>> = {
-	wildlife: "animals",
-	collectibles: "collections",
+/** Spec §6: category ids renamed after launch. Old links and saved views still open what the old
+ *  one held: Collectibles' races and jumps moved to Activities, so it opens both. */
+export const CATEGORY_ALIASES: Readonly<Record<string, readonly string[]>> = {
+	wildlife: ["animals"],
+	collectibles: ["collections", "activities"],
 }
 
 /** Category ids named in `?show=`, kept in `known` order, unknown ones dropped. */
 export function parseShow(search: string, known: string[]): string[] {
 	const raw = new URLSearchParams(search).get("show") ?? ""
 	const wanted = new Set(
-		raw.split(",").map((s) => {
+		raw.split(",").flatMap((s) => {
 			const id = s.trim()
-			return Object.hasOwn(CATEGORY_ALIASES, id) ? CATEGORY_ALIASES[id] : id
+			return Object.hasOwn(CATEGORY_ALIASES, id) ? CATEGORY_ALIASES[id] : [id]
 		})
 	)
 	return known.filter((id) => wanted.has(id))

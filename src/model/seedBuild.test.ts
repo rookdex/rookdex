@@ -263,6 +263,23 @@ describe("buildSeed rejects", () => {
 			/animals\/birds: story spoilers wait for the Hide spoilers switch/,
 		],
 		[
+			"a story spoiler tip",
+			(i: FixtureInput) =>
+				(pelican(i).tips = [{ text: "Look up.", spoiler: "story", sources: [ign, radar] }]),
+			/animals\/pelican tip 1: story spoilers wait for the Hide spoilers switch/,
+		],
+		[
+			"a gate spoiler tip",
+			(i: FixtureInput) =>
+				(pelican(i).tips = [{ text: "Look up.", spoiler: "gate", sources: [ign, radar] }]),
+			/animals\/pelican tip 1: gate spoilers wait for their disclosure/,
+		],
+		[
+			"replaces naming an id that is not a retired item in the category",
+			(i: FixtureInput) => (cars(i).items[0].replaces = ["vehicles/hoop-99"]),
+			/vehicles\/zeta: replaces vehicles\/hoop-99, which is not a retired item in vehicles/,
+		],
+		[
 			"a gate spoiler item",
 			(i: FixtureInput) => (pelican(i).spoiler = "gate"),
 			/animals\/pelican: gate spoilers wait for their disclosure/,
@@ -295,6 +312,20 @@ describe("buildSeed rejects", () => {
 		],
 	])("%s", (_name, change, error) => {
 		expect(errorsAfter(change)).toMatch(error)
+	})
+})
+
+describe("header sources", () => {
+	it("keeps a header game screen that only looks like the item's when joined with a slash", () => {
+		const input = validInput()
+		cars(input).sources = [game]
+		cars(input).items[0].sources = [{ kind: "game", screen: ["Progress", "Vehicles/Cars"] }]
+		const result = buildSeed(input)
+		const zeta = result.items.find((i) => i.id === "vehicles/zeta")
+		expect(zeta?.sources.map((s) => ("kind" in s ? s.screen : s.url))).toEqual([
+			["Progress", "Vehicles/Cars"],
+			["Progress", "Vehicles", "Cars"],
+		])
 	})
 })
 
