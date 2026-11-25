@@ -17,6 +17,12 @@ describe("_redirects (locale spec §6.2, category model spec §6)", () => {
 			"/nb/dex/wildlife/ /nb/dex/animals/ 301",
 			"/en/dex/collectibles/ /en/dex/collections/ 301",
 			"/nb/dex/collectibles/ /nb/dex/collections/ 301",
+			"/no/dex/wildlife /nb/dex/animals/ 301",
+			"/no/dex/collectibles /nb/dex/collections/ 301",
+			"/en/dex/wildlife /en/dex/animals/ 301",
+			"/nb/dex/wildlife /nb/dex/animals/ 301",
+			"/en/dex/collectibles /en/dex/collections/ 301",
+			"/nb/dex/collectibles /nb/dex/collections/ 301",
 			"/no /nb/ 301",
 			"/no/* /nb/:splat 301",
 		])
