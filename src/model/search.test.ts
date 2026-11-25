@@ -160,35 +160,42 @@ describe("aliases (#149)", () => {
 	})
 })
 
-describe("old group words (category model spec §2)", () => {
-	it("finds a former commercial vehicle by the old group's Norwegian word", () => {
-		const mule = {
-			id: "vehicles/mule",
-			category: "vehicles",
-			group: "service",
-			name: "Mule",
-			status: "confirmed" as const,
-			sources: [src],
+describe("merged group words (category model spec §2)", () => {
+	const seeded = (id: string, group: string, name: string) => ({
+		id,
+		category: id.split("/")[0],
+		group,
+		name,
+		status: "confirmed" as const,
+		sources: [src],
+	})
+	const police = seeded("vehicles/vapid-montagne-police", "service", "Vapid Montagne Police")
+	const spray = seeded("vehicles/pay-n-spray", "service", "Pay 'n' Spray")
+	const mule = seeded("vehicles/maibatsu-mule", "service", "Maibatsu Mule")
+	const parts = seeded("collectibles/spaceship-parts", "exploration", "Spaceship Parts")
+
+	it("finds every service item by the merged group's own name", () => {
+		for (const query of ["service", "tjenestekjøretøy"]) {
+			const result = view({ items: [police, spray, mule], query, terms: SEARCH_TERMS })
+			expect(result.visible.map((i) => i.id).sort(), query).toEqual(
+				[police, spray, mule].map((i) => i.id).sort()
+			)
 		}
-		const result = view({ items: [mule], query: "nyttekjøretøy", terms: SEARCH_TERMS })
-		expect(result.visible.map((i) => i.id)).toEqual(["vehicles/mule"])
 	})
 
-	it("finds the Classic Car Collection by the old vehicles group's words", () => {
-		const classic = {
-			id: "collectibles/classic-car-collection",
-			category: "collections",
-			group: "exploration",
-			name: "Classic Car Collection",
-			status: "confirmed" as const,
-			sources: [src],
+	it("finds a police car by its name, not every service item by an old group word", () => {
+		const result = view({ items: [police, spray, mule], query: "police", terms: SEARCH_TERMS })
+		expect(result.visible.map((i) => i.id)).toEqual([police.id])
+		for (const query of ["politi", "buss", "verksted", "nyttekjøretøy"]) {
+			const old = view({ items: [police, spray, mule], query, terms: SEARCH_TERMS })
+			expect(old.visible, query).toEqual([])
 		}
+	})
+
+	it("never answers a vehicle search with exploration items", () => {
 		for (const query of ["vehicle", "vehicles", "kjøretøy"]) {
-			const result = view({ items: [classic], query, terms: SEARCH_TERMS })
-			expect(
-				result.visible.map((i) => i.id),
-				query
-			).toEqual(["collectibles/classic-car-collection"])
+			const result = view({ items: [parts], query, terms: SEARCH_TERMS })
+			expect(result.visible, query).toEqual([])
 		}
 	})
 })
