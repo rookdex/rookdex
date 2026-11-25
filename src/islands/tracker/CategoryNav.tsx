@@ -1,7 +1,7 @@
 import type { ReactElement } from "react"
 import type { Translate } from "../../i18n"
 import type { Count } from "../../model/stats"
-import { AllIcon, BookIcon, categoryIcon } from "./icons"
+import { AllIcon, categoryIcon } from "./icons"
 
 interface Category extends Count {
 	id: string
@@ -16,7 +16,6 @@ interface Props {
 	onSelect: (ids: string[]) => void
 	allLabel: string
 	navLabel: string
-	sources: { href: string; label: string }
 	t: Translate
 }
 
@@ -67,7 +66,6 @@ export function CategoryNav({
 	onSelect,
 	allLabel,
 	navLabel,
-	sources,
 	t,
 }: Props) {
 	function toggle(id: string) {
@@ -102,13 +100,6 @@ export function CategoryNav({
 						/>
 					</li>
 				))}
-				{/* A link to another page, not a filter, so it has no aria-pressed. */}
-				<li className="tile-sources">
-					<a href={sources.href}>
-						<BookIcon />
-						{sources.label}
-					</a>
-				</li>
 			</ul>
 		</nav>
 	)

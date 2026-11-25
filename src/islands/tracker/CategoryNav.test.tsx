@@ -20,7 +20,6 @@ function renderNav(selected: string[] = [], locale: Locale = "en") {
 			onSelect={onSelect}
 			allLabel="All"
 			navLabel="Categories"
-			sources={{ href: "/en/tracker/sources/", label: "Sources" }}
 			t={translator(locale).t}
 		/>
 	)
@@ -65,11 +64,10 @@ describe("CategoryNav tiles (tracker refresh spec §4.1)", () => {
 		expect(onSelect).toHaveBeenLastCalledWith([])
 	})
 
-	it("ends with Sources as a link without aria-pressed, and has no axe violations", async () => {
+	it("holds only the filter tiles, no Sources link, and has no axe violations", async () => {
 		const { container } = renderNav()
-		const sources = screen.getByRole("link", { name: "Sources" })
-		expect(sources).toHaveAttribute("href", "/en/tracker/sources/")
-		expect(sources).not.toHaveAttribute("aria-pressed")
+		expect(screen.queryByRole("link")).toBeNull()
+		expect(container.querySelectorAll("li")).toHaveLength(categories.length + 1)
 		expect(await axe(container)).toHaveNoViolations()
 	})
 })

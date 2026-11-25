@@ -111,7 +111,7 @@ describe("Dex category page (category pages spec §5)", () => {
 		expect(en.querySelector(".dex-group [lang='en']")).toBeNull()
 	})
 
-	it("ends with the other categories and the Sources page", async () => {
+	it("ends with the other categories only, no Sources chip", async () => {
 		const doc = await page("en", "animals")
 		const more = doc.querySelector('nav[aria-labelledby="dex-more"]')
 		expect(text(more?.querySelector("h2"))).toBe("More in the Dex")
@@ -119,7 +119,6 @@ describe("Dex category page (category pages spec §5)", () => {
 			...categoryIds(live)
 				.filter((c) => c !== "animals")
 				.map((c) => `/en/dex/${c}/`),
-			"/en/tracker/sources/",
 		])
 	})
 

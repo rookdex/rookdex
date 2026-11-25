@@ -86,15 +86,12 @@ describe("Category toggles", () => {
 		expect(window.location.search).toBe("")
 	})
 
-	it("ends the chip row with a Sources link, not a toggle", async () => {
+	it("ends the tile row with the last category, with no Sources tile", async () => {
 		await ready()
 		const nav = screen.getByRole("navigation", { name: "Categories" })
+		expect(nav.querySelector("a")).toBeNull()
 		const items = [...nav.querySelectorAll("li")]
-		const last = items[items.length - 1].firstElementChild
-		expect(last?.tagName).toBe("A")
-		expect(last).toHaveAttribute("href", "/en/tracker/sources/")
-		expect(last).toHaveTextContent("Sources")
-		expect(last).not.toHaveAttribute("aria-pressed")
+		expect(items[items.length - 1].firstElementChild).toHaveAttribute("aria-pressed")
 	})
 
 	it("reads a deep link and drops unknown ids", async () => {

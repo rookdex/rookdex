@@ -431,7 +431,6 @@ export function Tracker({ locale }: Props) {
 					onSelect={selectCategories}
 					allLabel={t("tracker.all")}
 					navLabel={t("tracker.categories")}
-					sources={{ href: sourcesHref, label: t("tracker.sources") }}
 					t={t}
 				/>
 				<LastFound

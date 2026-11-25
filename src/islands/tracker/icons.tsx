@@ -64,14 +64,13 @@ export function AllIcon() {
 	)
 }
 
-/** A stopwatch, not a flag: every tracker row already shows a flag for Report. */
+/** A ticket: things to do, from races to golf. Not a flag (every tracker row shows one for
+ *  Report) and not a globe (the language switch uses one). */
 export function ActivitiesIcon() {
 	return (
 		<svg {...common} aria-hidden="true">
-			<circle cx="12" cy="14" r="7" />
-			<path d="M10 3h4M12 3v4" />
-			<path d="m17.5 8.5 1.5-1.5" />
-			<path d="M12 14l2.5-2.5" />
+			<path d="M4 6h16a1 1 0 0 1 1 1v3a2 2 0 0 0 0 4v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a2 2 0 0 0 0-4V7a1 1 0 0 1 1-1z" />
+			<path d="M15 6v2M15 11v2M15 16v2" />
 		</svg>
 	)
 }
