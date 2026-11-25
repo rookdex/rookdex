@@ -240,6 +240,7 @@
 	"sources.title": "Sources",
 	"sources.lede": "Where every item in the tracker comes from.",
 	"sources.description": "Where every item in the GTA 6 tracker comes from. Each animal, vehicle, place and collectible links to the official page or report that shows it.",
+	"sources.game": "In-game Progress menu",
 	"sources.back": "Back to the item in the tracker",
 	"settings.title": "Settings",
 	"settings.description": "Pick your language, check for updates, install the app, and see or delete the data Rookdex keeps on this device. Nothing is stored anywhere else.",

@@ -44,6 +44,14 @@ export const sourceInputSchema = z.strictObject({
 export const tierSchema = z.enum(["official", "press"])
 export const sourceSchema = sourceInputSchema.extend({ tier: tierSchema })
 
+/** Category model spec §8.7: a reading off a game screen. It has no URL. The screen is its menu
+ *  path, one entry per level (["Progress", "Vehicles", "Cars"]): `text()` forbids `>`. */
+export const gameSourceSchema = z.strictObject({
+	kind: z.literal("game"),
+	screen: z.array(text(TEXT.name)).min(1).max(4),
+})
+export const itemSourceInputSchema = z.union([sourceInputSchema, gameSourceSchema])
+
 export const seedItemInputSchema = z.strictObject({
 	id: idSchema,
 	category: z.string().regex(SLUG),
@@ -143,8 +151,11 @@ export const allowlistSchema = z.strictObject({
 export type Tier = z.infer<typeof tierSchema>
 export type SourceInput = z.infer<typeof sourceInputSchema>
 export type Source = z.infer<typeof sourceSchema>
+export type GameSource = z.infer<typeof gameSourceSchema>
+export type ItemSourceInput = z.infer<typeof itemSourceInputSchema>
+export type ItemSource = Source | GameSource
 export type SeedItemInput = z.infer<typeof seedItemInputSchema>
-export type SeedItem = z.infer<typeof seedItemSchema>
+export type SeedItem = Omit<z.infer<typeof seedItemSchema>, "sources"> & { sources: ItemSource[] }
 export type RumourInput = z.infer<typeof rumourInputSchema>
 export type Rumour = z.infer<typeof rumourSchema>
 export type FactInput = z.infer<typeof factInputSchema>

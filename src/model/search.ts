@@ -1,7 +1,10 @@
 // Tracker search (tracker search spec §3.1). Pure: no React, no DOM. The functions take plain
 // text fields, so a later site-wide search can reuse normalize and matches.
+import { normalize } from "./normalize"
 import type { SeedItem } from "./schema"
 import { groupKey, type Records } from "./stats"
+
+export { normalize }
 
 /** Group id to search words in both languages (searchTerms.ts). */
 export type SearchTerms = Readonly<Record<string, readonly string[]>>
@@ -32,12 +35,6 @@ export type EmptyState = "none" | "elsewhere" | "all-found" | "no-match"
 /** How long typing must pause before its result is announced (tracker search spec §5). Shared by
  *  the tracker and the Dex search, so it lives here and not in a React module. */
 export const SETTLE_MS = 500
-
-/** NFD with combining marks removed, lowercase, trimmed, inner whitespace collapsed. ø and æ
- *  are letters, not accents, so they stay. */
-export function normalize(text: string): string {
-	return text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim().replace(/\s+/g, " ")
-}
 
 function words(query: string): string[] {
 	const text = normalize(query)

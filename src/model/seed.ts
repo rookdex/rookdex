@@ -3,7 +3,6 @@
 // seed is invalid, so a bad seed fails the build and CI.
 import { z } from "astro/zod"
 import allowlistJson from "../../allowlist.json"
-import { normalizeHost } from "./outlet"
 import {
 	type Allowlist,
 	allowlistSchema,
@@ -12,81 +11,19 @@ import {
 	type Rumour,
 	rumourInputSchema,
 	type SeedItem,
-	type Source,
-	type SourceInput,
 	seedItemInputSchema,
-	type Tier,
 } from "./schema"
+import { attachTiers, officialErrors, tierErrors } from "./tiers"
 
 export const allowlist: Allowlist = allowlistSchema.parse(allowlistJson)
 
-const VIDEO_HOSTS = ["youtube.com", "youtu.be"]
-
-/**
- * `prefix` is a URL without scheme: a bare domain covers the domain and its subdomains,
- * `host/path` covers that host and paths under `/path`, and `host/path?query` names one exact
- * page (a trailer's watch URL; a channel prefix cannot cover `/watch`). Case-insensitive,
- * `www.` ignored.
- */
-export function matchesPrefix(url: URL, prefix: string): boolean {
-	const [rawHost = "", ...rest] = prefix.toLowerCase().split("/")
-	const host = normalizeHost(rawHost)
-	const urlHost = normalizeHost(url.hostname)
-	if (urlHost !== host && !(rest.length === 0 && urlHost.endsWith(`.${host}`))) return false
-	if (rest.length === 0) return true
-	const path = `/${rest.join("/")}`
-	if (!path.includes("?")) return url.pathname.toLowerCase().startsWith(path)
-	const page = `${url.pathname}${url.search}`.toLowerCase()
-	return page === path || page.startsWith(`${path}&`)
-}
-
-export type TierResult = Tier | "blocked" | "unlisted"
-
-export function resolveTier(urlString: string, list: Allowlist): TierResult {
-	const url = new URL(urlString)
-	if (list.blocklist.some((p) => matchesPrefix(url, p))) return "blocked"
-	if (list.official.some((p) => matchesPrefix(url, p))) return "official"
-	if (list.press.some((p) => matchesPrefix(url, p))) return "press"
-	return "unlisted"
-}
-
-export function isVideo(urlString: string): boolean {
-	const url = new URL(urlString)
-	return VIDEO_HOSTS.some((host) => matchesPrefix(url, host))
-}
-
-function attachTiers(
-	id: string,
-	sources: SourceInput[],
-	list: Allowlist
-): { sources: Source[]; errors: string[] } {
-	const errors: string[] = []
-	const tiered: Source[] = []
-	for (const source of sources) {
-		const tier = resolveTier(source.url, list)
-		if (tier === "blocked" || tier === "unlisted") {
-			errors.push(`${id}: source ${source.url} is ${tier}`)
-		} else {
-			tiered.push({ ...source, tier })
-		}
-	}
-	return { sources: tiered, errors }
-}
-
-/** Spec §4: confirmed needs an official source, and an official video alone needs press too. */
-function confirmedErrors(id: string, sources: Source[]): string[] {
-	const official = sources.filter((s) => s.tier === "official")
-	if (official.length === 0) return [`${id}: confirmed needs an official source`]
-	if (official.every((s) => isVideo(s.url)) && !sources.some((s) => s.tier === "press"))
-		return [`${id}: video-only official source needs a press source naming the item`]
-	return []
-}
-
-/** Spec §4: what each status needs from its sources. */
-export function tierErrors(item: SeedItem): string[] {
-	if (item.status === "confirmed") return confirmedErrors(item.id, item.sources)
-	return item.precedent ? [] : [`${item.id}: expected needs a precedent`]
-}
+export {
+	isVideo,
+	matchesPrefix,
+	resolveTier,
+	type TierResult,
+	tierErrors,
+} from "./tiers"
 
 function issueMessages(prefix: string, error: z.ZodError): string[] {
 	return error.issues.map((issue) => {
@@ -120,7 +57,7 @@ export function validateSeedFile(
 		errors.push(...tiered.errors)
 		if (tiered.errors.length > 0) continue
 		const item: SeedItem = { ...input, sources: tiered.sources }
-		const ruleErrors = tierErrors(item)
+		const ruleErrors = tierErrors(item, list)
 		errors.push(...ruleErrors)
 		if (ruleErrors.length === 0) items.push(item)
 	}
@@ -158,7 +95,7 @@ export function validateFacts(data: unknown, list: Allowlist): { facts: Fact[]; 
 		const tiered = attachTiers(input.id, input.sources, list)
 		errors.push(...tiered.errors)
 		if (tiered.errors.length > 0) continue
-		const ruleErrors = confirmedErrors(input.id, tiered.sources)
+		const ruleErrors = officialErrors(input.id, tiered.sources)
 		errors.push(...ruleErrors)
 		if (ruleErrors.length === 0) facts.push({ ...input, sources: tiered.sources })
 	}

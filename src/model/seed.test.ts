@@ -19,6 +19,7 @@ import {
 	validateRumours,
 	validateSeedFile,
 } from "./seed"
+import { isGameSource } from "./tiers"
 
 const list: Allowlist = {
 	official: ["rockstargames.com", "youtube.com/@RockstarGames/"],
@@ -81,7 +82,9 @@ describe("resolveTier", () => {
 describe("tier rules", () => {
 	it("confirmed needs an official source", () => {
 		const { errors } = validateSeedFile("wildlife", [item({ sources: [press] })], list)
-		expect(errors).toEqual(["wildlife/american-alligator: confirmed needs an official source"])
+		expect(errors).toEqual([
+			"wildlife/american-alligator: confirmed needs an official source, a game screen or two press sources on different allowlist entries",
+		])
 	})
 	it("a video-only official source needs a press source naming the item", () => {
 		expect(isVideo(trailer.url)).toBe(true)
@@ -103,7 +106,7 @@ describe("tier rules", () => {
 			list
 		)
 		expect(ok.errors).toEqual([])
-		expect(tierErrors(ok.items[0])).toEqual([])
+		expect(tierErrors(ok.items[0], list)).toEqual([])
 	})
 	it("rejects blocked and unlisted sources", () => {
 		const { errors } = validateSeedFile(
@@ -121,7 +124,7 @@ describe("validateSeedFile", () => {
 	it("attaches tiers to valid items", () => {
 		const { items, errors } = validateSeedFile("wildlife", [item({})], list)
 		expect(errors).toEqual([])
-		expect(items[0].sources[0].tier).toBe("official")
+		expect(items[0].sources.flatMap((s) => (isGameSource(s) ? [] : [s.tier]))).toEqual(["official"])
 	})
 	it("reports schema errors with the path", () => {
 		const { errors } = validateSeedFile("wildlife", [item({ name: "<b>Gator</b>" })], list)

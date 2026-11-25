@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import { translator } from "../i18n"
 import { dexCategory } from "../model/dex"
 import { categoryIds, seedItems } from "../model/seed"
+import { isGameSource } from "../model/tiers"
 import Page from "../pages/[locale]/dex/[category].astro"
 import { renderDoc } from "./render"
 
@@ -74,7 +75,9 @@ describe("Dex category page (category pages spec §5)", () => {
 			expect(text(details?.querySelector("summary"))).toBe(`Kilder (${item.sources.length})`)
 			expect(details?.querySelector("summary svg")?.getAttribute("aria-hidden")).toBe("true")
 			const links = [...(details?.querySelectorAll('a[target="_blank"]') ?? [])]
-			expect(links.map((a) => a.getAttribute("href"))).toEqual(item.sources.map((s) => s.url))
+			expect(links.map((a) => a.getAttribute("href"))).toEqual(
+				item.sources.flatMap((s) => (isGameSource(s) ? [] : [s.url]))
+			)
 		}
 	})
 

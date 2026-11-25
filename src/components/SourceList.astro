@@ -1,11 +1,11 @@
 ---
-import type { Locale } from "../i18n"
+import { type Locale, translator } from "../i18n"
 import { outletOf } from "../model/outlet"
-import type { Source } from "../model/schema"
+import type { ItemSource } from "../model/schema"
 import ExternalLink from "./ExternalLink.astro"
 
 interface Props {
-	sources: Source[]
+	sources: ItemSource[]
 	locale: Locale
 	/** "en" on nb pages: source titles are English seed text (category pages spec §10). */
 	lang?: string
@@ -14,20 +14,36 @@ interface Props {
 // One item's sources, title first and the outlet under it (category pages spec §5.3). The Sources
 // page and the Dex cards share it. Many items cite two trailers on youtube.com, so the title leads.
 const { sources, locale, lang } = Astro.props
+const { t } = translator(locale)
 ---
 
 <ul class="tap-links source-list">
 	{
-		sources.map((source) => (
-			<li>
-				{/* No whitespace around the title: a space before the ↗ would let it wrap alone. The lang
-				    span stays inside the link and stops before the Norwegian new-tab note. */}
-				<ExternalLink href={source.url} locale={locale} class="go-link"
-					>{lang ? <span lang={lang}>{source.title}</span> : source.title}</ExternalLink
-				>
-				<span class="outlet">{outletOf(source.url)}</span>
-			</li>
-		))
+		sources.map((source) =>
+			"kind" in source ? (
+				<li>
+					<span class="game-source">{t("sources.game")}</span>
+					<span class="outlet">
+						{lang ? (
+							<span lang={lang}>
+								{source.screen.map((part, index) => (index === 0 ? part : <Fragment> <span aria-hidden="true">›</span> {part}</Fragment>))}
+							</span>
+						) : (
+							source.screen.map((part, index) => (index === 0 ? part : <Fragment> <span aria-hidden="true">›</span> {part}</Fragment>))
+						)}
+					</span>
+				</li>
+			) : (
+				<li>
+					{/* No whitespace around the title: a space before the ↗ would let it wrap alone. The lang
+					    span stays inside the link and stops before the Norwegian new-tab note. */}
+					<ExternalLink href={source.url} locale={locale} class="go-link"
+						>{lang ? <span lang={lang}>{source.title}</span> : source.title}</ExternalLink
+					>
+					<span class="outlet">{outletOf(source.url)}</span>
+				</li>
+			)
+		)
 	}
 </ul>
 
@@ -50,6 +66,13 @@ const { sources, locale, lang } = Astro.props
 	.source-list li :global(a) {
 		display: block;
 		padding-block: calc((var(--tap) - 1lh) / 2);
+	}
+
+	/* The game screen's title line: the same height and ink as a link title above an outlet. */
+	.game-source {
+		display: block;
+		padding-block: calc((var(--tap) - 1lh) / 2);
+		color: var(--text);
 	}
 
 	.outlet {
