@@ -108,14 +108,15 @@ The new `--tracker-max-w` (§3.3), the spacing table (§3.5) and the tablet and 
 
 ### 5.1 The card (`ItemList.tsx`, `ItemRow`)
 
-Order in the DOM, which is also the Tab order: checkbox, book link, flag button.
+Order in the DOM, which is also the Tab order: checkbox, chevron (only on a cut-off card), book link, flag link. An open panel puts its close button right after the chevron.
 
 - **Icon tile** (36 px) with the category icon. Found: pink background tint and pink icon.
 - **Name** (15 px, semibold), as the checkbox's `label`.
 - **Meta line** (12 px, muted): a 7 px dot (pink for Confirmed, cyan for Expected), the tier text as today (`tracker.confirmed` or `tracker.expectedFrom`), " · ", the group label. It may wrap on narrow phones; it is never cut off.
 - **Check** top right, absolutely placed in a 44 px box. The label's `::after` still covers the card, so a tap anywhere on the card toggles it.
 - **Description** clamped to 2 lines (`-webkit-line-clamp: 2`). The full text stays in the DOM, so screen readers read all of it.
-- **Footer**, right-aligned: book (Sources) and flag ("coming soon", `aria-disabled`). Both sit above the label's click layer, as today. The footer is a flex row so December can add "Entry →" and a star without changing the layout. No empty placeholders now.
+- **Full text** (added 25.11.2026): when the clamp cuts the description, the footer gets a chevron first (`tracker.moreLabel`, tip `tracker.more`). It opens a `popover="auto"` panel laid over the card at the card's place and width, with the name and the whole description, so no card ever grows and the grid never jumps. The panel stays on screen at both edges; a panel taller than the screen scrolls inside itself. Opened from the keyboard, focus moves to its close button, since the chevron is under it; a tap leaves focus alone, so a phone keyboard is not woken. It closes from its own up chevron (`tracker.lessLabel`), on Escape, on a tap outside, on a scroll of more than 8 px, when the window changes width and when focus leaves it. A tap on another card's body that closes it does nothing else, so it never marks that card found; links and buttons work on the first tap. For its first second, until the user touches, scrolls, presses a key or clicks, a page shift (a phone keyboard closing after the chevron tap blurred the search field) moves the panel along with its card instead of closing it. A card whose text fits gets no chevron, and a browser without popovers shows neither chevron nor panel. The clamp is measured only while a card is within one screen height of the viewport (when it comes near, when its text box changes size and when a web font has loaded), so a card gets its chevron before it scrolls in and the page never measures every card on load. A card that lands on screen in one step (a jump, a restored scroll position, a filter or search change) gets its chevron a frame or two later.
+- **Footer**, right-aligned: chevron (above), book (Sources) and flag (a link that reports the item on GitHub in a new tab, `tracker.reportLabel`). All sit above the label's click layer, as today. The footer is a flex row so December can add "Entry →" and a star without changing the layout. No empty placeholders now.
 - **Found:** the card border turns pink (45 % mix), the icon tile turns pink and the check shows the ✓.
 
 ### 5.2 The rail (`StatsRail.tsx`, desktop only)
@@ -336,7 +337,7 @@ Two asks after PR 1 merged, settled in the brainstorm of 04.11 with mockups in t
 
 - The tracker page's `main` gets its own server-rendered modifier (`Base.astro` prop `trackerWide`, class `tracker-wide`; the hub's `.wrap.wide` stays 85rem). The modifier sets `--tracker-max-w: none` at the steps, so `.tracker`, the title row, the h1 and `.dex-browse` all fill `main` together. Never a `.tracker` or `:has()` rule: those match only after the island mounts and would shift the title.
 - At a 1920 px viewport with a 17 px scrollbar the list is about 1343 px, still four cards. The search field spans the tracker's width (about 1800 px); accepted.
-- Above 120rem the page stays centred and the sides stay empty on purpose; more than four columns is harder to scan.
+- Above 120rem the page stays centered and the sides stay empty on purpose; more than four columns is harder to scan.
 - **Accepted:** the hub (85rem) and the tracker differ in width from 1600 px.
 - Breakpoints read the viewport width, so a 1920 px wide browser window with borders lands just under 1920 and shows three cards. That is fine; the measure set emulates exact widths.
 - Phones, tablet and 1024 to 1599 px do not change.

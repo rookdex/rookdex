@@ -2187,6 +2187,68 @@ html:has(.search-row) {
 	height: 22px;
 }
 
+/* A card's full text, over the card in the top layer (spec §5.1). usePanel sets top, left, width
+   and min-height from the card, so inset and margin drop the popover's centered default. Display
+   is set only while open, so the closed panel keeps the popover's display: none. */
+.item-panel {
+	inset: auto;
+	box-sizing: border-box;
+	max-height: calc(100dvh - 16px);
+	overflow-y: auto;
+	/* A scroll past the end of a long text stays in the panel; a page scroll would close it. */
+	overscroll-behavior: contain;
+	margin: 0;
+	padding: 12px 12px 4px 14px;
+	border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+	border-radius: var(--radius);
+	background: var(--bg-raised);
+	color: var(--text);
+	box-shadow: 0 8px 24px color-mix(in srgb, var(--bg) 60%, transparent);
+}
+
+.item-panel:popover-open {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-1);
+}
+
+/* Focus lands on the panel itself only from a click on its text; its close button keeps the ring. */
+.item-panel:focus {
+	outline: none;
+}
+
+.item-panel p {
+	max-width: none;
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+.item-panel-name {
+	font-size: 0.9375rem;
+	font-weight: 600;
+}
+
+.item-panel-desc {
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+
+/* The close chevron sits where the flag sits on the card: 7 px from the right edge. */
+.item-panel-foot {
+	display: flex;
+	justify-content: flex-end;
+	margin: auto -6px 0 0;
+}
+
+/* A browser without popovers would show the panel inline under the card and leave the chevron
+   dead, so both stay out there and the clamped card is all it shows. */
+@supports not selector(:popover-open) {
+	.item-panel,
+	.item-foot [popovertarget] {
+		display: none;
+	}
+}
+
 /* Found: a pink edge and a pink icon tile beside the ✓, never colour alone (spec §5.1). */
 .item.found {
 	border-color: color-mix(in srgb, var(--accent) 45%, transparent);
@@ -3711,7 +3773,7 @@ html:has(.search-row) {
 /* Wide steps (tracker refresh spec §14.2). Each step adds a whole card column at the 280 px card
    minimum: 90rem gives the list 880 px (3 cards), 120rem gives 1360 px (4). Lifting
    --tracker-max-w lets the tracker, its title row and the Browse row fill main together. Above
-   120rem the page stays centred; more than four columns is harder to scan. */
+   120rem the page stays centered; more than four columns is harder to scan. */
 @media (min-width: 1600px) {
 	.wrap.wide {
 		max-width: 85rem;

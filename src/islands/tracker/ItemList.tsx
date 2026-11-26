@@ -1,10 +1,13 @@
+import { useRef } from "react"
 import type { Translate } from "../../i18n"
 import { itemReportUrl } from "../../model/report"
 import type { SeedItem } from "../../model/schema"
 import { categoryIds, groupItems } from "../../model/seed"
 import { type Count, groupKey, type Records } from "../../model/stats"
 import { GroupChips } from "./GroupChips"
-import { BookIcon, categoryIcon, FlagIcon } from "./icons"
+import { BookIcon, ChevronIcon, categoryIcon, FlagIcon } from "./icons"
+import { useCut } from "./useCut"
+import { usePanel } from "./usePanel"
 
 const none: Count = { done: 0, total: 0 }
 
@@ -140,19 +143,27 @@ interface RowProps {
 
 /**
  * The icon-lead card (tracker refresh spec §5.1). The label's ::after covers the card, so a tap
- * anywhere toggles the one real checkbox; the footer icons sit above that layer.
+ * anywhere toggles the one real checkbox; the footer icons sit above that layer. When the clamp
+ * cuts the description, a chevron in the footer opens the full text in a panel over the card.
  */
 function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: RowProps) {
+	const cardRef = useRef<HTMLLIElement>(null)
+	const descRef = useRef<HTMLParagraphElement>(null)
+	const panelRef = useRef<HTMLDivElement>(null)
+	const cut = useCut(descRef, item.description)
+	// An open panel stays until it closes, even if its text stops being cut meanwhile.
+	const shown = usePanel(panelRef, cardRef, cut) || cut
 	// The seed id has exactly one slash (schema), so it is unique as a DOM id as it stands.
 	const inputId = `item-${item.id}`
+	const panelId = `more-${item.id}`
 	const Icon = categoryIcon(item.category)
 	const tier =
 		item.status === "confirmed"
 			? t("tracker.confirmed")
 			: t("tracker.expectedFrom", { precedent: item.precedent ?? "" })
 	return (
-		<li className={done ? "item found" : "item"}>
-			{/* First in the DOM, so Tab runs checkbox, book, flag. CSS places it top right. */}
+		<li ref={cardRef} className={done ? "item found" : "item"}>
+			{/* First in the DOM, so Tab runs checkbox, chevron, book, flag. CSS places it top right. */}
 			<input
 				id={inputId}
 				className="item-check"
@@ -173,9 +184,23 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 					</span>
 				</div>
 			</div>
-			{item.description && <p className="item-desc">{item.description}</p>}
+			{item.description && (
+				<p ref={descRef} className="item-desc">
+					{item.description}
+				</p>
+			)}
 			{/* A flex row, so December can add "Entry →" and a star without a new layout. */}
 			<div className="item-foot">
+				{/* Only when the clamp cuts the text, so a chevron always means there is more to read. */}
+				{shown && (
+					<button type="button" className="item-icon has-tip tip-end" popoverTarget={panelId}>
+						<ChevronIcon />
+						<span className="visually-hidden">{t("tracker.moreLabel", { name: item.name })}</span>
+						<span className="tip" aria-hidden="true">
+							{t("tracker.more")}
+						</span>
+					</button>
+				)}
 				<a className="item-icon item-book has-tip tip-end" href={`${sourcesHref}#${item.id}`}>
 					<BookIcon />
 					<span className="visually-hidden">
@@ -198,6 +223,27 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 					</span>
 				</a>
 			</div>
+			{/* The full text, over the card in the top layer, so no card ever changes size. It stays in
+			    the DOM while the chevron shows, so the chevron always has its target. tabIndex -1 keeps
+			    focus in the panel on a click on its text; otherwise it falls to the results region and
+			    usePanel reads that as focus leaving. */}
+			{shown && (
+				<div ref={panelRef} id={panelId} className="item-panel" popover="auto" tabIndex={-1}>
+					<p className="item-panel-name">{item.name}</p>
+					<p className="item-panel-desc">{item.description}</p>
+					<div className="item-panel-foot">
+						<button
+							type="button"
+							className="item-icon"
+							popoverTarget={panelId}
+							popoverTargetAction="hide"
+						>
+							<ChevronIcon up />
+							<span className="visually-hidden">{t("tracker.lessLabel", { name: item.name })}</span>
+						</button>
+					</div>
+				</div>
+			)}
 		</li>
 	)
 }

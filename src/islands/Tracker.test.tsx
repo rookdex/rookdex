@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { axe } from "vitest-axe"
 import { renderReady, resetBrowser } from "../test/tracker-fixtures"
@@ -250,7 +250,7 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 		expect(pelican.querySelector('.item-dot[data-status="expected"]')).not.toBeNull()
 	})
 
-	it("runs Tab as checkbox, book, flag, with the book and flag in the footer", async () => {
+	it("runs Tab as checkbox, book, flag when the text fits, with the book and flag in the footer", async () => {
 		await ready()
 		const gator = card("American alligator")
 		expect([...gator.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
@@ -273,6 +273,77 @@ describe("Item card (tracker refresh spec §5.1)", () => {
 		expect(card("Pelican")).not.toHaveClass("found")
 		fireEvent.click(screen.getByText("Pelican"))
 		await waitFor(() => expect(card("Pelican")).toHaveClass("found"))
+	})
+
+	describe("full text panel", () => {
+		const chevron = (name: string) =>
+			within(card(name)).getByRole("button", { name: `Full text: ${name}` })
+
+		/** jsdom lays nothing out, so this makes every description report more text than it shows. */
+		const cutDescriptions = () =>
+			Object.defineProperty(HTMLElement.prototype, "scrollHeight", {
+				configurable: true,
+				get(this: HTMLElement) {
+					return this.classList.contains("item-desc") ? 60 : 0
+				},
+			})
+
+		afterEach(() => {
+			// Drops the stub, so jsdom's own scrollHeight on Element shows through again.
+			Reflect.deleteProperty(HTMLElement.prototype, "scrollHeight")
+		})
+
+		it("gives a cut-off card a chevron that opens its full text over the card", async () => {
+			cutDescriptions()
+			await ready()
+			const gator = card("American alligator")
+			const panel = gator.querySelector(".item-panel") as HTMLElement
+			expect(chevron("American alligator")).toHaveAttribute("popovertarget", panel.id)
+			expect(chevron("American alligator").closest(".item-foot")).not.toBeNull()
+			expect(panel).toHaveAttribute("popover", "auto")
+			// A click on its text focuses the panel, so focus never seems to leave it.
+			expect(panel).toHaveAttribute("tabindex", "-1")
+			expect(panel).toHaveTextContent("American alligator")
+			expect(panel.querySelector(".item-panel-desc")).toHaveTextContent("Everglades native.")
+			const close = panel.querySelector("button") as HTMLElement
+			expect(close).toHaveAttribute("popovertarget", panel.id)
+			expect(close).toHaveAttribute("popovertargetaction", "hide")
+			expect(close).toHaveTextContent("Close full text: American alligator")
+		})
+
+		it("runs Tab as checkbox, chevron, book, flag, then the panel's close", async () => {
+			cutDescriptions()
+			await ready()
+			const gator = card("American alligator")
+			expect([...gator.querySelectorAll("input, a, button")].map((e) => e.tagName)).toEqual([
+				"INPUT",
+				"BUTTON",
+				"A",
+				"A",
+				"BUTTON",
+			])
+		})
+
+		it("opens from the chevron without marking the card found", async () => {
+			cutDescriptions()
+			await ready()
+			fireEvent.click(chevron("American alligator"))
+			expect(screen.getByRole("checkbox", { name: "American alligator" })).not.toBeChecked()
+			expect(card("American alligator")).not.toHaveClass("found")
+		})
+
+		it("gives a card with no description no chevron", async () => {
+			cutDescriptions()
+			await ready()
+			expect(within(card("Pelican")).queryByRole("button")).toBeNull()
+			expect(card("Pelican").querySelector(".item-panel")).toBeNull()
+		})
+
+		it("gives a description that already fits no chevron", async () => {
+			await ready()
+			expect(within(card("American alligator")).queryByRole("button")).toBeNull()
+			expect(card("American alligator").querySelector(".item-panel")).toBeNull()
+		})
 	})
 })
 
