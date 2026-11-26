@@ -1,4 +1,4 @@
-import { type RefObject, useLayoutEffect, useRef, useState } from "react"
+import { useRef } from "react"
 import type { Translate } from "../../i18n"
 import { itemReportUrl } from "../../model/report"
 import type { SeedItem } from "../../model/schema"
@@ -6,6 +6,7 @@ import { categoryIds, groupItems } from "../../model/seed"
 import { type Count, groupKey, type Records } from "../../model/stats"
 import { GroupChips } from "./GroupChips"
 import { BookIcon, ChevronIcon, categoryIcon, FlagIcon } from "./icons"
+import { useCut } from "./useCut"
 import { usePanel } from "./usePanel"
 
 const none: Count = { done: 0, total: 0 }
@@ -245,32 +246,4 @@ function ItemRow({ item, done, disabled, groupName, onToggle, sourcesHref, t }: 
 			)}
 		</li>
 	)
-}
-
-/**
- * Whether the two-line clamp cuts the description. Checked on mount and whenever the text
- * changes, again when the paragraph resizes (width, 200 % text) and once the web fonts have loaded.
- */
-function useCut(ref: RefObject<HTMLElement | null>, text: string | undefined): boolean {
-	const [cut, setCut] = useState(false)
-	useLayoutEffect(() => {
-		const desc = ref.current
-		if (!desc || !text) {
-			setCut(false)
-			return
-		}
-		let live = true
-		const check = () => {
-			if (live) setCut(desc.scrollHeight > desc.clientHeight + 1)
-		}
-		check()
-		document.fonts?.ready.then(check)
-		const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(check)
-		observer?.observe(desc)
-		return () => {
-			live = false
-			observer?.disconnect()
-		}
-	}, [ref, text])
-	return cut
 }

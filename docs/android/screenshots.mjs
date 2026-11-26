@@ -202,6 +202,17 @@ try {
 			const scroll = await evaluate(`(${pickScroll})(${JSON.stringify(framings)})`)
 			await evaluate(`window.scrollTo({ top: ${scroll.top}, behavior: "instant" })`)
 			await waitFor(`Math.round(scrollY) === ${scroll.top}`, "the scroll to settle")
+			// A tracker card measures its text only when it comes near the screen, so a card that
+			// just landed in view gets its chevron a moment after the scroll.
+			await waitFor(
+				`[...document.querySelectorAll(".item-desc")].every((desc) => {
+					const box = desc.getBoundingClientRect()
+					if (box.bottom < 0 || box.top > innerHeight) return true
+					if (desc.scrollHeight <= desc.clientHeight + 1) return true
+					return desc.closest(".item").querySelector(".item-foot [popovertarget]") !== null
+				})`,
+				"the chevrons on the cut-off cards in view"
+			)
 			const { result } = await send("Page.captureScreenshot", { format: "png" })
 			const png = Buffer.from(result.data, "base64")
 			const width = png.readUInt32BE(16)
