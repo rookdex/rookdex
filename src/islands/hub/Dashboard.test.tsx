@@ -400,12 +400,15 @@ describe("the seed index file (plan review ruling 3)", () => {
 		const heading = document.createElement("h2")
 		heading.tabIndex = -1
 		document.body.append(heading)
-		render(<Dashboard {...props()} retryFocus={{ current: heading }} />)
-		await screen.findByText(OFFLINE)
-		installSeed()
-		fireEvent.click(screen.getByRole("button", { name: "Try again" }))
-		await waitFor(() => expect(heading).toHaveFocus())
-		heading.remove()
+		try {
+			render(<Dashboard {...props()} retryFocus={{ current: heading }} />)
+			await screen.findByText(OFFLINE)
+			installSeed()
+			fireEvent.click(screen.getByRole("button", { name: "Try again" }))
+			await waitFor(() => expect(heading).toHaveFocus())
+		} finally {
+			heading.remove()
+		}
 	})
 
 	it("offers a reload when the index file is gone after an update", async () => {
