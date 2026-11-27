@@ -1,6 +1,8 @@
 // The tracker's state and actions. No React, no DOM: the island subscribes and renders.
 // Every action captures the current profile id before its first await and writes to the
 // store before touching state, so a profile switch mid-write never misfiles a tick.
+
+import type { ChunkFailure, ChunkOutcome } from "./chunks"
 import {
 	activeProfiles,
 	createProfile as createProfileRecord,
@@ -15,7 +17,7 @@ import { listRecords, setDone } from "./progress"
 import { type ExportFile, type Profile, TEXT } from "./schema"
 import { countItems, groupKey, type Records, shown } from "./stats"
 import type { Store } from "./store"
-import { categoryIds, groupItems, type TrackItem } from "./trackItems"
+import { categoryIds, groupItems, type TrackItem, withText } from "./trackItems"
 import {
 	backupEntries,
 	buildExport,
@@ -31,6 +33,9 @@ import {
 
 export type Status = "loading" | "ready" | "error"
 export type TrackerError = ImportError | "storage" | "name" | "closed"
+
+/** Per category: its card text chunk is on its way, has landed, or failed (spec §5). */
+export type ChunkState = "loading" | "ready" | ChunkFailure
 
 export interface Announcement {
 	category: string
@@ -50,6 +55,10 @@ export interface TrackerState {
 	profiles: Profile[]
 	profileId: string
 	items: TrackItem[]
+	/** Card text chunks by category. Empty on the hub, which never loads one. */
+	chunks: Record<string, ChunkState>
+	/** Categories the list may show, in list order (ruling 9). Once in, a category stays in. */
+	revealed: string[]
 	records: Records
 	selected: string[]
 	/** Pressed group chips as `groupKey`s, in list order, only under pressed categories (spec §14.1). */
@@ -62,6 +71,10 @@ export interface TrackerState {
 export interface TrackerDeps {
 	openStore: () => Promise<Store>
 	items: TrackItem[]
+	/** Loads a category's card text. Leave undefined where no card is shown (the hub). */
+	loadChunk?: (category: string) => Promise<ChunkOutcome>
+	/** Calls `retry` when the browser comes back online; returns the unsubscribe. */
+	onOnline?: (retry: () => void) => () => void
 	defaultProfileName: string
 	selected?: string[]
 	groups?: string[]
@@ -134,6 +147,32 @@ export function showParam(selected: string[]): string | null {
 	return selected.length > 0 ? selected.join(",") : null
 }
 
+export interface ListChunks {
+	/** Every chunk the view needs has landed or failed. Until then the list holds its space. */
+	settled: boolean
+	/** Needed categories whose chunk is on its way or not started, in the order they are needed. */
+	pending: string[]
+	failed: { category: string; reason: ChunkFailure }[]
+	/** The categories the list may show (TrackerState.revealed). */
+	revealed: string[]
+}
+
+/** The chunks the list needs: the pressed categories, or every category under All. */
+export function listChunks(
+	state: Pick<TrackerState, "chunks" | "selected" | "items" | "revealed">
+): ListChunks {
+	const needed = state.selected.length > 0 ? state.selected : categoryIds(state.items)
+	const failed = needed.flatMap((category) => {
+		const status = state.chunks[category]
+		return status === "offline" || status === "stale" ? [{ category, reason: status }] : []
+	})
+	const pending = needed.filter((category) => {
+		const status = state.chunks[category]
+		return status === undefined || status === "loading"
+	})
+	return { settled: pending.length === 0, pending, failed, revealed: state.revealed }
+}
+
 /**
  * Per pressed category, the groups its chips offer (tracker refresh spec §14.1): every group with
  * a shown item, in the list's group order. A category with one group gets no chips, because
@@ -201,6 +240,8 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		profiles: [],
 		profileId: "",
 		items: deps.items,
+		chunks: {},
+		revealed: [],
 		records: {},
 		selected,
 		groups: keepChips(deps.groups ?? [], chipGroups(deps.items, selected)),
@@ -210,6 +251,68 @@ export function createTracker(deps: TrackerDeps): Tracker {
 	function set(patch: Partial<TrackerState>): void {
 		state = { ...state, ...patch }
 		for (const listener of listeners) listener()
+	}
+
+	const order = [...known]
+
+	/** Ruling 9: a needed category shows once its text is in and every needed category before it
+	 *  in list order has landed or failed. A shown one stays shown, so a press never hides cards. */
+	function reveal(chunks: Record<string, ChunkState>, selected: string[]): string[] {
+		const needed = selected.length > 0 ? order.filter((c) => selected.includes(c)) : order
+		const next = new Set(state.revealed)
+		for (const category of needed) {
+			const status = chunks[category]
+			if (status === undefined || status === "loading") break
+			if (status === "ready") next.add(category)
+		}
+		return order.filter((c) => next.has(c))
+	}
+
+	// Amendment 5: set once the view's own chunks have settled for the first time.
+	let background = false
+
+	/** Fetches one category's chunk and merges its text. A chunk that lands after its category
+	 *  was unpressed is merged all the same: it is the same seed text, and the list only shows
+	 *  revealed categories. */
+	function start(category: string): void {
+		const load = deps.loadChunk
+		if (!load) return
+		set({ chunks: { ...state.chunks, [category]: "loading" } })
+		void load(category).then((outcome) => {
+			const chunks: Record<string, ChunkState> = {
+				...state.chunks,
+				[category]: outcome.ok ? "ready" : outcome.reason,
+			}
+			set({
+				...(outcome.ok ? { items: withText(state.items, outcome.text) } : {}),
+				chunks,
+				revealed: reveal(chunks, state.selected),
+			})
+			// The rest follow quietly, so a later tile press is instant. Only never-started ones:
+			// a failed chunk waits for a press, refresh() or the online event.
+			if (!background && listChunks(state).settled) {
+				background = true
+				for (const other of order) if (state.chunks[other] === undefined) start(other)
+			}
+		})
+	}
+
+	/** Starts every needed chunk that is neither on its way nor in. A failed one is tried again. */
+	function loadChunks(selected: string[]): void {
+		if (!deps.loadChunk) return
+		for (const category of selected.length > 0 ? selected : order) {
+			const status = state.chunks[category]
+			if (status === "loading" || status === "ready") continue
+			start(category)
+		}
+	}
+
+	/** Tries every failed chunk again (refresh(), the online event). */
+	function retryFailed(): void {
+		for (const category of order) {
+			const status = state.chunks[category]
+			if (status === "offline" || status === "stale") start(category)
+		}
 	}
 
 	function fail(error: TrackerError): void {
@@ -351,11 +454,18 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			}
 		},
 		init() {
-			// Idempotent: a second call (StrictMode, a remount) must not create a second default profile.
+			// Idempotent: a second call (StrictMode, a remount) must not create a second default
+			// profile or start a second set of loads.
+			if (!booted) {
+				deps.onOnline?.(retryFailed)
+				// First, so the chunks travel while the store opens.
+				loadChunks(state.selected)
+			}
 			booted ??= boot()
 			return booted
 		},
 		async refresh() {
+			retryFailed()
 			// Only a booted, open store: before init there is nothing on screen to bring up to date.
 			if (state.status !== "ready" || closed || !store) return
 			await guard(async () => {
@@ -370,7 +480,12 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		// Unpressing a category drops its chips, so pressing it again starts with none (spec §14.1).
 		selectCategories(ids) {
 			const selected = ids.filter((id) => known.has(id))
-			set({ selected, groups: keepChips(state.groups, chipGroups(deps.items, selected)) })
+			set({
+				selected,
+				groups: keepChips(state.groups, chipGroups(deps.items, selected)),
+				revealed: reveal(state.chunks, selected),
+			})
+			loadChunks(selected)
 		},
 		toggleGroup(key) {
 			const chips = chipGroups(deps.items, state.selected)
