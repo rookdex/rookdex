@@ -1,0 +1,11 @@
+---
+// The seed index's address (data delivery plan, plan review ruling 3). The index itself is the
+// hashed file /data/seed-index.<hash>.json. The preload starts it while the HTML parses, and
+// crossorigin="anonymous" matches the island's same-origin fetch(), so the browser reuses it.
+// The data block is data and never runs, so it needs no CSP hash. jsonLd escapes "<".
+import { seedIndexFile } from "../model/seedDelivered"
+import { jsonLd } from "../model/seo"
+---
+
+<link rel="preload" href={seedIndexFile.url} as="fetch" crossorigin="anonymous" />
+<script type="application/json" id="seed-index" is:inline set:html={jsonLd({ url: seedIndexFile.url })}></script>
