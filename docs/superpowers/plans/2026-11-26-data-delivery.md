@@ -118,6 +118,14 @@ My review of the decisions above. These override both the task text and the stre
 
 ### Ruling 9: chunks show in list order on All (Task 6)
 
+**Changed 27.11, after the code review.** A press now hides a later category until every earlier needed one in list order has landed or failed, and the list rebuilds from the top behind the reserve. On a slow load no rule can keep the cards on screen and also never paint a card above them, so I chose the list order. This replaces the "stays there" rule, the shown set and "a tile press never hides cards" below, the third test below, and amendment 6's test that the alligator stays the same node. What holds now:
+
+- The model works `revealed` out afresh on each change (no shown set that only grows). A needed category shows once its text is in and every needed category before it in list order has loaded or failed. A category that failed before and is being tried again (the online event, `refresh()`) counts as settled, so a retry never hides cards.
+- `revealed` holds only needed categories. The reserve (`.pending`) covers the hidden state, since only a category loading for the first time holds the ones after it back.
+- Tests: the first test below stands. The third becomes: on `?show=<second>` with it loaded, press the first category with its fetch deferred. The second category's cards leave and the list holds the reserve. Once the first is released, both render, the first category's cards before the second's. Model tests in `tracker.chunks.test.ts` add: `?show=<second>` then All holds the second until the first is in; a failed earlier category lets the later one show; a retry keeps the shown cards.
+
+The text below is the ruling as I first wrote it, superseded where the paragraph above differs.
+
 Amendment 6's `shownCards` changes as follows. A needed category shows once every needed category before it in list order (`categoryIds(items)`) has loaded or failed. A category that is already on screen stays there, even when a newly pressed category before it is still loading. Track the shown set in the island (a `useRef<Set<string>>` updated during render, reset only when the page reloads), so a tile press never hides cards and `ItemList` stays mounted as amendment 6 requires. Tests in `Tracker.chunks.test.tsx`:
 
 Below, "first" and "second" are the fixtures' first two categories in list order; read them from `categoryIds` in the test instead of naming them.
@@ -1921,15 +1929,15 @@ git commit -m "Add the data delivery plan"
 git push -u origin feat/data-delivery
 ```
 
-Write the PR body to `.superpowers/probe/pr-body-data-delivery.md` and open the PR from `../rookdex-lf` with `gh pr create --base main --head feat/data-delivery --title "Deliver the seed as an inlined index and hashed chunks" --body-file .superpowers/probe/pr-body-data-delivery.md`. The body covers what changed, the decisions above (index carries names; Zod stays for user data), the before and after numbers from `baseline.md`, the nb strings for her approval, the browser checks with what was not tested (a real phone, a real deploy with an old worker), and `## Review`. She merges by hand once every check is done.
+Write the PR body to `.superpowers/probe/pr-body-data-delivery.md` and open the PR from `../rookdex-lf` with `gh pr create --base main --head feat/data-delivery --title "Deliver the seed as a hashed index and per-category chunks" --body-file .superpowers/probe/pr-body-data-delivery.md`. The body covers what changed, the decisions above (index carries names; Zod stays for user data), the before and after numbers from `baseline.md`, the nb strings for her approval, the browser checks with what was not tested (a real phone, a real deploy with an old worker), and `## Review`. She merges by hand once every check is done.
 
 ---
 
 ## Self-review
 
-- **Spec §5 coverage:** pure build and every check stay in `seedBuild.ts` and `seed.ts` (PR 1). Full result to Dex, sitemap and Sources (unchanged, they import `seed.ts`). Inlined index (Tasks 2, 3). Hashed chunk per category, loaded when shown, precached (Tasks 2, 3, 5, 6). Service worker copy of content-addressed URLs from `rookdex-*` caches, only ok responses, everything else fetched, a failed fetch rejects install (Task 7). Immutable `/data/*` (Task 3). Chunk loads keyed by category, cached in memory, and a late one never renders an unpressed category (Tasks 4, 5). `<` escaped (Task 2). Both failure messages in en and nb with Reload (Task 6). Browser never parses the seed (Task 6 guard).
-- **Spec §10 coverage:** index shape snapshot (Task 2, as an explicit expected object, so a review sees the shape). Reverse-order chunk arrivals (Task 5). A rejected fetch and a 404 HTML body each show their message (Task 6). New locale keys in en and nb (Task 6, and the existing locale parity test). Service worker: copied not fetched, a changed page fetched, a failed fetch rejects (Task 7).
+- **Spec §5 coverage:** pure build and every check stay in `seedBuild.ts` and `seed.ts` (PR 1). Full result to Dex, sitemap and Sources (unchanged, they import `seed.ts`). Hashed index file, preloaded, its URL inlined (Tasks 2, 3; plan review ruling 3). Hashed chunk per category, loaded when shown, precached (Tasks 2, 3, 5, 6). Service worker copy of content-addressed URLs from `rookdex-*` caches, only ok responses, everything else fetched, a failed fetch rejects install (Task 7). Immutable `/data/*` (Task 3). Chunk loads keyed by category, cached in memory, and a late one never renders an unpressed category (Tasks 4, 5). `<` escaped in the URL block (Task 3). Both failure messages in en and nb with Reload (Task 6). Browser never parses the seed, and loads Zod only behind `import()` (Task 6 and 6b guard).
+- **Spec §10 coverage:** index shape snapshot (Task 2, as an explicit expected object, so a review sees the shape). Reverse-order chunk arrivals (Tasks 5 and 6). A rejected fetch and a 404 HTML body each show their message (Task 6). New locale keys in en and nb (Task 6, and the existing locale parity test). Service worker: copied not fetched, a changed page fetched, a failed fetch rejects (Task 7).
 - **Not here, by the PR split:** the checklist in the index (100 % view PR), sets and hash opening of closed sets (PR 3), the Playwright smoke test (PR 4).
-- **Types:** `TrackItem`, `SeedIndex`, `ChunkOutcome`, `ChunkState`, `listChunks`, `buildTracker(name, options)` and `installSeed` are used with the same names and shapes in every task that mentions them.
+- **Types:** `TrackItem`, `SeedIndex`, `ChunkOutcome`, `ChunkState`, `listChunks`, `buildTracker(name, index, options)`, `revealed`, `IndexGate`, `loadSeedIndex`, `readSeedIndexUrl` and `installSeed` are used with the same names and shapes in every task that mentions them.
 
 > Stress-tested 2026-11-26 (skill 546547e): 10 applied, 1 adapted, 0 decided by me.
