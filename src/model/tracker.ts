@@ -57,7 +57,7 @@ export interface TrackerState {
 	items: TrackItem[]
 	/** Card text chunks by category. Empty on the hub, which never loads one. */
 	chunks: Record<string, ChunkState>
-	/** Categories the list may show, in list order (ruling 9). Once in, a category stays in. */
+	/** Needed categories the list may show, in list order (ruling 9, her call 27.11). */
 	revealed: string[]
 	records: Records
 	selected: string[]
@@ -157,9 +157,10 @@ export interface ListChunks {
 	failed: { category: string; reason: ChunkFailure }[]
 	/** The categories the list may show (TrackerState.revealed). */
 	revealed: string[]
-	/** A needed chunk is on its way for the first time, so the list holds a screen of height. A
-	 *  retry (the online event, refresh(), a press on a failed tile) never does: the list keeps its
-	 *  own height instead of jumping to a full screen and back. */
+	/** A needed chunk is on its way for the first time, so the list holds a screen of height. This
+	 *  covers every category reveal() holds back, since only such a chunk holds one back. A retry
+	 *  (the online event, refresh(), a press on a failed tile) never does: the list keeps its own
+	 *  height instead of jumping to a full screen and back. */
 	reserve: boolean
 }
 
@@ -264,17 +265,21 @@ export function createTracker(deps: TrackerDeps): Tracker {
 
 	const order = [...known]
 
-	/** Ruling 9: a needed category shows once its text is in and every needed category before it
-	 *  in list order has landed or failed. A shown one stays shown, so a press never hides cards. */
+	/** Ruling 9, as she ruled it 27.11: a needed category shows once its text is in and every
+	 *  needed category before it in list order has landed or failed. Worked out afresh on each
+	 *  change, so a press that adds an earlier category still on its way hides the later ones
+	 *  behind the reserve, and the list fills from the top: no card ever paints above one on
+	 *  screen. A retry (a chunk that failed before) counts as settled, so the online event or
+	 *  refresh() never hides cards. */
 	function reveal(chunks: Record<string, ChunkState>, selected: string[]): string[] {
 		const needed = selected.length > 0 ? order.filter((c) => selected.includes(c)) : order
-		const next = new Set(state.revealed)
+		const next: string[] = []
 		for (const category of needed) {
 			const status = chunks[category]
-			if (inFlight(status)) break
-			if (status === "ready") next.add(category)
+			if (status === undefined || status === "loading") break
+			if (status === "ready") next.push(category)
 		}
-		return order.filter((c) => next.has(c))
+		return next
 	}
 
 	// Amendment 5: set once the view's own chunks have settled for the first time.

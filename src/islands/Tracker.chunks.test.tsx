@@ -113,21 +113,26 @@ describe("chunks in the tracker (spec §5, §10)", () => {
 })
 
 describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
-	it("keeps loaded cards mounted while an earlier category loads, then shows it first", async () => {
+	it("hides loaded cards behind the reserve while an earlier pressed category loads (her call 27.11)", async () => {
 		const chunks = deferChunks(["animals"])
 		window.history.replaceState(null, "", "/en/tracker/?show=animals")
-		render(<Tracker locale="en" />)
+		const { container } = render(<Tracker locale="en" />)
+		const results = () => container.querySelector(".tracker-results")
 		const alligator = await screen.findByRole("checkbox", { name: "American alligator" })
 		await waitFor(() => expect(alligator).toBeEnabled())
 		// The background load (amendment 5) asks for Vehicles once Animals is in; it is held.
 		await waitFor(() => expect(chunks.requested("vehicles")).toBe(true))
 		expect(box("Bike")).toBeNull()
 		fireEvent.click(tile(/^Vehicles,/))
-		expect(box("American alligator")).toBe(alligator)
+		expect(box("American alligator")).toBeNull()
+		expect(results()).toHaveClass("pending")
 		chunks.release("vehicles")
+		// The list fills from the top: Vehicles first, then Animals below it.
 		const bike = await screen.findByRole("checkbox", { name: "Bike" })
-		expect(box("American alligator")).toBe(alligator)
-		expect(precedes(bike, alligator)).toBe(true)
+		const shown = box("American alligator")
+		expect(shown).not.toBeNull()
+		expect(precedes(bike, shown as Element)).toBe(true)
+		expect(results()).not.toHaveClass("pending")
 	})
 
 	it("shows no heading or chips for a pressed category until its text is in (pre-flight I8)", async () => {

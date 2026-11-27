@@ -255,7 +255,7 @@ describe("list order on arrival (ruling 9)", () => {
 		expect(tracker.getState().revealed).toEqual(["vehicles", "animals"])
 	})
 
-	it("keeps a shown category when an earlier one is pressed and still loading", async () => {
+	it("hides a shown category while an earlier pressed one is still loading (her call 27.11)", async () => {
 		const { loadChunk, release } = staged()
 		const tracker = make(loadChunk, ["animals"])
 		void tracker.init()
@@ -263,10 +263,80 @@ describe("list order on arrival (ruling 9)", () => {
 		await flush()
 		expect(tracker.getState().revealed).toEqual(["animals"])
 		tracker.selectCategories(["vehicles", "animals"])
-		expect(tracker.getState().revealed).toEqual(["animals"])
+		expect(listChunks(tracker.getState())).toMatchObject({ revealed: [], reserve: true })
 		release("vehicles")
 		await flush()
-		expect(tracker.getState().revealed).toEqual(["vehicles", "animals"])
+		expect(listChunks(tracker.getState())).toMatchObject({
+			revealed: ["vehicles", "animals"],
+			reserve: false,
+		})
+	})
+
+	// The fixtures list vehicles first, so animals plays the part of a later category opened by
+	// ?show= on a slow first visit, with the background load of the earlier one still on its way.
+	it("on All after ?show=, holds the shown category until every earlier one is in (her call 27.11)", async () => {
+		const { loadChunk, release } = staged()
+		const tracker = make(loadChunk, ["animals"])
+		void tracker.init()
+		release("animals")
+		await flush()
+		expect(calls(loadChunk)).toEqual(["animals", "vehicles"])
+		tracker.selectCategories([])
+		expect(listChunks(tracker.getState())).toMatchObject({
+			settled: false,
+			revealed: [],
+			reserve: true,
+		})
+		release("vehicles")
+		await flush()
+		expect(listChunks(tracker.getState())).toMatchObject({
+			settled: true,
+			revealed: ["vehicles", "animals"],
+			reserve: false,
+		})
+	})
+
+	it("shows the later category once an earlier pressed one fails (her call 27.11)", async () => {
+		const outcomes = new Map<string, (outcome: ChunkOutcome) => void>()
+		const loadChunk = vi.fn(
+			(category: string) => new Promise<ChunkOutcome>((resolve) => outcomes.set(category, resolve))
+		)
+		const tracker = make(loadChunk, ["animals"])
+		void tracker.init()
+		outcomes.get("animals")?.(texts.animals)
+		await flush()
+		tracker.selectCategories([])
+		expect(tracker.getState().revealed).toEqual([])
+		outcomes.get("vehicles")?.({ ok: false, reason: "offline" })
+		await flush()
+		expect(listChunks(tracker.getState())).toMatchObject({
+			revealed: ["animals"],
+			failed: [{ category: "vehicles", reason: "offline" }],
+		})
+	})
+
+	it("keeps the shown categories while a failed earlier one is tried again", async () => {
+		const tries: Record<string, number> = {}
+		const loadChunk = vi.fn((category: string): Promise<ChunkOutcome> => {
+			tries[category] = (tries[category] ?? 0) + 1
+			if (category !== "vehicles") return Promise.resolve(texts[category])
+			return tries.vehicles === 1
+				? Promise.resolve({ ok: false, reason: "offline" })
+				: new Promise<ChunkOutcome>(() => {})
+		})
+		let online: () => void = () => {}
+		const tracker = make(loadChunk, [], {
+			onOnline: (retry) => {
+				online = retry
+				return () => {}
+			},
+		})
+		void tracker.init()
+		await flush()
+		expect(tracker.getState().revealed).toEqual(["animals"])
+		online()
+		expect(tracker.getState().chunks.vehicles).toBe("retrying")
+		expect(tracker.getState().revealed).toEqual(["animals"])
 	})
 
 	it("never lets a failed earlier category hold up a later one", async () => {
