@@ -304,6 +304,55 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		await wait()
 		expect(document.querySelector(".search-count")).toHaveTextContent("0")
 	})
+	const failVehicles = () =>
+		stubChunks(async (category, url) => {
+			if (category === "vehicles") throw new TypeError("Failed to fetch")
+			return delivered.serve(url)
+		})
+
+	it("still speaks a non-zero count for the loaded cards when another category failed (gate G1)", async () => {
+		failVehicles()
+		window.history.replaceState(null, "", "/en/tracker/?show=vehicles,animals")
+		const { container } = render(<Tracker locale="en" />)
+		await notice(/Vehicles/)
+		await screen.findByRole("checkbox", { name: "American alligator" })
+		fireEvent.change(screen.getByRole("searchbox"), { target: { value: "alligator" } })
+		await waitFor(() => expect(liveRegion(container)).toHaveTextContent("1 result"))
+	})
+
+	it("stays silent for zero matches while another category failed (gate G1)", async () => {
+		failVehicles()
+		window.history.replaceState(null, "", "/en/tracker/?show=vehicles,animals")
+		const { container } = render(<Tracker locale="en" />)
+		await notice(/Vehicles/)
+		fireEvent.change(screen.getByRole("searchbox"), { target: { value: "zzz" } })
+		await wait(800)
+		expect(liveRegion(container)).not.toHaveTextContent(/No match|result/)
+	})
+
+	it("waits out the settle delay before speaking a query typed during loading (gate G4)", async () => {
+		const chunks = deferChunks()
+		const { container } = render(<Tracker locale="en" />)
+		await screen.findByRole("button", { name: "Profile: Player 1" })
+		fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Bike" } })
+		chunks.release("vehicles")
+		chunks.release("animals")
+		await screen.findByRole("checkbox", { name: "Bike" })
+		expect(liveRegion(container)).not.toHaveTextContent(/result/)
+		await waitFor(() => expect(liveRegion(container)).toHaveTextContent("1 result"))
+	})
+
+	it("Clear filters cancels a typing result that is still pending (gate G3)", async () => {
+		const chunks = deferChunks(["animals"])
+		window.history.replaceState(null, "", "/en/tracker/?show=animals")
+		const { container } = render(<Tracker locale="en" />)
+		await screen.findByRole("checkbox", { name: "American alligator" })
+		await waitFor(() => expect(chunks.requested("vehicles")).toBe(true))
+		fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Bike" } })
+		fireEvent.click(await screen.findByRole("button", { name: "Clear filters" }))
+		await wait(800)
+		expect(liveRegion(container)).not.toHaveTextContent(/outside|result/)
+	})
 })
 
 describe("the seed index file (plan review ruling 3, Review Focus 5)", () => {
@@ -333,5 +382,44 @@ describe("the seed index file (plan review ruling 3, Review Focus 5)", () => {
 		expect(await notice(STALE)).toBeInTheDocument()
 		expect(screen.getByRole("button", { name: "Reload" })).toBeInTheDocument()
 		expect(screen.queryByRole("button", { name: "Try again" })).toBeNull()
+	})
+
+	it("announces a repeat failure and returns focus to Try again (gate G2)", async () => {
+		let reject: (() => void) | undefined
+		stubIndex(async () => {
+			throw new TypeError("Failed to fetch")
+		})
+		const { container } = render(<Tracker locale="en" />)
+		await notice(INDEX_OFFLINE)
+		await waitFor(() => expect(liveRegion(container)).toHaveTextContent(INDEX_OFFLINE))
+		stubIndex(
+			() =>
+				new Promise<Response>((_, fail) => {
+					reject = () => fail(new TypeError("Failed to fetch"))
+				})
+		)
+		fireEvent.click(screen.getByRole("button", { name: "Try again" }))
+		// The region is emptied while the retry runs, so the same text again is a change.
+		await waitFor(() => expect(liveRegion(container)?.textContent).toBe(""))
+		await waitFor(() => expect(reject).toBeDefined())
+		reject?.()
+		await waitFor(() => expect(liveRegion(container)).toHaveTextContent(INDEX_OFFLINE))
+		expect(screen.getByRole("button", { name: "Try again" })).toHaveFocus()
+	})
+
+	it("shows the Reload notice when the index block is missing (gate G6)", async () => {
+		document.getElementById("seed-index")?.remove()
+		for (const node of document.querySelectorAll('script[type="application/json"]')) node.remove()
+		render(<Tracker locale="en" />)
+		expect(await notice(STALE)).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Reload" })).toBeInTheDocument()
+	})
+
+	it("marks the index fallback busy with a loading cue (gate G7)", async () => {
+		stubIndex(() => new Promise<Response>(() => {}))
+		const { container } = render(<Tracker locale="en" />)
+		const pending = container.querySelector(".index-pending") as HTMLElement
+		expect(pending).toHaveAttribute("aria-busy", "true")
+		expect(pending).toHaveTextContent("Loading your progress…")
 	})
 })

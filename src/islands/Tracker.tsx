@@ -84,7 +84,14 @@ interface ViewProps extends Props {
 export function Tracker({ locale }: Props) {
 	const { t } = translator(locale)
 	return (
-		<IndexGate fallback={<div className="index-pending" />} t={t}>
+		<IndexGate
+			fallback={
+				<div className="index-pending" aria-busy="true">
+					<p className="visually-hidden">{t("tracker.loading")}</p>
+				</div>
+			}
+			t={t}
+		>
 			{(index) => <TrackerView locale={locale} index={index} />}
 		</IndexGate>
 	)
@@ -283,6 +290,15 @@ function TrackerView({ locale, index }: ViewProps) {
 		return emptyText(kind, query) ?? plural("tracker.search.results", view.visible.length)
 	}
 
+	// What to say for a view, or nothing (gate G1). Nothing is spoken while a chunk is still on its
+	// way. With a failed category, only a non-zero count is spoken: the view holds only categories
+	// on screen, so it matches the list, while "No match" could be wrong with a category missing.
+	function spoken(chunks: ReturnType<typeof listChunks>, view: SearchView, query: string) {
+		if (!chunks.settled) return undefined
+		if (chunks.failed.length > 0 && view.visible.length === 0) return undefined
+		return resultsText(view, query)
+	}
+
 	// A typing result still pending would describe the old tiles.
 	function selectCategories(ids: string[]) {
 		live.cancel()
@@ -303,11 +319,12 @@ function TrackerView({ locale, index }: ViewProps) {
 		if (query.trim() === "") {
 			unspoken.current = false
 			live.say("")
-		} else if (listSettled) {
+		} else if (chunkView.settled) {
 			unspoken.current = false
-			live.sayLater(resultsText(search.viewFor({ query }), query))
+			const text = spoken(chunkView, search.viewFor({ query }), query)
+			if (text) live.sayLater(text)
 		} else {
-			// The list is still loading or failed: the results are spoken once it settles.
+			// A chunk is still on its way: the results are spoken once it lands.
 			unspoken.current = true
 		}
 	}
@@ -316,9 +333,10 @@ function TrackerView({ locale, index }: ViewProps) {
 	// there. Leaving the field closes the phone keyboard, and the results are where the user
 	// goes next, so a keyboard user's place moves forward instead of back to <body>.
 	function finishSearch() {
-		if (search.query.trim() !== "" && listSettled) {
+		if (search.query.trim() !== "" && chunkView.settled) {
 			unspoken.current = false
-			live.say(resultsText(search.view, search.query))
+			const text = spoken(chunkView, search.view, search.query)
+			if (text) live.say(text)
 		}
 		const list = results.current
 		if (!list) return
@@ -352,19 +370,17 @@ function TrackerView({ locale, index }: ViewProps) {
 	// found and the query stay. The button disappears with its line, so focus goes to the field
 	// rather than to <body>.
 	function clearFilters() {
+		live.cancel()
 		tracker.selectCategories([])
 		searchField.current?.focus()
 		// selectCategories is synchronous: the state read here already has the new chunks and
 		// revealed categories, so only what the list will show is spoken, and nothing while it loads.
 		const next = tracker.getState()
-		const settled = listChunks(next)
-		if (settled.settled && settled.failed.length === 0) {
-			live.say(
-				resultsText(
-					search.viewFor({ selected: [], groups: [], revealed: next.revealed }),
-					search.query
-				)
-			)
+		const nextChunks = listChunks(next)
+		if (nextChunks.settled) {
+			const view = search.viewFor({ selected: [], groups: [], revealed: next.revealed })
+			const text = spoken(nextChunks, view, search.query)
+			if (text) live.say(text)
 		} else if (search.query.trim() !== "") {
 			unspoken.current = true
 		}
@@ -433,10 +449,11 @@ function TrackerView({ locale, index }: ViewProps) {
 	// A query typed while the list was loading is spoken once, when the list settles (F1 follow-up).
 	// biome-ignore lint/correctness/useExhaustiveDependencies: `live` is a new object each render; only the list settling should speak
 	useEffect(() => {
-		if (!listSettled || !unspoken.current) return
+		if (!chunkView.settled || !unspoken.current) return
 		unspoken.current = false
-		if (search.query.trim() !== "") live.say(resultsText(search.view, search.query))
-	}, [listSettled])
+		const text = spoken(chunkView, search.view, search.query)
+		if (search.query.trim() !== "" && text) live.sayLater(text)
+	}, [chunkView.settled])
 	const emptyMessage = listSettled ? emptyText(empty, search.query) : undefined
 	// A chip row keeps its category on screen when no card is left (R17). A failed or loading view
 	// with no chips shows only the notice and the reserve, never "Nothing here yet." (amendment 6).

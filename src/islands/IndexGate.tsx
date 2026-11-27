@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useEffect, useState } from "react"
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import type { Translate } from "../i18n"
 import { type ChunkFailure, loadSeedIndex, readSeedIndexUrl } from "../model/chunks"
 import type { SeedIndex } from "../model/trackItems"
@@ -28,11 +28,27 @@ export function IndexGate({ fallback, t, say, children }: Props) {
 	const [state, setState] = useState<GateState>({ status: "loading" })
 	const [attempt, setAttempt] = useState(0)
 	const live = useLiveStatus()
+	// Set by the Try again button only: focus returns to it after a failed retry the user started.
+	const retryButton = useRef<HTMLButtonElement>(null)
+	const focusRetry = useRef(false)
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: `live` and `say` may be new each render; only a new attempt should load
 	useEffect(() => {
 		let current = true
-		if (attempt > 0) setState({ status: "loading" })
-		void loadSeedIndex(readSeedIndexUrl(), (url, init) => fetch(url, init)).then((outcome) => {
+		if (attempt > 0) {
+			setState({ status: "loading" })
+			// Emptied so the same failure text again is a change a screen reader speaks.
+			;(say ?? live.say)("")
+		}
+		let url: string
+		try {
+			url = readSeedIndexUrl()
+		} catch {
+			// No index block: an old or broken page, so Reload is the way out.
+			setState({ status: "failed", reason: "stale" })
+			return
+		}
+		void loadSeedIndex(url, (url, init) => fetch(url, init)).then((outcome) => {
 			if (!current) return
 			setState(
 				outcome.ok
@@ -52,6 +68,11 @@ export function IndexGate({ fallback, t, say, children }: Props) {
 		window.addEventListener("online", retry)
 		return () => window.removeEventListener("online", retry)
 	}, [failed, retry])
+
+	useEffect(() => {
+		if (state.status === "failed" && focusRetry.current) retryButton.current?.focus()
+		if (state.status !== "loading") focusRetry.current = false
+	}, [state.status])
 
 	const notice =
 		state.status === "failed"
@@ -75,7 +96,14 @@ export function IndexGate({ fallback, t, say, children }: Props) {
 							{t("tracker.chunk.reload")}
 						</button>
 					) : (
-						<button type="button" onClick={retry}>
+						<button
+							type="button"
+							ref={retryButton}
+							onClick={() => {
+								focusRetry.current = true
+								retry()
+							}}
+						>
 							{t("tracker.index.retry")}
 						</button>
 					)}
