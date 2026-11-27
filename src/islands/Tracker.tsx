@@ -141,6 +141,8 @@ function TrackerView({ locale, index }: ViewProps) {
 	}, [notice])
 	const searchField = useRef<HTMLInputElement>(null)
 	const results = useRef<HTMLDivElement>(null)
+	// A non-empty query was typed while the list could not be described yet.
+	const unspoken = useRef(false)
 	// From launch on the hub is the dashboard, so Overall links there (dashboard spec §4).
 	const [hubHref] = useState(() => (hubPhase(new Date()) === "after" ? `/${locale}/` : undefined))
 	const [dialog, setDialog] = useState<"new" | "rename" | "delete" | "deleted" | null>(null)
@@ -298,15 +300,26 @@ function TrackerView({ locale, index }: ViewProps) {
 		search.setQuery(query)
 		// An emptied box empties the region too: a polite region does not repeat identical text, so
 		// the same query typed again would otherwise be silent.
-		if (query.trim() === "") live.say("")
-		else if (listSettled) live.sayLater(resultsText(search.viewFor({ query }), query))
+		if (query.trim() === "") {
+			unspoken.current = false
+			live.say("")
+		} else if (listSettled) {
+			unspoken.current = false
+			live.sayLater(resultsText(search.viewFor({ query }), query))
+		} else {
+			// The list is still loading or failed: the results are spoken once it settles.
+			unspoken.current = true
+		}
 	}
 
 	// Enter or the phone's Search key: the list already matches, so say it now and move focus
 	// there. Leaving the field closes the phone keyboard, and the results are where the user
 	// goes next, so a keyboard user's place moves forward instead of back to <body>.
 	function finishSearch() {
-		if (search.query.trim() !== "" && listSettled) live.say(resultsText(search.view, search.query))
+		if (search.query.trim() !== "" && listSettled) {
+			unspoken.current = false
+			live.say(resultsText(search.view, search.query))
+		}
 		const list = results.current
 		if (!list) return
 		// The browser's own focus scroll centres a long list and hides its first cards under the
@@ -341,7 +354,20 @@ function TrackerView({ locale, index }: ViewProps) {
 	function clearFilters() {
 		tracker.selectCategories([])
 		searchField.current?.focus()
-		live.say(resultsText(search.viewFor({ selected: [], groups: [] }), search.query))
+		// selectCategories is synchronous: the state read here already has the new chunks and
+		// revealed categories, so only what the list will show is spoken, and nothing while it loads.
+		const next = tracker.getState()
+		const settled = listChunks(next)
+		if (settled.settled && settled.failed.length === 0) {
+			live.say(
+				resultsText(
+					search.viewFor({ selected: [], groups: [], revealed: next.revealed }),
+					search.query
+				)
+			)
+		} else if (search.query.trim() !== "") {
+			unspoken.current = true
+		}
 	}
 
 	// A tick is announced as before, and it cancels a pending typing result (spec §5). The tick
@@ -404,6 +430,13 @@ function TrackerView({ locale, index }: ViewProps) {
 	// I9: no empty-state text while a needed chunk is on its way or has failed. The notice speaks then.
 	const listSettled = chunkView.settled && chunkView.failed.length === 0
 	const empty = emptyState({ ...view, visible: shownCards }, search.query)
+	// A query typed while the list was loading is spoken once, when the list settles (F1 follow-up).
+	// biome-ignore lint/correctness/useExhaustiveDependencies: `live` is a new object each render; only the list settling should speak
+	useEffect(() => {
+		if (!listSettled || !unspoken.current) return
+		unspoken.current = false
+		if (search.query.trim() !== "") live.say(resultsText(search.view, search.query))
+	}, [listSettled])
 	const emptyMessage = listSettled ? emptyText(empty, search.query) : undefined
 	// A chip row keeps its category on screen when no card is left (R17). A failed or loading view
 	// with no chips shows only the notice and the reserve, never "Nothing here yet." (amendment 6).

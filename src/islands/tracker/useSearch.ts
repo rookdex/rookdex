@@ -14,6 +14,8 @@ export interface SearchChange {
 	selected?: string[]
 	groups?: string[]
 	hideFound?: boolean
+	/** The categories on screen for this change; the current ones when left out. */
+	revealed?: string[]
 }
 
 export interface Search {
@@ -113,8 +115,7 @@ export function useSearch(source: SearchSource, arrival?: string, initialQuery =
 				change.groups ?? source.groups,
 				change.query ?? query,
 				snapshot(change.hideFound ?? hideFound),
-				// A new tile selection reveals other categories later: its list is not known yet.
-				change.selected ? undefined : shown
+				change.revealed ? new Set(change.revealed) : shown
 			),
 	}
 }
