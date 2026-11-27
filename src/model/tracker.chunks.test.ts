@@ -68,7 +68,7 @@ describe("chunk loading (spec §5)", () => {
 		expect(tracker.getState().items[1].precedent).toBe("GTA V")
 	})
 
-	it("ends a category as offline when its loader rejects (gate G5)", async () => {
+	it("ends a category as offline when its loader rejects", async () => {
 		const loadChunk = vi.fn(async (): Promise<ChunkOutcome> => {
 			throw new Error("boom")
 		})
@@ -200,7 +200,7 @@ describe("background loading and retries (amendment 5)", () => {
 		expect(listChunks(tracker.getState()).failed).toEqual([])
 	})
 
-	it("holds the list's screen of height on a first load, never on a retry (gate round 2)", async () => {
+	it("holds the list's screen of height on a first load, never on a retry", async () => {
 		const outcomes: ((outcome: ChunkOutcome) => void)[] = []
 		const loadChunk = vi.fn(() => new Promise<ChunkOutcome>((resolve) => outcomes.push(resolve)))
 		let online: () => void = () => {}
@@ -255,7 +255,7 @@ describe("list order on arrival (ruling 9)", () => {
 		expect(tracker.getState().revealed).toEqual(["vehicles", "animals"])
 	})
 
-	it("hides a shown category while an earlier pressed one is still loading (her call 27.11)", async () => {
+	it("hides a shown category while an earlier pressed one is still loading (plan ruling 9)", async () => {
 		const { loadChunk, release } = staged()
 		const tracker = make(loadChunk, ["animals"])
 		void tracker.init()
@@ -274,7 +274,7 @@ describe("list order on arrival (ruling 9)", () => {
 
 	// The fixtures list vehicles first, so animals plays the part of a later category opened by
 	// ?show= on a slow first visit, with the background load of the earlier one still on its way.
-	it("on All after ?show=, holds the shown category until every earlier one is in (her call 27.11)", async () => {
+	it("on All after ?show=, holds the shown category until every earlier one is in (plan ruling 9)", async () => {
 		const { loadChunk, release } = staged()
 		const tracker = make(loadChunk, ["animals"])
 		void tracker.init()
@@ -296,7 +296,7 @@ describe("list order on arrival (ruling 9)", () => {
 		})
 	})
 
-	it("shows the later category once an earlier pressed one fails (her call 27.11)", async () => {
+	it("shows the later category once an earlier pressed one fails (plan ruling 9)", async () => {
 		const outcomes = new Map<string, (outcome: ChunkOutcome) => void>()
 		const loadChunk = vi.fn(
 			(category: string) => new Promise<ChunkOutcome>((resolve) => outcomes.set(category, resolve))

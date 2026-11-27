@@ -57,7 +57,7 @@ export interface TrackerState {
 	items: TrackItem[]
 	/** Card text chunks by category. Empty on the hub, which never loads one. */
 	chunks: Record<string, ChunkState>
-	/** Needed categories the list may show, in list order (ruling 9, her call 27.11). */
+	/** Needed categories the list may show, in list order (plan ruling 9, as changed on 27.11). */
 	revealed: string[]
 	records: Records
 	selected: string[]
@@ -265,7 +265,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 
 	const order = [...known]
 
-	/** Ruling 9, as she ruled it 27.11: a needed category shows once its text is in and every
+	/** Plan ruling 9, as changed on 27.11: a needed category shows once its text is in and every
 	 *  needed category before it in list order has landed or failed. Worked out afresh on each
 	 *  change, so a press that adds an earlier category still on its way hides the later ones
 	 *  behind the reserve, and the list fills from the top: no card ever paints above one on

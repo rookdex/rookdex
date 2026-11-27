@@ -171,7 +171,7 @@ describe("chunks in the tracker (spec §5, §10)", () => {
 })
 
 describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
-	it("hides loaded cards behind the reserve while an earlier pressed category loads (her call 27.11)", async () => {
+	it("hides loaded cards behind the reserve while an earlier pressed category loads (plan ruling 9)", async () => {
 		const chunks = deferChunks(["animals"])
 		window.history.replaceState(null, "", "/en/tracker/?show=animals")
 		const { container } = render(<Tracker locale="en" />)
@@ -273,7 +273,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		expect(within(results).queryByText('No match for "Bike".')).toBeNull()
 	})
 
-	it("holds a screen of height on the first load but not on a retry (gate round 2)", async () => {
+	it("holds a screen of height on the first load but not on a retry", async () => {
 		// The first animals request fails when the test says so; the retry waits for answer().
 		let fail: (() => void) | undefined
 		let answer: (() => void) | undefined
@@ -327,7 +327,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		await waitFor(() => expect(liveRegion(container)).toHaveTextContent(text))
 	})
 
-	it("does not speak results for cards the screen does not show (final review F1)", async () => {
+	it("does not speak results for cards the screen does not show", async () => {
 		const chunks = deferChunks(["animals"])
 		window.history.replaceState(null, "", "/en/tracker/?show=animals")
 		const { container } = render(<Tracker locale="en" />)
@@ -346,7 +346,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		await waitFor(() => expect(liveRegion(container)).toHaveTextContent("1 result"))
 	})
 
-	it("does not speak results for a category that failed to load (final review F1)", async () => {
+	it("does not speak results for a category that failed to load", async () => {
 		stubChunks(async (category, url) => {
 			if (category === "vehicles") throw new TypeError("Failed to fetch")
 			return delivered.serve(url)
@@ -361,7 +361,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		expect(liveRegion(container)).not.toHaveTextContent(/result/)
 		expect(liveRegion(container)).not.toHaveTextContent(/No match/)
 	})
-	it("speaks a query typed during the first load once the list lands, without Enter (F1 follow-up)", async () => {
+	it("speaks a query typed during the first load once the list lands, without Enter", async () => {
 		const chunks = deferChunks()
 		const { container } = render(<Tracker locale="en" />)
 		await screen.findByRole("button", { name: "Profile: Player 1" })
@@ -374,7 +374,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		await waitFor(() => expect(liveRegion(container)).toHaveTextContent("1 result"))
 	})
 
-	it("stays silent when the query was cleared before the list landed (F1 follow-up)", async () => {
+	it("stays silent when the query was cleared before the list landed", async () => {
 		const chunks = deferChunks()
 		const { container } = render(<Tracker locale="en" />)
 		await screen.findByRole("button", { name: "Profile: Player 1" })
@@ -388,7 +388,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		expect(liveRegion(container)).not.toHaveTextContent(/result/)
 	})
 
-	it("Clear filters does not speak cards of a category that is still loading (F1 follow-up)", async () => {
+	it("Clear filters does not speak cards of a category that is still loading", async () => {
 		const chunks = deferChunks(["animals"])
 		window.history.replaceState(null, "", "/en/tracker/?show=animals")
 		const { container } = render(<Tracker locale="en" />)
@@ -405,7 +405,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		await waitFor(() => expect(liveRegion(container)).toHaveTextContent("1 result"))
 	})
 
-	it("counts only categories on screen in the Hide found count (F1 wiring)", async () => {
+	it("counts only categories on screen in the Hide found count", async () => {
 		const db = await openStore(indexedDB)
 		await createProfile(db, "Player 1", new Date("2026-11-20T10:00:00Z"), () => "p1")
 		await setDone(db, "p1", "wildlife/american-alligator", true, new Date("2026-11-20T11:00:00Z"))
@@ -428,7 +428,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 			return delivered.serve(url)
 		})
 
-	it("still speaks a non-zero count for the loaded cards when another category failed (gate G1)", async () => {
+	it("still speaks a non-zero count for the loaded cards when another category failed", async () => {
 		failVehicles()
 		window.history.replaceState(null, "", "/en/tracker/?show=vehicles,animals")
 		const { container } = render(<Tracker locale="en" />)
@@ -438,7 +438,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		await waitFor(() => expect(liveRegion(container)).toHaveTextContent("1 result"))
 	})
 
-	it("stays silent for zero matches while another category failed (gate G1)", async () => {
+	it("stays silent for zero matches while another category failed", async () => {
 		failVehicles()
 		window.history.replaceState(null, "", "/en/tracker/?show=vehicles,animals")
 		const { container } = render(<Tracker locale="en" />)
@@ -462,7 +462,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		expect(liveRegion(container)).not.toHaveTextContent(/result/)
 	})
 
-	it("waits out the settle delay before speaking a query typed during loading (gate G4)", async () => {
+	it("waits out the settle delay before speaking a query typed during loading", async () => {
 		const chunks = deferChunks()
 		const { container } = render(<Tracker locale="en" />)
 		await screen.findByRole("button", { name: "Profile: Player 1" })
@@ -474,7 +474,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		await waitFor(() => expect(liveRegion(container)).toHaveTextContent("1 result"))
 	})
 
-	it("Clear filters cancels a typing result that is still pending (gate G3)", async () => {
+	it("Clear filters cancels a typing result that is still pending", async () => {
 		const chunks = deferChunks(["animals"])
 		window.history.replaceState(null, "", "/en/tracker/?show=animals")
 		const { container } = render(<Tracker locale="en" />)
@@ -527,7 +527,7 @@ describe("the seed index file (plan review ruling 3, Review Focus 5)", () => {
 		expect(screen.getByRole("button", { name: "Reload" })).not.toHaveAttribute("aria-disabled")
 	})
 
-	it("announces a repeat failure and returns focus to Try again (gate G2)", async () => {
+	it("announces a repeat failure and returns focus to Try again", async () => {
 		let reject: (() => void) | undefined
 		stubIndex(async () => {
 			throw new TypeError("Failed to fetch")
@@ -550,7 +550,7 @@ describe("the seed index file (plan review ruling 3, Review Focus 5)", () => {
 		expect(screen.getByRole("button", { name: "Try again" })).toHaveFocus()
 	})
 
-	it("keeps Try again focused and busy while it runs, then focuses the list (gate round 2)", async () => {
+	it("keeps Try again focused and busy while it runs, then focuses the list", async () => {
 		failIndex()
 		const { container } = render(<Tracker locale="en" />)
 		await notice(INDEX_OFFLINE)
@@ -578,7 +578,7 @@ describe("the seed index file (plan review ruling 3, Review Focus 5)", () => {
 		expect(container.querySelector(".tracker-results")).toHaveFocus()
 	})
 
-	it("moves focus to Reload when Try again finds the index gone (gate round 2)", async () => {
+	it("moves focus to Reload when Try again finds the index gone", async () => {
 		failIndex()
 		render(<Tracker locale="en" />)
 		await notice(INDEX_OFFLINE)
@@ -588,7 +588,7 @@ describe("the seed index file (plan review ruling 3, Review Focus 5)", () => {
 		await waitFor(() => expect(screen.getByRole("button", { name: "Reload" })).toHaveFocus())
 	})
 
-	it("shows the Reload notice when the index block is missing (gate G6)", async () => {
+	it("shows the Reload notice when the index block is missing", async () => {
 		document.getElementById("seed-index")?.remove()
 		for (const node of document.querySelectorAll('script[type="application/json"]')) node.remove()
 		render(<Tracker locale="en" />)
@@ -596,7 +596,7 @@ describe("the seed index file (plan review ruling 3, Review Focus 5)", () => {
 		expect(screen.getByRole("button", { name: "Reload" })).toBeInTheDocument()
 	})
 
-	it("marks the index fallback busy with a loading cue (gate G7)", async () => {
+	it("marks the index fallback busy with a loading cue", async () => {
 		stubIndex(() => new Promise<Response>(() => {}))
 		const { container } = render(<Tracker locale="en" />)
 		const pending = container.querySelector(".index-pending") as HTMLElement

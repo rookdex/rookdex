@@ -327,7 +327,7 @@ function TrackerView({ locale, index, results, moved }: ViewProps) {
 		return emptyText(kind, query) ?? plural("tracker.search.results", view.visible.length)
 	}
 
-	// What to say for a view, or nothing (gate G1). Nothing is spoken while a chunk is still on its
+	// What to say for a view, or nothing. Nothing is spoken while a chunk is still on its
 	// way. With a failed category, only a non-zero count is spoken: the view holds only categories
 	// on screen, so it matches the list, while "No match" could be wrong with a category missing.
 	function spoken(chunks: ReturnType<typeof listChunks>, view: SearchView, query: string) {
@@ -487,7 +487,7 @@ function TrackerView({ locale, index, results, moved }: ViewProps) {
 	// I9: no empty-state text while a needed chunk is on its way or has failed. The notice speaks then.
 	const listSettled = chunkView.settled && chunkView.failed.length === 0
 	const empty = emptyState({ ...view, visible: shownCards }, search.query)
-	// A query typed while the list was loading is spoken once, when the list settles (F1 follow-up).
+	// A query typed while the list was loading is spoken once, when the list settles.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: `live` is a new object each render; only the list settling should speak
 	useEffect(() => {
 		if (!chunkView.settled || !unspoken.current) return

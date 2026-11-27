@@ -94,7 +94,7 @@ export function useSearch(source: SearchSource, arrival?: string, initialQuery =
 		})
 	}
 
-	// Only the categories whose text has loaded are on screen, so only they count (final review F1).
+	// Only the categories whose text has loaded are on screen, so only they count.
 	const shown = new Set(source.revealed)
 	return {
 		query,

@@ -46,7 +46,7 @@ Size at scale: about 2,600 items make the index about 210 KB raw and 43 KB gzipp
 - **Work in `../rookdex-lf`** on branch `feat/data-delivery` (cut from `origin/main` at `6bd4e92`). `npm run lint` is `biome ci .` and must run there.
 - **Commits:** stage named paths only, never `git commit -a`. No `Co-Authored-By` or AI lines. Messages are plain sentences like the log ("Measure a card's text only when it nears the screen").
 - **Tests:** `src/test/setup.ts` pins `TZ=Europe/Oslo`. Run one file with `npx vitest run <path>`. Types: `npm run check`. Write test files with Write or Edit, never a Bash heredoc (heredocs halve backslashes).
-- **Merge:** `ward / gate` and `shipped-ids` are required, but she merges by hand only when every check is done, Lighthouse included.
+- **Merge:** `ward / gate` and `shipped-ids` are required, but I merge by hand only when every check is done, Lighthouse included.
 
 ## Review Focus
 
@@ -1543,7 +1543,7 @@ In `src/styles/global.css`, after the `.tracker-results` rule:
 	"tracker.chunk.reload": "Reload",
 ```
 
-`src/locales/nb.json`, same place. These are my drafts, and she approves them in the PR:
+`src/locales/nb.json`, same place. These are drafts, and I approve them in the PR:
 
 ```json
 	"tracker.chunk.offline.one": "{categories} kan ikke lastes uten nett ennå. Åpne den én gang på nett, så er den tilgjengelig etterpå.",
@@ -1929,7 +1929,7 @@ git commit -m "Add the data delivery plan"
 git push -u origin feat/data-delivery
 ```
 
-Write the PR body to `.superpowers/probe/pr-body-data-delivery.md` and open the PR from `../rookdex-lf` with `gh pr create --base main --head feat/data-delivery --title "Deliver the seed as a hashed index and per-category chunks" --body-file .superpowers/probe/pr-body-data-delivery.md`. The body covers what changed, the decisions above (index carries names; Zod stays for user data), the before and after numbers from `baseline.md`, the nb strings for her approval, the browser checks with what was not tested (a real phone, a real deploy with an old worker), and `## Review`. She merges by hand once every check is done.
+Write the PR body to `.superpowers/probe/pr-body-data-delivery.md` and open the PR from `../rookdex-lf` with `gh pr create --base main --head feat/data-delivery --title "Deliver the seed as a hashed index and per-category chunks" --body-file .superpowers/probe/pr-body-data-delivery.md`. The body covers what changed, the decisions above (index carries names; Zod stays for user data), the before and after numbers from `baseline.md`, the nb strings for my approval, the browser checks with what was not tested (a real phone, a real deploy with an old worker), and `## Review`. I merge by hand once every check is done.
 
 ---
 

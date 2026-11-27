@@ -393,7 +393,7 @@ describe("the seed index file (plan review ruling 3)", () => {
 		expect(await screen.findByRole("button", { name: /^Profile: / })).toBeInTheDocument()
 	})
 
-	it("moves focus to the hub's heading when Try again brings the index in (gate round 2)", async () => {
+	it("moves focus to the hub's heading when Try again brings the index in", async () => {
 		stubIndex(async () => {
 			throw new TypeError("Failed to fetch")
 		})
