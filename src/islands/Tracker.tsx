@@ -299,14 +299,14 @@ function TrackerView({ locale, index }: ViewProps) {
 		// An emptied box empties the region too: a polite region does not repeat identical text, so
 		// the same query typed again would otherwise be silent.
 		if (query.trim() === "") live.say("")
-		else live.sayLater(resultsText(search.viewFor({ query }), query))
+		else if (listSettled) live.sayLater(resultsText(search.viewFor({ query }), query))
 	}
 
 	// Enter or the phone's Search key: the list already matches, so say it now and move focus
 	// there. Leaving the field closes the phone keyboard, and the results are where the user
 	// goes next, so a keyboard user's place moves forward instead of back to <body>.
 	function finishSearch() {
-		if (search.query.trim() !== "") live.say(resultsText(search.view, search.query))
+		if (search.query.trim() !== "" && listSettled) live.say(resultsText(search.view, search.query))
 		const list = results.current
 		if (!list) return
 		// The browser's own focus scroll centres a long list and hides its first cards under the

@@ -135,6 +135,16 @@ describe("searchView (spec §3.1)", () => {
 		expect(view({ query: "car" }).elsewhere).toBe(0)
 	})
 
+	it("counts only the revealed categories as inside, and leaves elsewhere alone", () => {
+		const revealed = new Set(["vehicles"])
+		const v = view({ query: "animal", revealed })
+		expect(ids(v.visible).every((id) => id.startsWith("vehicles/"))).toBe(true)
+		expect(v.visible.length).toBeLessThan(view({ query: "animal" }).visible.length)
+		const hidden = new Set(["wildlife/pelican", "vehicles/albany-primo"])
+		expect(view({ query: "animal", hidden, revealed: new Set() }).hiddenCount).toBe(0)
+		expect(view({ selected: ["wildlife"], query: "car", revealed }).elsewhere).toBe(2)
+	})
+
 	it("hides the snapshot and counts it inside the tiles only", () => {
 		const hidden = new Set(["wildlife/pelican", "vehicles/albany-primo"])
 		const v = view({ selected: ["wildlife"], query: "animal", hidden })

@@ -36,6 +36,9 @@ export interface SearchInput {
 	terms: SearchTerms
 	/** Words true of one item only, keyed by item id (ITEM_TERMS). */
 	itemTerms: SearchTerms
+	/** When given, only these categories count as inside the filters: the ones whose text has
+	 *  loaded and so are on screen. `elsewhere` ignores it. */
+	revealed?: ReadonlySet<string>
 }
 
 export interface SearchView {
@@ -94,6 +97,7 @@ export function searchView({
 	hidden,
 	terms,
 	itemTerms,
+	revealed,
 }: SearchInput): SearchView {
 	const queryWords = words(query)
 	const all = selected.length === 0
@@ -118,7 +122,8 @@ export function searchView({
 				(!narrowed.has(item.category) || pressed.has(groupKey(item.category, item.group))))
 		if (!inside) {
 			if (queryWords.length > 0 && !hidden.has(item.id)) elsewhere++
-		} else if (hidden.has(item.id)) hiddenCount++
+		} else if (revealed && !revealed.has(item.category)) continue
+		else if (hidden.has(item.id)) hiddenCount++
 		else visible.push(item)
 	}
 	return { visible, elsewhere, hiddenCount }

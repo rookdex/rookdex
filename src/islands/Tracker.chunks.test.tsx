@@ -197,7 +197,7 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		expect(document.querySelector("button.last-found")).toBeNull()
 	})
 
-	it("says nothing about matches while the list is still loading (pre-flight I9)", async () => {
+	it("shows no empty-state text while the list is still loading (pre-flight I9)", async () => {
 		const chunks = deferChunks()
 		const { container } = render(<Tracker locale="en" />)
 		await screen.findByRole("button", { name: "Profile: Player 1" })
@@ -208,6 +208,39 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		chunks.release("animals")
 		expect(await screen.findByRole("checkbox", { name: "Bike" })).toBeInTheDocument()
 		expect(within(results).queryByText('No match for "Bike".')).toBeNull()
+	})
+	it("does not speak results for cards the screen does not show (final review F1)", async () => {
+		const chunks = deferChunks(["animals"])
+		window.history.replaceState(null, "", "/en/tracker/?show=animals")
+		const { container } = render(<Tracker locale="en" />)
+		await screen.findByRole("checkbox", { name: "American alligator" })
+		fireEvent.click(tile(/^Vehicles,/))
+		const field = screen.getByRole("searchbox")
+		fireEvent.change(field, { target: { value: "Bike" } })
+		fireEvent.keyDown(field, { key: "Enter" })
+		await wait()
+		// Vehicles is still on its way: Bike is not on screen, so no "1 result" and no count.
+		expect(liveRegion(container)).not.toHaveTextContent(/result/)
+		chunks.release("vehicles")
+		await screen.findByRole("checkbox", { name: "Bike" })
+		fireEvent.keyDown(field, { key: "Enter" })
+		await waitFor(() => expect(liveRegion(container)).toHaveTextContent("1 result"))
+	})
+
+	it("does not speak results for a category that failed to load (final review F1)", async () => {
+		stubChunks(async (category, url) => {
+			if (category === "vehicles") throw new TypeError("Failed to fetch")
+			return delivered.serve(url)
+		})
+		window.history.replaceState(null, "", "/en/tracker/?show=vehicles")
+		const { container } = render(<Tracker locale="en" />)
+		await notice(/Vehicles/)
+		const field = screen.getByRole("searchbox")
+		fireEvent.change(field, { target: { value: "Bike" } })
+		fireEvent.keyDown(field, { key: "Enter" })
+		await wait()
+		expect(liveRegion(container)).not.toHaveTextContent(/result/)
+		expect(liveRegion(container)).not.toHaveTextContent(/No match/)
 	})
 })
 
