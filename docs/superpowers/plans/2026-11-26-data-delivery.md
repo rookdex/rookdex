@@ -32,12 +32,14 @@ Size at scale: about 2,600 items make the index about 210 KB raw and 43 KB gzipp
 - **The checklist joins the index in the 100 % view PR,** which builds `checklist.json`.
 - **Zod leaves the tracker and hub bundles too** (plan review ruling 6). The browser's only Zod parse is an import file (`parseImport` in `transfer.ts`). IndexedDB records and the saved view are read without Zod. Zod reached the tracker only because `tracker.ts` imports `transfer.ts` and the `TEXT` limits from `schema.ts`. Task 6b loads `transfer.ts` on demand and moves the plain limits to a file without Zod, which closes the senior review's "Zod ships to client" finding for every page but the moment someone imports a file.
 - **The failure message is visible as well as spoken.** The `useLiveStatus` region is visually hidden, so it can't hold a Reload button. The notice shows above the list and is spoken once through that region, the way the backup nudge works.
+- **The index is not inlined** (plan review ruling 3). Spec §5 inlines it in the tracker page. It ships as `/data/seed-index.<hash>.json` instead, preloaded from both pages, and the pages carry only its URL. At about 2,600 items it would be about 43 KB gzipped in two pages' HTML.
+- **Every chunk loads once the view's own chunks are in** (stress-test amendment 5). Spec §5 loads a chunk "when the category opens". The rest follow quietly in the background, 7.9 KB gzipped today and precached anyway, so a later tile press is instant.
 
 ## Global Constraints
 
 - **No user data is affected.** No IndexedDB version bump, no export version change, every shipped id unchanged.
 - **No new dependencies.** The import guard uses the `typescript` package that is already a devDependency (6.0.3).
-- **The browser never parses the seed with Zod** and never imports `src/model/seed.ts`, `seedBuild.ts`, `seedDelivery.ts`, `tiers.ts` or `allowlist.json` (Task 5's guard test).
+- **The browser never parses the seed with Zod** and never imports `src/model/seed.ts`, `seedBuild.ts`, `seedDelivery.ts`, `tiers.ts` or `allowlist.json` (Task 6's guard test).
 - **Inlined JSON escapes `<` as `\u003c`** (`jsonLd()` in `src/model/seo.ts`).
 - **Data URLs are content-addressed:** `/data/<category>.<10 hex>.json` and `/data/seed-index.<10 hex>.json`, the hash over the exact bytes served. The only inlined JSON left is the index file's URL.
 - **Copy:** US spelling, no em dashes, times with a colon, dates with periods. In Norwegian the person is «bruker». New strings exist in `src/locales/en.json` and `src/locales/nb.json` (flat keys).
@@ -48,10 +50,10 @@ Size at scale: about 2,600 items make the index about 210 KB raw and 43 KB gzipp
 
 ## Review Focus
 
-1. **First visit offline, All view:** every chunk fails. Expected: one message that names every category, not one per category and not a blank list. Test in Task 5.
-2. **An old tab after a deploy** presses a category whose chunk URL the server no longer has. Expected: "Rookdex was updated. Reload to see the new list." with a working Reload button. Test in Task 5 (404 body).
-3. **A Sources back link (`#item-<id>`) while the chunk is still on its way.** Expected: the checkbox still gets focus once the list renders, not never. Test in Task 5 (deferred fetch).
-4. **The hub never fetches a chunk.** Expected: no request to `/data/` from the dashboard. Test in Task 5.
+1. **First visit offline, All view:** every chunk fails. Expected: one message that names every category, not one per category and not a blank list. Test in Task 6.
+2. **An old tab after a deploy** presses a category whose chunk URL the server no longer has. Expected: "Rookdex was updated. Reload to see the new list." with a working Reload button. Test in Task 6 (404 body).
+3. **A Sources back link (`#item-<id>`) while the chunk is still on its way.** Expected: the checkbox still gets focus once the list renders, not never. Test in Task 6 (deferred fetch).
+4. **The hub never fetches a chunk.** Expected: no request for a category chunk from the dashboard, only the one for the index file (ruling 3). Test in Task 6.
 5. **The index file fails to load** (offline, a 404 after a deploy, or a stall past 10 s). Expected: the tracker and the hub show the notice with its button, never a blank island or a thrown error. Test in Task 6 (ruling 3). The old `</script>` case is gone with the inlined index.
 6. **On All, chunks land out of list order.** Expected: no card paints above a card already on screen. Test in Task 6 (ruling 9).
 7. **The tracker and hub pages load no Zod.** Expected: the guard test fails on any static import of `schema.ts`, `transfer.ts` or Zod from browser code, and the built pages preload no chunk holding Zod. Task 6b.
@@ -121,8 +123,41 @@ Amendment 6's `shownCards` changes as follows. A needed category shows once ever
 Below, "first" and "second" are the fixtures' first two categories in list order; read them from `categoryIds` in the test instead of naming them.
 
 - On All with both fetches deferred, release the second category first: none of its cards render. Release the first: both render, the first category's cards before the second's in document order.
-- Amendment 6's reverse-order test still passes as written.
+- Amendment 6's reverse-order test: rewritten by pre-flight ruling B3.
 - On `?show=<second>` with it loaded, press the first category with its fetch deferred: a card of the second category stays the same node, and the first category's cards render before it once released.
+
+## Pre-flight rulings (27.11)
+
+From the pre-flight scan (`.superpowers/sdd/2026-11-26-data-delivery/preflight.md`). These override the task text, the stress-test amendments and the plan review rulings wherever they differ. The concrete instructions per task are in `.superpowers/sdd/2026-11-26-data-delivery/task-<N>-overrides.md`.
+
+- **B1 (Task 6):** no default exports. The named `Tracker` and `Dashboard` become the gated components. Their bodies move to `TrackerView` and `DashboardView`, which take `index`. Pages, `Hub.tsx` and every test keep their imports.
+- **B2 (Task 6):** the island tests never fail the index by accident. `tracker-fixtures.tsx` gets `stubChunks`, `deferChunks` and `stubIndex`, which answer the index file at once unless a test fails it on purpose. Every chunk test uses them.
+- **B3 (Task 6):** amendment 6's reverse-order test unpresses Vehicles before the chunks land. It expects the alligator and the pelican, and no Bike.
+- **I1 (Task 6):** `IndexGate` takes `fallback: ReactNode`. `DashboardProps` gains `categoryCount`, `Hub.tsx` passes `categories.length`, and the dashboard's fallback is `DashboardSkeleton`.
+- **I2 (Task 6):** the tracker's fallback is `<div className="index-pending" />`, with a global `min-height: 100dvh` rule in `global.css`.
+- **I3 (Task 6):** `IndexGate` takes `say?`. The dashboard passes `announce`. Without `say`, the gate renders its own status line.
+- **I4 (Tasks 5, 6):** the shown set lives in the model as `TrackerState.revealed`, which `listChunks` returns. The island writes no ref during render.
+- **I5 (Tasks 6, 6b):** the guard has two lists. `NEVER` is checked behind `import()` too, and `NOT_UP_FRONT` only before the walk crosses an `import()`. Bare specifiers are checked, and self-tests prove the guard can go red.
+- **I6 (Task 6b):** `exportProfile` stays synchronous. `buildExport` moves to a Zod-free `src/model/exportFile.ts`.
+- **I7 (Task 6):** a "press with a deferred fetch" test holds that chunk from before render and checks it was requested before the press. Ruling 9's third test merges into amendment 6's first.
+- **I8 (Task 6):** `ItemList` gets only the chips of shown categories.
+- **I9 (Task 6):** the empty-state text and the elsewhere line show only once the needed chunks have settled with no failure.
+- **I10 (Task 6b):** a failed `import("./transfer")` sets the new error `"stale"`, with the stale words, and never rejects.
+- **I11 (Task 8):** the browser probes fail chunk URLs and the index URL separately. The hub makes exactly one `/data/` request, for the index file.
+- **M1 (Task 2):** Task 2 creates `seedDelivered.ts` and stages it. `seed.ts` only gains `seedCategories` and `seedGroups`.
+- **M2 (Task 2):** drop the unused `JSDOM` and `jsonLd` imports. The test file has 10 tests.
+- **M3 (Task 4):** the first loader test expects the `{ signal }` argument. The timeout covers the body read. The test file has 16 tests.
+- **M4 (Task 5):** every `listChunks` equality check names `pending` and `revealed`. A failed chunk is tried again only on a press, `refresh()` or `online`.
+- **M5 (Task 3):** the route test expects `[...seedChunks, seedIndexFile]`.
+- **M6 (Task 6):** the `git add` line names `IndexGate.tsx`, `Dashboard.tsx`, `Hub.tsx` and `Tracker.tick.test.tsx`.
+- **M7 (Task 6):** the guard reports one line per forbidden edge. Before Step 3 it lists `seed.ts` via `buildTracker.ts` and via `Tracker.tsx`.
+- **M8 (Task 7):** the reject test expects `"Request failed: /en/"`.
+- **M9 (Task 7):** the index case uses `/data/seed-index.0123456789.json`, with the leading slash.
+- **M10 (Task 6b):** the new import tests live in `src/model/tracker.test.ts` and use a `deps.transfer` hook.
+- **M11 (Task 8):** commit the plan only if it changed. New PR title and body lines, and a Self-review update.
+- **M12 (Task 8):** a chunk preload, if needed, goes in `SeedIndex.astro` in the body, with no head slot.
+- **M13 (Tasks 0, 8, Review Focus, Global Constraints):** task numbers fixed in place. The probe pattern lives at `../rookdex/.superpowers/probe/panel-probe.mjs`.
+- **M14 (Tasks 6, 6b; this plan):** ruling 9's third test merges into amendment 6's first. Two spec changes added under "Delivery change from the spec". `src/model/limits.ts` and `src/islands/hub/limits.ts` each get a header line naming the other.
 
 ---
 
@@ -150,7 +185,7 @@ Expected: the build passes. The list shows the largest client chunks (on 26.11 `
 .superpowers/lh/measure.sh main "$(pwd)/.superpowers/lh/dist-main" 5
 ```
 
-Expected: five runs of `/en/tracker/` with performance scores around 0.89 to 0.91. Write the median score, LCP, CLS and total blocking time into `.superpowers/lh/baseline.md`. Task 7 compares against it.
+Expected: five runs of `/en/tracker/` with performance scores around 0.89 to 0.91. Write the median score, LCP, CLS and total blocking time into `.superpowers/lh/baseline.md`. Task 8 compares against it.
 
 ---
 
