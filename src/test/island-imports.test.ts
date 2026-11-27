@@ -16,8 +16,9 @@ const NEVER = new Set([
 	"src/model/tiers.ts",
 	"allowlist.json",
 ])
-/** Allowed only behind import(), so no page loads them up front. Task 6b fills this. */
-const NOT_UP_FRONT = new Set<string>([])
+/** Allowed only behind import(), so no page loads them up front: Zod and the import code that
+ *  parses with it (plan review ruling 6). */
+const NOT_UP_FRONT = new Set(["src/model/schema.ts", "src/model/transfer.ts", "zod", "astro/zod"])
 
 interface Edge {
 	specifier: string
@@ -118,6 +119,15 @@ describe("island imports (spec §5)", () => {
 		expect(blocked("src/model/seed.ts", true)).toBe(true)
 		expect(blocked("src/model/seed.ts", false)).toBe(true)
 		expect(blocked("src/model/stats.ts", false)).toBe(false)
+	})
+
+	it("keeps Zod and the import code out of the first load, but allows them behind import() (self-test)", () => {
+		expect(blocked("zod", false)).toBe(true)
+		expect(blocked("astro/zod", false)).toBe(true)
+		expect(blocked("src/model/schema.ts", false)).toBe(true)
+		expect(blocked("src/model/transfer.ts", false)).toBe(true)
+		expect(blocked("src/model/transfer.ts", true)).toBe(false)
+		expect(blocked("astro/zod", true)).toBe(false)
 	})
 
 	it("never reach the seed, its build checks or the source rules", () => {

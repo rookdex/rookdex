@@ -3,6 +3,8 @@
 // store before touching state, so a profile switch mid-write never misfiles a tick.
 
 import type { ChunkFailure, ChunkOutcome } from "./chunks"
+import { buildExport } from "./exportFile"
+import { MAX_IMPORT_BYTES, TEXT } from "./limits"
 import {
 	activeProfiles,
 	createProfile as createProfileRecord,
@@ -14,25 +16,17 @@ import {
 	softDeleteProfile,
 } from "./profiles"
 import { listRecords, setDone } from "./progress"
-import { type ExportFile, type Profile, TEXT } from "./schema"
+import type { ExportFile, Profile } from "./schema"
 import { countItems, groupKey, type Records, shown } from "./stats"
 import type { Store } from "./store"
 import { categoryIds, groupItems, type TrackItem, withText } from "./trackItems"
-import {
-	backupEntries,
-	buildExport,
-	collectBackup,
-	type ImportError,
-	type ImportResult,
-	importAsNewProfile,
-	importRecords,
-	MAX_IMPORT_BYTES,
-	parseImport,
-	restoreBackup,
-} from "./transfer"
+import type { ImportError, ImportResult } from "./transfer"
+
+/** The import and backup code. Loaded on first use, because it parses with Zod (Task 6b). */
+type TransferModule = typeof import("./transfer")
 
 export type Status = "loading" | "ready" | "error"
-export type TrackerError = ImportError | "storage" | "name" | "closed"
+export type TrackerError = ImportError | "storage" | "name" | "closed" | "stale"
 
 /** Per category: its card text chunk is on its way, has landed, or failed (spec §5). */
 export type ChunkState = "loading" | "ready" | ChunkFailure
@@ -88,6 +82,8 @@ export interface TrackerDeps {
 	activeProfile?: ActiveProfileStore
 	/** Called after each saved tick (not an untick), so the backup reminder can count them. */
 	onTick?: () => void
+	/** Loads the import and backup code. A test seam; the default is import("./transfer"). */
+	transfer?: () => Promise<TransferModule>
 }
 
 export interface ImportFileLike {
@@ -330,6 +326,19 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		return closed ? "closed" : "storage"
 	}
 
+	const loadTransfer = deps.transfer ?? (() => import("./transfer"))
+
+	/** The import and backup code, loaded on first use (Task 6b). In an old tab after a deploy the
+	 *  file can be gone; that reads as "stale", whose message asks for a reload. Never rejects. */
+	async function transfer(): Promise<TransferModule | undefined> {
+		try {
+			return await loadTransfer()
+		} catch {
+			fail("stale")
+			return undefined
+		}
+	}
+
 	async function guard(fn: () => Promise<void>): Promise<void> {
 		try {
 			await fn()
@@ -539,8 +548,10 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			return { filename, json: JSON.stringify(file, null, "\t") }
 		},
 		async exportAll() {
+			const mod = await transfer()
+			if (!mod) return undefined
 			try {
-				const backup = await collectBackup(ready(), now())
+				const backup = await mod.collectBackup(ready(), now())
 				if (!backup) return undefined
 				return { filename: backup.filename, json: JSON.stringify(backup.file, null, "\t") }
 			} catch {
@@ -549,14 +560,17 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			}
 		},
 		async readImport(file) {
+			// Before the import code loads, so an oversized file never costs a download.
 			if (file.size > MAX_IMPORT_BYTES) return fail("too-large")
+			const mod = await transfer()
+			if (!mod) return
 			let text: string
 			try {
 				text = await file.text()
 			} catch {
 				return fail("not-json")
 			}
-			const result = parseImport(text, file.size)
+			const result = mod.parseImport(text, file.size)
 			if (result.ok) set({ pendingImport: result.file, error: undefined })
 			else fail(result.error)
 		},
@@ -568,9 +582,11 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			await once(async () => {
 				const file = state.pendingImport
 				if (!file) return
+				const mod = await transfer()
+				if (!mod) return
 				const db = ready()
 				if (file.version === 2 || target === "all") {
-					results = await restoreBackup(db, backupEntries(file), now(), deps.newId)
+					results = await mod.restoreBackup(db, mod.backupEntries(file), now(), deps.newId)
 					// The shown profile may have gained records; it stays the shown one.
 					const profiles = activeProfiles(await listProfiles(db))
 					const current = profiles.find((p) => p.id === state.profileId) ?? profiles[0]
@@ -578,7 +594,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 					return
 				}
 				if (target === "new") {
-					const { profile, count } = await importAsNewProfile(
+					const { profile, count } = await mod.importAsNewProfile(
 						db,
 						file.profile_name,
 						file.records,
@@ -591,7 +607,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 				}
 				const profileId = state.profileId
 				const name = state.profiles.find((p) => p.id === profileId)?.name ?? ""
-				const { records, count } = await importRecords(db, profileId, file.records)
+				const { records, count } = await mod.importRecords(db, profileId, file.records)
 				results = [{ profileId, name, count, created: false }]
 				if (state.profileId !== profileId) {
 					set({ pendingImport: undefined })

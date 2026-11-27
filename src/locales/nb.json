@@ -186,6 +186,7 @@
 	"tracker.errors.closed": "Dataene dine ble endret i en annen fane. Last inn siden på nytt for å fortsette.",
 	"tracker.errors.newer-version": "Filen kommer fra en nyere Rookdex. Last inn siden på nytt for å oppdatere, og prøv igjen.",
 	"tracker.errors.too-many": "Filen har mer enn 10 000 elementer eller 100 profiler, så den kan ikke importeres.",
+	"tracker.errors.stale": "Rookdex er oppdatert. Last inn siden på nytt for å se den nye listen.",
 	"tracker.imported.one": "Importerte 1 element til {name}.",
 	"tracker.imported.other": "Importerte {count} elementer til {name}.",
 	"tracker.restored.one": "Gjenopprettet {profiles} profiler: {names}. 1 element kom inn.",

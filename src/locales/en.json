@@ -186,6 +186,7 @@
 	"tracker.errors.closed": "Your data changed in another tab. Reload to continue.",
 	"tracker.errors.newer-version": "That file comes from a newer Rookdex. Reload the page to update, then try again.",
 	"tracker.errors.too-many": "That file holds more than 10,000 items or 100 profiles, so it can't be imported.",
+	"tracker.errors.stale": "Rookdex was updated. Reload to see the new list.",
 	"tracker.imported.one": "Imported 1 item into {name}.",
 	"tracker.imported.other": "Imported {count} items into {name}.",
 	"tracker.restored.one": "Restored {profiles} profiles: {names}. 1 item came in.",
