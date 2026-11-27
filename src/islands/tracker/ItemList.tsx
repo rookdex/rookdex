@@ -1,9 +1,8 @@
 import { useRef } from "react"
 import type { Translate } from "../../i18n"
 import { itemReportUrl } from "../../model/report"
-import type { SeedItem } from "../../model/schema"
-import { categoryIds, groupItems } from "../../model/seed"
 import { type Count, groupKey, type Records } from "../../model/stats"
+import { categoryIds, groupItems, type TrackItem } from "../../model/trackItems"
 import { GroupChips } from "./GroupChips"
 import { BookIcon, ChevronIcon, categoryIcon, FlagIcon } from "./icons"
 import { useCut } from "./useCut"
@@ -12,7 +11,7 @@ import { usePanel } from "./usePanel"
 const none: Count = { done: 0, total: 0 }
 
 interface Props {
-	items: SeedItem[]
+	items: TrackItem[]
 	records: Records
 	disabled: boolean
 	categoryLabel: (id: string) => string
@@ -132,7 +131,7 @@ export function ItemList({
 }
 
 interface RowProps {
-	item: SeedItem
+	item: TrackItem
 	done: boolean
 	disabled: boolean
 	groupName: string

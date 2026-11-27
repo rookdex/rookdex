@@ -35,7 +35,7 @@ const terms = {
 }
 
 const none: ReadonlySet<string> = new Set()
-const ids = (list: SeedItem[]) => list.map((i) => i.id)
+const ids = (list: { id: string }[]) => list.map((i) => i.id)
 const view = (patch: Partial<Parameters<typeof searchView>[0]>) =>
 	searchView({
 		items,

@@ -1,7 +1,7 @@
 import type { Locale, Translate } from "../../i18n"
 import { relativeTime } from "../../model/relativeTime"
-import type { SeedItem } from "../../model/schema"
 import type { RecentFind } from "../../model/stats"
+import type { TrackItem } from "../../model/trackItems"
 import { categoryIcon } from "./icons"
 import { useNow } from "./useNow"
 
@@ -9,7 +9,7 @@ import { useNow } from "./useNow"
  *  disabled input cannot). It never changes the user's filters to make room (spec §5.3). */
 export function jumpable(
 	find: RecentFind | undefined,
-	visible: SeedItem[],
+	visible: TrackItem[],
 	ready: boolean
 ): boolean {
 	return ready && find !== undefined && visible.some((item) => item.id === find.item.id)

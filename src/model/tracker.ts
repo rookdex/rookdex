@@ -12,10 +12,10 @@ import {
 	softDeleteProfile,
 } from "./profiles"
 import { listRecords, setDone } from "./progress"
-import { type ExportFile, type Profile, type SeedItem, TEXT } from "./schema"
-import { categoryIds, groupItems } from "./seed"
+import { type ExportFile, type Profile, TEXT } from "./schema"
 import { countItems, groupKey, type Records, shown } from "./stats"
 import type { Store } from "./store"
+import { categoryIds, groupItems, type TrackItem } from "./trackItems"
 import {
 	backupEntries,
 	buildExport,
@@ -49,7 +49,7 @@ export interface TrackerState {
 	error?: TrackerError
 	profiles: Profile[]
 	profileId: string
-	items: SeedItem[]
+	items: TrackItem[]
 	records: Records
 	selected: string[]
 	/** Pressed group chips as `groupKey`s, in list order, only under pressed categories (spec §14.1). */
@@ -61,7 +61,7 @@ export interface TrackerState {
 
 export interface TrackerDeps {
 	openStore: () => Promise<Store>
-	items: SeedItem[]
+	items: TrackItem[]
 	defaultProfileName: string
 	selected?: string[]
 	groups?: string[]
@@ -140,7 +140,7 @@ export function showParam(selected: string[]): string | null {
  * one chip would filter nothing. Categories come in seed order. A Map, so a category id such as
  * "constructor" can never read Object.prototype (R16).
  */
-export function chipGroups(items: SeedItem[], selected: string[]): Map<string, string[]> {
+export function chipGroups(items: TrackItem[], selected: string[]): Map<string, string[]> {
 	const live = shown(items)
 	const chips = new Map<string, string[]>()
 	for (const category of categoryIds(live)) {

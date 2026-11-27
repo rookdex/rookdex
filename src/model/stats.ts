@@ -1,6 +1,6 @@
 // Computed, never stored. Retired items and records without a seed item are never counted.
-import type { ProgressRecord, SeedItem } from "./schema"
-import { categoryIds } from "./seed"
+import type { ProgressRecord } from "./schema"
+import { categoryIds, type TrackItem } from "./trackItems"
 
 export type Records = Record<string, ProgressRecord>
 
@@ -12,28 +12,28 @@ export interface CategoryCount extends Count {
 	category: string
 }
 export interface RecentFind {
-	item: SeedItem
+	item: TrackItem
 	updated_at: string
 }
 
 /** What the list shows: everything but retired items. Chips and tiles read it, so a
  *  `counts: false` group still gets its chip and its category still gets a tile. */
-export function shown(items: SeedItem[]): SeedItem[] {
+export function shown(items: TrackItem[]): TrackItem[] {
 	return items.filter((item) => !item.retired)
 }
 
 /** What counts toward a total: not retired, not in a `counts: false` group, not edition-only. */
-export function countable(items: SeedItem[]): SeedItem[] {
+export function countable(items: TrackItem[]): TrackItem[] {
 	return items.filter((item) => !item.retired && !item.uncounted)
 }
 
-export function countItems(items: SeedItem[], records: Records): Count {
+export function countItems(items: TrackItem[], records: Records): Count {
 	const live = countable(items)
 	const done = live.filter((item) => records[item.id]?.done).length
 	return { done, total: live.length }
 }
 
-export function perCategory(items: SeedItem[], records: Records): CategoryCount[] {
+export function perCategory(items: TrackItem[], records: Records): CategoryCount[] {
 	return categoryIds(items).map((category) => ({
 		category,
 		...countItems(
@@ -49,7 +49,7 @@ export function groupKey(category: string, group: string): string {
 }
 
 /** Per group, keyed by `groupKey`. Always over every countable item, never a filtered view. */
-export function perGroup(items: SeedItem[], records: Records): Record<string, Count> {
+export function perGroup(items: TrackItem[], records: Records): Record<string, Count> {
 	const counts: Record<string, Count> = {}
 	for (const item of countable(items)) {
 		const key = groupKey(item.category, item.group)
@@ -62,7 +62,7 @@ export function perGroup(items: SeedItem[], records: Records): Record<string, Co
 }
 
 /** Finds are activity, not totals: every shown item counts, uncounted ones too. */
-export function recentFinds(items: SeedItem[], records: Records, limit = 5): RecentFind[] {
+export function recentFinds(items: TrackItem[], records: Records, limit = 5): RecentFind[] {
 	return shown(items)
 		.flatMap((item) => {
 			const record = records[item.id]

@@ -1,6 +1,6 @@
 import { Fragment, type ReactNode, type RefObject, useEffect, useRef, useState } from "react"
 import type { Translate } from "../../i18n"
-import type { SeedItem } from "../../model/schema"
+import type { TrackItem } from "../../model/trackItems"
 
 /** How long the ticked row takes to slide out (spec §6.1 step 4). */
 export const LEAVE_MS = 200
@@ -13,7 +13,7 @@ export const nextBoxId = (itemId: string) => `next-${itemId}`
 export interface ShownGroup {
 	category: string
 	title: string
-	items: SeedItem[]
+	items: TrackItem[]
 }
 
 interface Props {

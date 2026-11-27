@@ -19,6 +19,8 @@ import {
 import { buildSeed, duplicates, idsIn } from "./seedBuild"
 import { attachTiers, officialErrors } from "./tiers"
 
+export { categoryIds, groupItems } from "./trackItems"
+
 export const allowlist: Allowlist = allowlistSchema.parse(allowlistJson)
 
 export {
@@ -74,23 +76,6 @@ export function validateFacts(data: unknown, list: Allowlist): { facts: Fact[]; 
 		if (ruleErrors.length === 0) facts.push({ ...input, sources: tiered.sources })
 	}
 	return { facts, errors }
-}
-
-/** Category ids in seed order (categories.json). */
-export function categoryIds(items: SeedItem[]): string[] {
-	return [...new Set(items.map((i) => i.category))]
-}
-
-/** Items by group in seed order: groups by their header's `order`, items by the group's `sort`.
- *  seedBuild sorts once, so every page and the tracker list items the same way. */
-export function groupItems(items: SeedItem[]): Map<string, SeedItem[]> {
-	const groups = new Map<string, SeedItem[]>()
-	for (const item of items) {
-		const list = groups.get(item.group)
-		if (list) list.push(item)
-		else groups.set(item.group, [item])
-	}
-	return groups
 }
 
 // Every JSON file at any depth, so a misplaced one reaches buildSeed's path check instead of
