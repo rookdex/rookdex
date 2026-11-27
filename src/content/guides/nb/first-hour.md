@@ -3,7 +3,7 @@ title: Den første timen
 searchTitle: "Den første timen i GTA 6: sjekk, hent og hopp over · Rookdex"
 summary: Det du bør sjekke, hente og la være den første timen i GTA VI.
 searchDescription: "Den første timen i GTA 6: hva du sjekker før du starter spillet, hva du gjør hvis spillet ikke starter, hva du kan droppe, og Jason og Lucia."
-updated: 2026-11-19
+updated: 2026-11-27
 sources:
   - https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing
   - https://support.rockstargames.com/articles/3SZF8cy8dG7lHsLf38uWK1/redeeming-the-one-month-gta-membership-included-with-your-grand-theft-auto-vi-pre-order
@@ -11,6 +11,7 @@ sources:
   - https://www.xbox.com/en-US/games/store/grand-theft-auto-vi/9NL3WWNZLZZN
   - https://www.gamespot.com/articles/how-switching-between-gta-6s-two-protagonists-works/
   - https://www.gamesradar.com/edge/gtavi-cover/
+  - https://rockstarintel.com/gta-vi-pre-order-bonus-now-available-to-buy-separately/
 ---
 
 ## Før du starter spillet
@@ -24,7 +25,7 @@ Sjekk driftsstatusen på support.rockstargames.com først. Det er vanlig at serv
 ## Dette trenger du ikke hente
 
 - **Ultimate Edition-gjenstander** låses opp kapittel for kapittel mens du spiller historien. Det er ingenting å lete etter den første timen.
-- **Vintage Vice City Pack** (en Vapid Stanier fra 1955 med garasje, antrekk, frisyrer og et våpenmønster) følger med alle forhåndsbestillinger og alle digitale kjøp før 20. november 2026.
+- **Vintage Vice City Pack** (en Vapid Stanier fra 1955 med garasje, antrekk, frisyrer og et våpenmønster) følger med alle forhåndsbestillinger og alle digitale kjøp før 20. november 2026. Nå kan du også kjøpe den alene på PlayStation og Xbox, til {price:vintage-pack} i PlayStation Store.
 - **GTA+-måneden** følger med et digitalt eksemplar kjøpt før 20. november 2026. Den gjelder GTA Online, ikke historien. Du løser den inn i PlayStation Store (innen 31. mars 2027) eller under Offers & Credits i Microsoft Store (innen 180 dager), og den fornyes til full pris til du sier den opp. Siden GTA Online ikke er med ved lansering, haster det ikke.
 
 ## To spillbare figurer

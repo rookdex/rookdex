@@ -7,8 +7,8 @@
 			"nb": "To utgaver, fra 79,99 dollar"
 		},
 		"summary": {
-			"en": "Pre-orders opened on 25 June. The Standard Edition costs $79.99 and the digital-only Ultimate Edition $99.99; Standard owners can upgrade later. Digital copies bought by 19 November came with the Vintage Vice City Pack and a month of GTA+. Boxed pre-orders include the pack.",
-			"nb": "Forhåndsbestillingen åpnet 25. juni. Standardutgaven koster 79,99 dollar og Ultimate Edition, som bare finnes digitalt, 99,99 dollar. Standard kan oppgraderes senere. Digitale kjøp til og med 19. november fikk Vintage Vice City Pack og én måned GTA+. Fysiske forhåndsbestillinger får pakken."
+			"en": "The Standard Edition costs $79.99 and the digital-only Ultimate Edition $99.99; Standard owners can upgrade later. Digital copies bought by 19 November came with the Vintage Vice City Pack and a month of GTA+, and boxed pre-orders include the pack. Since 22 November it also sells alone for $4.99.",
+			"nb": "Standardutgaven koster 79,99 dollar og den heldigitale Ultimate Edition 99,99 dollar. Standard kan oppgraderes. Digitale kjøp til og med 19. november fikk Vintage Vice City Pack og én måned GTA+, og fysiske forhåndsbestillinger får pakken. Fra 22. november selges den også alene for 4,99 dollar."
 		},
 		"announced": "2026-06-24",
 		"sources": [
@@ -23,6 +23,10 @@
 			{
 				"url": "https://www.rockstargames.com/newswire/article/39akk424a9oo53/grand-theft-auto-vi-now-available",
 				"title": "Grand Theft Auto VI Now Available"
+			},
+			{
+				"url": "https://rockstarintel.com/gta-vi-pre-order-bonus-now-available-to-buy-separately/",
+				"title": "GTA VI Pre-Order Bonus Now Available To Buy Separately"
 			}
 		]
 	},
@@ -99,12 +103,12 @@
 		"id": "facts/score-and-album",
 		"claim_key": "score-album-release",
 		"name": {
-			"en": "Justice Score Out 11 December, Album on Launch Day",
-			"nb": "Justice-musikken kommer 11. desember, albumet på lanseringsdagen"
+			"en": "Album Out Now, Justice Score on 11 December",
+			"nb": "Albumet er ute, Justice-musikken kommer 11. desember"
 		},
 		"summary": {
-			"en": "Justice composed the game's adaptive score. The 30-track Original Score comes out on 11 December on streaming services, CD and vinyl. Grand Theft Auto VI: The Album, with 34 original songs, comes out with the game on 19 November.",
-			"nb": "Justice har laget musikken til spillet, og den tilpasser seg det du gjør. Original Score med 30 spor kommer 11. desember på strømmetjenester, CD og vinyl. Grand Theft Auto VI: The Album, med 34 nye låter, kommer samtidig med spillet 19. november."
+			"en": "Grand Theft Auto VI: The Album, with 34 original songs, is out on streaming services, CD and vinyl. A Deluxe Edition with 23 more tracks from the game followed on 23 November. Justice's 30-track Original Score, which adapts to how you play, comes out on 11 December.",
+			"nb": "Grand Theft Auto VI: The Album, med 34 nye låter, er ute på strømmetjenester, CD og vinyl. 23. november kom en Deluxe Edition med 23 låter til fra spillet. Original Score fra Justice, med 30 spor og musikk som tilpasser seg det du gjør, kommer 11. desember."
 		},
 		"announced": "2026-10-29",
 		"sources": [
@@ -115,6 +119,14 @@
 			{
 				"url": "https://www.rockstargames.com/newswire/article/7599a881942544/announcing-grand-theft-auto-vi-the-album-coming-november-19",
 				"title": "Announcing Grand Theft Auto VI: The Album, Coming November 19"
+			},
+			{
+				"url": "https://www.rockstargames.com/newswire/article/k4a8955a93o747/grand-theft-auto-vi-the-album-now-available",
+				"title": "Grand Theft Auto VI: The Album Now Available"
+			},
+			{
+				"url": "https://www.rockstargames.com/newswire/article/178ok8411a55o5/grand-theft-auto-vi-the-album-deluxe-edition",
+				"title": "Grand Theft Auto VI: The Album (Deluxe Edition)"
 			}
 		]
 	},
@@ -256,6 +268,71 @@
 			{
 				"url": "https://www.rockstargames.com/newswire/article/39akk424a9oo53/grand-theft-auto-vi-now-available",
 				"title": "Grand Theft Auto VI Now Available"
+			}
+		]
+	},
+	{
+		"id": "facts/launch-sales",
+		"claim_key": "launch-sales",
+		"name": {
+			"en": "Record Launch: $3.79 Billion on Day One",
+			"nb": "Rekordlansering: 3,79 milliarder dollar første dag"
+		},
+		"summary": {
+			"en": "Take-Two says the game sold $3.79 billion at retail on launch day, the biggest entertainment launch ever, after 32.5 million copies sold before release. Sony adds that more than 39 million people played it on PS5 by 22 November, the biggest launch in PlayStation history.",
+			"nb": "Ifølge Take-Two solgte spillet for 3,79 milliarder dollar på lanseringsdagen, tidenes største lansering innen underholdning, etter 32,5 millioner solgte eksemplarer før utgivelsen. Sony melder at over 39 millioner hadde spilt det på PS5 innen 22. november, PlayStations største lansering noensinne."
+		},
+		"announced": "2026-11-20",
+		"sources": [
+			{
+				"url": "https://www.take2games.com/ir/news/grand-theft-auto-vi-shatters-entertainment-box-office-records",
+				"title": "Grand Theft Auto VI Shatters Entertainment Box Office Records with $3.79 Billion in Day One Retail Sales"
+			},
+			{
+				"url": "https://blog.playstation.com/2026/11/23/thank-you-for-making-grand-theft-auto-vi-the-biggest-launch-in-playstation-history/",
+				"title": "Thank you for making Grand Theft Auto VI the biggest launch in PlayStation history"
+			}
+		]
+	},
+	{
+		"id": "facts/metacritic-score",
+		"claim_key": "review-scores-metacritic",
+		"name": {
+			"en": "Rated 99 on Metacritic",
+			"nb": "99 på Metacritic"
+		},
+		"summary": {
+			"en": "Take-Two calls it the highest-rated game of all time, with a score of 99 on Metacritic. When reviews went live on 18 November, GamesRadar counted 107 of them and none were mixed or negative.",
+			"nb": "Take-Two kaller det tidenes best vurderte spill, med 99 på Metacritic. Da anmeldelsene kom 18. november, talte GamesRadar 107 av dem, og ingen var blandede eller negative."
+		},
+		"announced": "2026-11-20",
+		"sources": [
+			{
+				"url": "https://www.take2games.com/ir/news/grand-theft-auto-vi-shatters-entertainment-box-office-records",
+				"title": "Grand Theft Auto VI Shatters Entertainment Box Office Records with $3.79 Billion in Day One Retail Sales"
+			},
+			{
+				"url": "https://www.gamesradar.com/games/grand-theft-auto/gta-6-metacritic-score-makes-it-the-highest-rated-game-of-all-time-matching-the-og-zelda-ocarina-of-time/",
+				"title": "GTA 6 Metacritic score makes it the highest-rated game of all time"
+			}
+		]
+	},
+	{
+		"id": "facts/first-patch",
+		"claim_key": "launch-updates",
+		"name": {
+			"en": "First Patch Fixes Crashes and Stuck Weather",
+			"nb": "Første oppdatering retter krasj og vær som står stille"
+		},
+		"summary": {
+			"en": "The first update after launch came on 23 November. It fixes several crashes, autosaves that failed, weather that stopped changing, story phone calls that never came, a Wanted Level you could not lose, the gym's deadlift bar, and partners who kept the bags you meant to sell to fences.",
+			"nb": "Den første oppdateringen etter lansering kom 23. november. Den retter flere krasj, autolagring som sviktet, vær som ikke skiftet, samtaler i historien som aldri kom, et Wanted Level du ikke ble kvitt, markløftstanga på treningssenteret og partnere som ikke ga deg posene du skulle selge."
+		},
+		"announced": "2026-11-23",
+		"sources": [
+			{
+				"url": "https://support.rockstargames.com/articles/sN5pEdFYZdlvijKXd6xpJ/grand-theft-auto-vi-launch-updates-ps5-xbox-series-x-or-s",
+				"title": "Grand Theft Auto VI Launch Updates (PS5 / XBOX Series X|S)"
 			}
 		]
 	}
