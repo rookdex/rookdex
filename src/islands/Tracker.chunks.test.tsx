@@ -363,6 +363,20 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		expect(liveRegion(container)).not.toHaveTextContent(/No match|result/)
 	})
 
+	it("drops the last keystroke's pending count when the next one has nothing to say", async () => {
+		failVehicles()
+		window.history.replaceState(null, "", "/en/tracker/?show=vehicles,animals")
+		const { container } = render(<Tracker locale="en" />)
+		await notice(/Vehicles/)
+		await screen.findByRole("checkbox", { name: "American alligator" })
+		const field = screen.getByRole("searchbox")
+		// "alligator" queues "1 result"; "zzz" matches nothing with Vehicles missing, so it is silent.
+		fireEvent.change(field, { target: { value: "alligator" } })
+		fireEvent.change(field, { target: { value: "zzz" } })
+		await wait(800)
+		expect(liveRegion(container)).not.toHaveTextContent(/result/)
+	})
+
 	it("waits out the settle delay before speaking a query typed during loading (gate G4)", async () => {
 		const chunks = deferChunks()
 		const { container } = render(<Tracker locale="en" />)

@@ -325,10 +325,13 @@ function TrackerView({ locale, index, results }: ViewProps) {
 		} else if (chunkView.settled) {
 			unspoken.current = false
 			const text = spoken(chunkView, search.viewFor({ query }), query)
+			// Nothing to say still drops the last keystroke's pending count, which is out of date.
 			if (text) live.sayLater(text)
+			else live.cancel()
 		} else {
 			// A chunk is still on its way: the results are spoken once it lands.
 			unspoken.current = true
+			live.cancel()
 		}
 	}
 
@@ -340,6 +343,7 @@ function TrackerView({ locale, index, results }: ViewProps) {
 			unspoken.current = false
 			const text = spoken(chunkView, search.view, search.query)
 			if (text) live.say(text)
+			else live.cancel()
 		}
 		const list = results.current
 		if (!list) return
@@ -456,6 +460,7 @@ function TrackerView({ locale, index, results }: ViewProps) {
 		unspoken.current = false
 		const text = spoken(chunkView, search.view, search.query)
 		if (search.query.trim() !== "" && text) live.sayLater(text)
+		else live.cancel()
 	}, [chunkView.settled])
 	const emptyMessage = listSettled ? emptyText(empty, search.query) : undefined
 	// A chip row keeps its category on screen when no card is left (R17). A failed or loading view
