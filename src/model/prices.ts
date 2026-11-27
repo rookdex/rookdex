@@ -10,4 +10,6 @@ export interface Price {
 export const prices = {
 	standard: { amount: 949, currency: "NOK" },
 	ultimate: { amount: 1189, currency: "NOK" },
+	// The Vintage Vice City Pack bought on its own, Norwegian PlayStation Store, 27.11.2026.
+	"vintage-pack": { amount: 55, currency: "NOK" },
 } as const satisfies Record<string, Price>

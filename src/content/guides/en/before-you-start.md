@@ -3,11 +3,12 @@ title: Before you start
 searchTitle: "GTA 6 price, editions and download: before you start · Rookdex"
 summary: What to sort out before you start playing GTA VI.
 searchDescription: "GTA 6 came out on 19 November 2026 on PS5 and Xbox Series X|S. Editions, the download size, the pre-order bonus, GTA+ and prices in Norway."
-updated: 2026-11-19
+updated: 2026-11-27
 sources:
   - https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions
   - https://www.rockstargames.com/newswire/article/5171972o3ak5oa/pre-order-grand-theft-auto-vi-on-june-25
   - https://store.playstation.com/no-no/concept/10000730
+  - https://rockstarintel.com/gta-vi-pre-order-bonus-now-available-to-buy-separately/
 ---
 
 ## The date
@@ -20,7 +21,7 @@ Two editions are on sale: Standard at {price:standard} and Ultimate at {price:ul
 
 ## Pre-order bonus
 
-The Vintage Vice City Pack comes with every pre-order and with every digital copy bought before 20 November 2026.
+The Vintage Vice City Pack comes with every pre-order and with every digital copy bought before 20 November 2026. You can now also buy it on its own on PlayStation and Xbox, for {price:vintage-pack} in the PlayStation Store.
 
 ## GTA+
 

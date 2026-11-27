@@ -273,7 +273,7 @@
 	},
 	{
 		"id": "facts/launch-sales",
-		"claim_key": "preorder-estimate-us-digital",
+		"claim_key": "launch-sales",
 		"name": {
 			"en": "Record Launch: $3.79 Billion on Day One",
 			"nb": "Rekordlansering: 3,79 milliarder dollar første dag"

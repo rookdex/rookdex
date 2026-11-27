@@ -3,7 +3,7 @@ title: Your first hour
 searchTitle: "Your first hour in GTA 6: what to check, claim and skip · Rookdex"
 summary: What to check, claim and skip in your first hour of GTA VI.
 searchDescription: "Your first hour of GTA 6: what to check before you press play, what to do if it won't start, what you can skip, and playing as Jason and Lucia."
-updated: 2026-11-19
+updated: 2026-11-27
 sources:
   - https://www.rockstargames.com/newswire/article/4k138k8okkk483/grand-theft-auto-vi-an-extended-look-now-playing
   - https://support.rockstargames.com/articles/3SZF8cy8dG7lHsLf38uWK1/redeeming-the-one-month-gta-membership-included-with-your-grand-theft-auto-vi-pre-order
@@ -11,6 +11,7 @@ sources:
   - https://www.xbox.com/en-US/games/store/grand-theft-auto-vi/9NL3WWNZLZZN
   - https://www.gamespot.com/articles/how-switching-between-gta-6s-two-protagonists-works/
   - https://www.gamesradar.com/edge/gtavi-cover/
+  - https://rockstarintel.com/gta-vi-pre-order-bonus-now-available-to-buy-separately/
 ---
 
 ## Before you press play
@@ -24,7 +25,7 @@ Check the service status page on support.rockstargames.com first. Busy servers r
 ## What you don't need to claim
 
 - **Ultimate Edition items** unlock chapter by chapter as you play the story. There is nothing to hunt for in the first hour.
-- **The Vintage Vice City Pack** (a '55 Vapid Stanier with a garage, outfits, hairstyles and a weapon pattern) comes with every pre-order and with every digital purchase before 20 November 2026.
+- **The Vintage Vice City Pack** (a '55 Vapid Stanier with a garage, outfits, hairstyles and a weapon pattern) comes with every pre-order and with every digital purchase before 20 November 2026. You can now also buy it on its own on PlayStation and Xbox, for {price:vintage-pack} in the PlayStation Store.
 - **The GTA+ month** comes with a digital copy bought before 20 November 2026. It covers GTA Online, not the story. You claim it in the PlayStation Store (by 31 March 2027) or under Offers & Credits in the Microsoft Store (within 180 days), and it renews at full price until you cancel. With no GTA Online at launch, there's no hurry.
 
 ## Playing as two

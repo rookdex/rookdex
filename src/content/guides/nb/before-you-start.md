@@ -3,11 +3,12 @@ title: Før du begynner
 searchTitle: "GTA 6 pris og utgaver i Norge: før du begynner · Rookdex"
 summary: Det du bør ordne før du begynner å spille GTA VI.
 searchDescription: "GTA 6 kom 19. november 2026 på PS5 og Xbox Series X|S. Utgaver, størrelsen på nedlastingen, bonus ved forhåndsbestilling, GTA+ og priser i Norge."
-updated: 2026-11-19
+updated: 2026-11-27
 sources:
   - https://support.rockstargames.com/articles/4QfG4FmZCf5W1gS8jy4UVT/grand-theft-auto-vi-platform-editions-and-versions
   - https://www.rockstargames.com/newswire/article/5171972o3ak5oa/pre-order-grand-theft-auto-vi-on-june-25
   - https://store.playstation.com/no-no/concept/10000730
+  - https://rockstarintel.com/gta-vi-pre-order-bonus-now-available-to-buy-separately/
 ---
 
 ## Datoen
@@ -20,7 +21,7 @@ To utgaver er i salg: Standard til {price:standard} og Ultimate til {price:ultim
 
 ## Bonus ved forhåndsbestilling
 
-Vintage Vice City Pack følger med alle forhåndsbestillinger og alle digitale kjøp før 20. november 2026.
+Vintage Vice City Pack følger med alle forhåndsbestillinger og alle digitale kjøp før 20. november 2026. Nå kan du også kjøpe den alene på PlayStation og Xbox, til {price:vintage-pack} i PlayStation Store.
 
 ## GTA+
 
