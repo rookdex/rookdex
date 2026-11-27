@@ -169,6 +169,17 @@ describe("install copies unchanged hashed files (spec §5)", () => {
 		expect(await worker.cache.store.get("/en/")?.text()).toBe("new /en/")
 	})
 
+	it("fetches the file when copying it from an old cache fails (gate G8)", async () => {
+		const worker = loadWorker(fresh, {
+			precache: [chunk],
+			old: { "rookdex-v0": { [chunk]: new Response("old chunk") } },
+		})
+		worker.cache.put.mockRejectedValueOnce(new Error("quota"))
+		await install(worker)
+		expect(worker.fetch.mock.calls.map(([url]) => url)).toEqual([chunk])
+		expect(await worker.cache.store.get(chunk)?.text()).toBe(`new ${chunk}`)
+	})
+
 	it("never copies a failed response or one from a cache that is not Rookdex's", async () => {
 		const worker = loadWorker(fresh, {
 			precache: [chunk, script],

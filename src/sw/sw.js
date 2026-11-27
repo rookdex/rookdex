@@ -27,10 +27,14 @@ async function precache() {
 		PRECACHE.map(async (url) => {
 			if (CONTENT_ADDRESSED.test(url)) {
 				for (const previous of older) {
-					const copy = await previous.match(url)
-					if (copy?.ok) {
-						await cache.put(url, copy)
-						return
+					try {
+						const copy = await previous.match(url)
+						if (copy?.ok) {
+							await cache.put(url, copy)
+							return
+						}
+					} catch {
+						// A copy that cannot be read or stored is fetched instead of failing the install.
 					}
 				}
 			}
