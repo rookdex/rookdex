@@ -4,12 +4,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { renderReady, resetBrowser } from "../test/tracker-fixtures"
 import { Tracker } from "./Tracker"
 
-vi.mock("../model/seed", async (importOriginal) => {
-	const actual = await importOriginal<typeof import("../model/seed")>()
-	const { fixtures } = await import("../test/tracker-fixtures")
-	return { ...actual, seedItems: fixtures }
-})
-
 beforeEach(resetBrowser)
 
 // Vehicles has one group (Bikes), so it never gets chips. Animals has Reptiles & Amphibians

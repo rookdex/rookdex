@@ -221,6 +221,7 @@ export function Hub({
 							trackerHref={trackerHref}
 							dexHref={dexHref}
 							announce={announce}
+							categoryCount={categories.length}
 						/>
 					) : (
 						<DashboardSkeleton categoryCount={categories.length} t={t} />

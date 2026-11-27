@@ -4,12 +4,13 @@ import { hubPhase } from "../model/launch"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { openingView } from "../model/savedView"
 import { type EmptyState, emptyState, type SearchView } from "../model/search"
-import { categoryIds, seedItems } from "../model/seed"
 import { countItems, perCategory, perGroup, recentFinds, shown } from "../model/stats"
-import { chipGroups, parseGroups, parseShow } from "../model/tracker"
+import { chipGroups, listChunks, parseGroups, parseShow } from "../model/tracker"
+import { categoryIds, indexItems, type SeedIndex } from "../model/trackItems"
 import type { ImportResult } from "../model/transfer"
 import { downloadJson } from "../scripts/download"
 import { buildTracker } from "./buildTracker"
+import { IndexGate } from "./IndexGate"
 import {
 	BACKUP_REMINDER_TICKS,
 	type BackupLog,
@@ -74,20 +75,39 @@ function markCard(box: HTMLElement) {
 	box.addEventListener("blur", () => card.removeAttribute("data-arrived"), { once: true })
 }
 
-/** Island root. `client:only`: the first render reads the URL and IndexedDB. */
+interface ViewProps extends Props {
+	index: SeedIndex
+}
+
+/** Island root. `client:only`: once the seed index is in, the first render reads the URL and
+ *  IndexedDB. The page and every test render this. */
 export function Tracker({ locale }: Props) {
+	const { t } = translator(locale)
+	return (
+		<IndexGate fallback={<div className="index-pending" />} t={t}>
+			{(index) => <TrackerView locale={locale} index={index} />}
+		</IndexGate>
+	)
+}
+
+function TrackerView({ locale, index }: ViewProps) {
 	const { t, plural } = translator(locale)
 	// Read once: the filters, search and scroll the tracker opens with (saved view or the URL).
 	const [startView] = useState(() => openingView(window.location, readTrackerView()))
 	const [tracker] = useState(() => {
-		const selected = parseShow(startView.search, categoryIds(seedItems))
-		return buildTracker(
-			t("profile.defaultName"),
+		const items = indexItems(index)
+		const selected = parseShow(startView.search, categoryIds(items))
+		return buildTracker(t("profile.defaultName"), index, {
 			selected,
-			parseGroups(startView.search, chipGroups(seedItems, selected))
-		)
+			groups: parseGroups(startView.search, chipGroups(items, selected)),
+			chunks: true,
+		})
 	})
 	const state = useTrackerState(tracker)
+	// Cards render once their text is in, so no card grows under the reader (data delivery plan).
+	// Everything that needs every needed card in the DOM waits for listReady, not for the store.
+	const chunkView = listChunks(state)
+	const listReady = state.status === "ready" && chunkView.settled
 	useShowParam(state.selected)
 	useGroupParam(state.groups)
 	// The item a Sources back link points at stays visible on arrival, even if found (Task 4).
@@ -97,12 +117,28 @@ export function Tracker({ locale }: Props) {
 	// Back where the list was left, once it has loaded (the saved view's scroll position).
 	const scrolled = useRef(false)
 	useEffect(() => {
-		if (scrolled.current || state.status !== "ready") return
+		if (scrolled.current || !listReady) return
 		scrolled.current = true
 		// 0 is where a fresh page already sits, so there is nothing to restore.
 		if (startView.scroll) window.scrollTo({ top: startView.scroll, behavior: "instant" })
-	}, [state.status, startView.scroll])
+	}, [listReady, startView.scroll])
 	const live = useLiveStatus()
+	// One message for every chunk that failed (spec §5): stale wins, because Reload fixes it.
+	const notice = (() => {
+		const { failed } = chunkView
+		if (failed.length === 0) return ""
+		if (failed.some((f) => f.reason === "stale")) return t("tracker.chunk.stale")
+		const names = new Intl.ListFormat(locale, { type: "conjunction" }).format(
+			failed.map((f) => seedLabel(t, "category", f.category))
+		)
+		return plural("tracker.chunk.offline", failed.length, { categories: names })
+	})()
+	const stale = chunkView.failed.some((f) => f.reason === "stale")
+	// Spoken once per new text through the status line; the visible copy is not a live region.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: `live` is a new object each render; only a new text should speak
+	useEffect(() => {
+		if (notice) live.say(notice)
+	}, [notice])
 	const searchField = useRef<HTMLInputElement>(null)
 	const results = useRef<HTMLDivElement>(null)
 	// From launch on the hub is the dashboard, so Overall links there (dashboard spec §4).
@@ -130,7 +166,7 @@ export function Tracker({ locale }: Props) {
 	// into React: an uncaught error would unmount the whole Tracker, and the hash survives a reload.
 	const arrived = useRef(false)
 	useEffect(() => {
-		if (state.status !== "ready" || arrived.current) return
+		if (!listReady || arrived.current) return
 		arrived.current = true
 		try {
 			const box = hashTarget(window.location.hash, document)
@@ -141,7 +177,7 @@ export function Tracker({ locale }: Props) {
 		} catch {
 			// A browser without scrollIntoView options still got the focus.
 		}
-	}, [state.status])
+	}, [listReady])
 
 	// The Last found row (spec §5.3). The card scrolls, not the checkbox: the checkbox sits 22 px
 	// below the card's top, so a focus scroll would tuck the card under the sticky search row.
@@ -359,9 +395,20 @@ export function Tracker({ locale }: Props) {
 
 	const sourcesHref = `/${locale}/tracker/sources/`
 	const { view } = search
-	const empty = emptyState(view, search.query)
 	const chips = chipGroups(state.items, state.selected)
-	const emptyMessage = emptyText(empty, search.query)
+	// Ruling 9 and I4: only categories the model revealed show cards or chips, in list order, so a
+	// late or failed chunk never paints a card above one already on screen.
+	const revealed = new Set(chunkView.revealed)
+	const shownCards = view.visible.filter((item) => revealed.has(item.category))
+	const shownChips = new Map([...chips].filter(([id]) => revealed.has(id)))
+	// I9: no empty-state text while a needed chunk is on its way or has failed. The notice speaks then.
+	const listSettled = chunkView.settled && chunkView.failed.length === 0
+	const empty = emptyState({ ...view, visible: shownCards }, search.query)
+	const emptyMessage = listSettled ? emptyText(empty, search.query) : undefined
+	// A chip row keeps its category on screen when no card is left (R17). A failed or loading view
+	// with no chips shows only the notice and the reserve, never "Nothing here yet." (amendment 6).
+	const showList =
+		shownChips.size > 0 || (empty === "none" && (shownCards.length > 0 || listSettled))
 
 	if (state.status === "error") {
 		return (
@@ -435,16 +482,33 @@ export function Tracker({ locale }: Props) {
 				/>
 				<LastFound
 					find={recent[0]}
-					canJump={jumpable(recent[0], view.visible, state.status === "ready")}
+					canJump={jumpable(recent[0], shownCards, listReady)}
 					onJump={jumpTo}
 					locale={locale}
 					t={t}
 				/>
-				<div className="tracker-results" ref={results} tabIndex={-1}>
-					{/* A chip row keeps its category on screen when no card is left (R17). */}
-					{(empty === "none" || chips.size > 0) && (
+				<div
+					className={chunkView.settled ? "tracker-results" : "tracker-results pending"}
+					ref={results}
+					tabIndex={-1}
+					aria-busy={!chunkView.settled}
+				>
+					{notice && (
+						<p className="hint chunk-notice">
+							<span>{notice}</span>
+							{stale && (
+								<>
+									{" "}
+									<button type="button" onClick={() => window.location.reload()}>
+										{t("tracker.chunk.reload")}
+									</button>
+								</>
+							)}
+						</p>
+					)}
+					{showList && (
 						<ItemList
-							items={view.visible}
+							items={shownCards}
 							records={state.records}
 							disabled={state.status !== "ready"}
 							categoryLabel={(id) => seedLabel(t, "category", id)}
@@ -453,7 +517,7 @@ export function Tracker({ locale }: Props) {
 							groupCounts={perGroup(state.items, state.records)}
 							onToggle={toggleItem}
 							order={categories.map((c) => c.id)}
-							chips={chips}
+							chips={shownChips}
 							groups={state.groups}
 							onToggleGroup={toggleGroup}
 							sourcesHref={sourcesHref}
@@ -461,7 +525,7 @@ export function Tracker({ locale }: Props) {
 						/>
 					)}
 					{emptyMessage && <p className="item-empty">{emptyMessage}</p>}
-					{view.elsewhere > 0 && (
+					{listSettled && view.elsewhere > 0 && (
 						<p className="search-elsewhere">
 							{plural("tracker.search.elsewhere", view.elsewhere)}{" "}
 							<button type="button" className="search-elsewhere-btn" onClick={clearFilters}>

@@ -10,7 +10,9 @@ import {
 import { dayFromKey } from "../../model/days"
 import { activeProfiles } from "../../model/profiles"
 import { type Count, countItems, perCategory, recentFinds, shown } from "../../model/stats"
+import type { SeedIndex } from "../../model/trackItems"
 import { buildTracker } from "../buildTracker"
+import { IndexGate } from "../IndexGate"
 import { ProfileMenu } from "../tracker/ProfileMenu"
 import { Bar } from "../tracker/StatsRail"
 import { useTrackerState } from "../useTracker"
@@ -34,13 +36,31 @@ export interface DashboardProps {
 	dexHref: string
 	/** Writes one line to the hub's status region. */
 	announce: (message: string) => void
+	/** Categories in the skeleton while the seed index loads: the hub's own count, so the skeleton
+	 *  it showed before the dashboard loaded keeps its height (pre-flight I1). */
+	categoryCount: number
+}
+
+/** The dashboard island. Waits for the seed index (plan review ruling 3) behind the same skeleton
+ *  the hub shows, and speaks a failure through the hub's one status region. */
+export function Dashboard(props: DashboardProps) {
+	const { t } = translator(props.locale)
+	return (
+		<IndexGate
+			fallback={<DashboardSkeleton categoryCount={props.categoryCount} t={t} />}
+			t={t}
+			say={props.announce}
+		>
+			{(index) => <DashboardView {...props} index={index} />}
+		</IndexGate>
+	)
 }
 
 /**
  * The hub after launch (dashboard spec §4). Loaded only in the after phase, so visitors before
  * launch never download the tracker model. Builds its own tracker over the shared IndexedDB.
  */
-export function Dashboard({
+function DashboardView({
 	locale,
 	today,
 	daysSince,
@@ -48,9 +68,10 @@ export function Dashboard({
 	trackerHref,
 	dexHref,
 	announce,
-}: DashboardProps) {
+	index,
+}: DashboardProps & { index: SeedIndex }) {
 	const { t, plural } = translator(locale)
-	const [tracker] = useState(() => buildTracker(t("profile.defaultName")))
+	const [tracker] = useState(() => buildTracker(t("profile.defaultName"), index))
 	const state = useTrackerState(tracker)
 	const { items, records } = state
 	const zone = useRef<HTMLElement>(null)

@@ -6,14 +6,8 @@ import { axe } from "vitest-axe"
 import { createProfile } from "../../model/profiles"
 import { setDone } from "../../model/progress"
 import { DB_NAME, openStore } from "../../model/store"
-import { resetBrowser } from "../../test/tracker-fixtures"
+import { installSeed, resetBrowser, stubIndex } from "../../test/tracker-fixtures"
 import { Dashboard, type DashboardProps } from "./Dashboard"
-
-vi.mock("../../model/seed", async (importOriginal) => {
-	const actual = await importOriginal<typeof import("../../model/seed")>()
-	const { fixtures } = await import("../../test/tracker-fixtures")
-	return { ...actual, seedItems: fixtures }
-})
 
 /** While `hold` is set, every tick or untick waits for it before it writes, so a race can be staged. */
 const writes = vi.hoisted(() => ({ hold: undefined as Promise<void> | undefined }))
@@ -64,6 +58,7 @@ function props(today = "2026-11-20"): DashboardProps {
 		trackerHref: "/en/tracker/",
 		dexHref: "/en/dex/",
 		announce,
+		categoryCount: 2,
 	}
 }
 
@@ -379,5 +374,31 @@ describe("ticking on the hub (dashboard spec §6.1, §7)", () => {
 		fireEvent.click(within(next()).getByRole("checkbox", { name: "Pelican" }))
 		await screen.findByRole("button", { name: "Undo" })
 		expect(await axe(container)).toHaveNoViolations()
+	})
+})
+
+describe("the seed index file (plan review ruling 3)", () => {
+	const OFFLINE = "The list could not load. Check your connection and try again."
+
+	it("shows the notice and Try again through the hub's status line when the index fails", async () => {
+		stubIndex(async () => {
+			throw new TypeError("Failed to fetch")
+		})
+		const { container } = render(<Dashboard {...props()} />)
+		expect(await screen.findByText(OFFLINE)).toBeInTheDocument()
+		await waitFor(() => expect(announce).toHaveBeenCalledWith(OFFLINE))
+		expect(container.querySelector("[aria-live]")).toBeNull()
+		installSeed()
+		fireEvent.click(screen.getByRole("button", { name: "Try again" }))
+		expect(await screen.findByRole("button", { name: /^Profile: / })).toBeInTheDocument()
+	})
+
+	it("offers a reload when the index file is gone after an update", async () => {
+		stubIndex(async () => new Response("Not found", { status: 404 }))
+		render(<Dashboard {...props()} />)
+		expect(
+			await screen.findByText("Rookdex was updated. Reload to see the new list.")
+		).toBeInTheDocument()
+		expect(screen.getByRole("button", { name: "Reload" })).toBeInTheDocument()
 	})
 })

@@ -1373,6 +1373,15 @@ p {
 	min-width: 0;
 }
 
+/* While a needed category's card text is on its way (.pending), or the seed index is (IndexGate's
+   .index-pending), the island keeps a screen of height, so the footer never paints in view and
+   then jumps away. The page's .tracker-fallback does the same, but its style is scoped to the page
+   and can't reach the island. */
+.tracker-results.pending,
+.index-pending {
+	min-height: 100dvh;
+}
+
 /* Enter in the search field lands here. A ring round the whole list reads as a fault; the next
    Tab reaches the first card, which carries its own ring. */
 .tracker-results:focus {

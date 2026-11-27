@@ -1,14 +1,8 @@
 // @vitest-environment jsdom
 import { fireEvent, screen, waitFor, within } from "@testing-library/react"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it } from "vitest"
 import { downloads, openMenu, renderReady, resetBrowser } from "../test/tracker-fixtures"
 import { Tracker } from "./Tracker"
-
-vi.mock("../model/seed", async (importOriginal) => {
-	const actual = await importOriginal<typeof import("../model/seed")>()
-	const { fixtures } = await import("../test/tracker-fixtures")
-	return { ...actual, seedItems: fixtures }
-})
 
 beforeEach(resetBrowser)
 
