@@ -1,4 +1,4 @@
-import { type ChangeEvent, useEffect, useRef, useState } from "react"
+import { type ChangeEvent, type RefObject, useEffect, useRef, useState } from "react"
 import { type Locale, seedLabel, translator } from "../i18n"
 import { hubPhase } from "../model/launch"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
@@ -77,12 +77,15 @@ function markCard(box: HTMLElement) {
 
 interface ViewProps extends Props {
 	index: SeedIndex
+	/** The list container. Owned by the root, so the index gate can focus it after Try again. */
+	results: RefObject<HTMLDivElement | null>
 }
 
 /** Island root. `client:only`: once the seed index is in, the first render reads the URL and
  *  IndexedDB. The page and every test render this. */
 export function Tracker({ locale }: Props) {
 	const { t } = translator(locale)
+	const results = useRef<HTMLDivElement>(null)
 	return (
 		<IndexGate
 			fallback={
@@ -91,13 +94,14 @@ export function Tracker({ locale }: Props) {
 				</div>
 			}
 			t={t}
+			focusTarget={results}
 		>
-			{(index) => <TrackerView locale={locale} index={index} />}
+			{(index) => <TrackerView locale={locale} index={index} results={results} />}
 		</IndexGate>
 	)
 }
 
-function TrackerView({ locale, index }: ViewProps) {
+function TrackerView({ locale, index, results }: ViewProps) {
 	const { t, plural } = translator(locale)
 	// Read once: the filters, search and scroll the tracker opens with (saved view or the URL).
 	const [startView] = useState(() => openingView(window.location, readTrackerView()))
@@ -147,7 +151,6 @@ function TrackerView({ locale, index }: ViewProps) {
 		if (notice) live.say(notice)
 	}, [notice])
 	const searchField = useRef<HTMLInputElement>(null)
-	const results = useRef<HTMLDivElement>(null)
 	// A non-empty query was typed while the list could not be described yet.
 	const unspoken = useRef(false)
 	// From launch on the hub is the dashboard, so Overall links there (dashboard spec §4).

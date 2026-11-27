@@ -393,6 +393,21 @@ describe("the seed index file (plan review ruling 3)", () => {
 		expect(await screen.findByRole("button", { name: /^Profile: / })).toBeInTheDocument()
 	})
 
+	it("moves focus to the hub's heading when Try again brings the index in (gate round 2)", async () => {
+		stubIndex(async () => {
+			throw new TypeError("Failed to fetch")
+		})
+		const heading = document.createElement("h2")
+		heading.tabIndex = -1
+		document.body.append(heading)
+		render(<Dashboard {...props()} retryFocus={{ current: heading }} />)
+		await screen.findByText(OFFLINE)
+		installSeed()
+		fireEvent.click(screen.getByRole("button", { name: "Try again" }))
+		await waitFor(() => expect(heading).toHaveFocus())
+		heading.remove()
+	})
+
 	it("offers a reload when the index file is gone after an update", async () => {
 		stubIndex(async () => new Response("Not found", { status: 404 }))
 		render(<Dashboard {...props()} />)

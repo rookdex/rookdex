@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { type Locale, seedLabel, translator } from "../../i18n"
 import {
 	categoryRows,
@@ -39,6 +39,8 @@ export interface DashboardProps {
 	/** Categories in the skeleton while the seed index loads: the hub's own count, so the skeleton
 	 *  it showed before the dashboard loaded keeps its height (pre-flight I1). */
 	categoryCount: number
+	/** Where focus goes when Try again brings the seed index in (the hub's heading). */
+	retryFocus?: RefObject<HTMLElement | null>
 }
 
 /** The dashboard island. Waits for the seed index (plan review ruling 3) behind the same skeleton
@@ -50,6 +52,7 @@ export function Dashboard(props: DashboardProps) {
 			fallback={<DashboardSkeleton categoryCount={props.categoryCount} t={t} />}
 			t={t}
 			say={props.announce}
+			focusTarget={props.retryFocus}
 		>
 			{(index) => <DashboardView {...props} index={index} />}
 		</IndexGate>

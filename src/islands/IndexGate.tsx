@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
+import { type ReactNode, type RefObject, useCallback, useEffect, useRef, useState } from "react"
 import type { Translate } from "../i18n"
 import { type ChunkFailure, loadSeedIndex, readSeedIndexUrl } from "../model/chunks"
 import type { SeedIndex } from "../model/trackItems"
@@ -11,11 +11,15 @@ interface Props {
 	/** Speaks the failure notice. The hub passes its one status region's writer (`announce`). Leave
 	 *  undefined to give the gate its own status line (the tracker). */
 	say?: (text: string) => void
+	/** Where focus goes when a retry started from the notice's button brings the index in. It
+	 *  must be in the DOM from the children's first render. Leave undefined to move nothing. */
+	focusTarget?: RefObject<HTMLElement | null>
 	children: (index: SeedIndex) => ReactNode
 }
 
 type GateState =
-	| { status: "loading" }
+	/** `retrying`: the failure whose notice stays on screen while it is tried again. */
+	| { status: "loading"; retrying?: ChunkFailure }
 	| { status: "ready"; index: SeedIndex }
 	| { status: "failed"; reason: ChunkFailure }
 
@@ -23,20 +27,26 @@ type GateState =
  * Loads the seed index file the page names (plan review ruling 3) and renders `children` with it.
  * Until then the fallback; on failure a notice with Try again (offline) or Reload (stale, an old
  * tab after a deploy), spoken once. Try again and the browser's online event both load it again.
+ * The notice stays while a retry runs, its button marked busy, so focus is never dropped to <body>.
  */
-export function IndexGate({ fallback, t, say, children }: Props) {
+export function IndexGate({ fallback, t, say, focusTarget, children }: Props) {
 	const [state, setState] = useState<GateState>({ status: "loading" })
 	const [attempt, setAttempt] = useState(0)
 	const live = useLiveStatus()
-	// Set by the Try again button only: focus returns to it after a failed retry the user started.
-	const retryButton = useRef<HTMLButtonElement>(null)
+	// The notice's button (Try again or Reload). Set when a retry starts from it, by a click or with
+	// focus on it: focus then returns to it after a failed retry, or moves to focusTarget.
+	const noticeButton = useRef<HTMLButtonElement>(null)
 	const focusRetry = useRef(false)
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: `live` and `say` may be new each render; only a new attempt should load
 	useEffect(() => {
 		let current = true
 		if (attempt > 0) {
-			setState({ status: "loading" })
+			setState((old) =>
+				old.status === "failed"
+					? { status: "loading", retrying: old.reason }
+					: { status: "loading" }
+			)
 			// Emptied so the same failure text again is a change a screen reader speaks.
 			;(say ?? live.say)("")
 		}
@@ -61,7 +71,12 @@ export function IndexGate({ fallback, t, say, children }: Props) {
 		}
 	}, [attempt])
 
-	const retry = useCallback(() => setAttempt((n) => n + 1), [])
+	const retry = useCallback(() => {
+		if (noticeButton.current && document.activeElement === noticeButton.current) {
+			focusRetry.current = true
+		}
+		setAttempt((n) => n + 1)
+	}, [])
 	const failed = state.status === "failed"
 	useEffect(() => {
 		if (!failed) return
@@ -69,9 +84,12 @@ export function IndexGate({ fallback, t, say, children }: Props) {
 		return () => window.removeEventListener("online", retry)
 	}, [failed, retry])
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: `focusTarget` is a ref, read when the status changes
 	useEffect(() => {
-		if (state.status === "failed" && focusRetry.current) retryButton.current?.focus()
-		if (state.status !== "loading") focusRetry.current = false
+		if (state.status === "loading" || !focusRetry.current) return
+		focusRetry.current = false
+		if (state.status === "failed") noticeButton.current?.focus()
+		else focusTarget?.current?.focus()
 	}, [state.status])
 
 	const notice =
@@ -84,22 +102,34 @@ export function IndexGate({ fallback, t, say, children }: Props) {
 	}, [notice])
 
 	if (state.status === "ready") return <>{children(state.index)}</>
+	// The failure on screen: the last one, or the one being tried again.
+	const shown = state.status === "failed" ? state.reason : state.retrying
+	const busy = state.status === "loading"
 	return (
 		<>
-			{state.status === "loading" ? (
+			{shown === undefined ? (
 				fallback
 			) : (
 				<p className="hint chunk-notice">
-					<span>{notice}</span>{" "}
-					{state.reason === "stale" ? (
-						<button type="button" onClick={() => window.location.reload()}>
+					<span>{t(shown === "stale" ? "tracker.chunk.stale" : "tracker.index.offline")}</span>{" "}
+					{shown === "stale" ? (
+						<button
+							type="button"
+							ref={noticeButton}
+							aria-disabled={busy || undefined}
+							onClick={() => {
+								if (!busy) window.location.reload()
+							}}
+						>
 							{t("tracker.chunk.reload")}
 						</button>
 					) : (
 						<button
 							type="button"
-							ref={retryButton}
+							ref={noticeButton}
+							aria-disabled={busy || undefined}
 							onClick={() => {
+								if (busy) return
 								focusRetry.current = true
 								retry()
 							}}

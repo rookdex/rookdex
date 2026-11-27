@@ -435,6 +435,44 @@ describe("the seed index file (plan review ruling 3, Review Focus 5)", () => {
 		expect(screen.getByRole("button", { name: "Try again" })).toHaveFocus()
 	})
 
+	it("keeps Try again focused and busy while it runs, then focuses the list (gate round 2)", async () => {
+		failIndex()
+		const { container } = render(<Tracker locale="en" />)
+		await notice(INDEX_OFFLINE)
+		let answer: (() => void) | undefined
+		stubIndex(
+			() =>
+				new Promise<Response>((resolve) => {
+					answer = () => resolve(delivered.serve(delivered.index.url))
+				})
+		)
+		const button = screen.getByRole("button", { name: "Try again" })
+		button.focus()
+		fireEvent.click(button)
+		await waitFor(() => expect(answer).toBeDefined())
+		expect(button).toBeInTheDocument()
+		expect(button).toHaveFocus()
+		expect(button).toHaveAttribute("aria-disabled", "true")
+		// A second press while the first runs asks for nothing.
+		fireEvent.click(button)
+		await wait()
+		const asked = delivered.fetch.mock.calls.filter(([url]) => url === delivered.index.url)
+		expect(asked).toHaveLength(1)
+		answer?.()
+		expect(await screen.findByRole("checkbox", { name: "American alligator" })).toBeInTheDocument()
+		expect(container.querySelector(".tracker-results")).toHaveFocus()
+	})
+
+	it("moves focus to Reload when Try again finds the index gone (gate round 2)", async () => {
+		failIndex()
+		render(<Tracker locale="en" />)
+		await notice(INDEX_OFFLINE)
+		stubIndex(async () => new Response("Not found", { status: 404 }))
+		fireEvent.click(screen.getByRole("button", { name: "Try again" }))
+		expect(await notice(STALE)).toBeInTheDocument()
+		await waitFor(() => expect(screen.getByRole("button", { name: "Reload" })).toHaveFocus())
+	})
+
 	it("shows the Reload notice when the index block is missing (gate G6)", async () => {
 		document.getElementById("seed-index")?.remove()
 		for (const node of document.querySelectorAll('script[type="application/json"]')) node.remove()
