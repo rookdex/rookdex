@@ -26,7 +26,8 @@ type GateState =
 /**
  * Loads the seed index file the page names (plan review ruling 3) and renders `children` with it.
  * Until then the fallback; on failure a notice with Try again (offline) or Reload (stale, an old
- * tab after a deploy), spoken once. Try again and the browser's online event both load it again.
+ * tab after a deploy), spoken once. Try again and, after an offline failure, the browser's online
+ * event both load it again.
  * The notice stays while a retry runs, its button marked busy, so focus is never dropped to <body>.
  */
 export function IndexGate({ fallback, t, say, focusTarget, children }: Props) {
@@ -77,12 +78,14 @@ export function IndexGate({ fallback, t, say, focusTarget, children }: Props) {
 		}
 		setAttempt((n) => n + 1)
 	}, [])
-	const failed = state.status === "failed"
+	// Only an offline failure can mend when the connection comes back. A stale index is gone from
+	// the server, so retrying it would only mark Reload busy and say the same notice again.
+	const offline = state.status === "failed" && state.reason === "offline"
 	useEffect(() => {
-		if (!failed) return
+		if (!offline) return
 		window.addEventListener("online", retry)
 		return () => window.removeEventListener("online", retry)
-	}, [failed, retry])
+	}, [offline, retry])
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: `focusTarget` is a ref, read when the status changes
 	useEffect(() => {

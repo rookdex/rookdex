@@ -458,6 +458,17 @@ describe("the seed index file (plan review ruling 3, Review Focus 5)", () => {
 		expect(screen.queryByRole("button", { name: "Try again" })).toBeNull()
 	})
 
+	it("does not ask for a gone index again when the browser comes back online", async () => {
+		stubIndex(async () => new Response("Not found", { status: 404 }))
+		render(<Tracker locale="en" />)
+		await notice(STALE)
+		window.dispatchEvent(new Event("online"))
+		await wait()
+		const asked = delivered.fetch.mock.calls.filter(([url]) => url === delivered.index.url)
+		expect(asked).toHaveLength(1)
+		expect(screen.getByRole("button", { name: "Reload" })).not.toHaveAttribute("aria-disabled")
+	})
+
 	it("announces a repeat failure and returns focus to Try again (gate G2)", async () => {
 		let reject: (() => void) | undefined
 		stubIndex(async () => {
