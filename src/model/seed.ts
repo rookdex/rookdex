@@ -16,7 +16,7 @@ import {
 	rumourInputSchema,
 	type SeedItem,
 } from "./schema"
-import { buildSeed, duplicates, idsIn } from "./seedBuild"
+import { buildSeed, duplicates, idsIn, type SeedCategory, type SeedGroup } from "./seedBuild"
 import { attachTiers, officialErrors } from "./tiers"
 
 export { categoryIds, groupItems } from "./trackItems"
@@ -108,5 +108,9 @@ const errors = [...built.errors, ...news.rumours.errors, ...news.facts.errors, .
 if (errors.length > 0) throw new Error(`Seed invalid:\n${errors.join("\n")}`)
 
 export const seedItems: SeedItem[] = built.items
+/** The categories with items, in categories.json order (seedDelivered.ts builds the index from them). */
+export const seedCategories: SeedCategory[] = built.categories
+/** Every group in display order. */
+export const seedGroups: SeedGroup[] = built.groups
 export const rumours: Rumour[] = news.rumours.rumours
 export const facts: Fact[] = news.facts.facts
