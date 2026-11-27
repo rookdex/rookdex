@@ -582,6 +582,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			await once(async () => {
 				const file = state.pendingImport
 				if (!file) return
+				const profileId = state.profileId
 				const mod = await transfer()
 				if (!mod) return
 				const db = ready()
@@ -605,7 +606,6 @@ export function createTracker(deps: TrackerDeps): Tracker {
 					await show(db, profile, { pendingImport: undefined })
 					return
 				}
-				const profileId = state.profileId
 				const name = state.profiles.find((p) => p.id === profileId)?.name ?? ""
 				const { records, count } = await mod.importRecords(db, profileId, file.records)
 				results = [{ profileId, name, count, created: false }]
