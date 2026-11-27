@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
-import { beforeEach, describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { createProfile } from "../model/profiles"
 import { setDone } from "../model/progress"
 import { openStore } from "../model/store"
@@ -92,6 +92,64 @@ describe("chunks in the tracker (spec §5, §10)", () => {
 		chunks.release("animals")
 		const alligator = await screen.findByRole("checkbox", { name: "American alligator" })
 		await waitFor(() => expect(alligator).toHaveFocus())
+	})
+
+	describe("once the user has moved before the list is ready", () => {
+		const scrollIntoView = Element.prototype.scrollIntoView
+		afterEach(() => {
+			Element.prototype.scrollIntoView = scrollIntoView
+			vi.restoreAllMocks()
+		})
+
+		it("leaves focus and the page alone on a Sources back link", async () => {
+			const scroll = vi.fn()
+			Element.prototype.scrollIntoView = scroll
+			const chunks = deferChunks()
+			window.history.replaceState(
+				null,
+				"",
+				"/en/tracker/?show=animals#item-wildlife/american-alligator"
+			)
+			render(<Tracker locale="en" />)
+			await waitFor(() => expect(chunks.requested("animals")).toBe(true))
+			fireEvent.wheel(window)
+			chunks.release("animals")
+			const alligator = await screen.findByRole("checkbox", { name: "American alligator" })
+			await waitFor(() => expect(alligator).toBeEnabled())
+			await wait()
+			expect(alligator).not.toHaveFocus()
+			expect(scroll).not.toHaveBeenCalled()
+		})
+
+		it("does not restore the saved scroll position", async () => {
+			const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => undefined)
+			sessionStorage.setItem(
+				"rookdex.tracker-view",
+				JSON.stringify({ params: "show=animals", query: "", scroll: 480 })
+			)
+			const chunks = deferChunks()
+			render(<Tracker locale="en" />)
+			await waitFor(() => expect(chunks.requested("animals")).toBe(true))
+			fireEvent.keyDown(document.body, { key: "ArrowDown" })
+			chunks.release("animals")
+			const alligator = await screen.findByRole("checkbox", { name: "American alligator" })
+			await waitFor(() => expect(alligator).toBeEnabled())
+			await wait()
+			expect(scrollTo).not.toHaveBeenCalledWith({ top: 480, behavior: "instant" })
+		})
+
+		it("still restores it when the user has not moved", async () => {
+			const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => undefined)
+			sessionStorage.setItem(
+				"rookdex.tracker-view",
+				JSON.stringify({ params: "show=animals", query: "", scroll: 480 })
+			)
+			const chunks = deferChunks()
+			render(<Tracker locale="en" />)
+			await waitFor(() => expect(chunks.requested("animals")).toBe(true))
+			chunks.release("animals")
+			await waitFor(() => expect(scrollTo).toHaveBeenCalledWith({ top: 480, behavior: "instant" }))
+		})
 	})
 
 	it("the hub fetches the index file and never a chunk (Review Focus 4)", async () => {

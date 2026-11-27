@@ -75,10 +75,32 @@ function markCard(box: HTMLElement) {
 	box.addEventListener("blur", () => card.removeAttribute("data-arrived"), { once: true })
 }
 
+// A reader's own move. Not `scroll`: a programmatic scroll fires it too.
+const USER_MOVE = ["wheel", "touchstart", "keydown", "pointerdown"] as const
+
+/** Set once the user scrolls, touches, clicks or presses a key on the page. */
+function useUserMoved(): RefObject<boolean> {
+	const moved = useRef(false)
+	useEffect(() => {
+		const detach = () => {
+			for (const type of USER_MOVE) window.removeEventListener(type, mark)
+		}
+		const mark = () => {
+			moved.current = true
+			detach()
+		}
+		for (const type of USER_MOVE) window.addEventListener(type, mark, { passive: true })
+		return detach
+	}, [])
+	return moved
+}
+
 interface ViewProps extends Props {
 	index: SeedIndex
 	/** The list container. Owned by the root, so the index gate can focus it after Try again. */
 	results: RefObject<HTMLDivElement | null>
+	/** Whether the user has moved on the page since it opened, the index wait included. */
+	moved: RefObject<boolean>
 }
 
 /** Island root. `client:only`: once the seed index is in, the first render reads the URL and
@@ -86,6 +108,7 @@ interface ViewProps extends Props {
 export function Tracker({ locale }: Props) {
 	const { t } = translator(locale)
 	const results = useRef<HTMLDivElement>(null)
+	const moved = useUserMoved()
 	return (
 		<IndexGate
 			fallback={
@@ -96,12 +119,12 @@ export function Tracker({ locale }: Props) {
 			t={t}
 			focusTarget={results}
 		>
-			{(index) => <TrackerView locale={locale} index={index} results={results} />}
+			{(index) => <TrackerView locale={locale} index={index} results={results} moved={moved} />}
 		</IndexGate>
 	)
 }
 
-function TrackerView({ locale, index, results }: ViewProps) {
+function TrackerView({ locale, index, results, moved }: ViewProps) {
 	const { t, plural } = translator(locale)
 	// Read once: the filters, search and scroll the tracker opens with (saved view or the URL).
 	const [startView] = useState(() => openingView(window.location, readTrackerView()))
@@ -125,14 +148,17 @@ function TrackerView({ locale, index, results }: ViewProps) {
 	const [arrival] = useState(() => hashItemId(window.location.hash) ?? undefined)
 	const search = useSearch(state, arrival, startView.query)
 	useRememberView(state.selected, state.groups, search.query)
-	// Back where the list was left, once it has loaded (the saved view's scroll position).
+	// Back where the list was left, once it has loaded (the saved view's scroll position). Earlier
+	// categories can be read while a later one loads, so once the user has moved, the page stays.
 	const scrolled = useRef(false)
 	useEffect(() => {
 		if (scrolled.current || !listReady) return
 		scrolled.current = true
 		// 0 is where a fresh page already sits, so there is nothing to restore.
-		if (startView.scroll) window.scrollTo({ top: startView.scroll, behavior: "instant" })
-	}, [listReady, startView.scroll])
+		if (startView.scroll && !moved.current) {
+			window.scrollTo({ top: startView.scroll, behavior: "instant" })
+		}
+	}, [listReady, startView.scroll, moved])
 	const live = useLiveStatus()
 	// One message for every chunk that failed (spec §5): stale wins, because Reload fixes it.
 	const notice = (() => {
@@ -181,10 +207,13 @@ function TrackerView({ locale, index, results }: ViewProps) {
 	// counts as non-keyboard focus, so the ring would not draw. Chromium ignores focusVisible, so
 	// the card is marked and styled while the checkbox keeps that focus. Nothing here may throw
 	// into React: an uncaught error would unmount the whole Tracker, and the hash survives a reload.
+	// A user who has moved since the page opened keeps their place: neither focus nor the page
+	// jumps to the item under them.
 	const arrived = useRef(false)
 	useEffect(() => {
 		if (!listReady || arrived.current) return
 		arrived.current = true
+		if (moved.current) return
 		try {
 			const box = hashTarget(window.location.hash, document)
 			if (!box) return
@@ -194,7 +223,7 @@ function TrackerView({ locale, index, results }: ViewProps) {
 		} catch {
 			// A browser without scrollIntoView options still got the focus.
 		}
-	}, [listReady])
+	}, [listReady, moved])
 
 	// The Last found row (spec §5.3). The card scrolls, not the checkbox: the checkbox sits 22 px
 	// below the card's top, so a focus scroll would tuck the card under the sticky search row.
