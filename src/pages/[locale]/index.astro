@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content"
 import { getRelativeLocaleUrl } from "astro:i18n"
 import Mark from "../../components/Mark.astro"
+import SeedIndex from "../../components/SeedIndex.astro"
 import { MAP_LINK } from "../../config/map-link"
 import { defaultLocale, isLocale, type Locale, locales, translator } from "../../i18n"
 import { Hub } from "../../islands/hub/Hub"
@@ -60,6 +61,7 @@ const news = latestNews(facts, rumours, NEWS_LIMIT).map(({ id, kind, date, name 
 				<a class="go-link" href={getRelativeLocaleUrl(locale, "tracker")}>{t("hub.openTracker")}</a>
 			</p>
 		</header>
+		<SeedIndex />
 		{/* The server-rendered time changes every build; the version hash skips it (precache.mjs). */}
 		<div class="build-stamp" data-build-stamp>
 			<script is:inline data-phase={staticPhase} set:html={prepaint}></script>

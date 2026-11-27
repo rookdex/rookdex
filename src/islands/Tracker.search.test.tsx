@@ -5,12 +5,6 @@ import { openMenu, renderReady, resetBrowser } from "../test/tracker-fixtures"
 import { HIDE_FOUND_KEY } from "./seenFlag"
 import { Tracker } from "./Tracker"
 
-vi.mock("../model/seed", async (importOriginal) => {
-	const actual = await importOriginal<typeof import("../model/seed")>()
-	const { fixtures } = await import("../test/tracker-fixtures")
-	return { ...actual, seedItems: fixtures }
-})
-
 // jsdom's File may lack text(); the island only needs size + text().
 if (typeof File.prototype.text !== "function") {
 	File.prototype.text = function () {

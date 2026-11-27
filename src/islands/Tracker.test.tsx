@@ -5,12 +5,6 @@ import { axe } from "vitest-axe"
 import { renderReady, resetBrowser } from "../test/tracker-fixtures"
 import { Tracker } from "./Tracker"
 
-vi.mock("../model/seed", async (importOriginal) => {
-	const actual = await importOriginal<typeof import("../model/seed")>()
-	const { fixtures } = await import("../test/tracker-fixtures")
-	return { ...actual, seedItems: fixtures }
-})
-
 beforeEach(resetBrowser)
 
 const ready = (locale: "en" | "nb" = "en") => renderReady(<Tracker locale={locale} />)

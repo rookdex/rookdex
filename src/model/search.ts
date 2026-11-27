@@ -1,8 +1,8 @@
 // Tracker search (tracker search spec §3.1). Pure: no React, no DOM. The functions take plain
 // text fields, so a later site-wide search can reuse normalize and matches.
 import { normalize } from "./normalize"
-import type { SeedItem } from "./schema"
 import { groupKey, type Records } from "./stats"
+import type { TrackItem } from "./trackItems"
 
 export { normalize }
 
@@ -11,7 +11,11 @@ export type SearchTerms = Readonly<Record<string, readonly string[]>>
 
 /** The text a query searches for one item: its name, its aliases, its group's words and its own
  *  words. One list for the tracker and the Dex, so both answer a query the same way. */
-export function searchFields(item: SeedItem, terms: SearchTerms, itemTerms: SearchTerms): string[] {
+export function searchFields(
+	item: TrackItem,
+	terms: SearchTerms,
+	itemTerms: SearchTerms
+): string[] {
 	return [
 		item.name,
 		...(item.aliases ?? []),
@@ -21,7 +25,7 @@ export function searchFields(item: SeedItem, terms: SearchTerms, itemTerms: Sear
 }
 
 export interface SearchInput {
-	items: SeedItem[]
+	items: TrackItem[]
 	/** Category tile ids; empty means All. */
 	selected: string[]
 	/** Pressed group chips as `groupKey`s. A category with none pressed shows every group. */
@@ -32,11 +36,14 @@ export interface SearchInput {
 	terms: SearchTerms
 	/** Words true of one item only, keyed by item id (ITEM_TERMS). */
 	itemTerms: SearchTerms
+	/** When given, only these categories count as inside the filters: the ones whose text has
+	 *  loaded and so are on screen. `elsewhere` ignores it. */
+	revealed?: ReadonlySet<string>
 }
 
 export interface SearchView {
 	/** Inside the pressed tiles and chips, matching, not hidden, in seed order. */
-	visible: SeedItem[]
+	visible: TrackItem[]
 	/** Matching and not hidden outside the filters; 0 with no query or with All. */
 	elsewhere: number
 	/** Matching and hidden inside the filters. */
@@ -90,6 +97,7 @@ export function searchView({
 	hidden,
 	terms,
 	itemTerms,
+	revealed,
 }: SearchInput): SearchView {
 	const queryWords = words(query)
 	const all = selected.length === 0
@@ -100,7 +108,7 @@ export function searchView({
 			.filter((item) => pressed.has(groupKey(item.category, item.group)))
 			.map((item) => item.category)
 	)
-	const visible: SeedItem[] = []
+	const visible: TrackItem[] = []
 	let elsewhere = 0
 	let hiddenCount = 0
 	for (const item of items) {
@@ -114,7 +122,8 @@ export function searchView({
 				(!narrowed.has(item.category) || pressed.has(groupKey(item.category, item.group))))
 		if (!inside) {
 			if (queryWords.length > 0 && !hidden.has(item.id)) elsewhere++
-		} else if (hidden.has(item.id)) hiddenCount++
+		} else if (revealed && !revealed.has(item.category)) continue
+		else if (hidden.has(item.id)) hiddenCount++
 		else visible.push(item)
 	}
 	return { visible, elsewhere, hiddenCount }

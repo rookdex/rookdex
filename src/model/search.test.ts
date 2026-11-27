@@ -35,7 +35,7 @@ const terms = {
 }
 
 const none: ReadonlySet<string> = new Set()
-const ids = (list: SeedItem[]) => list.map((i) => i.id)
+const ids = (list: { id: string }[]) => list.map((i) => i.id)
 const view = (patch: Partial<Parameters<typeof searchView>[0]>) =>
 	searchView({
 		items,
@@ -133,6 +133,16 @@ describe("searchView (spec §3.1)", () => {
 	it("counts nothing elsewhere with no query or with All", () => {
 		expect(view({ selected: ["wildlife"] }).elsewhere).toBe(0)
 		expect(view({ query: "car" }).elsewhere).toBe(0)
+	})
+
+	it("counts only the revealed categories as inside, and leaves elsewhere alone", () => {
+		const revealed = new Set(["vehicles"])
+		const v = view({ query: "animal", revealed })
+		expect(ids(v.visible).every((id) => id.startsWith("vehicles/"))).toBe(true)
+		expect(v.visible.length).toBeLessThan(view({ query: "animal" }).visible.length)
+		const hidden = new Set(["wildlife/pelican", "vehicles/albany-primo"])
+		expect(view({ query: "animal", hidden, revealed: new Set() }).hiddenCount).toBe(0)
+		expect(view({ selected: ["wildlife"], query: "car", revealed }).elsewhere).toBe(2)
 	})
 
 	it("hides the snapshot and counts it inside the tiles only", () => {

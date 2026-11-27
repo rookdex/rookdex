@@ -1,15 +1,16 @@
-import { type ChangeEvent, useEffect, useRef, useState } from "react"
+import { type ChangeEvent, type RefObject, useEffect, useRef, useState } from "react"
 import { type Locale, seedLabel, translator } from "../i18n"
 import { hubPhase } from "../model/launch"
 import { activeProfiles, deletedProfiles } from "../model/profiles"
 import { openingView } from "../model/savedView"
 import { type EmptyState, emptyState, type SearchView } from "../model/search"
-import { categoryIds, seedItems } from "../model/seed"
 import { countItems, perCategory, perGroup, recentFinds, shown } from "../model/stats"
-import { chipGroups, parseGroups, parseShow } from "../model/tracker"
+import { chipGroups, listChunks, parseGroups, parseShow } from "../model/tracker"
+import { categoryIds, indexItems, type SeedIndex } from "../model/trackItems"
 import type { ImportResult } from "../model/transfer"
 import { downloadJson } from "../scripts/download"
 import { buildTracker } from "./buildTracker"
+import { IndexGate } from "./IndexGate"
 import {
 	BACKUP_REMINDER_TICKS,
 	type BackupLog,
@@ -74,37 +75,115 @@ function markCard(box: HTMLElement) {
 	box.addEventListener("blur", () => card.removeAttribute("data-arrived"), { once: true })
 }
 
-/** Island root. `client:only`: the first render reads the URL and IndexedDB. */
+// A reader's own move. Not `scroll`: a programmatic scroll fires it too.
+const USER_MOVE = ["wheel", "touchstart", "keydown", "pointerdown"] as const
+
+/** Set once the user scrolls, touches, clicks or presses a key on the page. */
+function useUserMoved(): RefObject<boolean> {
+	const moved = useRef(false)
+	useEffect(() => {
+		const detach = () => {
+			for (const type of USER_MOVE) window.removeEventListener(type, mark)
+		}
+		const mark = () => {
+			moved.current = true
+			detach()
+		}
+		for (const type of USER_MOVE) window.addEventListener(type, mark, { passive: true })
+		return detach
+	}, [])
+	return moved
+}
+
+interface ViewProps extends Props {
+	index: SeedIndex
+	/** The list container. Owned by the root, so the index gate can focus it after Try again. */
+	results: RefObject<HTMLDivElement | null>
+	/** Whether the user has moved on the page since it opened, the index wait included. */
+	moved: RefObject<boolean>
+}
+
+/** Island root. `client:only`: once the seed index is in, the first render reads the URL and
+ *  IndexedDB. The page and every test render this. */
 export function Tracker({ locale }: Props) {
+	const { t } = translator(locale)
+	const results = useRef<HTMLDivElement>(null)
+	const moved = useUserMoved()
+	return (
+		<IndexGate
+			fallback={
+				<div className="index-pending" aria-busy="true">
+					<p className="visually-hidden">{t("tracker.loading")}</p>
+				</div>
+			}
+			t={t}
+			focusTarget={results}
+		>
+			{(index) => <TrackerView locale={locale} index={index} results={results} moved={moved} />}
+		</IndexGate>
+	)
+}
+
+function TrackerView({ locale, index, results, moved }: ViewProps) {
 	const { t, plural } = translator(locale)
 	// Read once: the filters, search and scroll the tracker opens with (saved view or the URL).
 	const [startView] = useState(() => openingView(window.location, readTrackerView()))
 	const [tracker] = useState(() => {
-		const selected = parseShow(startView.search, categoryIds(seedItems))
-		return buildTracker(
-			t("profile.defaultName"),
+		const items = indexItems(index)
+		const selected = parseShow(startView.search, categoryIds(items))
+		return buildTracker(t("profile.defaultName"), index, {
 			selected,
-			parseGroups(startView.search, chipGroups(seedItems, selected))
-		)
+			groups: parseGroups(startView.search, chipGroups(items, selected)),
+			chunks: true,
+		})
 	})
 	const state = useTrackerState(tracker)
+	// Cards render once their text is in, so no card grows under the reader (data delivery plan).
+	// Everything that needs every needed card in the DOM waits for listReady, not for the store.
+	const chunkView = listChunks(state)
+	const listReady = state.status === "ready" && chunkView.settled
 	useShowParam(state.selected)
 	useGroupParam(state.groups)
 	// The item a Sources back link points at stays visible on arrival, even if found (Task 4).
 	const [arrival] = useState(() => hashItemId(window.location.hash) ?? undefined)
 	const search = useSearch(state, arrival, startView.query)
 	useRememberView(state.selected, state.groups, search.query)
-	// Back where the list was left, once it has loaded (the saved view's scroll position).
+	// Back where the list was left, once it has loaded (the saved view's scroll position). Earlier
+	// categories can be read while a later one loads, so once the user has moved, the page stays.
 	const scrolled = useRef(false)
 	useEffect(() => {
-		if (scrolled.current || state.status !== "ready") return
+		if (scrolled.current || !listReady) return
 		scrolled.current = true
 		// 0 is where a fresh page already sits, so there is nothing to restore.
-		if (startView.scroll) window.scrollTo({ top: startView.scroll, behavior: "instant" })
-	}, [state.status, startView.scroll])
+		if (startView.scroll && !moved.current) {
+			window.scrollTo({ top: startView.scroll, behavior: "instant" })
+		}
+	}, [listReady, startView.scroll, moved])
 	const live = useLiveStatus()
+	// One message for every chunk that failed (spec §5): stale wins, because Reload fixes it.
+	const notice = (() => {
+		const { failed } = chunkView
+		if (failed.length === 0) return ""
+		if (failed.some((f) => f.reason === "stale")) return t("tracker.chunk.stale")
+		const names = new Intl.ListFormat(locale, { type: "conjunction" }).format(
+			failed.map((f) => seedLabel(t, "category", f.category))
+		)
+		return plural("tracker.chunk.offline", failed.length, { categories: names })
+	})()
+	const stale = chunkView.failed.some((f) => f.reason === "stale")
+	const lastNotice = useRef("")
+	// Spoken once per new text through the status line; the visible copy is not a live region.
+	// When the notice goes (a retry has started), the region is emptied if it still holds it, so
+	// the same text after a failed retry is a change a screen reader speaks.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: `live` is a new object each render; only a new text should speak
+	useEffect(() => {
+		if (notice) live.say(notice)
+		else if (live.message !== "" && live.message === lastNotice.current) live.say("")
+		lastNotice.current = notice
+	}, [notice])
 	const searchField = useRef<HTMLInputElement>(null)
-	const results = useRef<HTMLDivElement>(null)
+	// A non-empty query was typed while the list could not be described yet.
+	const unspoken = useRef(false)
 	// From launch on the hub is the dashboard, so Overall links there (dashboard spec §4).
 	const [hubHref] = useState(() => (hubPhase(new Date()) === "after" ? `/${locale}/` : undefined))
 	const [dialog, setDialog] = useState<"new" | "rename" | "delete" | "deleted" | null>(null)
@@ -128,10 +207,13 @@ export function Tracker({ locale }: Props) {
 	// counts as non-keyboard focus, so the ring would not draw. Chromium ignores focusVisible, so
 	// the card is marked and styled while the checkbox keeps that focus. Nothing here may throw
 	// into React: an uncaught error would unmount the whole Tracker, and the hash survives a reload.
+	// A user who has moved since the page opened keeps their place: neither focus nor the page
+	// jumps to the item under them.
 	const arrived = useRef(false)
 	useEffect(() => {
-		if (state.status !== "ready" || arrived.current) return
+		if (!listReady || arrived.current) return
 		arrived.current = true
+		if (moved.current) return
 		try {
 			const box = hashTarget(window.location.hash, document)
 			if (!box) return
@@ -141,7 +223,7 @@ export function Tracker({ locale }: Props) {
 		} catch {
 			// A browser without scrollIntoView options still got the focus.
 		}
-	}, [state.status])
+	}, [listReady, moved])
 
 	// The Last found row (spec §5.3). The card scrolls, not the checkbox: the checkbox sits 22 px
 	// below the card's top, so a focus scroll would tuck the card under the sticky search row.
@@ -245,6 +327,15 @@ export function Tracker({ locale }: Props) {
 		return emptyText(kind, query) ?? plural("tracker.search.results", view.visible.length)
 	}
 
+	// What to say for a view, or nothing. Nothing is spoken while a chunk is still on its
+	// way. With a failed category, only a non-zero count is spoken: the view holds only categories
+	// on screen, so it matches the list, while "No match" could be wrong with a category missing.
+	function spoken(chunks: ReturnType<typeof listChunks>, view: SearchView, query: string) {
+		if (!chunks.settled) return undefined
+		if (chunks.failed.length > 0 && view.visible.length === 0) return undefined
+		return resultsText(view, query)
+	}
+
 	// A typing result still pending would describe the old tiles.
 	function selectCategories(ids: string[]) {
 		live.cancel()
@@ -262,15 +353,32 @@ export function Tracker({ locale }: Props) {
 		search.setQuery(query)
 		// An emptied box empties the region too: a polite region does not repeat identical text, so
 		// the same query typed again would otherwise be silent.
-		if (query.trim() === "") live.say("")
-		else live.sayLater(resultsText(search.viewFor({ query }), query))
+		if (query.trim() === "") {
+			unspoken.current = false
+			live.say("")
+		} else if (chunkView.settled) {
+			unspoken.current = false
+			const text = spoken(chunkView, search.viewFor({ query }), query)
+			// Nothing to say still drops the last keystroke's pending count, which is out of date.
+			if (text) live.sayLater(text)
+			else live.cancel()
+		} else {
+			// A chunk is still on its way: the results are spoken once it lands.
+			unspoken.current = true
+			live.cancel()
+		}
 	}
 
 	// Enter or the phone's Search key: the list already matches, so say it now and move focus
 	// there. Leaving the field closes the phone keyboard, and the results are where the user
 	// goes next, so a keyboard user's place moves forward instead of back to <body>.
 	function finishSearch() {
-		if (search.query.trim() !== "") live.say(resultsText(search.view, search.query))
+		if (search.query.trim() !== "" && chunkView.settled) {
+			unspoken.current = false
+			const text = spoken(chunkView, search.view, search.query)
+			if (text) live.say(text)
+			else live.cancel()
+		}
 		const list = results.current
 		if (!list) return
 		// The browser's own focus scroll centres a long list and hides its first cards under the
@@ -303,9 +411,20 @@ export function Tracker({ locale }: Props) {
 	// found and the query stay. The button disappears with its line, so focus goes to the field
 	// rather than to <body>.
 	function clearFilters() {
+		live.cancel()
 		tracker.selectCategories([])
 		searchField.current?.focus()
-		live.say(resultsText(search.viewFor({ selected: [], groups: [] }), search.query))
+		// selectCategories is synchronous: the state read here already has the new chunks and
+		// revealed categories, so only what the list will show is spoken, and nothing while it loads.
+		const next = tracker.getState()
+		const nextChunks = listChunks(next)
+		if (nextChunks.settled) {
+			const view = search.viewFor({ selected: [], groups: [], revealed: next.revealed })
+			const text = spoken(nextChunks, view, search.query)
+			if (text) live.say(text)
+		} else if (search.query.trim() !== "") {
+			unspoken.current = true
+		}
 	}
 
 	// A tick is announced as before, and it cancels a pending typing result (spec §5). The tick
@@ -359,9 +478,29 @@ export function Tracker({ locale }: Props) {
 
 	const sourcesHref = `/${locale}/tracker/sources/`
 	const { view } = search
-	const empty = emptyState(view, search.query)
 	const chips = chipGroups(state.items, state.selected)
-	const emptyMessage = emptyText(empty, search.query)
+	// Ruling 9 and I4: only categories the model revealed show cards or chips, in list order, so a
+	// late or failed chunk never paints a card above one already on screen.
+	const revealed = new Set(chunkView.revealed)
+	const shownCards = view.visible.filter((item) => revealed.has(item.category))
+	const shownChips = new Map([...chips].filter(([id]) => revealed.has(id)))
+	// I9: no empty-state text while a needed chunk is on its way or has failed. The notice speaks then.
+	const listSettled = chunkView.settled && chunkView.failed.length === 0
+	const empty = emptyState({ ...view, visible: shownCards }, search.query)
+	// A query typed while the list was loading is spoken once, when the list settles.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: `live` is a new object each render; only the list settling should speak
+	useEffect(() => {
+		if (!chunkView.settled || !unspoken.current) return
+		unspoken.current = false
+		const text = spoken(chunkView, search.view, search.query)
+		if (search.query.trim() !== "" && text) live.sayLater(text)
+		else live.cancel()
+	}, [chunkView.settled])
+	const emptyMessage = listSettled ? emptyText(empty, search.query) : undefined
+	// A chip row keeps its category on screen when no card is left (R17). A failed or loading view
+	// with no chips shows only the notice and the reserve, never "Nothing here yet." (amendment 6).
+	const showList =
+		shownChips.size > 0 || (empty === "none" && (shownCards.length > 0 || listSettled))
 
 	if (state.status === "error") {
 		return (
@@ -435,16 +574,33 @@ export function Tracker({ locale }: Props) {
 				/>
 				<LastFound
 					find={recent[0]}
-					canJump={jumpable(recent[0], view.visible, state.status === "ready")}
+					canJump={jumpable(recent[0], shownCards, listReady)}
 					onJump={jumpTo}
 					locale={locale}
 					t={t}
 				/>
-				<div className="tracker-results" ref={results} tabIndex={-1}>
-					{/* A chip row keeps its category on screen when no card is left (R17). */}
-					{(empty === "none" || chips.size > 0) && (
+				<div
+					className={chunkView.reserve ? "tracker-results pending" : "tracker-results"}
+					ref={results}
+					tabIndex={-1}
+					aria-busy={!chunkView.settled}
+				>
+					{notice && (
+						<p className="hint chunk-notice">
+							<span>{notice}</span>
+							{stale && (
+								<>
+									{" "}
+									<button type="button" onClick={() => window.location.reload()}>
+										{t("tracker.chunk.reload")}
+									</button>
+								</>
+							)}
+						</p>
+					)}
+					{showList && (
 						<ItemList
-							items={view.visible}
+							items={shownCards}
 							records={state.records}
 							disabled={state.status !== "ready"}
 							categoryLabel={(id) => seedLabel(t, "category", id)}
@@ -453,7 +609,7 @@ export function Tracker({ locale }: Props) {
 							groupCounts={perGroup(state.items, state.records)}
 							onToggle={toggleItem}
 							order={categories.map((c) => c.id)}
-							chips={chips}
+							chips={shownChips}
 							groups={state.groups}
 							onToggleGroup={toggleGroup}
 							sourcesHref={sourcesHref}
@@ -461,7 +617,7 @@ export function Tracker({ locale }: Props) {
 						/>
 					)}
 					{emptyMessage && <p className="item-empty">{emptyMessage}</p>}
-					{view.elsewhere > 0 && (
+					{listSettled && view.elsewhere > 0 && (
 						<p className="search-elsewhere">
 							{plural("tracker.search.elsewhere", view.elsewhere)}{" "}
 							<button type="button" className="search-elsewhere-btn" onClick={clearFilters}>

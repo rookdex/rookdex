@@ -1,9 +1,9 @@
 // The dashboard's numbers (dashboard spec §6.2). Pure: no DOM, no clock; the caller passes `now`.
 // Retired items and records without a seed item never count, as in stats.ts.
 import { addDays, localDayKey } from "./days"
-import type { Fact, Rumour, SeedItem } from "./schema"
-import { categoryIds, groupItems } from "./seed"
+import type { Fact, Rumour } from "./schema"
 import { countable, perCategory, type Records, shown } from "./stats"
+import { categoryIds, groupItems, type TrackItem } from "./trackItems"
 
 /** Where a player with nothing found starts. */
 export const FIRST_GOAL = "animals"
@@ -16,14 +16,14 @@ export interface NextGroup {
 	category: string
 	/** Every unfound item of the category, not only the ones shown. */
 	left: number
-	items: SeedItem[]
+	items: TrackItem[]
 }
 
 /**
  * Categories below 100 %, highest share found first, ties in category order. With nothing found,
  * animals comes first and the rest follow in category order.
  */
-export function rankCategories(items: SeedItem[], records: Records): string[] {
+export function rankCategories(items: TrackItem[], records: Records): string[] {
 	const counts = perCategory(countable(items), records)
 	if (counts.every((c) => c.done === 0)) {
 		const first = counts.find((c) => c.category === FIRST_GOAL) ?? counts[0]
@@ -40,12 +40,12 @@ export function rankCategories(items: SeedItem[], records: Records): string[] {
  * The category with the highest share found below 100 %. Ties go to category order. With nothing
  * found it is animals; with everything found it is undefined.
  */
-export function closestCategory(items: SeedItem[], records: Records): string | undefined {
+export function closestCategory(items: TrackItem[], records: Records): string | undefined {
 	return rankCategories(items, records)[0]
 }
 
 /** Unfound items of `category` in the tracker's order (group, then name). */
-function openItems(items: SeedItem[], records: Records, category: string): SeedItem[] {
+function openItems(items: TrackItem[], records: Records, category: string): TrackItem[] {
 	const open = countable(items).filter(
 		(item) => item.category === category && !records[item.id]?.done
 	)
@@ -56,7 +56,7 @@ function openItems(items: SeedItem[], records: Records, category: string): SeedI
  * What's next: up to `limit` unfound items, from the closest category first, then the next-closest,
  * from at most NEXT_GROUPS categories. Empty when everything is found.
  */
-export function nextGroups(items: SeedItem[], records: Records, limit: number): NextGroup[] {
+export function nextGroups(items: TrackItem[], records: Records, limit: number): NextGroup[] {
 	const groups: NextGroup[] = []
 	let room = limit
 	for (const category of rankCategories(items, records)) {
@@ -69,7 +69,7 @@ export function nextGroups(items: SeedItem[], records: Records, limit: number): 
 }
 
 /** Finds whose tick (stored in UTC) falls on `now`'s local calendar day. */
-export function foundToday(items: SeedItem[], records: Records, now: Date): number {
+export function foundToday(items: TrackItem[], records: Records, now: Date): number {
 	const today = localDayKey(now)
 	return shown(items).filter((item) => {
 		const record = records[item.id]
@@ -130,7 +130,7 @@ export interface DayCount {
  * days kept (desktop dashboard spec §6.2). Retired items and records with no seed item never count.
  */
 export function findsByDay(
-	items: SeedItem[],
+	items: TrackItem[],
 	records: Records,
 	today: string,
 	days: number
@@ -156,7 +156,7 @@ export interface CategoryRow {
 }
 
 /** Every category, in the order its first item appears in the tracker. Retired items are skipped. */
-export function categoryRows(items: SeedItem[], records: Records): CategoryRow[] {
+export function categoryRows(items: TrackItem[], records: Records): CategoryRow[] {
 	const live = shown(items)
 	const counts = perCategory(live, records)
 	return categoryIds(live).map((id) => {

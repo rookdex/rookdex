@@ -221,6 +221,8 @@ export function Hub({
 							trackerHref={trackerHref}
 							dexHref={dexHref}
 							announce={announce}
+							categoryCount={categories.length}
+							retryFocus={heading}
 						/>
 					) : (
 						<DashboardSkeleton categoryCount={categories.length} t={t} />

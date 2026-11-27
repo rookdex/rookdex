@@ -1,6 +1,10 @@
 // The tracker's state and actions. No React, no DOM: the island subscribes and renders.
 // Every action captures the current profile id before its first await and writes to the
 // store before touching state, so a profile switch mid-write never misfiles a tick.
+
+import type { ChunkFailure, ChunkOutcome } from "./chunks"
+import { buildExport } from "./exportFile"
+import { MAX_IMPORT_BYTES, TEXT } from "./limits"
 import {
 	activeProfiles,
 	createProfile as createProfileRecord,
@@ -12,25 +16,26 @@ import {
 	softDeleteProfile,
 } from "./profiles"
 import { listRecords, setDone } from "./progress"
-import { type ExportFile, type Profile, type SeedItem, TEXT } from "./schema"
-import { categoryIds, groupItems } from "./seed"
+import type { ExportFile, Profile } from "./schema"
 import { countItems, groupKey, type Records, shown } from "./stats"
 import type { Store } from "./store"
-import {
-	backupEntries,
-	buildExport,
-	collectBackup,
-	type ImportError,
-	type ImportResult,
-	importAsNewProfile,
-	importRecords,
-	MAX_IMPORT_BYTES,
-	parseImport,
-	restoreBackup,
-} from "./transfer"
+import { categoryIds, groupItems, type TrackItem, withText } from "./trackItems"
+import type { ImportError, ImportResult } from "./transfer"
+
+/** The import and backup code. Loaded on first use, because it parses with Zod (Task 6b). */
+type TransferModule = typeof import("./transfer")
 
 export type Status = "loading" | "ready" | "error"
-export type TrackerError = ImportError | "storage" | "name" | "closed"
+export type TrackerError = ImportError | "storage" | "name" | "closed" | "stale"
+
+/** Per category: its card text chunk is on its way, on its way again after a failure, has landed,
+ *  or failed (spec §5). */
+export type ChunkState = "loading" | "retrying" | "ready" | ChunkFailure
+
+/** On its way, the first time or again: the list waits for it. */
+function inFlight(status: ChunkState | undefined): boolean {
+	return status === undefined || status === "loading" || status === "retrying"
+}
 
 export interface Announcement {
 	category: string
@@ -49,7 +54,11 @@ export interface TrackerState {
 	error?: TrackerError
 	profiles: Profile[]
 	profileId: string
-	items: SeedItem[]
+	items: TrackItem[]
+	/** Card text chunks by category. Empty on the hub, which never loads one. */
+	chunks: Record<string, ChunkState>
+	/** Needed categories the list may show, in list order (plan ruling 9, as changed on 27.11). */
+	revealed: string[]
 	records: Records
 	selected: string[]
 	/** Pressed group chips as `groupKey`s, in list order, only under pressed categories (spec §14.1). */
@@ -61,7 +70,11 @@ export interface TrackerState {
 
 export interface TrackerDeps {
 	openStore: () => Promise<Store>
-	items: SeedItem[]
+	items: TrackItem[]
+	/** Loads a category's card text. Leave undefined where no card is shown (the hub). */
+	loadChunk?: (category: string) => Promise<ChunkOutcome>
+	/** Calls `retry` when the browser comes back online; returns the unsubscribe. */
+	onOnline?: (retry: () => void) => () => void
 	defaultProfileName: string
 	selected?: string[]
 	groups?: string[]
@@ -75,6 +88,8 @@ export interface TrackerDeps {
 	activeProfile?: ActiveProfileStore
 	/** Called after each saved tick (not an untick), so the backup reminder can count them. */
 	onTick?: () => void
+	/** Loads the import and backup code. A test seam; the default is import("./transfer"). */
+	transfer?: () => Promise<TransferModule>
 }
 
 export interface ImportFileLike {
@@ -134,13 +149,47 @@ export function showParam(selected: string[]): string | null {
 	return selected.length > 0 ? selected.join(",") : null
 }
 
+export interface ListChunks {
+	/** Every chunk the view needs has landed or failed. Until then the list holds its space. */
+	settled: boolean
+	/** Needed categories whose chunk is on its way or not started, in the order they are needed. */
+	pending: string[]
+	failed: { category: string; reason: ChunkFailure }[]
+	/** The categories the list may show (TrackerState.revealed). */
+	revealed: string[]
+	/** A needed chunk is on its way for the first time, so the list holds a screen of height. This
+	 *  covers every category reveal() holds back, since only such a chunk holds one back. A retry
+	 *  (the online event, refresh(), a press on a failed tile) never does: the list keeps its own
+	 *  height instead of jumping to a full screen and back. */
+	reserve: boolean
+}
+
+/** The chunks the list needs: the pressed categories, or every category under All. */
+export function listChunks(
+	state: Pick<TrackerState, "chunks" | "selected" | "items" | "revealed">
+): ListChunks {
+	const needed = state.selected.length > 0 ? state.selected : categoryIds(state.items)
+	const failed = needed.flatMap((category) => {
+		const status = state.chunks[category]
+		return status === "offline" || status === "stale" ? [{ category, reason: status }] : []
+	})
+	const pending = needed.filter((category) => inFlight(state.chunks[category]))
+	return {
+		settled: pending.length === 0,
+		pending,
+		failed,
+		revealed: state.revealed,
+		reserve: pending.some((category) => state.chunks[category] !== "retrying"),
+	}
+}
+
 /**
  * Per pressed category, the groups its chips offer (tracker refresh spec §14.1): every group with
  * a shown item, in the list's group order. A category with one group gets no chips, because
  * one chip would filter nothing. Categories come in seed order. A Map, so a category id such as
  * "constructor" can never read Object.prototype (R16).
  */
-export function chipGroups(items: SeedItem[], selected: string[]): Map<string, string[]> {
+export function chipGroups(items: TrackItem[], selected: string[]): Map<string, string[]> {
 	const live = shown(items)
 	const chips = new Map<string, string[]>()
 	for (const category of categoryIds(live)) {
@@ -201,6 +250,8 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		profiles: [],
 		profileId: "",
 		items: deps.items,
+		chunks: {},
+		revealed: [],
 		records: {},
 		selected,
 		groups: keepChips(deps.groups ?? [], chipGroups(deps.items, selected)),
@@ -210,6 +261,77 @@ export function createTracker(deps: TrackerDeps): Tracker {
 	function set(patch: Partial<TrackerState>): void {
 		state = { ...state, ...patch }
 		for (const listener of listeners) listener()
+	}
+
+	const order = [...known]
+
+	/** Plan ruling 9, as changed on 27.11: a needed category shows once its text is in and every
+	 *  needed category before it in list order has landed or failed. Worked out afresh on each
+	 *  change, so a press that adds an earlier category still on its way hides the later ones
+	 *  behind the reserve, and the list fills from the top: no card ever paints above one on
+	 *  screen. A retry (a chunk that failed before) counts as settled, so the online event or
+	 *  refresh() never hides cards. */
+	function reveal(chunks: Record<string, ChunkState>, selected: string[]): string[] {
+		const needed = selected.length > 0 ? order.filter((c) => selected.includes(c)) : order
+		const next: string[] = []
+		for (const category of needed) {
+			const status = chunks[category]
+			if (status === undefined || status === "loading") break
+			if (status === "ready") next.push(category)
+		}
+		return next
+	}
+
+	// Amendment 5: set once the view's own chunks have settled for the first time.
+	let background = false
+
+	/** Fetches one category's chunk and merges its text. A chunk that lands after its category
+	 *  was unpressed is merged all the same: it is the same seed text, and the list only shows
+	 *  revealed categories. */
+	function start(category: string): void {
+		const load = deps.loadChunk
+		if (!load) return
+		const before = state.chunks[category]
+		const again = before === "offline" || before === "stale"
+		set({ chunks: { ...state.chunks, [category]: again ? "retrying" : "loading" } })
+		const failed: ChunkOutcome = { ok: false, reason: "offline" }
+		void load(category)
+			.catch(() => failed)
+			.then((outcome) => {
+				const chunks: Record<string, ChunkState> = {
+					...state.chunks,
+					[category]: outcome.ok ? "ready" : outcome.reason,
+				}
+				set({
+					...(outcome.ok ? { items: withText(state.items, outcome.text) } : {}),
+					chunks,
+					revealed: reveal(chunks, state.selected),
+				})
+				// The rest follow quietly, so a later tile press is instant. Only never-started ones:
+				// a failed chunk waits for a press, refresh() or the online event.
+				if (!background && listChunks(state).settled) {
+					background = true
+					for (const other of order) if (state.chunks[other] === undefined) start(other)
+				}
+			})
+	}
+
+	/** Starts every needed chunk that is neither on its way nor in. A failed one is tried again. */
+	function loadChunks(selected: string[]): void {
+		if (!deps.loadChunk) return
+		for (const category of selected.length > 0 ? selected : order) {
+			const status = state.chunks[category]
+			if (status === "loading" || status === "retrying" || status === "ready") continue
+			start(category)
+		}
+	}
+
+	/** Tries every failed chunk again (refresh(), the online event). */
+	function retryFailed(): void {
+		for (const category of order) {
+			const status = state.chunks[category]
+			if (status === "offline" || status === "stale") start(category)
+		}
 	}
 
 	function fail(error: TrackerError): void {
@@ -225,6 +347,19 @@ export function createTracker(deps: TrackerDeps): Tracker {
 	/** The error a failed write shows: the true cause when the store was closed under us. */
 	function writeError(): TrackerError {
 		return closed ? "closed" : "storage"
+	}
+
+	const loadTransfer = deps.transfer ?? (() => import("./transfer"))
+
+	/** The import and backup code, loaded on first use (Task 6b). In an old tab after a deploy the
+	 *  file can be gone; that reads as "stale", whose message asks for a reload. Never rejects. */
+	async function transfer(): Promise<TransferModule | undefined> {
+		try {
+			return await loadTransfer()
+		} catch {
+			fail("stale")
+			return undefined
+		}
 	}
 
 	async function guard(fn: () => Promise<void>): Promise<void> {
@@ -351,11 +486,18 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			}
 		},
 		init() {
-			// Idempotent: a second call (StrictMode, a remount) must not create a second default profile.
+			// Idempotent: a second call (StrictMode, a remount) must not create a second default
+			// profile or start a second set of loads.
+			if (!booted) {
+				deps.onOnline?.(retryFailed)
+				// First, so the chunks travel while the store opens.
+				loadChunks(state.selected)
+			}
 			booted ??= boot()
 			return booted
 		},
 		async refresh() {
+			retryFailed()
 			// Only a booted, open store: before init there is nothing on screen to bring up to date.
 			if (state.status !== "ready" || closed || !store) return
 			await guard(async () => {
@@ -370,7 +512,12 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		// Unpressing a category drops its chips, so pressing it again starts with none (spec §14.1).
 		selectCategories(ids) {
 			const selected = ids.filter((id) => known.has(id))
-			set({ selected, groups: keepChips(state.groups, chipGroups(deps.items, selected)) })
+			set({
+				selected,
+				groups: keepChips(state.groups, chipGroups(deps.items, selected)),
+				revealed: reveal(state.chunks, selected),
+			})
+			loadChunks(selected)
 		},
 		toggleGroup(key) {
 			const chips = chipGroups(deps.items, state.selected)
@@ -424,8 +571,10 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			return { filename, json: JSON.stringify(file, null, "\t") }
 		},
 		async exportAll() {
+			const mod = await transfer()
+			if (!mod) return undefined
 			try {
-				const backup = await collectBackup(ready(), now())
+				const backup = await mod.collectBackup(ready(), now())
 				if (!backup) return undefined
 				return { filename: backup.filename, json: JSON.stringify(backup.file, null, "\t") }
 			} catch {
@@ -434,14 +583,17 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			}
 		},
 		async readImport(file) {
+			// Before the import code loads, so an oversized file never costs a download.
 			if (file.size > MAX_IMPORT_BYTES) return fail("too-large")
+			const mod = await transfer()
+			if (!mod) return
 			let text: string
 			try {
 				text = await file.text()
 			} catch {
 				return fail("not-json")
 			}
-			const result = parseImport(text, file.size)
+			const result = mod.parseImport(text, file.size)
 			if (result.ok) set({ pendingImport: result.file, error: undefined })
 			else fail(result.error)
 		},
@@ -453,9 +605,12 @@ export function createTracker(deps: TrackerDeps): Tracker {
 			await once(async () => {
 				const file = state.pendingImport
 				if (!file) return
+				const profileId = state.profileId
+				const mod = await transfer()
+				if (!mod) return
 				const db = ready()
 				if (file.version === 2 || target === "all") {
-					results = await restoreBackup(db, backupEntries(file), now(), deps.newId)
+					results = await mod.restoreBackup(db, mod.backupEntries(file), now(), deps.newId)
 					// The shown profile may have gained records; it stays the shown one.
 					const profiles = activeProfiles(await listProfiles(db))
 					const current = profiles.find((p) => p.id === state.profileId) ?? profiles[0]
@@ -463,7 +618,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 					return
 				}
 				if (target === "new") {
-					const { profile, count } = await importAsNewProfile(
+					const { profile, count } = await mod.importAsNewProfile(
 						db,
 						file.profile_name,
 						file.records,
@@ -474,9 +629,8 @@ export function createTracker(deps: TrackerDeps): Tracker {
 					await show(db, profile, { pendingImport: undefined })
 					return
 				}
-				const profileId = state.profileId
 				const name = state.profiles.find((p) => p.id === profileId)?.name ?? ""
-				const { records, count } = await importRecords(db, profileId, file.records)
+				const { records, count } = await mod.importRecords(db, profileId, file.records)
 				results = [{ profileId, name, count, created: false }]
 				if (state.profileId !== profileId) {
 					set({ pendingImport: undefined })

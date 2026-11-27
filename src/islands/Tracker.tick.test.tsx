@@ -8,12 +8,6 @@ import { Tracker } from "./Tracker"
 
 const renders = vi.hoisted(() => ({ list: 0 }))
 
-vi.mock("../model/seed", async (importOriginal) => {
-	const actual = await importOriginal<typeof import("../model/seed")>()
-	const { fixtures } = await import("../test/tracker-fixtures")
-	return { ...actual, seedItems: fixtures }
-})
-
 // Counts the list's renders. The real list renders inside, unchanged.
 vi.mock("./tracker/ItemList", async (importOriginal) => {
 	const actual = await importOriginal<typeof import("./tracker/ItemList")>()

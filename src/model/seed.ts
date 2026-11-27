@@ -16,8 +16,10 @@ import {
 	rumourInputSchema,
 	type SeedItem,
 } from "./schema"
-import { buildSeed, duplicates, idsIn } from "./seedBuild"
+import { buildSeed, duplicates, idsIn, type SeedCategory, type SeedGroup } from "./seedBuild"
 import { attachTiers, officialErrors } from "./tiers"
+
+export { categoryIds, groupItems } from "./trackItems"
 
 export const allowlist: Allowlist = allowlistSchema.parse(allowlistJson)
 
@@ -76,23 +78,6 @@ export function validateFacts(data: unknown, list: Allowlist): { facts: Fact[]; 
 	return { facts, errors }
 }
 
-/** Category ids in seed order (categories.json). */
-export function categoryIds(items: SeedItem[]): string[] {
-	return [...new Set(items.map((i) => i.category))]
-}
-
-/** Items by group in seed order: groups by their header's `order`, items by the group's `sort`.
- *  seedBuild sorts once, so every page and the tracker list items the same way. */
-export function groupItems(items: SeedItem[]): Map<string, SeedItem[]> {
-	const groups = new Map<string, SeedItem[]>()
-	for (const item of items) {
-		const list = groups.get(item.group)
-		if (list) list.push(item)
-		else groups.set(item.group, [item])
-	}
-	return groups
-}
-
 // Every JSON file at any depth, so a misplaced one reaches buildSeed's path check instead of
 // being skipped without a word.
 const groupFiles = import.meta.glob<{ default: unknown }>("../seed/categories/**/*.json", {
@@ -123,5 +108,9 @@ const errors = [...built.errors, ...news.rumours.errors, ...news.facts.errors, .
 if (errors.length > 0) throw new Error(`Seed invalid:\n${errors.join("\n")}`)
 
 export const seedItems: SeedItem[] = built.items
+/** The categories with items, in categories.json order (seedDelivered.ts builds the index from them). */
+export const seedCategories: SeedCategory[] = built.categories
+/** Every group in display order. */
+export const seedGroups: SeedGroup[] = built.groups
 export const rumours: Rumour[] = news.rumours.rumours
 export const facts: Fact[] = news.facts.facts

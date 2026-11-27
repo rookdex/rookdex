@@ -1,30 +1,16 @@
 // Every shape that crosses a boundary: seed JSON at build, imports at runtime, IndexedDB records.
 // Zod 4 via astro/zod, so no extra dependency.
 import { z } from "astro/zod"
+import { ID_PATTERN, MAX_BACKUP_PROFILES, MAX_RECORDS, SLUG, TEXT } from "./limits"
 
 // Zod probes for eval with a caught Function("") before compiling fast parsers. Our CSP has no
 // 'unsafe-eval', so the browser blocks the probe and reports it as an issue on every page whose
 // island parses. Jitless skips the probe; the CSP would block the fast path anyway.
 z.config({ jitless: true })
 
-export const TEXT = {
-	name: 80,
-	description: 300,
-	summary: 300,
-	sourceTitle: 120,
-	note: 500,
-	profileName: 40,
-	tip: 300,
-	area: 120,
-} as const
+export { ID_PATTERN, MAX_BACKUP_PROFILES, MAX_RECORDS, SLUG, TEXT } from "./limits"
 
-export const MAX_RECORDS = 10_000
-/** Far above any real household; it only stops a crafted file from creating thousands. */
-export const MAX_BACKUP_PROFILES = 100
-/** Exactly `<category>/<kebab-name>`: one slash, so an id can also serve as a DOM id. */
-export const ID_PATTERN = /^[a-z0-9-]+\/[a-z0-9-]+$/
 const FORBIDDEN = /[<>]|http/i
-export const SLUG = /^[a-z][a-z0-9-]{0,39}$/
 export const slugSchema = z.string().regex(SLUG)
 
 /** Plain text: trimmed, non-empty, capped, no URLs, no markup. */

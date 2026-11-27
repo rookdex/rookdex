@@ -92,6 +92,14 @@ describe("hosts and deploy (SEO spec §4.5, §4.6)", () => {
 		expect(config.assets.not_found_handling).toBe("404-page")
 	})
 
+	it("caches the hashed seed chunks like the hashed build assets", () => {
+		const lines = read("public/_headers").split(/\r?\n/)
+		const astro = lines.indexOf("/_astro/*")
+		const data = lines.indexOf("/data/*")
+		expect(data).toBeGreaterThanOrEqual(0)
+		expect(lines[data + 1].trim()).toBe(lines[astro + 1].trim())
+	})
+
 	it("sends noindex on every workers.dev host", () => {
 		const lines = read("public/_headers").split(/\r?\n/)
 		const host = lines.indexOf("https://:version.:subdomain.workers.dev/*")

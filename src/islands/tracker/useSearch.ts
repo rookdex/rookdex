@@ -6,7 +6,7 @@ import { clearFlag, HIDE_FOUND_KEY, readFlag, writeFlag } from "../seenFlag"
 
 export type SearchSource = Pick<
 	TrackerState,
-	"status" | "profileId" | "items" | "records" | "selected" | "groups"
+	"status" | "profileId" | "items" | "records" | "selected" | "groups" | "revealed"
 >
 
 export interface SearchChange {
@@ -14,6 +14,8 @@ export interface SearchChange {
 	selected?: string[]
 	groups?: string[]
 	hideFound?: boolean
+	/** The categories on screen for this change; the current ones when left out. */
+	revealed?: string[]
 }
 
 export interface Search {
@@ -77,7 +79,8 @@ export function useSearch(source: SearchSource, arrival?: string, initialQuery =
 		selected: string[],
 		groups: string[],
 		q: string,
-		hide: ReadonlySet<string>
+		hide: ReadonlySet<string>,
+		revealed?: ReadonlySet<string>
 	): SearchView {
 		return searchView({
 			items: source.items,
@@ -87,13 +90,16 @@ export function useSearch(source: SearchSource, arrival?: string, initialQuery =
 			hidden: hide,
 			terms: SEARCH_TERMS,
 			itemTerms: ITEM_TERMS,
+			revealed,
 		})
 	}
 
+	// Only the categories whose text has loaded are on screen, so only they count.
+	const shown = new Set(source.revealed)
 	return {
 		query,
 		hideFound,
-		view: viewOf(source.selected, source.groups, query, hidden),
+		view: viewOf(source.selected, source.groups, query, hidden, shown),
 		setQuery,
 		clearQuery: () => setQuery(""),
 		toggleHideFound() {
@@ -108,7 +114,8 @@ export function useSearch(source: SearchSource, arrival?: string, initialQuery =
 				change.selected ?? source.selected,
 				change.groups ?? source.groups,
 				change.query ?? query,
-				snapshot(change.hideFound ?? hideFound)
+				snapshot(change.hideFound ?? hideFound),
+				change.revealed ? new Set(change.revealed) : shown
 			),
 	}
 }

@@ -3,6 +3,7 @@ import { experimental_AstroContainer as AstroContainer } from "astro/container"
 import { JSDOM } from "jsdom"
 import { describe, expect, it } from "vitest"
 import { categoryIds, seedItems } from "../model/seed"
+import { seedIndexFile } from "../model/seedDelivered"
 import Tracker from "../pages/[locale]/tracker/index.astro"
 
 // The shared renderDoc container has no renderers, and a client:only island needs React's.
@@ -41,6 +42,16 @@ describe("Tracker page", () => {
 		expect(head?.firstElementChild?.tagName).toBe("H1")
 		expect(head?.lastElementChild?.id).toBe("tracker-profile")
 		expect(head?.lastElementChild?.childElementCount).toBe(0)
+	})
+
+	it("links the seed index file and preloads it (data delivery plan)", async () => {
+		const doc = await renderPage(Tracker)
+		const node = doc.getElementById("seed-index")
+		expect(node?.getAttribute("type")).toBe("application/json")
+		expect(JSON.parse(node?.textContent ?? "")).toEqual({ url: seedIndexFile.url })
+		const preload = doc.querySelector('link[rel="preload"][as="fetch"]')
+		expect(preload?.getAttribute("href")).toBe(seedIndexFile.url)
+		expect(preload?.getAttribute("crossorigin")).toBe("anonymous")
 	})
 
 	describe("wide steps (spec §14.2)", () => {

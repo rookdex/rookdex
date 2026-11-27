@@ -2,6 +2,7 @@
 import { act, renderHook } from "@testing-library/react"
 import { beforeEach, describe, expect, it } from "vitest"
 import type { Records } from "../../model/stats"
+import { categoryIds } from "../../model/trackItems"
 import { fixtures } from "../../test/tracker-fixtures"
 import { HIDE_FOUND_KEY } from "../seenFlag"
 import { type SearchSource, useSearch } from "./useSearch"
@@ -22,6 +23,7 @@ const base: SearchSource = {
 	records: {},
 	selected: [],
 	groups: [],
+	revealed: categoryIds(fixtures),
 }
 
 function setup(source: Partial<SearchSource> = {}) {

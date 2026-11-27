@@ -1,11 +1,12 @@
 // Export file build and import validation. A file carries profile names and records only.
 // Version 1 holds one profile (Tracker's profile menu); version 2 holds every profile (Settings).
+import { exportDay } from "./exportFile"
+import { MAX_IMPORT_BYTES } from "./limits"
 import { activeProfiles, listProfiles } from "./profiles"
 import { listRecords, mergeInto } from "./progress"
 import {
 	type BackupFile,
 	type ExportFile,
-	type ExportFileV1,
 	exportFileSchema,
 	MAX_BACKUP_PROFILES,
 	MAX_RECORDS,
@@ -15,7 +16,8 @@ import {
 } from "./schema"
 import { request, type Store } from "./store"
 
-export const MAX_IMPORT_BYTES = 5 * 1024 * 1024
+export { buildExport } from "./exportFile"
+export { MAX_IMPORT_BYTES } from "./limits"
 /** The newest file version this build reads. A higher one comes from a newer Rookdex. */
 export const EXPORT_VERSION = 2
 
@@ -36,33 +38,12 @@ export interface ImportResult {
 	created: boolean
 }
 
-const day = (now: Date) => now.toISOString().slice(0, 10)
-
-export function buildExport(
-	profile: Profile,
-	records: ProgressRecord[],
-	now: Date
-): { filename: string; file: ExportFileV1 } {
-	const file: ExportFileV1 = {
-		version: 1,
-		exported_at: now.toISOString(),
-		profile_name: profile.name,
-		records,
-	}
-	const slug =
-		profile.name
-			.toLowerCase()
-			.replace(/[^a-z0-9]+/g, "-")
-			.replace(/^-|-$/g, "") || "profile"
-	return { filename: `rookdex-${slug}-${day(now)}.json`, file }
-}
-
 export function buildBackup(
 	profiles: BackupEntry[],
 	now: Date
 ): { filename: string; file: BackupFile } {
 	const file: BackupFile = { version: 2, exported_at: now.toISOString(), profiles }
-	return { filename: `rookdex-backup-${day(now)}.json`, file }
+	return { filename: `rookdex-backup-${exportDay(now)}.json`, file }
 }
 
 /** Every active profile with its records, oldest first. Undefined when there is none yet. */

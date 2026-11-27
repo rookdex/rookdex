@@ -1,5 +1,6 @@
 import { IDBFactory } from "fake-indexeddb"
 import { describe, expect, it, vi } from "vitest"
+import { MAX_IMPORT_BYTES } from "./limits"
 import { listRecords } from "./progress"
 import { openingView } from "./savedView"
 import type { SeedItem } from "./schema"
@@ -270,6 +271,25 @@ describe("export and import", () => {
 		await tracker.readImport(fileOf(JSON.stringify({ version: 3 })))
 		expect(tracker.getState().error).toBe("newer-version")
 		expect(tracker.getState().pendingImport).toBeUndefined()
+	})
+	it("refuses an oversized file before the import code loads (Task 6b)", async () => {
+		const transfer = vi.fn(() => import("./transfer"))
+		const { tracker } = make({ transfer })
+		await tracker.init()
+		await tracker.readImport(fileOf("{}", MAX_IMPORT_BYTES + 1))
+		expect(tracker.getState().error).toBe("too-large")
+		expect(transfer).not.toHaveBeenCalled()
+	})
+	it("asks for a reload when the import code is gone after an update (pre-flight I10)", async () => {
+		const { tracker } = make({
+			transfer: () => Promise.reject(new TypeError("Failed to fetch dynamically imported module")),
+		})
+		await tracker.init()
+		await tracker.readImport(fileOf("{}"))
+		expect(tracker.getState().error).toBe("stale")
+		tracker.clearError()
+		expect(await tracker.exportAll()).toBeUndefined()
+		expect(tracker.getState().error).toBe("stale")
 	})
 	it("says how many records came in and where", async () => {
 		const { tracker } = make()
