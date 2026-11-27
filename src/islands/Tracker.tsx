@@ -145,10 +145,15 @@ function TrackerView({ locale, index, results }: ViewProps) {
 		return plural("tracker.chunk.offline", failed.length, { categories: names })
 	})()
 	const stale = chunkView.failed.some((f) => f.reason === "stale")
+	const lastNotice = useRef("")
 	// Spoken once per new text through the status line; the visible copy is not a live region.
+	// When the notice goes (a retry has started), the region is emptied if it still holds it, so
+	// the same text after a failed retry is a change a screen reader speaks.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: `live` is a new object each render; only a new text should speak
 	useEffect(() => {
 		if (notice) live.say(notice)
+		else if (live.message !== "" && live.message === lastNotice.current) live.say("")
+		lastNotice.current = notice
 	}, [notice])
 	const searchField = useRef<HTMLInputElement>(null)
 	// A non-empty query was typed while the list could not be described yet.

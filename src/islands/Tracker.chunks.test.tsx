@@ -242,6 +242,33 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		expect(results()).not.toHaveClass("pending")
 	})
 
+	it("speaks the notice again when a retried category fails again", async () => {
+		// The first animals request fails at once; the retry fails when the test says so.
+		let first = true
+		let fail: (() => void) | undefined
+		stubChunks((category, url) => {
+			if (category !== "animals") return delivered.serve(url)
+			if (first) {
+				first = false
+				return Promise.reject(new TypeError("Failed to fetch"))
+			}
+			return new Promise<Response>((_, reject) => {
+				fail = () => reject(new TypeError("Failed to fetch"))
+			})
+		})
+		const { container } = render(<Tracker locale="en" />)
+		const text = /^Can't load Animals offline yet/
+		await notice(text)
+		await waitFor(() => expect(liveRegion(container)).toHaveTextContent(text))
+		window.dispatchEvent(new Event("online"))
+		await waitFor(() => expect(fail).toBeDefined())
+		// Emptied while the retry runs, so the same text again is a change.
+		await waitFor(() => expect(liveRegion(container)?.textContent).toBe(""))
+		fail?.()
+		await notice(text)
+		await waitFor(() => expect(liveRegion(container)).toHaveTextContent(text))
+	})
+
 	it("does not speak results for cards the screen does not show (final review F1)", async () => {
 		const chunks = deferChunks(["animals"])
 		window.history.replaceState(null, "", "/en/tracker/?show=animals")
