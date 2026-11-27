@@ -1388,6 +1388,10 @@ p {
 	outline: none;
 }
 
+.tracker-results > .chunk-notice {
+	margin-block-end: var(--space-4);
+}
+
 /* A 100-character query with no spaces still wraps inside 320 px. */
 .item-empty {
 	overflow-wrap: anywhere;
