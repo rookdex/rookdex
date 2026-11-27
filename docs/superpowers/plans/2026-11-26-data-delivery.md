@@ -24,13 +24,13 @@ So I split the item by what reads it:
 2. **A chunk carries only the card text** (`description`, `precedent`) of one category's shown items. That is 63 % of the item bytes once sources are gone (measured 26.11: index items 17.7 KB raw and 3.6 KB gzipped, card text 30.6 KB raw and 7.9 KB gzipped). Sources never reach the browser: no island reads them (the book links to the Sources page).
 3. **The list waits for the chunks it shows,** because a description that arrives later would change the card's height. Under All that is every chunk. The results area keeps a screen of reserved height while it waits, so the footer never paints in view (the same rule as `.tracker-fallback`).
 
-Size at scale: about 2,600 items make the index about 210 KB raw and 43 KB gzipped in two pages' HTML (my estimate, 12 times today). That is above the spec's 15 KB guess. The first large content PR measures it again and moves the index to a hashed file if it has grown past 30 KB gzipped.
+Size at scale: about 2,600 items make the index about 210 KB raw and 43 KB gzipped (my estimate, 12 times today). That is above the spec's 15 KB guess, so the index ships as its own hashed file from this PR on (plan review ruling 3), not inlined in two pages' HTML.
 
 ## Delivery change from the spec
 
 - **Chunks come from a static endpoint,** `src/pages/data/[chunk].json.ts`, not an `integrations/seed.mjs` integration. Astro then builds them, serves them in dev and reruns on seed changes, and the endpoint imports the TypeScript seed directly. PR 1 already loads the seed through `import.meta.glob` in `seed.ts` instead of the integration.
 - **The checklist joins the index in the 100 % view PR,** which builds `checklist.json`.
-- **Zod stays in the browser for user data.** This PR removes the seed, `buildSeed()` and the source rules from the client bundle, which is what spec §5 asks for. Zod still validates IndexedDB records, import files and the saved view (`profiles.ts`, `progress.ts`, `transfer.ts`, `savedView.ts`), so the senior review's "Zod ships to client" finding is only partly closed. Lazy-loading those paths is a separate PR.
+- **Zod leaves the tracker and hub bundles too** (plan review ruling 6). The browser's only Zod parse is an import file (`parseImport` in `transfer.ts`). IndexedDB records and the saved view are read without Zod. Zod reached the tracker only because `tracker.ts` imports `transfer.ts` and the `TEXT` limits from `schema.ts`. Task 6b loads `transfer.ts` on demand and moves the plain limits to a file without Zod, which closes the senior review's "Zod ships to client" finding for every page but the moment someone imports a file.
 - **The failure message is visible as well as spoken.** The `useLiveStatus` region is visually hidden, so it can't hold a Reload button. The notice shows above the list and is spoken once through that region, the way the backup nudge works.
 
 ## Global Constraints
@@ -39,7 +39,7 @@ Size at scale: about 2,600 items make the index about 210 KB raw and 43 KB gzipp
 - **No new dependencies.** The import guard uses the `typescript` package that is already a devDependency (6.0.3).
 - **The browser never parses the seed with Zod** and never imports `src/model/seed.ts`, `seedBuild.ts`, `seedDelivery.ts`, `tiers.ts` or `allowlist.json` (Task 5's guard test).
 - **Inlined JSON escapes `<` as `\u003c`** (`jsonLd()` in `src/model/seo.ts`).
-- **Chunk URLs are content-addressed:** `/data/<category>.<10 hex>.json`, the hash over the exact bytes served.
+- **Data URLs are content-addressed:** `/data/<category>.<10 hex>.json` and `/data/seed-index.<10 hex>.json`, the hash over the exact bytes served. The only inlined JSON left is the index file's URL.
 - **Copy:** US spelling, no em dashes, times with a colon, dates with periods. In Norwegian the person is «bruker». New strings exist in `src/locales/en.json` and `src/locales/nb.json` (flat keys).
 - **Work in `../rookdex-lf`** on branch `feat/data-delivery` (cut from `origin/main` at `6bd4e92`). `npm run lint` is `biome ci .` and must run there.
 - **Commits:** stage named paths only, never `git commit -a`. No `Co-Authored-By` or AI lines. Messages are plain sentences like the log ("Measure a card's text only when it nears the screen").
@@ -52,7 +52,9 @@ Size at scale: about 2,600 items make the index about 210 KB raw and 43 KB gzipp
 2. **An old tab after a deploy** presses a category whose chunk URL the server no longer has. Expected: "Rookdex was updated. Reload to see the new list." with a working Reload button. Test in Task 5 (404 body).
 3. **A Sources back link (`#item-<id>`) while the chunk is still on its way.** Expected: the checkbox still gets focus once the list renders, not never. Test in Task 5 (deferred fetch).
 4. **The hub never fetches a chunk.** Expected: no request to `/data/` from the dashboard. Test in Task 5.
-5. **Seed text containing `</script>`** inside the inlined index. Expected: the page still parses and the text survives as text. Test in Task 2.
+5. **The index file fails to load** (offline, a 404 after a deploy, or a stall past 10 s). Expected: the tracker and the hub show the notice with its button, never a blank island or a thrown error. Test in Task 6 (ruling 3). The old `</script>` case is gone with the inlined index.
+6. **On All, chunks land out of list order.** Expected: no card paints above a card already on screen. Test in Task 6 (ruling 9).
+7. **The tracker and hub pages load no Zod.** Expected: the guard test fails on any static import of `schema.ts`, `transfer.ts` or Zod from browser code, and the built pages preload no chunk holding Zod. Task 6b.
 
 ## Stress-test amendments (26.11)
 
@@ -76,6 +78,51 @@ These override the task text below wherever they differ. Each names the task tha
 8. **Task 6: the guard also walks `src/scripts/`** (non-test `.ts` files): `dex-search.ts`, `settings.ts` and `delete-all.ts` run in the browser too.
 9. **Tasks 1 and 6: stage every touched file.** Add `src/islands/tracker/LastFound.tsx` (its `visible: SeedItem[]` becomes `TrackItem[]`) to Task 1's file list and `git add` line, and add `src/islands/Tracker.tick.test.tsx` to Task 6's. End every task with `git status --short`, which must print nothing.
 10. **Task 6: nb copy uses «listen»,** as the rest of `nb.json` does: «Rookdex er oppdatert. Last inn siden på nytt for å se den nye listen.»
+
+## Plan review rulings (27.11)
+
+My review of the decisions above. These override both the task text and the stress-test amendments wherever they differ. Decisions 1, 2, 4, 5, 7 and 8 stand as written.
+
+**Before Task 0:** rebase `feat/data-delivery` on `origin/main` (`bb92d08`, the News PR #157, content only), so Task 0 measures what is live.
+
+### Ruling 3: the index ships as a hashed file, not inlined
+
+- **Task 2:** `seedDelivery.ts` also exports `buildIndexFile(index: SeedIndex): SeedFile`, where `SeedFile` is `SeedChunk` without `category` (`{ file, url, body }`). The file is `seed-index.<chunkHash(body)>`, the body is `JSON.stringify(index)`, the URL `/data/seed-index.<hash>.json`. `seedDelivered.ts` exports `seedIndexFile` beside `seedChunks` and `seedIndex`. Tests: the index file's URL matches `/^\/data\/seed-index\.[0-9a-f]{10}\.json$/`, its body parses back to `seedIndex`, and no chunk's `file` starts with `seed-index.` (a category may never be named `seed-index`). Drop amendment 2 (the 30 KB tripwire) and the `</script>` test (Review Focus 5 changed). Task 8 still measures the index size.
+- **Task 3:** the endpoint serves the index file too: `getStaticPaths` maps `[...seedChunks, seedIndexFile]`. `SeedIndex.astro` now renders two lines and nothing else:
+  ```astro
+  <link rel="preload" href={seedIndexFile.url} as="fetch" crossorigin="anonymous" />
+  <script type="application/json" id="seed-index" is:inline set:html={jsonLd({ url: seedIndexFile.url })}></script>
+  ```
+  The preload starts the download while the HTML parses, in parallel with the island's JS (`preload` is allowed in the body). `crossorigin="anonymous"` matches a same-origin `fetch()`, so the browser reuses the preloaded response. The page tests check that both pages carry the link and a data block whose `url` equals `seedIndexFile.url`, and that the URL in the link and the block are the same. `ls dist/data` now shows six files.
+- **Task 4:** `chunks.ts` gets one shared fetch path for the index and the chunks: the timeout from amendment 4, `!response.ok` or a body that fails its shape check reads as `"stale"`, and a rejected or aborted fetch reads as `"offline"`. Replace `readSeedIndex` with `readSeedIndexUrl(doc?: Document): string` (throws "Seed index missing" as before) and add `loadSeedIndex(url, fetchFn, timeoutMs = 10_000): Promise<{ ok: true; index: SeedIndex } | { ok: false; reason: ChunkFailure }>`. Its shape check: `categories` and `groups` are arrays. A failed load is not cached. Tests mirror the chunk tests: success, offline, 404, HTML body, wrong shape, timeout.
+- **Task 6:** both islands wait for the index through one small component, `src/islands/IndexGate.tsx`: `IndexGate({ fetchFn?, children: (index: SeedIndex) => ReactNode, reserve: string })`. It reads the URL, calls `loadSeedIndex`, and renders, in order: the `reserve` class while loading (the tracker passes the class that holds the page's `.tracker-fallback` height, so nothing shifts; the hub passes its own existing loading class, or none if the hub has no reserve today), the notice on failure, and `children(index)` once loaded. The notice reuses `.chunk-notice` and the live region pattern. Copy:
+  - `tracker.index.offline`: en "The list could not load. Check your connection and try again." nb «Listen kunne ikke lastes. Sjekk tilkoblingen og prøv igjen.» Button `tracker.index.retry`: en "Try again", nb «Prøv igjen». The button and the `online` event both retry.
+  - Stale: the existing `tracker.chunk.stale` and `tracker.chunk.reload` keys, so a reload is offered with the same words.
+  
+  `Tracker.tsx` and `Dashboard.tsx` keep their bodies and take `index: SeedIndex` as a prop instead of calling `readSeedIndex()`. Their default exports wrap them in `IndexGate`, so the pages and the tests render the same component. `buildTracker` requires `index` (no fallback read). `installSeed` stubs `fetch` for the index URL as well as the chunks, and writes the URL block. `renderReady` already waits for the ready tracker, which now comes after the index. New tests (`Tracker.chunks.test.tsx` and `Dashboard.test.tsx`): the index fetch rejects, then the notice and "Try again" show, no list and no throw. Pressing "Try again" with a working fetch renders the tracker. A 404 on the index shows the stale notice with Reload. The hub test that counts `/data/` requests now expects exactly one, for the index, and none for a chunk (Review Focus 4 changes from "no request" to "only the index").
+- **Task 7:** the worker's copy rule already matches `/data/<name>.<10 hex>.json`, so the index file copies across deploys like a chunk. Add a test case with `data/seed-index.0123456789.json`.
+- **Task 8:** report the index file's raw and gzipped size from `dist/data/seed-index.*.json` instead of the inlined block (replace the `node -e` line that greps `id="seed-index"`). Lighthouse must still meet main's median, because the index now is a request on the path to the list.
+
+### Ruling 6: Zod leaves the tracker and hub (new Task 6b, after Task 6)
+
+**Files:** create `src/model/limits.ts`; modify `src/model/schema.ts`, `src/model/transfer.ts`, `src/model/tracker.ts`, `src/test/island-imports.test.ts`, and any browser file the guard flags.
+
+1. Move `TEXT`, `MAX_RECORDS`, `MAX_BACKUP_PROFILES`, `ID_PATTERN` and `SLUG` from `schema.ts` into `limits.ts`, a file with no imports. `schema.ts` imports them and re-exports them, so build code and tests keep their imports. Move `MAX_IMPORT_BYTES` from `transfer.ts` to `limits.ts` the same way (`transfer.ts` re-exports it).
+2. `tracker.ts` imports `TEXT` and `MAX_IMPORT_BYTES` from `./limits`, keeps `import type` for transfer's types, and loads the rest on demand: `const transfer = () => import("./transfer")`, awaited inside the export, backup and import actions, which are already async. The size check (`file.size > MAX_IMPORT_BYTES`) stays synchronous, before the import.
+3. The guard (`island-imports.test.ts`, Task 6) adds `src/model/schema.ts`, `src/model/transfer.ts`, `zod` and `astro/zod` to `FORBIDDEN` for static value imports. It already skips `import type`; it must also skip dynamic `import()`, which is how browser code may still reach `transfer.ts`. The test fails before step 2, naming `src/model/schema.ts via src/model/tracker.ts`.
+4. Tests: the existing import, export and backup tests in `Tracker.import.test.tsx` and `src/scripts/settings` pass unchanged. Add one: a file over `MAX_IMPORT_BYTES` fails with `"too-large"` before `transfer.ts` is imported (spy on the dynamic import through a `deps` hook, or assert the result without reading the file).
+5. Build check: `npm run build`, then for `dist/en/tracker/index.html` and `dist/en/index.html` list every `_astro/*.js` the page loads and modulepreloads, and grep those files for a Zod marker (`"jitless"` or `ZodError`). Expected: no match. The chunk that holds Zod still exists and loads only when someone imports a file.
+6. Commit: "Load the import code on demand so Zod leaves the tracker and hub".
+
+### Ruling 9: chunks show in list order on All (Task 6)
+
+Amendment 6's `shownCards` changes as follows. A needed category shows once every needed category before it in list order (`categoryIds(items)`) has loaded or failed. A category that is already on screen stays there, even when a newly pressed category before it is still loading. Track the shown set in the island (a `useRef<Set<string>>` updated during render, reset only when the page reloads), so a tile press never hides cards and `ItemList` stays mounted as amendment 6 requires. Tests in `Tracker.chunks.test.tsx`:
+
+Below, "first" and "second" are the fixtures' first two categories in list order; read them from `categoryIds` in the test instead of naming them.
+
+- On All with both fetches deferred, release the second category first: none of its cards render. Release the first: both render, the first category's cards before the second's in document order.
+- Amendment 6's reverse-order test still passes as written.
+- On `?show=<second>` with it loaded, press the first category with its fetch deferred: a card of the second category stays the same node, and the first category's cards render before it once released.
 
 ---
 
