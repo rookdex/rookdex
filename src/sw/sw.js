@@ -3,11 +3,41 @@ const VERSION = "__VERSION__"
 const PRECACHE = "__PRECACHE__"
 const CACHE = `rookdex-${VERSION}`
 
+// URLs whose name changes whenever their bytes do: Astro's hashed assets, the seed chunks and the
+// seed index file (/data/<name>.<10 hex>.json, the hash in src/model/seedDelivery.ts).
+const CONTENT_ADDRESSED = /^\/(?:_astro\/|data\/[a-z0-9-]+\.[0-9a-f]{10}\.json$)/
+
 // The new worker precaches, then waits. The page's update notice asks it to take over, so an open
 // page never runs half on the old version and half on the new (feedback spec §10.1).
 self.addEventListener("install", (event) => {
-	event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)))
+	event.waitUntil(precache())
 })
+
+/**
+ * Fills this version's cache (spec §5). A content-addressed file an older Rookdex cache already
+ * holds is copied from there, so a deploy downloads only what changed. Pages, the root, icons and
+ * the manifest keep their URL across versions, so they are always fetched. `cache.add` rejects on
+ * any failed fetch, which rejects install: a half-filled cache never activates.
+ */
+async function precache() {
+	const cache = await caches.open(CACHE)
+	const names = (await caches.keys()).filter((key) => key.startsWith("rookdex-") && key !== CACHE)
+	const older = await Promise.all(names.map((name) => caches.open(name)))
+	await Promise.all(
+		PRECACHE.map(async (url) => {
+			if (CONTENT_ADDRESSED.test(url)) {
+				for (const previous of older) {
+					const copy = await previous.match(url)
+					if (copy?.ok) {
+						await cache.put(url, copy)
+						return
+					}
+				}
+			}
+			await cache.add(url)
+		})
+	)
+}
 
 self.addEventListener("message", (event) => {
 	if (event.data?.type === "SKIP_WAITING") self.skipWaiting()
