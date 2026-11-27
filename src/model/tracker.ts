@@ -274,23 +274,26 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		const load = deps.loadChunk
 		if (!load) return
 		set({ chunks: { ...state.chunks, [category]: "loading" } })
-		void load(category).then((outcome) => {
-			const chunks: Record<string, ChunkState> = {
-				...state.chunks,
-				[category]: outcome.ok ? "ready" : outcome.reason,
-			}
-			set({
-				...(outcome.ok ? { items: withText(state.items, outcome.text) } : {}),
-				chunks,
-				revealed: reveal(chunks, state.selected),
+		const failed: ChunkOutcome = { ok: false, reason: "offline" }
+		void load(category)
+			.catch(() => failed)
+			.then((outcome) => {
+				const chunks: Record<string, ChunkState> = {
+					...state.chunks,
+					[category]: outcome.ok ? "ready" : outcome.reason,
+				}
+				set({
+					...(outcome.ok ? { items: withText(state.items, outcome.text) } : {}),
+					chunks,
+					revealed: reveal(chunks, state.selected),
+				})
+				// The rest follow quietly, so a later tile press is instant. Only never-started ones:
+				// a failed chunk waits for a press, refresh() or the online event.
+				if (!background && listChunks(state).settled) {
+					background = true
+					for (const other of order) if (state.chunks[other] === undefined) start(other)
+				}
 			})
-			// The rest follow quietly, so a later tile press is instant. Only never-started ones:
-			// a failed chunk waits for a press, refresh() or the online event.
-			if (!background && listChunks(state).settled) {
-				background = true
-				for (const other of order) if (state.chunks[other] === undefined) start(other)
-			}
-		})
 	}
 
 	/** Starts every needed chunk that is neither on its way nor in. A failed one is tried again. */

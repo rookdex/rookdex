@@ -67,6 +67,17 @@ describe("chunk loading (spec §5)", () => {
 		expect(tracker.getState().items[1].precedent).toBe("GTA V")
 	})
 
+	it("ends a category as offline when its loader rejects (gate G5)", async () => {
+		const loadChunk = vi.fn(async (): Promise<ChunkOutcome> => {
+			throw new Error("boom")
+		})
+		const tracker = make(loadChunk, ["animals"])
+		void tracker.init()
+		await flush()
+		expect(tracker.getState().chunks.animals).toBe("offline")
+		expect(listChunks(tracker.getState()).settled).toBe(true)
+	})
+
 	it("loads only the pressed category, and the next one when it is pressed", async () => {
 		const { loadChunk, release } = staged()
 		const tracker = make(loadChunk, ["animals"])
