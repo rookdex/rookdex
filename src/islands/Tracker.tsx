@@ -538,7 +538,7 @@ function TrackerView({ locale, index }: ViewProps) {
 					t={t}
 				/>
 				<div
-					className={chunkView.settled ? "tracker-results" : "tracker-results pending"}
+					className={chunkView.reserve ? "tracker-results pending" : "tracker-results"}
 					ref={results}
 					tabIndex={-1}
 					aria-busy={!chunkView.settled}

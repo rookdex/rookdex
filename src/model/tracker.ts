@@ -28,8 +28,14 @@ type TransferModule = typeof import("./transfer")
 export type Status = "loading" | "ready" | "error"
 export type TrackerError = ImportError | "storage" | "name" | "closed" | "stale"
 
-/** Per category: its card text chunk is on its way, has landed, or failed (spec §5). */
-export type ChunkState = "loading" | "ready" | ChunkFailure
+/** Per category: its card text chunk is on its way, on its way again after a failure, has landed,
+ *  or failed (spec §5). */
+export type ChunkState = "loading" | "retrying" | "ready" | ChunkFailure
+
+/** On its way, the first time or again: the list waits for it. */
+function inFlight(status: ChunkState | undefined): boolean {
+	return status === undefined || status === "loading" || status === "retrying"
+}
 
 export interface Announcement {
 	category: string
@@ -151,6 +157,10 @@ export interface ListChunks {
 	failed: { category: string; reason: ChunkFailure }[]
 	/** The categories the list may show (TrackerState.revealed). */
 	revealed: string[]
+	/** A needed chunk is on its way for the first time, so the list holds a screen of height. A
+	 *  retry (the online event, refresh(), a press on a failed tile) never does: the list keeps its
+	 *  own height instead of jumping to a full screen and back. */
+	reserve: boolean
 }
 
 /** The chunks the list needs: the pressed categories, or every category under All. */
@@ -162,11 +172,14 @@ export function listChunks(
 		const status = state.chunks[category]
 		return status === "offline" || status === "stale" ? [{ category, reason: status }] : []
 	})
-	const pending = needed.filter((category) => {
-		const status = state.chunks[category]
-		return status === undefined || status === "loading"
-	})
-	return { settled: pending.length === 0, pending, failed, revealed: state.revealed }
+	const pending = needed.filter((category) => inFlight(state.chunks[category]))
+	return {
+		settled: pending.length === 0,
+		pending,
+		failed,
+		revealed: state.revealed,
+		reserve: pending.some((category) => state.chunks[category] !== "retrying"),
+	}
 }
 
 /**
@@ -258,7 +271,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		const next = new Set(state.revealed)
 		for (const category of needed) {
 			const status = chunks[category]
-			if (status === undefined || status === "loading") break
+			if (inFlight(status)) break
 			if (status === "ready") next.add(category)
 		}
 		return order.filter((c) => next.has(c))
@@ -273,7 +286,9 @@ export function createTracker(deps: TrackerDeps): Tracker {
 	function start(category: string): void {
 		const load = deps.loadChunk
 		if (!load) return
-		set({ chunks: { ...state.chunks, [category]: "loading" } })
+		const before = state.chunks[category]
+		const again = before === "offline" || before === "stale"
+		set({ chunks: { ...state.chunks, [category]: again ? "retrying" : "loading" } })
 		const failed: ChunkOutcome = { ok: false, reason: "offline" }
 		void load(category)
 			.catch(() => failed)
@@ -301,7 +316,7 @@ export function createTracker(deps: TrackerDeps): Tracker {
 		if (!deps.loadChunk) return
 		for (const category of selected.length > 0 ? selected : order) {
 			const status = state.chunks[category]
-			if (status === "loading" || status === "ready") continue
+			if (status === "loading" || status === "retrying" || status === "ready") continue
 			start(category)
 		}
 	}

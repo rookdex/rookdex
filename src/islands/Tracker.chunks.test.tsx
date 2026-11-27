@@ -209,6 +209,34 @@ describe("the list while chunks arrive (amendment 6, ruling 9)", () => {
 		expect(await screen.findByRole("checkbox", { name: "Bike" })).toBeInTheDocument()
 		expect(within(results).queryByText('No match for "Bike".')).toBeNull()
 	})
+
+	it("holds a screen of height on the first load but not on a retry (gate round 2)", async () => {
+		// The first animals request fails when the test says so; the retry waits for answer().
+		let fail: (() => void) | undefined
+		let answer: (() => void) | undefined
+		stubChunks((category, url) => {
+			if (category !== "animals") return delivered.serve(url)
+			return new Promise<Response>((resolve, reject) => {
+				if (fail) answer = () => resolve(delivered.serve(url))
+				else fail = () => reject(new TypeError("Failed to fetch"))
+			})
+		})
+		const { container } = render(<Tracker locale="en" />)
+		const results = () => container.querySelector(".tracker-results") as HTMLElement
+		await waitFor(() => expect(fail).toBeDefined())
+		await waitFor(() => expect(results()).toHaveClass("pending"))
+		fail?.()
+		await notice(/^Can't load Animals offline yet/)
+		expect(results()).not.toHaveClass("pending")
+		window.dispatchEvent(new Event("online"))
+		await waitFor(() => expect(answer).toBeDefined())
+		expect(results()).toHaveAttribute("aria-busy", "true")
+		expect(results()).not.toHaveClass("pending")
+		answer?.()
+		expect(await screen.findByRole("checkbox", { name: "American alligator" })).toBeInTheDocument()
+		expect(results()).not.toHaveClass("pending")
+	})
+
 	it("does not speak results for cards the screen does not show (final review F1)", async () => {
 		const chunks = deferChunks(["animals"])
 		window.history.replaceState(null, "", "/en/tracker/?show=animals")

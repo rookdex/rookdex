@@ -62,6 +62,7 @@ describe("chunk loading (spec §5)", () => {
 			pending: [],
 			failed: [],
 			revealed: ["vehicles", "animals"],
+			reserve: false,
 		})
 		expect(tracker.getState().items[0].description).toBe("Two wheels.")
 		expect(tracker.getState().items[1].precedent).toBe("GTA V")
@@ -126,6 +127,7 @@ describe("chunk loading (spec §5)", () => {
 				{ category: "animals", reason: "stale" },
 			],
 			revealed: [],
+			reserve: false,
 		})
 		tracker.selectCategories(["vehicles"])
 		await flush()
@@ -134,6 +136,7 @@ describe("chunk loading (spec §5)", () => {
 			pending: [],
 			failed: [],
 			revealed: ["vehicles"],
+			reserve: false,
 		})
 	})
 
@@ -195,6 +198,47 @@ describe("background loading and retries (amendment 5)", () => {
 		await tracker.refresh()
 		await flush()
 		expect(listChunks(tracker.getState()).failed).toEqual([])
+	})
+
+	it("holds the list's screen of height on a first load, never on a retry (gate round 2)", async () => {
+		const outcomes: ((outcome: ChunkOutcome) => void)[] = []
+		const loadChunk = vi.fn(() => new Promise<ChunkOutcome>((resolve) => outcomes.push(resolve)))
+		let online: () => void = () => {}
+		const tracker = make(loadChunk, ["vehicles"], {
+			items: [items[0]],
+			onOnline: (retry) => {
+				online = retry
+				return () => {}
+			},
+		})
+		void tracker.init()
+		expect(listChunks(tracker.getState()).reserve).toBe(true)
+		outcomes[0]({ ok: false, reason: "offline" })
+		await flush()
+		expect(listChunks(tracker.getState()).reserve).toBe(false)
+		online()
+		expect(tracker.getState().chunks.vehicles).toBe("retrying")
+		expect(listChunks(tracker.getState())).toMatchObject({ settled: false, reserve: false })
+		outcomes[1](texts.vehicles)
+		await flush()
+		expect(listChunks(tracker.getState())).toMatchObject({
+			settled: true,
+			reserve: false,
+			revealed: ["vehicles"],
+		})
+	})
+
+	it("starts a retrying chunk only once when its tile is pressed again", async () => {
+		const loadChunk = vi
+			.fn<(category: string) => Promise<ChunkOutcome>>()
+			.mockResolvedValueOnce({ ok: false, reason: "offline" })
+			.mockReturnValue(new Promise<ChunkOutcome>(() => {}))
+		const tracker = make(loadChunk, ["vehicles"], { items: [items[0]] })
+		void tracker.init()
+		await flush()
+		tracker.selectCategories([])
+		tracker.selectCategories(["vehicles"])
+		expect(loadChunk).toHaveBeenCalledTimes(2)
 	})
 })
 
